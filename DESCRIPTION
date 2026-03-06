@@ -9,11 +9,11 @@ Authors@R:
                 role = c("aut"),
                 email = "jacob@martin-email.com"))
 Description: sciVizModules extends VizModules with a curated collection of domain-specific Shiny modulestailored for the biological, chemical, 
-and physical sciences. Built on the flexible foundationsof VizModules, these modules introduce plot types and interactive controls commonly needed 
-inscientific research. Each module preserves the interactivity-first philosophy of its parent packagewhile incorporating scientifically meaningful defaults, 
-axis conventions, and annotation layersrelevant to each domain. sciVizModules enables researchers to rapidly deploy 
-publication-ready,interactive visualizations with minimal code, bridging the gap between raw experimental dataand interpretable 
-scientific figures.
+    and physical sciences. Built on the flexible foundationsof VizModules, these modules introduce plot types and interactive controls commonly needed 
+    inscientific research. Each module preserves the interactivity-first philosophy of its parent packagewhile incorporating scientifically meaningful defaults, 
+    axis conventions, and annotation layersrelevant to each domain. sciVizModules enables researchers to rapidly deploy 
+    publication-ready,interactive visualizations with minimal code, bridging the gap between raw experimental dataand interpretable 
+    scientific figures.
 License: MIT + file LICENSE
 Depends:
     shiny,
