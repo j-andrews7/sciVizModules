@@ -1,0 +1,53 @@
+Package: sciVizModules
+Title: Flexible, scientific based interactive plotting VizModules
+Version: 0.99.0.9000
+Authors@R: 
+    c(person(given = "Jared", family = "Andrews", email = "jared.andrews07@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-0780-6248")),
+        person(given = "Jacob",
+                family = "Martin",
+                role = c("aut"),
+                email = "jacob@martin-email.com"))
+Description: sciVizModules extends VizModules with a curated collection of domain-specific Shiny modulestailored for the biological, chemical, 
+and physical sciences. Built on the flexible foundationsof VizModules, these modules introduce plot types and interactive controls commonly needed 
+inscientific research. Each module preserves the interactivity-first philosophy of its parent packagewhile incorporating scientifically meaningful defaults, 
+axis conventions, and annotation layersrelevant to each domain. sciVizModules enables researchers to rapidly deploy 
+publication-ready,interactive visualizations with minimal code, bridging the gap between raw experimental dataand interpretable 
+scientific figures.
+License: MIT + file LICENSE
+Depends:
+    shiny,
+    plotthis,
+    dittoViz,
+    plotly,
+    R (>= 3.5),
+    shinyBS,
+    VizModules
+Imports:
+    colourpicker,
+    dplyr,
+    DT,
+    readxl,
+    shinyjs,
+    scales,
+    shinyjqui,
+    ggplot2,
+    htmltools,
+    jsonlite,
+    methods,
+    shinyWidgets,
+    htmlwidgets
+Remotes:
+    j-andrews7/VizModules
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Suggests:
+    knitr,
+    rmarkdown,
+    shinytest2,
+    testthat (>= 3.0.0)
+VignetteBuilder: knitr
+Config/testthat/edition: 3
+URL: https://github.com/j-andrews7/sciVizModules
