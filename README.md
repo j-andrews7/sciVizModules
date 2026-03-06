@@ -13,7 +13,7 @@ defaults, axis conventions, and annotation layers relevant to each domain. sciVi
 researchers to rapidly deploy publication-ready, interactive visualizations with minimal code,
 bridging the gap between raw experimental data and interpretable scientific figures.
 
-Developed by [Jared Andrews](https://github.com/j-andrews7) and [Jacob Martin][https://github.com/Jacob1106]
+Developed by [Jared Andrews](https://github.com/j-andrews7) and [Jacob Martin](https://github.com/Jacob1106)
 
 ## Install
 
