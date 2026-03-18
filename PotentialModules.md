@@ -65,7 +65,7 @@ Survival Curve:
 Shows the survival of a population over time. 
 
 
-![](man/PlotScreenShots/DoseResponseCurve.png)
+![](man/PlotScreenShots/Survival_Curve.png)
 
 
 UMAP: 
