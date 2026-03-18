@@ -45,10 +45,12 @@ Visualise how drug conc in plasma changes over time after dosing. C_max T_max an
 
 IC50 Curve:
 
-Dose-response curve show how a drug or compound inhibits a biological process: 
-
 ![](man/PlotScreenShots/IC50.png)
 
+
+Dose Response Curve:
+
+![](man/PlotScreenShots/DoseResponseCurve.png)
 
 
 Michaelis Menten Curve:
