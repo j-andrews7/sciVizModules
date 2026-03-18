@@ -25,3 +25,4 @@ VizModules must be installed first:
 devtools::install_github("j-andrews7/VizModules")
 devtools::install_github("j-andrews7/sciVizModules")
 ```
+
