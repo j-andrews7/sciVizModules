@@ -10,12 +10,13 @@ survivalCurvePlotOutputUI(id)
 \item{id}{The ID for the Shiny module.}
 }
 \value{
-A resizable \code{\link[plotly:plotlyOutput]{plotlyOutput}} widget.
+A resizable \code{\link[plotly:plotlyOutput]{plotlyOutput}} widget
+  (delegated from \code{\link[VizModules:linePlotOutputUI]{VizModules::linePlotOutputUI()}}).
 }
 \description{
-A single resizable plotly figure.  When the data contains an \code{n.risk}
-column, a "Number at risk" table is embedded directly below the x-axis as
-plotly annotations.
+Delegates to \code{\link[VizModules:linePlotOutputUI]{VizModules::linePlotOutputUI()}}.
+When the data contains an \code{n.risk} column the server embeds a
+"Number at risk" table as plotly annotations below the x-axis.
 }
 \seealso{
 \code{\link[=survivalCurvePlotInputsUI]{survivalCurvePlotInputsUI()}},

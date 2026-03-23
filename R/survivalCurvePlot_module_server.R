@@ -1,37 +1,35 @@
 #' Server logic for the survivalCurvePlot module
 #'
-#' Renders a Kaplan-Meier-style survival curve as an interactive plotly step
-#' function.  The server:
+#' Renders a Kaplan-Meier-style survival curve following the same design
+#' pattern as [volcanoPlotServer()]: the module pre-processes the data (builds
+#' the step-function representation) and delegates all rendering to
+#' [VizModules::linePlot()], which is the same underlying engine used by
+#' [VizModules::linePlotServer()].
 #'
-#' \enumerate{
-#'   \item **Auto-detects** the group and `n.risk` columns from the data using
-#'     `grep()` -- no user selectors are needed for these columns.
-#'   \item **Transforms** the data into a step-function representation via
-#'     `.survival_to_step()` (defined in `R/plot_mods.R`).
-#'   \item **Draws** one `add_lines` trace per group plus an optional
-#'     `add_markers` trace placed only at the original data points.
-#'   \item **Embeds** a "Number at risk" table as plotly annotations below the
-#'     x-axis when an `n.risk` column is present.
-#'   \item Respects the **Axes** and **Lines** tab inputs from
-#'     `VizModules:::.uniform_axes_inputs_ui()` and
-#'     `VizModules:::.uniform_lines_inputs_ui()`.
-#'   \item Supports **Auto Update / manual Update / Reset** via
-#'     [VizModules::module_tack_ui()] and [VizModules::setup_auto_update_logic()].
-#' }
+#' All standard plot-control inputs (axes, grid, fonts, line styles, reference
+#' lines, reset, auto-update, download format) come from the
+#' [VizModules::linePlotInputsUI()] tabset rendered by
+#' [survivalCurvePlotInputsUI()].  The server hides irrelevant linePlot inputs
+#' (`group.by`, `errorBar`, `order.by`, etc.) and overrides the colour-picker
+#' output so it reflects the auto-detected groups in the survival data.
 #'
 #' @section Data transformation:
-#' Each row (t_i, s_i) is expanded to two rows so that the line renders
-#' as a staircase:
+#' Each row \eqn{(t_i, s_i)} is expanded to two rows (using `.survival_to_step()`
+#' from `R/plot_mods.R`) so that the line renders as a staircase:
 #' \enumerate{
-#'   \item (t_i, s_{i-1} * 100) -- horizontal segment.
-#'   \item (t_i, s_i * 100) -- vertical drop.
+#'   \item \eqn{(t_i,\; s_{i-1} \times 100)} — horizontal segment.
+#'   \item \eqn{(t_i,\; s_i \times 100)} — vertical drop.
 #' }
-#' Marker points are drawn from the original (un-expanded) data only.
+#' A separate `add_markers()` trace drawn from the \emph{original} data
+#' overlays symbols at the observed (non-interpolated) time points only.
 #'
 #' @param id The ID for the Shiny module.
 #' @param data A `reactive` returning the input data frame.
-#' @param hide.inputs A character vector of input IDs to hide.
-#' @param hide.tabs A character vector of tab names to hide.
+#' @param hide.inputs A character vector of linePlot input IDs to hide via
+#'   shinyjs.  Defaults to `c("group.by", "errorBar", "errorBarColour",
+#'   "errorBarWidth", "order.by", "x.adjustment", "y.adjustment")`.
+#' @param hide.tabs A character vector of linePlot tab names to hide.
+#'   Defaults to `"Facet"`.
 #' @return The `moduleServer` for the survivalCurvePlot module.
 #'
 #' @import shiny
@@ -39,30 +37,35 @@
 #' @importFrom shinyjs hide
 #' @importFrom htmlwidgets saveWidget
 #' @importFrom shinyjqui jqui_resizable
-#' @importFrom grDevices col2rgb
+#' @importFrom VizModules linePlot
 #'
 #' @export
 #' @author Jacob Martin, Jared Andrews
-#' @seealso [VizModules::linePlot()], [survivalCurvePlotInputsUI()],
+#' @seealso [VizModules::linePlot()], [VizModules::linePlotInputsUI()],
+#'   [survivalCurvePlotInputsUI()],
 #'   [survivalCurvePlotOutputUI()],
 #'   [survivalCurvePlotApp()]
-survivalCurvePlotServer <- function(id, data,
-                                    hide.inputs = NULL,
-                                    hide.tabs   = NULL) {
+survivalCurvePlotServer <- function(
+        id, data,
+        hide.inputs = c("group.by", "errorBar", "errorBarColour",
+                        "errorBarWidth", "order.by",
+                        "x.adjustment", "y.adjustment"),
+        hide.tabs   = "Facet") {
+
     stopifnot(is.reactive(data))
 
     moduleServer(id, function(input, output, session) {
         ns <- session$ns
 
-        # --- Hide specified inputs / tabs ------------------------------------
+        # --- Hide irrelevant linePlot inputs / tabs --------------------------
         if (!is.null(hide.inputs)) {
             for (inp in hide.inputs) shinyjs::hide(inp)
         }
         if (!is.null(hide.tabs)) {
-            for (tab in hide.tabs) hideTab(inputId = "survivalPlotTabsetPanel", target = tab)
+            for (tab in hide.tabs) hideTab(inputId = "linePlotTabsetPanel", target = tab)
         }
 
-        # --- Auto-detect group column ----------------------------------------
+        # --- Auto-detect group column from raw data --------------------------
         group_col_name <- reactive({
             df <- data()
             if (is.null(df) || ncol(df) == 0) return(NULL)
@@ -73,7 +76,7 @@ survivalCurvePlotServer <- function(id, data,
             if (length(non_num) > 0) non_num[1] else NULL
         })
 
-        # --- Auto-detect n.risk column ----------------------------------------
+        # --- Auto-detect n.risk column from raw data -------------------------
         nrisk_col_name <- reactive({
             df <- data()
             if (is.null(df)) return(NULL)
@@ -93,24 +96,46 @@ survivalCurvePlotServer <- function(id, data,
             }
         })
 
-        # --- Dynamic colour picker -------------------------------------------
-        default_hex <- c(
-            "#E69F00", "#56B4E9", "#009E73", "#F0E442",
-            "#0072B2", "#D55E00", "#CC79A7", "#000000"
-        )
-
+        # --- Override linePlotInputsUI's palette.selection uiOutput ---------
+        # linePlotInputsUI renders uiOutput(ns("palette.selection")) in the
+        # Aesthetics tab; we fill it here so colours reflect survival groups.
         output$palette.selection <- renderUI({
             groups <- group_levels()
             initial_colors <- isolate(
-                resolve_palette(groups, input$survival.colors, default_hex)
+                resolve_palette(groups, input$palette.colours, .default_sci_palette)
             )
             multiColorPicker(
-                ns("survival.colors"),
+                ns("palette.colours"),
                 label           = "Group Colors",
                 groups          = groups,
                 palette_options = default_palettes()[["choices"]],
                 colors          = initial_colors,
                 compact         = TRUE
+            )
+        })
+
+        # --- Helpers: single time/survival column from (possibly multi) input
+        get_tc <- reactive({
+            tc <- input$x.value
+            if (length(tc) > 1) tc[1] else tc
+        })
+        get_sc <- reactive({
+            sc <- input$y.value
+            if (length(sc) > 1) sc[1] else sc
+        })
+
+        # --- Step-function data transformation --------------------------------
+        step_data <- reactive({
+            req(data())
+            tc <- get_tc()
+            sc <- get_sc()
+            req(!is.null(tc), !is.null(sc), nzchar(tc), nzchar(sc))
+            df <- data()
+            req(tc %in% names(df), sc %in% names(df))
+            gc <- group_col_name()
+            .survival_to_step(
+                df, tc, sc,
+                if (!is.null(gc) && gc %in% names(df)) gc else NULL
             )
         })
 
@@ -123,30 +148,19 @@ survivalCurvePlotServer <- function(id, data,
             sc_found <- grep("surv|survival|^prob$|^estimate$|^s$",
                              names(df)[vapply(df, is.numeric, logical(1))],
                              value = TRUE, ignore.case = TRUE)
-            updateSelectInput(session, "time.col",
+            updateSelectInput(session, "x.value",
                 selected = if (length(tc_found) > 0) tc_found[1] else names(df)[1])
-            updateSelectInput(session, "surv.col",
+            updateSelectInput(session, "y.value",
                 selected = if (length(sc_found) > 0) sc_found[1] else "")
+            updateSelectInput(session, "plot.type",     selected = "lines")
             updateSelectInput(session, "line.type",     selected = "solid")
-            updateSelectInput(session, "marker.symbol", selected = "circle")
             shinyWidgets::updateMaterialSwitch(session, "show.markers", value = TRUE)
+            updateSelectInput(session, "marker.symbol", selected = "circle")
             VizModules:::.reset_axes_inputs(session)
             VizModules:::.reset_lines_inputs(session)
         })
 
-        # --- Step-function data transformation --------------------------------
-        step_data <- reactive({
-            req(data(), input$time.col, input$surv.col)
-            df <- data()
-            req(input$time.col %in% names(df), input$surv.col %in% names(df))
-            gc <- group_col_name()
-            .survival_to_step(
-                df, input$time.col, input$surv.col,
-                if (!is.null(gc) && gc %in% names(df)) gc else NULL
-            )
-        })
-
-        # --- Build the interactive plot --------------------------------------
+        # --- Build the interactive survival curve plot -----------------------
         generate_plot <- reactive({
             isolate_fn <- setup_auto_update_logic(input)
 
@@ -154,70 +168,91 @@ survivalCurvePlotServer <- function(id, data,
             sd      <- step_data()
             orig_df <- data()
 
-            tc  <- input$time.col
-            sc  <- input$surv.col
+            tc  <- get_tc()
+            sc  <- get_sc()
             gc  <- group_col_name()
             nrc <- nrisk_col_name()
 
             gc_valid  <- !is.null(gc) && gc %in% names(sd)
             nrc_valid <- !is.null(nrc) && nrc %in% names(orig_df)
 
-            colors     <- isolate_fn(input$survival.colors)
-            raw_lt     <- isolate_fn(input$line.type)
-            line_type  <- if (!is.null(raw_lt) && nzchar(raw_lt %||% "")) raw_lt else "solid"
-            show_mrkrs <- isTRUE(isolate_fn(input$show.markers))
-            raw_ms     <- isolate_fn(input$marker.symbol)
-            marker_sym <- if (!is.null(raw_ms) && nzchar(raw_ms %||% "")) raw_ms else "circle"
-            raw_dlf    <- isolate_fn(input$download.format)
-            dl_format  <- if (!is.null(raw_dlf) && nzchar(raw_dlf %||% "")) raw_dlf else "png"
-
             groups <- group_levels()
 
-            palette_vals <- if (!is.null(colors) && length(colors) > 0) {
-                unname(colors)
+            line_type  <- isolate_fn(input$line.type)   %||% "solid"
+            show_mrkrs <- isTRUE(isolate_fn(input$show.markers))
+            marker_sym <- isolate_fn(input$marker.symbol) %||% "circle"
+            dl_format  <- isolate_fn(input$download.format) %||% "png"
+
+            # Colors: resolve from the colour picker in Aesthetics tab
+            colors_named <- isolate_fn(input$palette.colours)
+            palette_vals <- if (!is.null(colors_named) && length(colors_named) > 0) {
+                unname(colors_named)
             } else {
-                default_hex
+                .default_sci_palette
             }
 
             get_hex <- function(g, i) {
-                if (!is.null(colors) && as.character(g) %in% names(colors)) {
-                    colors[[as.character(g)]]
+                if (!is.null(colors_named) && as.character(g) %in% names(colors_named)) {
+                    colors_named[[as.character(g)]]
                 } else {
                     palette_vals[min(i, length(palette_vals))]
                 }
             }
 
-            # --- Build traces ------------------------------------------------
-            fig <- plot_ly()
+            # colour.group.by for linePlot()
+            colour_by   <- if (gc_valid) reformulate(gc) else palette_vals[1]
+            show_legend <- gc_valid
 
-            for (i in seq_along(groups)) {
-                g   <- groups[i]
-                hex <- get_hex(g, i)
+            # ------------------------------------------------------------------
+            # Core: call linePlot() with step-function data.
+            # .make_survival_steps() already converted survival to % (0-100),
+            # so NO further multiplication is applied here.
+            # ------------------------------------------------------------------
+            fig <- linePlot(
+                data              = sd,
+                x                 = tc,
+                y                 = sc,
+                plot.mode         = "lines",
+                line.type         = line_type,
+                colour.group.by   = colour_by,
+                palette.selection = palette_vals,
+                show.legend       = show_legend,
+                axis.showline     = isolate_fn(input$axis.showline),
+                axis.mirror       = isolate_fn(input$axis.mirror),
+                axis.linecolor    = isolate_fn(input$axis.linecolor),
+                axis.linewidth    = isolate_fn(input$axis.linewidth),
+                axis.tickfont.size   = isolate_fn(input$axis.tickfont.size),
+                axis.tickfont.color  = isolate_fn(input$axis.tickfont.color),
+                axis.tickfont.family = isolate_fn(input$axis.tickfont.family),
+                axis.tickangle.x  = isolate_fn(input$axis.tickangle.x),
+                axis.tickangle.y  = isolate_fn(input$axis.tickangle.y),
+                axis.ticks        = isolate_fn(input$axis.ticks),
+                axis.tickcolor    = isolate_fn(input$axis.tickcolor),
+                axis.ticklen      = isolate_fn(input$axis.ticklen),
+                axis.tickwidth    = isolate_fn(input$axis.tickwidth),
+                show.grid.x       = isolate_fn(input$show.grid.x),
+                show.grid.y       = isolate_fn(input$show.grid.y),
+                title.font.family = isolate_fn(input$title.font.family) %||% "Arial",
+                title.text.color  = isolate_fn(input$text.colour) %||% "#000000",
+                x.title           = tc,
+                y.title           = "Survival (%)"
+            )
 
-                step_grp <- if (gc_valid) sd[sd[[gc]] == g, , drop = FALSE] else sd
-                orig_grp <- if (gc_valid) orig_df[orig_df[[gc]] == g, , drop = FALSE] else orig_df
+            # --- Markers at ORIGINAL data points only -------------------------
+            # orig_df has survival on 0-1 scale; multiply by 100 for % axis.
+            if (show_mrkrs) {
+                for (i in seq_along(groups)) {
+                    g         <- groups[i]
+                    hex       <- get_hex(g, i)
+                    orig_grp  <- if (gc_valid) orig_df[orig_df[[gc]] == g, , drop = FALSE] else orig_df
+                    grp_label <- as.character(g)
 
-                grp_label <- as.character(g)
-                show_leg  <- length(groups) > 1
-
-                fig <- fig |> add_lines(
-                    data       = step_grp,
-                    x          = step_grp[[tc]],
-                    y          = step_grp[[sc]] * 100,
-                    name       = grp_label,
-                    line       = list(color = hex, dash = line_type),
-                    legendgroup = grp_label,
-                    showlegend  = show_leg,
-                    inherit     = FALSE
-                )
-
-                if (show_mrkrs) {
                     fig <- fig |> add_markers(
-                        data       = orig_grp,
-                        x          = orig_grp[[tc]],
-                        y          = orig_grp[[sc]] * 100,
-                        name       = grp_label,
-                        marker     = list(color = hex, symbol = marker_sym, size = 7),
+                        data        = orig_grp,
+                        x           = orig_grp[[tc]],
+                        y           = orig_grp[[sc]] * 100,
+                        name        = grp_label,
+                        marker      = list(color = hex, symbol = marker_sym, size = 7),
                         legendgroup = grp_label,
                         showlegend  = FALSE,
                         inherit     = FALSE
@@ -230,12 +265,6 @@ survivalCurvePlotServer <- function(id, data,
             min_time <- min(orig_df[[tc]], na.rm = TRUE)
             x_pad    <- (max_time - min_time) * 0.08
             x_range  <- c(min_time - x_pad * 0.2, max_time + x_pad)
-
-            # --- Axis styling from uniform inputs ----------------------------
-            x_style <- .build_axis_style(input, "x", isolate_fn, title = tc)
-            y_style <- .build_axis_style(input, "y", isolate_fn, title = "Survival (%)")
-            x_style$range <- x_range
-            y_style$range <- c(0, 105)
 
             # --- Number at risk table as plotly annotations below plot -------
             risk_annotations <- list()
@@ -293,24 +322,16 @@ survivalCurvePlotServer <- function(id, data,
 
             b_margin <- if (nrc_valid) 80 + n_groups * 30 else 80
 
-            raw_tf     <- isolate_fn(input$title.font.family)
-            raw_tc     <- isolate_fn(input$text.colour)
-            title_font <- list(
-                family = if (!is.null(raw_tf)) raw_tf else "Arial",
-                color  = if (!is.null(raw_tc)) raw_tc else "#000000"
-            )
-
             fig <- fig |> layout(
-                title       = list(text = "", font = title_font),
-                xaxis       = x_style,
-                yaxis       = y_style,
-                showlegend  = length(groups) > 1,
-                margin      = list(t = 60, l = 90, r = 60,
+                xaxis       = list(range = x_range),
+                yaxis       = list(range = c(0, 105)),
+                showlegend  = gc_valid,
+                margin      = list(t = 80, l = 90, r = 60,
                                    b = b_margin, autoexpand = TRUE),
                 annotations = risk_annotations
             )
 
-            # --- Reference lines (Lines tab) ---------------------------------
+            # --- Reference lines from the Lines tab --------------------------
             fig <- .sci_add_reference_lines(
                 fig,
                 hline.intercepts  = isolate_fn(input$hline.intercepts),
@@ -331,17 +352,18 @@ survivalCurvePlotServer <- function(id, data,
                 abline.opacities  = isolate_fn(input$abline.opacities)
             )
 
-            # --- Plotly config (download format, modebar) --------------------
+            # --- Plot config (modebar, download format) ----------------------
             cfg <- .sci_plot_config(download.format = dl_format)
             fig <- do.call(plotly::config, c(list(p = fig), cfg))
 
             fig
         })
 
-        # --- Render the plot -------------------------------------------------
-        output$survivalPlot <- renderPlotly({
+        # --- Render to output$linePlot (matches linePlotOutputUI) ------------
+        output$linePlot <- renderPlotly({
             tryCatch(
-                generate_plot(),
+                generate_plot() |>
+                    layout(margin = list(autoexpand = TRUE)),
                 error = function(e) {
                     plot_ly() |>
                         layout(
@@ -364,10 +386,4 @@ survivalCurvePlotServer <- function(id, data,
             filename_base = "survival_curve"
         )
     })
-}
-
-# Null-coalescing operator used internally in this module
-`%||%` <- function(x, y) {
-    if (!is.null(x) && length(x) > 0 && !is.na(x[1]) &&
-        nzchar(as.character(x[1]))) x else y
 }

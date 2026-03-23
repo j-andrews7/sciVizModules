@@ -4,35 +4,41 @@
 \alias{survivalCurvePlotServer}
 \title{Server logic for the survivalCurvePlot module}
 \usage{
-survivalCurvePlotServer(id, data, hide.inputs = NULL, hide.tabs = NULL)
+survivalCurvePlotServer(
+  id,
+  data,
+  hide.inputs = c("group.by", "errorBar", "errorBarColour", "errorBarWidth",
+    "order.by", "x.adjustment", "y.adjustment"),
+  hide.tabs = "Facet"
+)
 }
 \arguments{
 \item{id}{The ID for the Shiny module.}
 
 \item{data}{A \code{reactive} returning the input data frame.}
 
-\item{hide.inputs}{A character vector of input IDs to hide.}
+\item{hide.inputs}{A character vector of linePlot input IDs to hide.}
 
-\item{hide.tabs}{A character vector of tab names to hide.}
+\item{hide.tabs}{A character vector of linePlot tab names to hide.}
 }
 \value{
 The \code{moduleServer} for the survivalCurvePlot module.
 }
 \description{
-Renders a Kaplan-Meier-style survival curve as an interactive plotly step
-function.  Group and n.risk columns are auto-detected using \code{grep()};
-no user selectors are required for them.
+Follows the same design pattern as \code{\link[=volcanoPlotServer]{volcanoPlotServer()}}: the module
+pre-processes the data (step-function transform via \code{.survival_to_step()})
+and calls \code{\link[VizModules:linePlot]{VizModules::linePlot()}} for rendering, reading all axis,
+grid, font, line-style, and reference-line settings from the inputs
+created by \code{\link[VizModules:linePlotInputsUI]{VizModules::linePlotInputsUI()}}.
 }
 \details{
-The server transforms input data into a step-function representation via
-\code{.survival_to_step()} (defined in \code{R/plot_mods.R}), draws one
-\code{add_lines} trace per group plus optional \code{add_markers} at the
-original data points, and embeds a "Number at risk" table as plotly
-annotations below the x-axis.
-
-Auto Update / manual Update / Reset are supported via
+Auto-update / manual-update / reset are handled via
 \code{\link[VizModules:module_tack_ui]{VizModules::module_tack_ui()}} and
 \code{\link[VizModules:setup_auto_update_logic]{VizModules::setup_auto_update_logic()}}.
+
+Group and n.risk columns are auto-detected from the data using
+\code{grep()}.  The colour picker in the Aesthetics tab reflects the
+auto-detected groups.
 }
 \seealso{
 \code{\link[VizModules:linePlot]{VizModules::linePlot()}},

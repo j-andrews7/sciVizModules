@@ -2,11 +2,28 @@
 #
 # This file mirrors the role of plot_mods.R in VizModules.  It contains the
 # lower-level helpers used by the survival curve (and future) modules:
+#   - Null-coalescing operator
+#   - Default colour palette constant
 #   - Step-function data transformation for KM curves
 #   - Reference-line helpers (h/v/ab lines on plotly figures)
 #   - Axis-style list builder from uniform Shiny inputs
 #   - Plot config builder
 #   - Download handler factory
+
+
+# ---- Null-coalescing operator ----------------------------------------------
+# Used across server files; defined once here.
+`%||%` <- function(x, y) {
+    if (!is.null(x) && length(x) > 0 && !is.na(x[1]) &&
+        nzchar(as.character(x[1]))) x else y
+}
+
+
+# ---- Default colour palette (colourblind-friendly) -------------------------
+.default_sci_palette <- c(
+    "#E69F00", "#56B4E9", "#009E73", "#F0E442",
+    "#0072B2", "#D55E00", "#CC79A7", "#000000"
+)
 
 
 # ---- Step-function data transformation for survival curves -----------------

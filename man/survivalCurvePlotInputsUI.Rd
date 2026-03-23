@@ -17,27 +17,30 @@ survivalCurvePlotInputsUI(
 
 \item{data}{The data frame used for plot generation.}
 
-\item{defaults}{A named list of default values. Recognised keys:
-\code{time.col}, \code{surv.col}, \code{line.type}, \code{marker.symbol}.}
+\item{defaults}{A named list of default values passed to
+\code{\link[VizModules:linePlotInputsUI]{VizModules::linePlotInputsUI()}}.
+Recognised survival-specific keys: \code{x.value} and \code{y.value}.}
 
 \item{title}{An optional title displayed above the tabset panel.}
 
 \item{columns}{Number of columns for the UI grid layout.}
 }
 \value{
-A Shiny \code{tagList} containing all UI elements.
+A Shiny \code{tagList} containing survival-specific extras above the
+  standard linePlot tabset.
 }
 \description{
-Column auto-detection uses \code{grep()} on column names.
+Wraps \code{\link[VizModules:linePlotInputsUI]{VizModules::linePlotInputsUI()}}
+following the same design pattern as \code{\link[=volcanoPlotInputsUI]{volcanoPlotInputsUI()}}.
 }
 \details{
-Tabs: \strong{Data} (time + survival column selectors),
-\strong{Colors} (per-group colour picker),
-\strong{Aesthetics} (line type + marker shape),
-\strong{Axes} (full axis styling), \strong{Lines} (reference lines).
+Prepends a marker-toggle switch and marker-shape selector above the standard
+linePlot tabset (Data, Aesthetics, Axes, Lines, module\_tack\_ui).
 
-Reset / Auto Update / Save buttons added via
-\code{\link[VizModules:module_tack_ui]{VizModules::module_tack_ui()}}.
+Column auto-detection uses \code{grep()} to set default \code{x.value}
+(time) and \code{y.value} (survival). Irrelevant inputs
+(\code{group.by}, \code{errorBar}, etc.) are hidden by
+\code{\link[=survivalCurvePlotServer]{survivalCurvePlotServer()}}.
 }
 \examples{
 library(sciVizModules)
@@ -47,7 +50,8 @@ survivalCurvePlotInputsUI("survivalPlot", km_survival_groups)
 \seealso{
 \code{\link[=survivalCurvePlotOutputUI]{survivalCurvePlotOutputUI()}},
   \code{\link[=survivalCurvePlotServer]{survivalCurvePlotServer()}},
-  \code{\link[=survivalCurvePlotApp]{survivalCurvePlotApp()}}
+  \code{\link[=survivalCurvePlotApp]{survivalCurvePlotApp()}},
+  \code{\link[VizModules:linePlotInputsUI]{VizModules::linePlotInputsUI()}}
 }
 \author{
 Jacob Martin, Jared Andrews
