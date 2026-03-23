@@ -3,7 +3,12 @@
 ## data/km_survival_groups.rda.
 
 # ---- Single-group Kaplan-Meier data ----------------------------------------
-# Data matches the example table shown in the problem description
+# Data matches the example table shown in the problem description.
+#
+# The `censor` column is a 0/1 indicator:
+#   0 = the event (e.g. death) occurred at this time point
+#   1 = the observation was censored (patient left study / study ended)
+# Non-zero values in `censor` will be shown as markers on the survival curve.
 
 km_survival_single <- data.frame(
     time    = c(0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000),
@@ -16,14 +21,18 @@ km_survival_single <- data.frame(
     lower    = c(1.0000, 0.7652, 0.5309, 0.3629, 0.2250,
                  0.1569, 0.0900, 0.0470, 0.0314, 0.0109, 0.0109),
     upper    = c(1.000,  0.892,  0.695,  0.536,  0.394,
-                 0.318,  0.234,  0.170,  0.143,  0.117,  0.117)
+                 0.318,  0.234,  0.170,  0.143,  0.117,  0.117),
+    # t=200, t=400, t=700, t=900, t=1000 are censoring time points
+    censor   = c(0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 1)
 )
 
 usethis::use_data(km_survival_single, overwrite = TRUE)
 
 
 # ---- Two-group Kaplan-Meier data -------------------------------------------
-# Simulated low-risk vs. high-risk groups demonstrating grouped survival curves
+# Simulated low-risk vs. high-risk groups demonstrating grouped survival curves.
+#
+# The `censor` column follows the same 0/1 convention as km_survival_single.
 
 group1 <- data.frame(
     time     = c(0, 10, 20, 30, 40, 50, 60, 70),
@@ -33,7 +42,9 @@ group1 <- data.frame(
     std.err  = c(0.000, 0.034, 0.037, 0.040, 0.043, 0.046, 0.046, 0.047),
     lower    = c(1.000, 0.782, 0.734, 0.683, 0.635, 0.546, 0.529, 0.412),
     upper    = c(1.000, 0.919, 0.882, 0.843, 0.808, 0.733, 0.715, 0.603),
-    group    = rep("Group 1 (low risk)", 8)
+    group    = rep("Group 1 (low risk)", 8),
+    # t=20, t=50, t=70 are censoring time points for group 1
+    censor   = c(0, 0, 1, 0, 0, 1, 0, 1)
 )
 
 group2 <- data.frame(
@@ -44,7 +55,9 @@ group2 <- data.frame(
     std.err  = c(0.000, 0.041, 0.048, 0.049, 0.039, 0.027, 0.019, 0.011),
     lower    = c(1.000, 0.699, 0.519, 0.392, 0.127, 0.037, 0.012, 0.002),
     upper    = c(1.000, 0.863, 0.720, 0.592, 0.300, 0.162, 0.125, 0.104),
-    group    = rep("Group 2 (high risk)", 8)
+    group    = rep("Group 2 (high risk)", 8),
+    # t=30, t=60, t=70 are censoring time points for group 2
+    censor   = c(0, 0, 0, 1, 0, 0, 1, 1)
 )
 
 km_survival_groups <- rbind(group1, group2)

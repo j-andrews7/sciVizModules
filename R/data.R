@@ -87,7 +87,7 @@
 #' format produced by the \code{survival} R package.  Suitable for demonstrating
 #' [survivalCurvePlotApp()] without grouping.
 #'
-#' @format A data frame with 11 rows and 7 columns:
+#' @format A data frame with 11 rows and 8 columns:
 #' \describe{
 #'   \item{time}{Time point (arbitrary units, e.g. days).}
 #'   \item{n.risk}{Number of subjects still at risk at each time point.}
@@ -96,6 +96,10 @@
 #'   \item{std.err}{Standard error of the survival estimate.}
 #'   \item{lower}{Lower bound of the 95\% confidence interval (0–1 scale).}
 #'   \item{upper}{Upper bound of the 95\% confidence interval (0–1 scale).}
+#'   \item{censor}{Censoring indicator: \code{0} = event occurred;
+#'     \code{1} = observation censored (patient left study or study ended).
+#'     Rows where \code{censor == 1} are displayed as markers on the survival
+#'     curve when the Censor Column is selected in the app.}
 #' }
 #'
 #' @source Simulated data inspired by the example in the problem description.
@@ -115,7 +119,7 @@
 #' useful for demonstrating grouped Kaplan-Meier curves in
 #' [survivalCurvePlotApp()].
 #'
-#' @format A data frame with 16 rows and 8 columns:
+#' @format A data frame with 16 rows and 9 columns:
 #' \describe{
 #'   \item{time}{Time point (months).}
 #'   \item{n.risk}{Number of subjects still at risk at each time point.}
@@ -126,6 +130,10 @@
 #'   \item{upper}{Upper bound of the 95\% confidence interval (0–1 scale).}
 #'   \item{group}{Group label: \code{"Group 1 (low risk)"} or
 #'     \code{"Group 2 (high risk)"}.}
+#'   \item{censor}{Censoring indicator: \code{0} = event occurred;
+#'     \code{1} = observation censored.
+#'     Rows where \code{censor == 1} are displayed as markers on the survival
+#'     curve when the Censor Column is selected in the app.}
 #' }
 #'
 #' @source Simulated to illustrate a typical two-arm KM comparison.
