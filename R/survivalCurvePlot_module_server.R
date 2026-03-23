@@ -1,38 +1,45 @@
 #' Server logic for the survivalCurvePlot module
 #'
-#' Renders a Kaplan-Meier–style survival curve as an interactive plotly step
-#' function together with an optional confidence-interval ribbon and a
-#' **Survival Summary Table** showing per-group numbers at risk.
+#' Renders a Kaplan-Meier-style survival curve as an interactive plotly step
+#' function.  The server:
 #'
-#' The server follows the same modular pattern as [volcanoPlotServer()]:
-#' it first transforms the input data into a step-function representation
-#' (duplicating each time point to create horizontal-then-vertical steps) and
-#' then hands the result to [VizModules::linePlot()] for rendering.  CI ribbons
-#' are added as an extra plotly layer on top of the linePlot output.
+#' \enumerate{
+#'   \item **Auto-detects** the group and `n.risk` columns from the data using
+#'     `grep()` -- no user selectors are needed for these columns.
+#'   \item **Transforms** the data into a step-function representation via
+#'     `.survival_to_step()` (defined in `R/plot_mods.R`).
+#'   \item **Draws** one `add_lines` trace per group plus an optional
+#'     `add_markers` trace placed only at the original data points.
+#'   \item **Embeds** a "Number at risk" table as plotly annotations below the
+#'     x-axis when an `n.risk` column is present.
+#'   \item Respects the **Axes** and **Lines** tab inputs from
+#'     `VizModules:::.uniform_axes_inputs_ui()` and
+#'     `VizModules:::.uniform_lines_inputs_ui()`.
+#'   \item Supports **Auto Update / manual Update / Reset** via
+#'     [VizModules::module_tack_ui()] and [VizModules::setup_auto_update_logic()].
+#' }
 #'
 #' @section Data transformation:
-#' Each row \eqn{(t_i, s_i)} in the input data is expanded into two rows:
+#' Each row (t_i, s_i) is expanded to two rows so that the line renders
+#' as a staircase:
 #' \enumerate{
-#'   \item \eqn{(t_i,\; s_{i-1})} – horizontal segment at the previous survival level.
-#'   \item \eqn{(t_i,\; s_i)}     – vertical drop to the new survival level.
+#'   \item (t_i, s_{i-1} * 100) -- horizontal segment.
+#'   \item (t_i, s_i * 100) -- vertical drop.
 #' }
-#' The first time point is kept as-is.  Survival values are multiplied by 100
-#' so that the y-axis shows percentages.
+#' Marker points are drawn from the original (un-expanded) data only.
 #'
 #' @param id The ID for the Shiny module.
-#' @param data A `reactive` containing the input data frame.
-#'   Must include at minimum a time column and a survival probability column
-#'   (0–1 scale).
-#' @param hide.inputs A character vector of input IDs to hide via shinyjs.
-#' @param hide.tabs A character vector of tab names to hide from the tabset panel.
+#' @param data A `reactive` returning the input data frame.
+#' @param hide.inputs A character vector of input IDs to hide.
+#' @param hide.tabs A character vector of tab names to hide.
 #' @return The `moduleServer` for the survivalCurvePlot module.
 #'
 #' @import shiny
 #' @import plotly
 #' @importFrom shinyjs hide
-#' @importFrom DT renderDT datatable
 #' @importFrom htmlwidgets saveWidget
-#' @importFrom htmltools tags
+#' @importFrom shinyjqui jqui_resizable
+#' @importFrom grDevices col2rgb
 #'
 #' @export
 #' @author Jacob Martin, Jared Andrews
@@ -52,31 +59,48 @@ survivalCurvePlotServer <- function(id, data,
             for (inp in hide.inputs) shinyjs::hide(inp)
         }
         if (!is.null(hide.tabs)) {
-            for (tab in hide.tabs) {
-                hideTab(inputId = "survivalPlotTabsetPanel", target = tab)
-            }
+            for (tab in hide.tabs) hideTab(inputId = "survivalPlotTabsetPanel", target = tab)
         }
 
-        # --- Determine groups present in data --------------------------------
+        # --- Auto-detect group column ----------------------------------------
+        group_col_name <- reactive({
+            df <- data()
+            if (is.null(df) || ncol(df) == 0) return(NULL)
+            non_num <- names(df)[vapply(df, function(x) !is.numeric(x), logical(1))]
+            found <- grep("^group$|^strata$|^arm$|^treatment$|^cohort$",
+                          non_num, value = TRUE, ignore.case = TRUE)
+            if (length(found) > 0) return(found[1])
+            if (length(non_num) > 0) non_num[1] else NULL
+        })
+
+        # --- Auto-detect n.risk column ----------------------------------------
+        nrisk_col_name <- reactive({
+            df <- data()
+            if (is.null(df)) return(NULL)
+            found <- grep("n[._]?risk|at[._]?risk",
+                          names(df), value = TRUE, ignore.case = TRUE)
+            if (length(found) > 0) found[1] else NULL
+        })
+
+        # --- Group levels present in data ------------------------------------
         group_levels <- reactive({
             df <- data()
-            if (is.null(df)) return("Survival")
-            gc <- input$group.col
-            if (!is.null(gc) && nzchar(gc) && gc %in% names(df)) {
+            gc <- group_col_name()
+            if (!is.null(gc) && gc %in% names(df)) {
                 as.character(unique(df[[gc]]))
             } else {
                 "Survival"
             }
         })
 
-        # --- Dynamic per-group colour picker ---------------------------------
+        # --- Dynamic colour picker -------------------------------------------
+        default_hex <- c(
+            "#E69F00", "#56B4E9", "#009E73", "#F0E442",
+            "#0072B2", "#D55E00", "#CC79A7", "#000000"
+        )
+
         output$palette.selection <- renderUI({
             groups <- group_levels()
-            # Fallback palette: colourblind-friendly defaults drawn from dittoColors
-            default_hex <- c(
-                "#E69F00", "#56B4E9", "#009E73", "#F0E442",
-                "#0072B2", "#D55E00", "#CC79A7", "#000000"
-            )
             initial_colors <- isolate(
                 resolve_palette(groups, input$survival.colors, default_hex)
             )
@@ -90,124 +114,227 @@ survivalCurvePlotServer <- function(id, data,
             )
         })
 
-        # --- Step-function data transformation -------------------------------
+        # --- Reset handler ---------------------------------------------------
+        observeEvent(input$reset, {
+            df <- data()
+            if (is.null(df)) return()
+            tc_found <- grep("^time$|^days$|^months$|^years$|^t$",
+                             names(df), value = TRUE, ignore.case = TRUE)
+            sc_found <- grep("surv|survival|^prob$|^estimate$|^s$",
+                             names(df)[vapply(df, is.numeric, logical(1))],
+                             value = TRUE, ignore.case = TRUE)
+            updateSelectInput(session, "time.col",
+                selected = if (length(tc_found) > 0) tc_found[1] else names(df)[1])
+            updateSelectInput(session, "surv.col",
+                selected = if (length(sc_found) > 0) sc_found[1] else "")
+            updateSelectInput(session, "line.type",     selected = "solid")
+            updateSelectInput(session, "marker.symbol", selected = "circle")
+            shinyWidgets::updateMaterialSwitch(session, "show.markers", value = TRUE)
+            VizModules:::.reset_axes_inputs(session)
+            VizModules:::.reset_lines_inputs(session)
+        })
+
+        # --- Step-function data transformation --------------------------------
         step_data <- reactive({
             req(data(), input$time.col, input$surv.col)
             df <- data()
             req(input$time.col %in% names(df), input$surv.col %in% names(df))
-
-            gc  <- if (!is.null(input$group.col) && nzchar(input$group.col) &&
-                       input$group.col %in% names(df)) input$group.col else NULL
-            lc  <- if (isTRUE(input$show.ci) && !is.null(input$lower.col) &&
-                       nzchar(input$lower.col) && input$lower.col %in% names(df)) input$lower.col else NULL
-            uc  <- if (isTRUE(input$show.ci) && !is.null(input$upper.col) &&
-                       nzchar(input$upper.col) && input$upper.col %in% names(df)) input$upper.col else NULL
-
-            .survival_to_step(df, input$time.col, input$surv.col, gc, lc, uc)
+            gc <- group_col_name()
+            .survival_to_step(
+                df, input$time.col, input$surv.col,
+                if (!is.null(gc) && gc %in% names(df)) gc else NULL
+            )
         })
 
         # --- Build the interactive plot --------------------------------------
         generate_plot <- reactive({
-            req(step_data())
-            sd <- step_data()
+            isolate_fn <- setup_auto_update_logic(input)
 
-            tc   <- input$time.col
-            sc   <- input$surv.col
-            gc   <- if (!is.null(input$group.col) && nzchar(input$group.col) &&
-                        input$group.col %in% names(sd)) input$group.col else NULL
-            lc   <- if (isTRUE(input$show.ci) && !is.null(input$lower.col) &&
-                        nzchar(input$lower.col) && input$lower.col %in% names(sd)) input$lower.col else NULL
-            uc   <- if (isTRUE(input$show.ci) && !is.null(input$upper.col) &&
-                        nzchar(input$upper.col) && input$upper.col %in% names(sd)) input$upper.col else NULL
+            req(step_data(), data())
+            sd      <- step_data()
+            orig_df <- data()
 
-            colors    <- input$survival.colors
-            line_type <- if (!is.null(input$line.type) && nzchar(input$line.type)) input$line.type else "solid"
-            title_txt <- if (!is.null(input$title.text)) input$title.text else "Survival Curve"
+            tc  <- input$time.col
+            sc  <- input$surv.col
+            gc  <- group_col_name()
+            nrc <- nrisk_col_name()
+
+            gc_valid  <- !is.null(gc) && gc %in% names(sd)
+            nrc_valid <- !is.null(nrc) && nrc %in% names(orig_df)
+
+            colors     <- isolate_fn(input$survival.colors)
+            raw_lt     <- isolate_fn(input$line.type)
+            line_type  <- if (!is.null(raw_lt) && nzchar(raw_lt %||% "")) raw_lt else "solid"
+            show_mrkrs <- isTRUE(isolate_fn(input$show.markers))
+            raw_ms     <- isolate_fn(input$marker.symbol)
+            marker_sym <- if (!is.null(raw_ms) && nzchar(raw_ms %||% "")) raw_ms else "circle"
+            raw_dlf    <- isolate_fn(input$download.format)
+            dl_format  <- if (!is.null(raw_dlf) && nzchar(raw_dlf %||% "")) raw_dlf else "png"
 
             groups <- group_levels()
 
-            # Build one linePlot trace per group using the step-function data.
-            # linePlot() handles the colour palette and legend; CI ribbons are
-            # added as extra plotly layers afterwards.
-            default_hex <- c(
-                "#E69F00", "#56B4E9", "#009E73", "#F0E442",
-                "#0072B2", "#D55E00", "#CC79A7", "#000000"
-            )
-            if (!is.null(gc)) {
-                colour_by    <- reformulate(gc)
-                palette_vals <- if (!is.null(colors) && length(colors) > 0) unname(colors) else default_hex
-                show_legend  <- TRUE
+            palette_vals <- if (!is.null(colors) && length(colors) > 0) {
+                unname(colors)
             } else {
-                colour_by    <- if (!is.null(colors) && length(colors) > 0) colors[[1]] else default_hex[1]
-                palette_vals <- if (!is.null(colors) && length(colors) > 0) unname(colors) else default_hex
-                show_legend  <- FALSE
+                default_hex
             }
 
-            fig <- linePlot(
-                data              = sd,
-                x                 = tc,
-                y                 = sc,
-                plot.mode         = "lines",
-                line.type         = line_type,
-                colour.group.by   = colour_by,
-                palette.selection = palette_vals,
-                show.legend       = show_legend,
-                title.text        = title_txt,
-                x.title           = tc,
-                y.title           = "Survival (%)"
-            )
-
-            # Add CI ribbons on top if requested --------------------------------
-            if (!is.null(lc) && !is.null(uc)) {
-                if (!is.null(gc)) {
-                    for (i in seq_along(groups)) {
-                        g        <- groups[i]
-                        grp_data <- sd[sd[[gc]] == g, , drop = FALSE]
-                        hex      <- if (!is.null(colors) && as.character(g) %in% names(colors)) {
-                            colors[[as.character(g)]]
-                        } else {
-                            palette_vals[min(i, length(palette_vals))]
-                        }
-                        rgb_v      <- grDevices::col2rgb(hex)
-                        fill_color <- sprintf("rgba(%d,%d,%d,0.2)", rgb_v[1], rgb_v[2], rgb_v[3])
-                        fig <- fig |>
-                            add_ribbons(
-                                data        = grp_data,
-                                x           = grp_data[[tc]],
-                                ymin        = grp_data[[lc]],
-                                ymax        = grp_data[[uc]],
-                                line        = list(color = "transparent"),
-                                fillcolor   = fill_color,
-                                name        = paste0(g, " 95% CI"),
-                                showlegend  = FALSE,
-                                legendgroup = as.character(g),
-                                inherit     = FALSE
-                            )
-                    }
+            get_hex <- function(g, i) {
+                if (!is.null(colors) && as.character(g) %in% names(colors)) {
+                    colors[[as.character(g)]]
                 } else {
-                    hex        <- if (!is.null(colors) && length(colors) > 0) colors[[1]] else default_hex[1]
-                    rgb_v      <- grDevices::col2rgb(hex)
-                    fill_color <- sprintf("rgba(%d,%d,%d,0.2)", rgb_v[1], rgb_v[2], rgb_v[3])
-                    fig <- fig |>
-                        add_ribbons(
-                            data       = sd,
-                            x          = sd[[tc]],
-                            ymin       = sd[[lc]],
-                            ymax       = sd[[uc]],
-                            line       = list(color = "transparent"),
-                            fillcolor  = fill_color,
-                            name       = "95% CI",
-                            showlegend = TRUE,
-                            inherit    = FALSE
-                        )
+                    palette_vals[min(i, length(palette_vals))]
                 }
             }
 
-            fig <- fig |>
-                layout(
-                    yaxis  = list(range = c(0, 105)),
-                    margin = list(t = 80, l = 80, r = 80, b = 80, autoexpand = TRUE)
+            # --- Build traces ------------------------------------------------
+            fig <- plot_ly()
+
+            for (i in seq_along(groups)) {
+                g   <- groups[i]
+                hex <- get_hex(g, i)
+
+                step_grp <- if (gc_valid) sd[sd[[gc]] == g, , drop = FALSE] else sd
+                orig_grp <- if (gc_valid) orig_df[orig_df[[gc]] == g, , drop = FALSE] else orig_df
+
+                grp_label <- as.character(g)
+                show_leg  <- length(groups) > 1
+
+                fig <- fig |> add_lines(
+                    data       = step_grp,
+                    x          = step_grp[[tc]],
+                    y          = step_grp[[sc]] * 100,
+                    name       = grp_label,
+                    line       = list(color = hex, dash = line_type),
+                    legendgroup = grp_label,
+                    showlegend  = show_leg,
+                    inherit     = FALSE
                 )
+
+                if (show_mrkrs) {
+                    fig <- fig |> add_markers(
+                        data       = orig_grp,
+                        x          = orig_grp[[tc]],
+                        y          = orig_grp[[sc]] * 100,
+                        name       = grp_label,
+                        marker     = list(color = hex, symbol = marker_sym, size = 7),
+                        legendgroup = grp_label,
+                        showlegend  = FALSE,
+                        inherit     = FALSE
+                    )
+                }
+            }
+
+            # --- X-axis padding: ~8% blank space beyond last time point ------
+            max_time <- max(orig_df[[tc]], na.rm = TRUE)
+            min_time <- min(orig_df[[tc]], na.rm = TRUE)
+            x_pad    <- (max_time - min_time) * 0.08
+            x_range  <- c(min_time - x_pad * 0.2, max_time + x_pad)
+
+            # --- Axis styling from uniform inputs ----------------------------
+            x_style <- .build_axis_style(input, "x", isolate_fn, title = tc)
+            y_style <- .build_axis_style(input, "y", isolate_fn, title = "Survival (%)")
+            x_style$range <- x_range
+            y_style$range <- c(0, 105)
+
+            # --- Number at risk table as plotly annotations below plot -------
+            risk_annotations <- list()
+            n_groups <- length(groups)
+
+            if (nrc_valid) {
+                times    <- sort(unique(orig_df[[tc]]))
+                row_h    <- 0.06
+                y_header <- -0.14
+
+                risk_annotations[[1]] <- list(
+                    text      = "<b>Number at risk</b>",
+                    xref      = "paper", yref = "paper",
+                    x = 0, y = y_header,
+                    xanchor   = "right",
+                    showarrow = FALSE,
+                    font      = list(size = 11)
+                )
+
+                for (i in seq_along(groups)) {
+                    g     <- groups[i]
+                    hex   <- get_hex(g, i)
+                    y_pos <- y_header - i * row_h
+
+                    risk_annotations[[length(risk_annotations) + 1]] <- list(
+                        text      = as.character(g),
+                        xref      = "paper", yref = "paper",
+                        x = 0, y = y_pos,
+                        xanchor   = "right",
+                        showarrow = FALSE,
+                        font      = list(size = 10, color = hex)
+                    )
+
+                    grp_data <- if (gc_valid) {
+                        orig_df[orig_df[[gc]] == g, , drop = FALSE]
+                    } else {
+                        orig_df
+                    }
+
+                    for (t in times) {
+                        row_data <- grp_data[grp_data[[tc]] == t, nrc, drop = TRUE]
+                        if (length(row_data) > 0 && !is.na(row_data[1])) {
+                            risk_annotations[[length(risk_annotations) + 1]] <- list(
+                                text      = as.character(row_data[1]),
+                                xref      = "x", yref = "paper",
+                                x = t,    y = y_pos,
+                                xanchor   = "center",
+                                showarrow = FALSE,
+                                font      = list(size = 10, color = hex)
+                            )
+                        }
+                    }
+                }
+            }
+
+            b_margin <- if (nrc_valid) 80 + n_groups * 30 else 80
+
+            raw_tf     <- isolate_fn(input$title.font.family)
+            raw_tc     <- isolate_fn(input$text.colour)
+            title_font <- list(
+                family = if (!is.null(raw_tf)) raw_tf else "Arial",
+                color  = if (!is.null(raw_tc)) raw_tc else "#000000"
+            )
+
+            fig <- fig |> layout(
+                title       = list(text = "", font = title_font),
+                xaxis       = x_style,
+                yaxis       = y_style,
+                showlegend  = length(groups) > 1,
+                margin      = list(t = 60, l = 90, r = 60,
+                                   b = b_margin, autoexpand = TRUE),
+                annotations = risk_annotations
+            )
+
+            # --- Reference lines (Lines tab) ---------------------------------
+            fig <- .sci_add_reference_lines(
+                fig,
+                hline.intercepts  = isolate_fn(input$hline.intercepts),
+                hline.colors      = isolate_fn(input$hline.colors),
+                hline.widths      = isolate_fn(input$hline.widths),
+                hline.linetypes   = isolate_fn(input$hline.linetypes),
+                hline.opacities   = isolate_fn(input$hline.opacities),
+                vline.intercepts  = isolate_fn(input$vline.intercepts),
+                vline.colors      = isolate_fn(input$vline.colors),
+                vline.widths      = isolate_fn(input$vline.widths),
+                vline.linetypes   = isolate_fn(input$vline.linetypes),
+                vline.opacities   = isolate_fn(input$vline.opacities),
+                abline.slopes     = isolate_fn(input$abline.slopes),
+                abline.intercepts = isolate_fn(input$abline.intercepts),
+                abline.colors     = isolate_fn(input$abline.colors),
+                abline.widths     = isolate_fn(input$abline.widths),
+                abline.linetypes  = isolate_fn(input$abline.linetypes),
+                abline.opacities  = isolate_fn(input$abline.opacities)
+            )
+
+            # --- Plotly config (download format, modebar) --------------------
+            cfg <- .sci_plot_config(download.format = dl_format)
+            fig <- do.call(plotly::config, c(list(p = fig), cfg))
+
             fig
         })
 
@@ -224,158 +351,23 @@ survivalCurvePlotServer <- function(id, data,
                                 x = 0.5, y = 0.5, showarrow = FALSE,
                                 font      = list(size = 14, color = "red")
                             )),
-                            xaxis = list(title = ""), yaxis = list(title = "")
+                            xaxis = list(title = ""),
+                            yaxis = list(title = "")
                         )
                 }
             )
         })
 
-        # --- Survival Summary Table ------------------------------------------
-        output$riskTable <- DT::renderDT({
-            req(data(), input$time.col)
-            df  <- data()
-            tc  <- input$time.col
-            gc  <- if (!is.null(input$group.col) && nzchar(input$group.col) &&
-                       input$group.col %in% names(df)) input$group.col else NULL
-            nrc <- if (!is.null(input$n.risk.col) && nzchar(input$n.risk.col) &&
-                       input$n.risk.col %in% names(df)) input$n.risk.col else NULL
-
-            if (!is.null(gc) && !is.null(nrc)) {
-                # Wide format: rows = groups, cols = time points
-                groups <- unique(df[[gc]])
-                times  <- sort(unique(df[[tc]]))
-
-                risk_rows <- lapply(groups, function(g) {
-                    grp       <- df[df[[gc]] == g, , drop = FALSE]
-                    risk_vals <- vapply(times, function(t) {
-                        rows <- grp[grp[[tc]] == t, nrc, drop = TRUE]
-                        if (length(rows) > 0) as.character(rows[[1]]) else "-"
-                    }, character(1))
-                    c(as.character(g), risk_vals)
-                })
-
-                risk_df           <- as.data.frame(do.call(rbind, risk_rows),
-                                                   stringsAsFactors = FALSE)
-                names(risk_df)    <- c("Group", as.character(times))
-            } else {
-                # Show the raw data columns relevant to survival
-                keep_cols <- intersect(
-                    names(df),
-                    c(tc, "n.risk", "n_risk", "n.event", "n_event",
-                      "survival", "surv", "std.err", "lower", "upper",
-                      if (!is.null(nrc)) nrc else character(0))
-                )
-                risk_df <- if (length(keep_cols) > 0) df[, keep_cols, drop = FALSE] else df
-            }
-
-            DT::datatable(
-                risk_df,
-                options  = list(scrollX = TRUE, pageLength = 15, dom = "t"),
-                rownames = FALSE,
-                caption  = htmltools::tags$caption(
-                    style = "caption-side: top; text-align: left; font-weight: bold;",
-                    "Survival Summary Table"
-                )
-            )
-        })
-
         # --- Download handler ------------------------------------------------
-        output$download.interactive <- downloadHandler(
-            filename = function() paste0("survivalCurve_", Sys.Date(), ".html"),
-            content  = function(file) {
-                htmlwidgets::saveWidget(generate_plot(), file)
-            }
+        output$download.interactive <- .sci_plot_download_handler(
+            generate_plot,
+            filename_base = "survival_curve"
         )
     })
 }
 
-
-# ---- Internal helper: step-function data transformation --------------------
-
-#' Convert survival data to a plotly step-function format
-#'
-#' @param df       Input data frame.
-#' @param time_col Name of the time column.
-#' @param surv_col Name of the survival column (0–1 scale; multiplied by 100).
-#' @param group_col Optional name of a grouping column.
-#' @param lower_col Optional name of the lower CI column (0–1 scale).
-#' @param upper_col Optional name of the upper CI column (0–1 scale).
-#' @return A data frame with duplicated rows that create a step-function shape
-#'   when plotted as a line.
-#' @noRd
-.survival_to_step <- function(df, time_col, surv_col,
-                               group_col = NULL,
-                               lower_col = NULL,
-                               upper_col = NULL) {
-    if (!is.null(group_col) && group_col %in% names(df)) {
-        groups      <- unique(df[[group_col]])
-        result_list <- lapply(groups, function(g) {
-            grp_data <- df[df[[group_col]] == g, , drop = FALSE]
-            grp_data <- grp_data[order(grp_data[[time_col]]), ]
-            step     <- .make_survival_steps(grp_data, time_col, surv_col,
-                                             lower_col, upper_col)
-            step[[group_col]] <- g
-            step
-        })
-        do.call(rbind, result_list)
-    } else {
-        df <- df[order(df[[time_col]]), ]
-        .make_survival_steps(df, time_col, surv_col, lower_col, upper_col)
-    }
-}
-
-#' Build step-function rows for a single group
-#'
-#' @param df       Data frame for one group, sorted by time.
-#' @param time_col Name of the time column.
-#' @param surv_col Name of the survival column.
-#' @param lower_col Optional lower CI column.
-#' @param upper_col Optional upper CI column.
-#' @return A data frame with step-function values.
-#' @noRd
-.make_survival_steps <- function(df, time_col, surv_col,
-                                  lower_col = NULL,
-                                  upper_col = NULL) {
-    n <- nrow(df)
-    if (n == 0) {
-        keep <- c(time_col, surv_col,
-                  if (!is.null(lower_col)) lower_col else character(0),
-                  if (!is.null(upper_col)) upper_col else character(0))
-        return(df[0, intersect(keep, names(df)), drop = FALSE])
-    }
-
-    times     <- df[[time_col]]
-    survivals <- df[[surv_col]] * 100  # convert to %
-    lowers    <- if (!is.null(lower_col) && lower_col %in% names(df)) df[[lower_col]] * 100 else NULL
-    uppers    <- if (!is.null(upper_col) && upper_col %in% names(df)) df[[upper_col]] * 100 else NULL
-
-    # Initialise with the first (leftmost) point
-    new_times     <- times[1]
-    new_survivals <- survivals[1]
-    new_lowers    <- if (!is.null(lowers)) lowers[1] else NULL
-    new_uppers    <- if (!is.null(uppers)) uppers[1] else NULL
-
-    if (n > 1) {
-        for (i in 2:n) {
-            # Horizontal segment: extend previous survival level to current time
-            new_times     <- c(new_times,     times[i])
-            new_survivals <- c(new_survivals, survivals[i - 1])
-            if (!is.null(lowers)) new_lowers <- c(new_lowers, lowers[i - 1])
-            if (!is.null(uppers)) new_uppers <- c(new_uppers, uppers[i - 1])
-
-            # Vertical drop: fall to the new survival value at the same time
-            new_times     <- c(new_times,     times[i])
-            new_survivals <- c(new_survivals, survivals[i])
-            if (!is.null(lowers)) new_lowers <- c(new_lowers, lowers[i])
-            if (!is.null(uppers)) new_uppers <- c(new_uppers, uppers[i])
-        }
-    }
-
-    result              <- data.frame(a = new_times, b = new_survivals,
-                                      stringsAsFactors = FALSE)
-    names(result)       <- c(time_col, surv_col)
-    if (!is.null(lowers)) result[[lower_col]] <- new_lowers
-    if (!is.null(uppers)) result[[upper_col]] <- new_uppers
-
-    result
+# Null-coalescing operator used internally in this module
+`%||%` <- function(x, y) {
+    if (!is.null(x) && length(x) > 0 && !is.na(x[1]) &&
+        nzchar(as.character(x[1]))) x else y
 }

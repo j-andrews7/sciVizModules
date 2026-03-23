@@ -10,20 +10,12 @@ survivalCurvePlotOutputUI(id)
 \item{id}{The ID for the Shiny module.}
 }
 \value{
-A Shiny \code{tagList} containing a resizable plotly output and a DT table.
+A resizable \code{\link[plotly:plotlyOutput]{plotlyOutput}} widget.
 }
 \description{
-This should be placed in the UI where the plot and risk table should be shown,
-with an \code{id} that matches the \code{id} used in \code{survivalCurvePlotServer()} and
-\code{survivalCurvePlotInputsUI()}.
-}
-\details{
-The output contains two components:
-\enumerate{
-  \item An interactive plotly survival curve (resizable).
-  \item A \strong{Survival Summary Table} below the plot showing the number at
-    risk and other summary statistics at each time point.
-}
+A single resizable plotly figure.  When the data contains an \code{n.risk}
+column, a "Number at risk" table is embedded directly below the x-axis as
+plotly annotations.
 }
 \seealso{
 \code{\link[=survivalCurvePlotInputsUI]{survivalCurvePlotInputsUI()}},

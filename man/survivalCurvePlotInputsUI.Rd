@@ -15,52 +15,30 @@ survivalCurvePlotInputsUI(
 \arguments{
 \item{id}{The ID for the Shiny module.}
 
-\item{data}{The data frame used for plot generation. Must contain at minimum
-a time column and a survival probability column.}
+\item{data}{The data frame used for plot generation.}
 
-\item{defaults}{A named list of default values for the inputs. Recognised
-keys: \code{time.col}, \code{surv.col}, \code{group.col}, \code{n.risk.col}, \code{lower.col},
-\code{upper.col}, \code{show.ci}, \code{title.text}, \code{line.type}.}
+\item{defaults}{A named list of default values. Recognised keys:
+\code{time.col}, \code{surv.col}, \code{line.type}, \code{marker.symbol}.}
 
 \item{title}{An optional title displayed above the tabset panel.}
 
 \item{columns}{Number of columns for the UI grid layout.}
 }
 \value{
-A Shiny \code{tagList} containing the UI elements.
+A Shiny \code{tagList} containing all UI elements.
 }
 \description{
-This should be placed in the UI where the inputs should be shown, with an \code{id}
-that matches the \code{id} used in the \code{survivalCurvePlotServer()} and
-\code{survivalCurvePlotOutputUI()} functions.
+Column auto-detection uses \code{grep()} on column names.
 }
 \details{
-The user inputs for this module are separated from the outputs to
-allow for more flexible UI design.
+Tabs: \strong{Data} (time + survival column selectors),
+\strong{Colors} (per-group colour picker),
+\strong{Aesthetics} (line type + marker shape),
+\strong{Axes} (full axis styling), \strong{Lines} (reference lines).
 
-The inputs are organized into a tabset via \code{\link[VizModules:organize_inputs]{VizModules::organize_inputs()}},
-with \code{columns} controlling the number of columns in each tab's grid.
-
-This module wraps \code{\link[VizModules:linePlotInputsUI]{VizModules::linePlotInputsUI()}} and extends it with
-survival-specific controls for column selection, confidence intervals, and
-per-group colour picking.
+Reset / Auto Update / Save buttons added via
+\code{\link[VizModules:module_tack_ui]{VizModules::module_tack_ui()}}.
 }
-\section{Survival-specific inputs}{
-
-\itemize{
-  \item \code{time.col} - Column containing the time variable (auto-detected).
-  \item \code{surv.col} - Column containing the survival probability (auto-detected).
-  \item \code{group.col} - Optional column for grouping curves (auto-detected).
-  \item \code{n.risk.col} - Column with the number at risk for the risk table (auto-detected).
-  \item \code{lower.col} - Column for the lower 95\% CI bound (auto-detected).
-  \item \code{upper.col} - Column for the upper 95\% CI bound (auto-detected).
-  \item \code{show.ci} - Toggle to display the confidence interval ribbon.
-  \item \code{title.text} - Main plot title (default: \code{"Survival Curve"}).
-  \item \code{line.type} - Plotly line dash style (default: \code{"solid"}).
-  \item \code{survival.colors} - Per-group colour picker (\code{multiColorPicker}).
-}
-}
-
 \examples{
 library(sciVizModules)
 data(km_survival_groups)

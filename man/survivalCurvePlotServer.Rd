@@ -9,42 +9,34 @@ survivalCurvePlotServer(id, data, hide.inputs = NULL, hide.tabs = NULL)
 \arguments{
 \item{id}{The ID for the Shiny module.}
 
-\item{data}{A \code{reactive} containing the input data frame.
-Must include at minimum a time column and a survival probability column
-(0--1 scale).}
+\item{data}{A \code{reactive} returning the input data frame.}
 
-\item{hide.inputs}{A character vector of input IDs to hide via shinyjs.}
+\item{hide.inputs}{A character vector of input IDs to hide.}
 
-\item{hide.tabs}{A character vector of tab names to hide from the tabset panel.}
+\item{hide.tabs}{A character vector of tab names to hide.}
 }
 \value{
 The \code{moduleServer} for the survivalCurvePlot module.
 }
 \description{
 Renders a Kaplan-Meier-style survival curve as an interactive plotly step
-function together with an optional confidence-interval ribbon and a
-\strong{Survival Summary Table} showing per-group numbers at risk.
+function.  Group and n.risk columns are auto-detected using \code{grep()};
+no user selectors are required for them.
 }
 \details{
-The server follows the same modular pattern as \code{\link{volcanoPlotServer}}:
-it first transforms the input data into a step-function representation
-(duplicating each time point to create horizontal-then-vertical steps) and
-then hands the result to \code{\link[VizModules:linePlot]{VizModules::linePlot()}} for rendering.  CI ribbons
-are added as an extra plotly layer on top of the linePlot output.
-}
-\section{Data transformation}{
+The server transforms input data into a step-function representation via
+\code{.survival_to_step()} (defined in \code{R/plot_mods.R}), draws one
+\code{add_lines} trace per group plus optional \code{add_markers} at the
+original data points, and embeds a "Number at risk" table as plotly
+annotations below the x-axis.
 
-Each row \eqn{(t_i, s_i)} in the input data is expanded into two rows:
-\enumerate{
-  \item \eqn{(t_i,\; s_{i-1})} -- horizontal segment at the previous survival level.
-  \item \eqn{(t_i,\; s_i)}     -- vertical drop to the new survival level.
+Auto Update / manual Update / Reset are supported via
+\code{\link[VizModules:module_tack_ui]{VizModules::module_tack_ui()}} and
+\code{\link[VizModules:setup_auto_update_logic]{VizModules::setup_auto_update_logic()}}.
 }
-The first time point is kept as-is.  Survival values are multiplied by 100
-so that the y-axis shows percentages.
-}
-
 \seealso{
-\code{\link[VizModules:linePlot]{VizModules::linePlot()}}, \code{\link[=survivalCurvePlotInputsUI]{survivalCurvePlotInputsUI()}},
+\code{\link[VizModules:linePlot]{VizModules::linePlot()}},
+  \code{\link[=survivalCurvePlotInputsUI]{survivalCurvePlotInputsUI()}},
   \code{\link[=survivalCurvePlotOutputUI]{survivalCurvePlotOutputUI()}},
   \code{\link[=survivalCurvePlotApp]{survivalCurvePlotApp()}}
 }
