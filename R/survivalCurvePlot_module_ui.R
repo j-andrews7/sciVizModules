@@ -1,8 +1,8 @@
 #' Input UI components for the survivalCurvePlot module
 #'
 #' Wraps [VizModules::linePlotInputsUI()] following the same design pattern as
-#' [volcanoPlotInputsUI()].  Survival-specific controls (marker toggle and
-#' marker shape selector) are prepended above the standard linePlot tabset.
+#' [volcanoPlotInputsUI()].  Survival-specific controls (censor column selector
+#' and censor marker shape) are prepended above the standard linePlot tabset.
 #'
 #' Default column selections use the **first two columns** of the data frame:
 #' column 1 → x (time), column 2 → y (survival).  Irrelevant linePlot inputs
@@ -21,7 +21,6 @@
 #'
 #' @import shiny
 #' @importFrom shinyBS tipify
-#' @importFrom shinyWidgets materialSwitch
 #' @importFrom VizModules linePlotInputsUI
 #'
 #' @export
@@ -41,7 +40,7 @@ survivalCurvePlotInputsUI <- function(id, data,
 
     col_names <- names(data)
 
-    # --- Simple position-based column defaults (first col = time, second = surv)
+    # --- Position-based column defaults: col[1] = time, col[2] = survival ----
     if (!"x.value" %in% names(defaults)) {
         defaults$x.value <- col_names[1]
     }
@@ -51,21 +50,22 @@ survivalCurvePlotInputsUI <- function(id, data,
     # Force plot mode to lines (step-function)
     if (!"plot.type" %in% names(defaults)) defaults$plot.type <- "lines"
 
-    # --- Survival-specific extras (marker toggle + shape) --------------------
+    # --- Survival-specific extras (censor column + marker shape) -------------
     extras <- tagList(
         tipify(
-            materialSwitch(ns("show.markers"), "Show Data Points:",
-                value  = TRUE,
-                status = "success"),
-            "Overlay marker symbols at the original (non-interpolated) time points.",
+            selectInput(ns("censor.col"), "Censor Column:",
+                choices  = c("None" = "", col_names),
+                selected = ""),
+            paste("Select a column whose non-zero values mark censoring events.",
+                  "Leave blank for no censor markers."),
             placement = "top", options = list(container = "body")
         ),
         tipify(
-            selectInput(ns("marker.symbol"), "Marker Shape:",
-                choices  = c("circle", "square", "diamond", "cross", "x",
-                             "triangle-up", "triangle-down", "star", "pentagon"),
-                selected = "circle"),
-            "Shape of the marker placed at each observed time point.",
+            selectInput(ns("marker.symbol"), "Censor Marker Shape:",
+                choices  = c("x", "cross", "circle", "square", "diamond",
+                             "triangle-up", "triangle-down", "star"),
+                selected = "x"),
+            "Shape of the mark placed at each censoring event time point.",
             placement = "top", options = list(container = "body")
         )
     )
@@ -87,8 +87,7 @@ survivalCurvePlotInputsUI <- function(id, data,
 #' Output UI components for the survivalCurvePlot module
 #'
 #' Delegates to [VizModules::linePlotOutputUI()], creating a resizable plotly
-#' output.  When the data contains an `n.risk` column, the server embeds a
-#' "Number at risk" table as a second subplot below the KM curve.
+#' output.
 #'
 #' @param id The ID for the Shiny module.
 #' @return A resizable [plotly::plotlyOutput()] widget.

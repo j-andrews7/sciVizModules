@@ -9,21 +9,19 @@
 #' Irrelevant inputs (`group.by`, `errorBar`, `order.by`, etc.) and the Facet
 #' tab are hidden via shinyjs after the dynamic UI renders.
 #'
-#' @section Risk table:
-#' When the data contains an `n.risk` column (detected by [grep()]), the
-#' server builds a second subplot below the KM curve using
-#' [plotly::subplot()].  Each group's at-risk counts are rendered as text
-#' scatter traces — so the table is part of the plotly figure and resizes
-#' correctly when the user drags the widget handles.
-#'
 #' @section Column defaults:
 #' Column 1 → time (x), column 2 → survival (y).  Both can be overridden via
-#' the Data tab selectors.
+#' the Data tab selectors.  No automatic group or n.risk column detection is
+#' performed; only the two selected columns are used for the survival curve.
+#'
+#' @section Censor markers:
+#' When a censor column is selected via `input$censor.col`, rows where that
+#' column is non-zero are overlaid as marker symbols on the curve at their
+#' corresponding `(time, survival)` coordinates.
 #'
 #' @param id The ID for the Shiny module.
 #' @param data A `reactive` returning the input data frame.
-#' @param hide.inputs linePlot input IDs to hide (defaults cover all
-#'   survival-irrelevant inputs).
+#' @param hide.inputs linePlot input IDs to hide after the UI renders.
 #' @param hide.tabs linePlot tab names to hide.  Defaults to `"Facet"`.
 #' @return The `moduleServer` for the survivalCurvePlot module.
 #'
@@ -52,9 +50,7 @@ survivalCurvePlotServer <- function(
         ns <- session$ns
 
         # --- Hide irrelevant inputs/tabs AFTER dynamic UI renders -----------
-        # The UI is created via renderUI in the app, so DOM elements don't
-        # exist when the module server initialises.  We wait for x.value
-        # (first input the Data tab creates) before calling hide().
+        # Wait for x.value (first Data-tab input) to exist before hiding.
         observeEvent(input$x.value, {
             if (!is.null(hide.inputs)) {
                 for (inp in hide.inputs) shinyjs::hide(inp)
@@ -66,54 +62,27 @@ survivalCurvePlotServer <- function(
             }
         }, once = TRUE, ignoreNULL = TRUE)
 
-        # --- Auto-detect group column ----------------------------------------
-        group_col_name <- reactive({
-            df <- data()
-            if (is.null(df) || ncol(df) == 0) return(NULL)
-            non_num <- names(df)[vapply(df, function(x) !is.numeric(x), logical(1))]
-            found <- grep("^group$|^strata$|^arm$|^treatment$|^cohort$",
-                          non_num, value = TRUE, ignore.case = TRUE)
-            if (length(found) > 0) return(found[1])
-            if (length(non_num) > 0) non_num[1] else NULL
-        })
-
-        # --- Auto-detect n.risk column ---------------------------------------
-        nrisk_col_name <- reactive({
-            df <- data()
-            if (is.null(df)) return(NULL)
-            found <- grep("n[._]?risk|at[._]?risk",
-                          names(df), value = TRUE, ignore.case = TRUE)
-            if (length(found) > 0) found[1] else NULL
-        })
-
-        # --- Group levels ----------------------------------------------------
-        group_levels <- reactive({
-            df <- data()
-            gc <- group_col_name()
-            if (!is.null(gc) && gc %in% names(df)) {
-                as.character(unique(df[[gc]]))
-            } else {
-                "Survival"
-            }
-        })
-
         # --- Override linePlotInputsUI's palette.selection uiOutput ----------
+        # linePlotInputsUI renders `uiOutput(ns("palette.selection"))` in the
+        # Aesthetics tab and leaves it empty for the parent module to fill.
+        # We fill it here with a single-group colour picker for the KM curve,
+        # following the same pattern used in volcanoPlotServer.
         output$palette.selection <- renderUI({
-            groups <- group_levels()
             initial_colors <- isolate(
-                resolve_palette(groups, input$palette.colours, .default_sci_palette)
+                resolve_palette("Survival", input$palette.colours,
+                                .default_sci_palette)
             )
             multiColorPicker(
                 ns("palette.colours"),
-                label           = "Group Colors",
-                groups          = groups,
+                label           = "Curve Color",
+                groups          = "Survival",
                 palette_options = default_palettes()[["choices"]],
                 colors          = initial_colors,
                 compact         = TRUE
             )
         })
 
-        # --- Single column helpers -------------------------------------------
+        # --- Column helpers (single value from potentially-multi select) -----
         get_tc <- reactive({
             tc <- input$x.value
             if (length(tc) > 1) tc[1] else tc
@@ -131,11 +100,8 @@ survivalCurvePlotServer <- function(
             req(!is.null(tc), !is.null(sc), nzchar(tc), nzchar(sc))
             df <- data()
             req(tc %in% names(df), sc %in% names(df))
-            gc <- group_col_name()
-            .survival_to_step(
-                df, tc, sc,
-                if (!is.null(gc) && gc %in% names(df)) gc else NULL
-            )
+            # No group column — single survival curve from col[1] and col[2]
+            .survival_to_step(df, tc, sc, NULL)
         })
 
         # --- Reset handler ---------------------------------------------------
@@ -149,8 +115,8 @@ survivalCurvePlotServer <- function(
                 selected = if (length(col_names) >= 2) col_names[2] else col_names[1])
             updateSelectInput(session, "plot.type",     selected = "lines")
             updateSelectInput(session, "line.type",     selected = "solid")
-            shinyWidgets::updateMaterialSwitch(session, "show.markers", value = TRUE)
-            updateSelectInput(session, "marker.symbol", selected = "circle")
+            updateSelectInput(session, "censor.col",    selected = "")
+            updateSelectInput(session, "marker.symbol", selected = "x")
             VizModules:::.reset_axes_inputs(session)
             VizModules:::.reset_lines_inputs(session)
         })
@@ -163,20 +129,12 @@ survivalCurvePlotServer <- function(
             sd      <- step_data()
             orig_df <- data()
 
-            tc  <- get_tc()
-            sc  <- get_sc()
-            gc  <- group_col_name()
-            nrc <- nrisk_col_name()
-
-            gc_valid  <- !is.null(gc)  && gc  %in% names(sd)
-            nrc_valid <- !is.null(nrc) && nrc %in% names(orig_df)
-
-            groups   <- group_levels()
-            n_groups <- length(groups)
+            tc <- get_tc()
+            sc <- get_sc()
 
             line_type  <- isolate_fn(input$line.type)    %||% "solid"
-            show_mrkrs <- isTRUE(isolate_fn(input$show.markers))
-            marker_sym <- isolate_fn(input$marker.symbol) %||% "circle"
+            censor_col <- isolate_fn(input$censor.col)
+            marker_sym <- isolate_fn(input$marker.symbol) %||% "x"
             dl_format  <- isolate_fn(input$download.format) %||% "png"
 
             colors_named <- isolate_fn(input$palette.colours)
@@ -185,29 +143,17 @@ survivalCurvePlotServer <- function(
             } else {
                 .default_sci_palette
             }
-
-            get_hex <- function(g, i) {
-                if (!is.null(colors_named) &&
-                    as.character(g) %in% names(colors_named)) {
-                    colors_named[[as.character(g)]]
-                } else {
-                    palette_vals[min(i, length(palette_vals))]
-                }
-            }
-
-            colour_by   <- if (gc_valid) reformulate(gc) else palette_vals[1]
-            show_legend <- gc_valid
+            curve_color <- palette_vals[1]
 
             # --- KM line plot via linePlot() ---------------------------------
-            fig_km <- linePlot(
+            fig <- linePlot(
                 data              = sd,
                 x                 = tc,
                 y                 = sc,
                 plot.mode         = "lines",
                 line.type         = line_type,
-                colour.group.by   = colour_by,
                 palette.selection = palette_vals,
-                show.legend       = show_legend,
+                show.legend       = FALSE,
                 axis.showline     = isolate_fn(input$axis.showline),
                 axis.mirror       = isolate_fn(input$axis.mirror),
                 axis.linecolor    = isolate_fn(input$axis.linecolor),
@@ -229,44 +175,53 @@ survivalCurvePlotServer <- function(
                 y.title           = "Survival (%)"
             )
 
-            # --- Marker overlay at original (non-interpolated) data points ---
-            if (show_mrkrs) {
-                for (i in seq_along(groups)) {
-                    g        <- groups[i]
-                    hex      <- get_hex(g, i)
-                    orig_grp <- if (gc_valid) {
-                        orig_df[orig_df[[gc]] == g, , drop = FALSE]
-                    } else {
-                        orig_df
-                    }
-                    fig_km <- fig_km |> add_markers(
-                        data        = orig_grp,
-                        x           = orig_grp[[tc]],
-                        y           = orig_grp[[sc]] * 100,
-                        name        = as.character(g),
-                        marker      = list(color = hex, symbol = marker_sym, size = 7),
-                        legendgroup = as.character(g),
-                        showlegend  = FALSE,
-                        inherit     = FALSE
+            # --- Censor event markers ----------------------------------------
+            # Rows where the censor column is non-zero are plotted as markers.
+            # The censor column must be numeric (e.g. 0/1 indicator); non-numeric
+            # columns are silently skipped.
+            censor_valid <- !is.null(censor_col) && nzchar(censor_col) &&
+                            censor_col %in% names(orig_df) &&
+                            is.numeric(orig_df[[censor_col]])
+
+            if (censor_valid) {
+                censor_rows <- orig_df[
+                    !is.na(orig_df[[censor_col]]) & orig_df[[censor_col]] != 0,
+                    , drop = FALSE
+                ]
+                if (nrow(censor_rows) > 0) {
+                    fig <- fig |> add_markers(
+                        data       = censor_rows,
+                        x          = censor_rows[[tc]],
+                        y          = censor_rows[[sc]] * 100,
+                        name       = "Censored",
+                        marker     = list(color = curve_color,
+                                          symbol = marker_sym, size = 8),
+                        showlegend = FALSE,
+                        inherit    = FALSE
                     )
                 }
             }
 
-            # --- X-axis padding ----------------------------------------------
+            # --- X-axis padding: ~8% blank space beyond last time point ------
             max_time <- max(orig_df[[tc]], na.rm = TRUE)
             min_time <- min(orig_df[[tc]], na.rm = TRUE)
             x_pad    <- (max_time - min_time) * 0.08
             x_range  <- c(min_time - x_pad * 0.2, max_time + x_pad)
 
-            fig_km <- fig_km |> layout(
-                xaxis      = list(range = x_range),
+            # Explicitly set range AND x-axis title (subplot/layout calls can
+            # drop the title set by linePlot(); setting it here is definitive).
+            fig <- fig |> layout(
+                xaxis      = list(range = x_range,
+                                  title = list(text = tc)),
                 yaxis      = list(range = c(0, 105)),
-                showlegend = gc_valid
+                showlegend = FALSE,
+                margin     = list(t = 80, l = 90, r = 60,
+                                  b = 60, autoexpand = TRUE)
             )
 
-            # --- Reference lines ---------------------------------------------
-            fig_km <- .sci_add_reference_lines(
-                fig_km,
+            # --- Reference lines from Lines tab ------------------------------
+            fig <- .sci_add_reference_lines(
+                fig,
                 hline.intercepts  = isolate_fn(input$hline.intercepts),
                 hline.colors      = isolate_fn(input$hline.colors),
                 hline.widths      = isolate_fn(input$hline.widths),
@@ -285,116 +240,7 @@ survivalCurvePlotServer <- function(
                 abline.opacities  = isolate_fn(input$abline.opacities)
             )
 
-            # --- Number at risk: subplot approach ----------------------------
-            # Using subplot() ensures the table scales correctly when the user
-            # resizes the widget — unlike annotation-only approach which can
-            # clip content outside fixed pixel margins.
-            if (nrc_valid) {
-                times <- sort(unique(orig_df[[tc]]))
-
-                # Build risk table as a second subplot with text scatter traces
-                fig_risk <- plot_ly()
-
-                for (i in seq_along(groups)) {
-                    g      <- groups[i]
-                    hex    <- get_hex(g, i)
-                    y_pos  <- n_groups - i + 0.5  # top group at highest y
-
-                    grp_data <- if (gc_valid) {
-                        orig_df[orig_df[[gc]] == g, , drop = FALSE]
-                    } else {
-                        orig_df
-                    }
-
-                    risk_vals <- vapply(times, function(t) {
-                        row <- grp_data[grp_data[[tc]] == t, nrc, drop = TRUE]
-                        if (length(row) > 0 && !is.na(row[1])) {
-                            as.character(row[1])
-                        } else {
-                            ""
-                        }
-                    }, character(1))
-
-                    fig_risk <- fig_risk |> add_trace(
-                        type         = "scatter",
-                        mode         = "text",
-                        x            = times,
-                        y            = rep(y_pos, length(times)),
-                        text         = risk_vals,
-                        textfont     = list(color = hex, size = 10),
-                        showlegend   = FALSE,
-                        hoverinfo    = "none",
-                        textposition = "middle center"
-                    )
-                }
-
-                fig_risk <- fig_risk |> layout(
-                    xaxis = list(range = x_range, visible = FALSE),
-                    yaxis = list(range = c(-0.1, n_groups + 0.6),
-                                 visible = FALSE, fixedrange = TRUE)
-                )
-
-                # Proportional heights: risk table gets ~8% per group row
-                risk_h <- min(0.28, max(0.10, 0.08 * (n_groups + 1)))
-                km_h   <- 1 - risk_h
-
-                fig <- subplot(
-                    fig_km, fig_risk,
-                    nrows   = 2,
-                    heights = c(km_h, risk_h),
-                    shareX  = TRUE,
-                    titleY  = TRUE,
-                    margin  = 0.02
-                )
-
-                # Dynamic left margin so group labels are never clipped
-                max_label_chars <- max(nchar(c("Number at risk",
-                                               as.character(groups))))
-                l_margin <- max(90, ceiling(max_label_chars * 7) + 20)
-
-                # After subplot(), risk subplot's axes are y2.
-                # Build annotations: header + group labels (yref = "y2")
-                risk_anns <- list(
-                    list(
-                        text      = "<b>Number at risk</b>",
-                        xref      = "x",  yref = "y2",
-                        x         = x_range[1],
-                        y         = n_groups + 0.5,
-                        xanchor   = "left",
-                        showarrow = FALSE,
-                        font      = list(size = 11, color = "black")
-                    )
-                )
-                for (i in seq_along(groups)) {
-                    g     <- groups[i]
-                    hex   <- get_hex(g, i)
-                    y_pos <- n_groups - i + 0.5
-                    risk_anns[[length(risk_anns) + 1]] <- list(
-                        text      = as.character(g),
-                        xref      = "x",  yref = "y2",
-                        x         = x_range[1],
-                        y         = y_pos,
-                        xanchor   = "right",
-                        showarrow = FALSE,
-                        font      = list(color = hex, size = 10)
-                    )
-                }
-
-                fig <- fig |> layout(
-                    xaxis       = list(range = x_range, title = tc),
-                    showlegend  = gc_valid,
-                    margin      = list(t = 80, l = l_margin, r = 60,
-                                       b = 30, autoexpand = TRUE),
-                    annotations = risk_anns
-                )
-            } else {
-                fig <- fig_km |> layout(
-                    margin = list(t = 80, l = 90, r = 60,
-                                  b = 60, autoexpand = TRUE)
-                )
-            }
-
-            # --- Plot config -------------------------------------------------
+            # --- Plot config (modebar, download format) ----------------------
             cfg <- .sci_plot_config(download.format = dl_format)
             fig <- do.call(plotly::config, c(list(p = fig), cfg))
 
