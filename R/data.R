@@ -80,3 +80,61 @@
 #' @author Jared Andrews
 #' @keywords datasets
 "airway_voom"
+
+#' Single-group Kaplan-Meier survival example dataset
+#'
+#' A simulated survival dataset for a single cohort, matching the summary table
+#' format produced by the \code{survival} R package.  Suitable for demonstrating
+#' [survivalCurvePlotApp()] without grouping.
+#'
+#' @format A data frame with 11 rows and 7 columns:
+#' \describe{
+#'   \item{time}{Time point (arbitrary units, e.g. days).}
+#'   \item{n.risk}{Number of subjects still at risk at each time point.}
+#'   \item{n.event}{Number of events (e.g. deaths) at each time point.}
+#'   \item{survival}{Kaplan-Meier survival probability estimate (0–1 scale).}
+#'   \item{std.err}{Standard error of the survival estimate.}
+#'   \item{lower}{Lower bound of the 95\% confidence interval (0–1 scale).}
+#'   \item{upper}{Upper bound of the 95\% confidence interval (0–1 scale).}
+#' }
+#'
+#' @source Simulated data inspired by the example in the problem description.
+#'   See \code{data-raw/generate_survival_data.R} for the generation script.
+#'
+#' @examples
+#' library(sciVizModules)
+#' head(km_survival_single)
+#'
+#' @author Jacob Martin, Jared Andrews
+#' @keywords datasets
+"km_survival_single"
+
+#' Two-group Kaplan-Meier survival example dataset
+#'
+#' A simulated survival dataset containing two groups (low-risk and high-risk),
+#' useful for demonstrating grouped Kaplan-Meier curves in
+#' [survivalCurvePlotApp()].
+#'
+#' @format A data frame with 16 rows and 8 columns:
+#' \describe{
+#'   \item{time}{Time point (months).}
+#'   \item{n.risk}{Number of subjects still at risk at each time point.}
+#'   \item{n.event}{Number of events at each time point.}
+#'   \item{survival}{Kaplan-Meier survival probability estimate (0–1 scale).}
+#'   \item{std.err}{Standard error of the survival estimate.}
+#'   \item{lower}{Lower bound of the 95\% confidence interval (0–1 scale).}
+#'   \item{upper}{Upper bound of the 95\% confidence interval (0–1 scale).}
+#'   \item{group}{Group label: \code{"Group 1 (low risk)"} or
+#'     \code{"Group 2 (high risk)"}.}
+#' }
+#'
+#' @source Simulated to illustrate a typical two-arm KM comparison.
+#'   See \code{data-raw/generate_survival_data.R} for the generation script.
+#'
+#' @examples
+#' library(sciVizModules)
+#' head(km_survival_groups)
+#'
+#' @author Jacob Martin, Jared Andrews
+#' @keywords datasets
+"km_survival_groups"
