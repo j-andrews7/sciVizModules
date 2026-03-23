@@ -14,37 +14,29 @@ survivalCurvePlotServer(
 }
 \arguments{
 \item{id}{The ID for the Shiny module.}
-
 \item{data}{A \code{reactive} returning the input data frame.}
-
-\item{hide.inputs}{A character vector of linePlot input IDs to hide.}
-
-\item{hide.tabs}{A character vector of linePlot tab names to hide.}
+\item{hide.inputs}{linePlot input IDs to hide (defaults cover all
+  survival-irrelevant inputs).}
+\item{hide.tabs}{linePlot tab names to hide. Defaults to \code{"Facet"}.}
 }
 \value{
 The \code{moduleServer} for the survivalCurvePlot module.
 }
 \description{
-Follows the same design pattern as \code{\link[=volcanoPlotServer]{volcanoPlotServer()}}: the module
-pre-processes the data (step-function transform via \code{.survival_to_step()})
-and calls \code{\link[VizModules:linePlot]{VizModules::linePlot()}} for rendering, reading all axis,
-grid, font, line-style, and reference-line settings from the inputs
-created by \code{\link[VizModules:linePlotInputsUI]{VizModules::linePlotInputsUI()}}.
+Pre-processes data (step-function transform) then calls
+\code{\link[VizModules:linePlot]{VizModules::linePlot()}} for rendering.
+All axis/font/grid/reference-line settings come from
+\code{\link[VizModules:linePlotInputsUI]{VizModules::linePlotInputsUI()}}.
 }
 \details{
-Auto-update / manual-update / reset are handled via
-\code{\link[VizModules:module_tack_ui]{VizModules::module_tack_ui()}} and
-\code{\link[VizModules:setup_auto_update_logic]{VizModules::setup_auto_update_logic()}}.
-
-Group and n.risk columns are auto-detected from the data using
-\code{grep()}.  The colour picker in the Aesthetics tab reflects the
-auto-detected groups.
+Inputs hidden after dynamic UI renders (\code{observeEvent(input$x.value, once=TRUE)}).
+Risk table embedded as a second \code{subplot()} row so it scales correctly
+when the widget is resized.
 }
 \seealso{
 \code{\link[VizModules:linePlot]{VizModules::linePlot()}},
   \code{\link[=survivalCurvePlotInputsUI]{survivalCurvePlotInputsUI()}},
-  \code{\link[=survivalCurvePlotOutputUI]{survivalCurvePlotOutputUI()}},
-  \code{\link[=survivalCurvePlotApp]{survivalCurvePlotApp()}}
+  \code{\link[=survivalCurvePlotOutputUI]{survivalCurvePlotOutputUI()}}
 }
 \author{
 Jacob Martin, Jared Andrews

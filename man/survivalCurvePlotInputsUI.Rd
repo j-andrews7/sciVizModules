@@ -14,33 +14,20 @@ survivalCurvePlotInputsUI(
 }
 \arguments{
 \item{id}{The ID for the Shiny module.}
-
 \item{data}{The data frame used for plot generation.}
-
-\item{defaults}{A named list of default values passed to
-\code{\link[VizModules:linePlotInputsUI]{VizModules::linePlotInputsUI()}}.
-Recognised survival-specific keys: \code{x.value} and \code{y.value}.}
-
+\item{defaults}{A named list of default values. Key overrides: \code{x.value}
+  (time column) and \code{y.value} (survival column).}
 \item{title}{An optional title displayed above the tabset panel.}
-
 \item{columns}{Number of columns for the UI grid layout.}
 }
 \value{
-A Shiny \code{tagList} containing survival-specific extras above the
-  standard linePlot tabset.
+A Shiny \code{tagList} with survival-specific extras above the standard
+  linePlot tabset.
 }
 \description{
 Wraps \code{\link[VizModules:linePlotInputsUI]{VizModules::linePlotInputsUI()}}
 following the same design pattern as \code{\link[=volcanoPlotInputsUI]{volcanoPlotInputsUI()}}.
-}
-\details{
-Prepends a marker-toggle switch and marker-shape selector above the standard
-linePlot tabset (Data, Aesthetics, Axes, Lines, module\_tack\_ui).
-
-Column auto-detection uses \code{grep()} to set default \code{x.value}
-(time) and \code{y.value} (survival). Irrelevant inputs
-(\code{group.by}, \code{errorBar}, etc.) are hidden by
-\code{\link[=survivalCurvePlotServer]{survivalCurvePlotServer()}}.
+Defaults: column 1 as time (x), column 2 as survival (y).
 }
 \examples{
 library(sciVizModules)
@@ -50,7 +37,6 @@ survivalCurvePlotInputsUI("survivalPlot", km_survival_groups)
 \seealso{
 \code{\link[=survivalCurvePlotOutputUI]{survivalCurvePlotOutputUI()}},
   \code{\link[=survivalCurvePlotServer]{survivalCurvePlotServer()}},
-  \code{\link[=survivalCurvePlotApp]{survivalCurvePlotApp()}},
   \code{\link[VizModules:linePlotInputsUI]{VizModules::linePlotInputsUI()}}
 }
 \author{
