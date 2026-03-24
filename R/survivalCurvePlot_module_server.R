@@ -149,7 +149,7 @@ survivalCurvePlotServer <- function(
                 selected = if (length(col_names) >= 2) col_names[2] else col_names[1])
             updateSelectInput(session, "plot.type",     selected = "lines")
             updateSelectInput(session, "line.type",     selected = "solid")
-            shinyWidgets::updateMaterialSwitch(session, "show.markers", value = TRUE)
+            updateSelectInput(session, "censor.column", selected = "None")
             updateSelectInput(session, "marker.symbol", selected = "circle")
             VizModules:::.reset_axes_inputs(session)
             VizModules:::.reset_lines_inputs(session)
@@ -175,7 +175,9 @@ survivalCurvePlotServer <- function(
             n_groups <- length(groups)
 
             line_type  <- isolate_fn(input$line.type)    %||% "solid"
-            show_mrkrs <- isTRUE(isolate_fn(input$show.markers))
+            censor_col <- isolate_fn(input$censor.column)
+            censor_valid <- !is.null(censor_col) && nzchar(censor_col) &&
+                            censor_col != "None" && censor_col %in% names(orig_df)
             marker_sym <- isolate_fn(input$marker.symbol) %||% "circle"
             dl_format  <- isolate_fn(input$download.format) %||% "png"
 
@@ -229,8 +231,8 @@ survivalCurvePlotServer <- function(
                 y.title           = "Survival (%)"
             )
 
-            # --- Marker overlay at original (non-interpolated) data points ---
-            if (show_mrkrs) {
+            # --- Marker overlay at censor data points ------------------------
+            if (censor_valid) {
                 for (i in seq_along(groups)) {
                     g        <- groups[i]
                     hex      <- get_hex(g, i)
@@ -239,16 +241,22 @@ survivalCurvePlotServer <- function(
                     } else {
                         orig_df
                     }
-                    fig_km <- fig_km |> add_markers(
-                        data        = orig_grp,
-                        x           = orig_grp[[tc]],
-                        y           = orig_grp[[sc]] * 100,
-                        name        = as.character(g),
-                        marker      = list(color = hex, symbol = marker_sym, size = 7),
-                        legendgroup = as.character(g),
-                        showlegend  = FALSE,
-                        inherit     = FALSE
-                    )
+                    marker_rows <- orig_grp[
+                        !is.na(orig_grp[[censor_col]]) & orig_grp[[censor_col]] > 0,
+                        , drop = FALSE
+                    ]
+                    if (nrow(marker_rows) > 0) {
+                        fig_km <- fig_km |> add_markers(
+                            data        = marker_rows,
+                            x           = marker_rows[[tc]],
+                            y           = marker_rows[[sc]] * 100,
+                            name        = as.character(g),
+                            marker      = list(color = hex, symbol = marker_sym, size = 7),
+                            legendgroup = as.character(g),
+                            showlegend  = FALSE,
+                            inherit     = FALSE
+                        )
+                    }
                 }
             }
 
@@ -259,7 +267,7 @@ survivalCurvePlotServer <- function(
             x_range  <- c(min_time - x_pad * 0.2, max_time + x_pad)
 
             fig_km <- fig_km |> layout(
-                xaxis      = list(range = x_range),
+                xaxis      = list(range = x_range, title = tc),
                 yaxis      = list(range = c(0, 105)),
                 showlegend = gc_valid
             )
@@ -285,31 +293,61 @@ survivalCurvePlotServer <- function(
                 abline.opacities  = isolate_fn(input$abline.opacities)
             )
 
-            # --- Number at risk: subplot approach ----------------------------
+            # --- Number at risk / censor table: subplot approach -------------
             # Using subplot() ensures the table scales correctly when the user
             # resizes the widget — unlike annotation-only approach which can
             # clip content outside fixed pixel margins.
-            if (nrc_valid) {
+            if (nrc_valid || censor_valid) {
                 times <- sort(unique(orig_df[[tc]]))
 
-                # Build risk table as a second subplot with text scatter traces
+                # Build table as a second subplot with text scatter traces
                 fig_risk <- plot_ly()
 
-                for (i in seq_along(groups)) {
-                    g      <- groups[i]
-                    hex    <- get_hex(g, i)
-                    y_pos  <- n_groups - i + 0.5  # top group at highest y
+                if (nrc_valid) {
+                    for (i in seq_along(groups)) {
+                        g      <- groups[i]
+                        hex    <- get_hex(g, i)
+                        y_pos  <- n_groups - i + 0.5  # top group at highest y
 
-                    grp_data <- if (gc_valid) {
-                        orig_df[orig_df[[gc]] == g, , drop = FALSE]
-                    } else {
-                        orig_df
+                        grp_data <- if (gc_valid) {
+                            orig_df[orig_df[[gc]] == g, , drop = FALSE]
+                        } else {
+                            orig_df
+                        }
+
+                        risk_vals <- vapply(times, function(t) {
+                            row <- grp_data[grp_data[[tc]] == t, nrc, drop = TRUE]
+                            if (length(row) > 0 && !is.na(row[1])) {
+                                as.character(row[1])
+                            } else {
+                                ""
+                            }
+                        }, character(1))
+
+                        fig_risk <- fig_risk |> add_trace(
+                            type         = "scatter",
+                            mode         = "text",
+                            x            = times,
+                            y            = rep(y_pos, length(times)),
+                            text         = risk_vals,
+                            textfont     = list(color = hex, size = 10),
+                            showlegend   = FALSE,
+                            hoverinfo    = "none",
+                            textposition = "middle center"
+                        )
                     }
+                }
 
-                    risk_vals <- vapply(times, function(t) {
-                        row <- grp_data[grp_data[[tc]] == t, nrc, drop = TRUE]
-                        if (length(row) > 0 && !is.na(row[1])) {
-                            as.character(row[1])
+                # --- Censor row below n.risk rows ----------------------------
+                # y = -0.5 places the censor row one unit below the bottom
+                # n.risk row (lowest group at y = 0.5); y = 0.5 centres it in
+                # a single-row table when no n.risk section is present.
+                censor_row_y <- if (nrc_valid) -0.5 else 0.5
+                if (censor_valid) {
+                    censor_vals <- vapply(times, function(t) {
+                        row <- orig_df[orig_df[[tc]] == t, censor_col, drop = TRUE]
+                        if (length(row) > 0 && !all(is.na(row))) {
+                            as.character(sum(row, na.rm = TRUE))
                         } else {
                             ""
                         }
@@ -319,23 +357,28 @@ survivalCurvePlotServer <- function(
                         type         = "scatter",
                         mode         = "text",
                         x            = times,
-                        y            = rep(y_pos, length(times)),
-                        text         = risk_vals,
-                        textfont     = list(color = hex, size = 10),
+                        y            = rep(censor_row_y, length(times)),
+                        text         = censor_vals,
+                        textfont     = list(color = "black", size = 10),
                         showlegend   = FALSE,
                         hoverinfo    = "none",
                         textposition = "middle center"
                     )
                 }
 
+                y_top    <- if (nrc_valid) n_groups + 0.6 else 1.1
+                y_bottom <- if (nrc_valid && censor_valid) -0.65 else -0.1
+
                 fig_risk <- fig_risk |> layout(
                     xaxis = list(range = x_range, visible = FALSE),
-                    yaxis = list(range = c(-0.1, n_groups + 0.6),
+                    yaxis = list(range = c(y_bottom, y_top),
                                  visible = FALSE, fixedrange = TRUE)
                 )
 
-                # Proportional heights: risk table gets ~8% per group row
-                risk_h <- min(0.28, max(0.10, 0.08 * (n_groups + 1)))
+                # Proportional heights: table gets ~8% per row
+                n_table_rows <- (if (nrc_valid) as.integer(n_groups) else 0L) +
+                                (if (censor_valid) 1L else 0L)
+                risk_h <- min(0.28, max(0.10, 0.08 * (n_table_rows + 1)))
                 km_h   <- 1 - risk_h
 
                 fig <- subplot(
@@ -348,14 +391,21 @@ survivalCurvePlotServer <- function(
                 )
 
                 # Dynamic left margin so group labels are never clipped
-                max_label_chars <- max(nchar(c("Number at risk",
-                                               as.character(groups))))
+                label_candidates <- "Censor"
+                if (nrc_valid) {
+                    label_candidates <- c("Number at risk",
+                                          as.character(groups),
+                                          label_candidates)
+                }
+                max_label_chars <- max(nchar(label_candidates))
                 l_margin <- max(90, ceiling(max_label_chars * 7) + 20)
 
                 # After subplot(), risk subplot's axes are y2.
                 # Build annotations: header + group labels (yref = "y2")
-                risk_anns <- list(
-                    list(
+                risk_anns <- list()
+
+                if (nrc_valid) {
+                    risk_anns[[length(risk_anns) + 1]] <- list(
                         text      = "<b>Number at risk</b>",
                         xref      = "x",  yref = "y2",
                         x         = x_range[1],
@@ -364,19 +414,31 @@ survivalCurvePlotServer <- function(
                         showarrow = FALSE,
                         font      = list(size = 11, color = "black")
                     )
-                )
-                for (i in seq_along(groups)) {
-                    g     <- groups[i]
-                    hex   <- get_hex(g, i)
-                    y_pos <- n_groups - i + 0.5
+                    for (i in seq_along(groups)) {
+                        g     <- groups[i]
+                        hex   <- get_hex(g, i)
+                        y_pos <- n_groups - i + 0.5
+                        risk_anns[[length(risk_anns) + 1]] <- list(
+                            text      = as.character(g),
+                            xref      = "x",  yref = "y2",
+                            x         = x_range[1],
+                            y         = y_pos,
+                            xanchor   = "right",
+                            showarrow = FALSE,
+                            font      = list(color = hex, size = 10)
+                        )
+                    }
+                }
+
+                if (censor_valid) {
                     risk_anns[[length(risk_anns) + 1]] <- list(
-                        text      = as.character(g),
+                        text      = "<b>Censor</b>",
                         xref      = "x",  yref = "y2",
                         x         = x_range[1],
-                        y         = y_pos,
+                        y         = censor_row_y,
                         xanchor   = "right",
                         showarrow = FALSE,
-                        font      = list(color = hex, size = 10)
+                        font      = list(size = 10, color = "black")
                     )
                 }
 

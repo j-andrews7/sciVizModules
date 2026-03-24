@@ -1,13 +1,15 @@
 #' Input UI components for the survivalCurvePlot module
 #'
 #' Wraps [VizModules::linePlotInputsUI()] following the same design pattern as
-#' [volcanoPlotInputsUI()].  Survival-specific controls (marker toggle and
-#' marker shape selector) are prepended above the standard linePlot tabset.
+#' [volcanoPlotInputsUI()].  Survival-specific controls (censor column selector
+#' and marker shape selector) are prepended above the standard linePlot tabset.
 #'
 #' Default column selections use the **first two columns** of the data frame:
 #' column 1 → x (time), column 2 → y (survival).  Irrelevant linePlot inputs
 #' (`group.by`, `errorBar`, `order.by`, etc.) and the Facet tab are hidden by
-#' [survivalCurvePlotServer()].
+#' [survivalCurvePlotServer()].  When a censor column is selected, markers are
+#' overlaid at time points where the censor value is greater than 0, and a
+#' Censor row is added to the table below the plot.
 #'
 #' @param id The ID for the Shiny module.
 #' @param data The data frame used for plot generation.
@@ -21,7 +23,6 @@
 #'
 #' @import shiny
 #' @importFrom shinyBS tipify
-#' @importFrom shinyWidgets materialSwitch
 #' @importFrom VizModules linePlotInputsUI
 #'
 #' @export
@@ -51,13 +52,13 @@ survivalCurvePlotInputsUI <- function(id, data,
     # Force plot mode to lines (step-function)
     if (!"plot.type" %in% names(defaults)) defaults$plot.type <- "lines"
 
-    # --- Survival-specific extras (marker toggle + shape) --------------------
+    # --- Survival-specific extras (censor column selector + marker shape) ----
     extras <- tagList(
         tipify(
-            materialSwitch(ns("show.markers"), "Show Data Points:",
-                value  = TRUE,
-                status = "success"),
-            "Overlay marker symbols at the original (non-interpolated) time points.",
+            selectInput(ns("censor.column"), "Censor Column:",
+                choices  = c("None", col_names),
+                selected = "None"),
+            "Select a column for censor data. Markers are shown at time points where the censor value is greater than 0.",
             placement = "top", options = list(container = "body")
         ),
         tipify(
