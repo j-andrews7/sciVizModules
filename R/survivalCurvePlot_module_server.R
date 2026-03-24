@@ -7,8 +7,9 @@
 #'
 #' All axis, grid, font, line-style, reference-line, reset, auto-update, and
 #' download settings come from the [VizModules::linePlotInputsUI()] tabset.
-#' Survival-irrelevant inputs (`group.by`, `errorBar`, `order.by`, etc.) and
-#' the Facet tab are hidden via shinyjs after the dynamic UI renders.
+#' Survival-irrelevant inputs (`group.by`, `errorBar`, `order.by`, `flip.x`,
+#' `flip.y`, etc.) and the Facet tab are hidden via shinyjs after the dynamic
+#' UI renders.
 #'
 #' @section Column defaults:
 #' Column 1 → time (x), column 2 → survival (y). Both can be overridden via
@@ -16,10 +17,17 @@
 #' always plots a single survival curve.
 #'
 #' @section Censor markers:
-#' When the user selects a censor indicator column via `input$censor.col`, every
-#' row where that column is a **non-zero numeric value** gets a marker plotted on
-#' the curve at `(time, survival)`. This marks censoring events — patients who
-#' left the study before experiencing the event.
+#' When the user selects a censor indicator column via `input$censor.col`,
+#' every row where that column is **non-zero numeric** gets a marker plotted
+#' on the curve at `(time, survival × 100)`.  This places the symbol at the
+#' correct survival level for that time point, not at the raw censor value.
+#'
+#' @section Risk + censor table:
+#' When the data contains an `n.risk`-style column (detected automatically)
+#' and/or a censor column is selected, a summary table is drawn below the
+#' KM curve using [plotly::subplot()].  Each row shows values at every time
+#' point, with row labels on the left.  Because the table lives inside the
+#' plotly figure it scales correctly when the user resizes the widget.
 #'
 #' @param id       The module namespace ID.
 #' @param data     A `reactive` returning the KM summary data frame.
@@ -46,7 +54,8 @@ survivalCurvePlotServer <- function(
         data,
         hide.inputs = c("group.by", "errorBar", "errorBarColour",
                         "errorBarWidth", "order.by",
-                        "x.adjustment", "y.adjustment"),
+                        "x.adjustment", "y.adjustment",
+                        "flip.x", "flip.y"),
         hide.tabs = "Facet") {
 
     stopifnot(is.reactive(data))
@@ -80,8 +89,8 @@ survivalCurvePlotServer <- function(
         # We render a single-colour picker here (one colour = one survival curve).
         # This follows the same pattern used in volcanoPlotServer.
         output$palette.selection <- renderUI({
-            # Resolve the initial colour, preserving any value the user has
-            # already chosen (via `isolate` so it doesn't trigger reactivity).
+            # Preserve any colour the user has already chosen (isolate prevents
+            # re-triggering this renderUI every time inputs change).
             initial_colour <- isolate(
                 resolve_palette("Survival", input$palette.colours,
                                 .default_sci_palette)
@@ -190,9 +199,9 @@ survivalCurvePlotServer <- function(
 
             # ── Collect user settings from the linePlot tabset ────────────────
 
-            line_style       <- isolate_fn(input$line.type)     %||% "solid"
-            censor_indicator <- isolate_fn(input$censor.col)     # column name or ""
-            censor_symbol    <- isolate_fn(input$marker.symbol)  %||% "x"
+            line_style       <- isolate_fn(input$line.type)      %||% "solid"
+            censor_indicator <- isolate_fn(input$censor.col)      # column name or ""
+            censor_symbol    <- isolate_fn(input$marker.symbol)   %||% "x"
             download_format  <- isolate_fn(input$download.format) %||% "png"
 
             # Resolve curve colour from the colour picker.
@@ -204,6 +213,7 @@ survivalCurvePlotServer <- function(
                 .default_sci_palette
             }
             curve_colour <- colour_vector[1]   # single curve → first palette colour
+
 
             # ── Draw the KM step-function line via linePlot() ─────────────────
             # `colour.group.by = NULL` tells linePlot to use a single colour
@@ -241,11 +251,13 @@ survivalCurvePlotServer <- function(
                 y.title           = "Survival (%)"
             )
 
-            # ── Overlay censor event markers ──────────────────────────────────
-            # Each row in the original data where the chosen censor column holds
-            # a non-zero value represents a patient who was censored (lost to
-            # follow-up or study ended).  We mark those points with a symbol so
-            # they are visually distinguishable from the step-function line.
+
+            # ── Overlay censor event markers on the KM line ───────────────────
+            # When the user chooses a censor indicator column, every row where
+            # that column is non-zero is treated as a censoring event.  We plot
+            # a symbol at the SURVIVAL value for that time point (not at the raw
+            # censor indicator value) — the symbol sits on the step-function
+            # line exactly where the patient was censored.
             # Only numeric censor columns are accepted to avoid type errors.
             censor_col_valid <- !is.null(censor_indicator) &&
                                  nzchar(censor_indicator) &&
@@ -253,7 +265,7 @@ survivalCurvePlotServer <- function(
                                  is.numeric(raw_data[[censor_indicator]])
 
             if (censor_col_valid) {
-                # Keep only rows that are flagged as censored (value != 0).
+                # Keep only rows flagged as censored (non-zero indicator).
                 censored_rows <- raw_data[
                     !is.na(raw_data[[censor_indicator]]) &
                     raw_data[[censor_indicator]] != 0,
@@ -261,9 +273,9 @@ survivalCurvePlotServer <- function(
                 ]
 
                 if (nrow(censored_rows) > 0) {
-                    # Plot a marker at each censored time point.
-                    # The y-value uses the original 0–1 survival column × 100
-                    # to match the % scale used by step_df.
+                    # Place each symbol at (time, survival_at_that_time × 100).
+                    # Multiplying by 100 converts the 0–1 KM estimate to the %
+                    # scale that linePlot uses for the y-axis.
                     km_figure <- km_figure |> add_markers(
                         data       = censored_rows,
                         x          = censored_rows[[t_col]],
@@ -278,24 +290,191 @@ survivalCurvePlotServer <- function(
                 }
             }
 
-            # ── Set axis ranges and titles ────────────────────────────────────
-            # Add ~8% blank space on the right so the curve doesn't run to the
-            # plot edge.  Also explicitly set the x-axis title here because a
-            # subsequent layout() call can overwrite what linePlot() set.
+
+            # ── Compute x-axis display range (with right-side padding) ────────
+            # Adding ~8% blank space on the right keeps the curve from running
+            # flush to the plot edge; a tiny left offset keeps t=0 from
+            # touching the y-axis.
             max_time        <- max(raw_data[[t_col]], na.rm = TRUE)
             min_time        <- min(raw_data[[t_col]], na.rm = TRUE)
             time_range_span <- max_time - min_time
             x_padding       <- time_range_span * 0.08
             x_display_range <- c(min_time - x_padding * 0.2, max_time + x_padding)
 
-            km_figure <- km_figure |> layout(
-                xaxis      = list(range = x_display_range,
-                                  title = list(text = t_col)),
-                yaxis      = list(range = c(0, 105)),
-                showlegend = FALSE,
-                margin     = list(t = 80, l = 90, r = 60,
-                                  b = 60, autoexpand = TRUE)
-            )
+
+            # ── Build the "Number at risk / Censored" summary table ───────────
+            # The table lives as a second plotly subplot directly below the KM
+            # curve.  Using subplot() means it resizes with the widget — unlike
+            # fixed annotation approaches that can clip at small sizes.
+            #
+            # Table rows shown:
+            #   "Number at risk" — n.risk values at each time point (auto-detected)
+            #   "Censored"       — censor indicator values (shown only when the
+            #                       user has selected a censor column)
+
+            # Auto-detect the n.risk column by matching common naming conventions.
+            nrisk_col_name <- {
+                found <- grep("n[._]?risk|at[._]?risk",
+                              names(raw_data), value = TRUE, ignore.case = TRUE)
+                if (length(found) > 0) found[1] else NULL
+            }
+            has_nrisk  <- !is.null(nrisk_col_name)
+            has_censor <- censor_col_valid   # same flag as the marker section
+
+            if (has_nrisk || has_censor) {
+
+                # Unique time points in ascending order (one column per time point).
+                time_points <- sort(unique(raw_data[[t_col]]))
+
+                # Count the rows we need in the table.
+                n_table_rows <- sum(c(has_nrisk, has_censor))
+
+                # Build an empty figure for the table panel.
+                fig_table <- plot_ly()
+
+                # `row_y` tracks the y-position of the current table row
+                # (counts down from n_table_rows so the first row is at the top).
+                row_y <- n_table_rows
+
+                if (has_nrisk) {
+                    # Look up the n.risk value for every time point.
+                    nrisk_text <- vapply(time_points, function(t) {
+                        val <- raw_data[raw_data[[t_col]] == t,
+                                        nrisk_col_name, drop = TRUE]
+                        if (length(val) > 0 && !is.na(val[1])) {
+                            as.character(val[1])
+                        } else {
+                            ""
+                        }
+                    }, character(1))
+
+                    fig_table <- fig_table |> add_trace(
+                        type         = "scatter",
+                        mode         = "text",
+                        x            = time_points,
+                        y            = rep(row_y - 0.5, length(time_points)),
+                        text         = nrisk_text,
+                        textfont     = list(color = curve_colour, size = 10),
+                        showlegend   = FALSE,
+                        hoverinfo    = "none",
+                        textposition = "middle center"
+                    )
+                    row_y <- row_y - 1
+                }
+
+                if (has_censor) {
+                    # Show the raw 0/1 indicator value for each time point.
+                    censor_text <- vapply(time_points, function(t) {
+                        val <- raw_data[raw_data[[t_col]] == t,
+                                        censor_indicator, drop = TRUE]
+                        if (length(val) > 0 && !is.na(val[1])) {
+                            as.character(val[1])
+                        } else {
+                            ""
+                        }
+                    }, character(1))
+
+                    fig_table <- fig_table |> add_trace(
+                        type         = "scatter",
+                        mode         = "text",
+                        x            = time_points,
+                        y            = rep(row_y - 0.5, length(time_points)),
+                        text         = censor_text,
+                        textfont     = list(color = curve_colour, size = 10),
+                        showlegend   = FALSE,
+                        hoverinfo    = "none",
+                        textposition = "middle center"
+                    )
+                }
+
+                # Hide the table subplot's own axes — the KM x-axis is shared.
+                fig_table <- fig_table |> layout(
+                    xaxis = list(range = x_display_range, visible = FALSE),
+                    yaxis = list(range = c(-0.1, n_table_rows + 0.5),
+                                 visible = FALSE, fixedrange = TRUE)
+                )
+
+                # Proportional heights: give each table row ~8% of total height,
+                # capped at 25% so the KM curve always dominates visually.
+                row_height_fraction <- 0.08   # fraction of total height per row
+                max_table_height    <- 0.25   # upper cap on table panel height
+                table_height <- min(max_table_height,
+                                    max(row_height_fraction,
+                                        row_height_fraction * (n_table_rows + 1)))
+                km_height    <- 1 - table_height
+
+                # Combine the KM plot (top) and table (bottom) into one figure.
+                km_figure <- subplot(
+                    km_figure, fig_table,
+                    nrows   = 2,
+                    heights = c(km_height, table_height),
+                    shareX  = TRUE,
+                    titleY  = TRUE,
+                    margin  = 0.02
+                )
+
+                # Compute left margin wide enough for the longest row label.
+                # Each character is approximately 7 pixels wide; add 20 px padding.
+                min_left_margin  <- 90    # pixels — matches the no-table fallback
+                pixels_per_char  <- 7
+                label_padding_px <- 20
+                max_label_chars <- max(nchar(c("Number at risk", "Censored")))
+                left_margin     <- max(min_left_margin,
+                                       ceiling(max_label_chars * pixels_per_char) +
+                                       label_padding_px)
+
+                # Build text annotations for each row label.
+                # After subplot(), the table subplot axes are labelled "y2".
+                table_annotations <- list()
+                ann_row_y <- n_table_rows
+
+                if (has_nrisk) {
+                    table_annotations <- c(table_annotations, list(list(
+                        text      = "<b>Number at risk</b>",
+                        xref      = "x",  yref = "y2",
+                        x         = x_display_range[1],
+                        y         = ann_row_y - 0.5,
+                        xanchor   = "right",
+                        showarrow = FALSE,
+                        font      = list(size = 10, color = "black")
+                    )))
+                    ann_row_y <- ann_row_y - 1
+                }
+
+                if (has_censor) {
+                    table_annotations <- c(table_annotations, list(list(
+                        text      = "<b>Censored</b>",
+                        xref      = "x",  yref = "y2",
+                        x         = x_display_range[1],
+                        y         = ann_row_y - 0.5,
+                        xanchor   = "right",
+                        showarrow = FALSE,
+                        font      = list(size = 10, color = "black")
+                    )))
+                }
+
+                # Apply the final layout: shared x-axis title, margins, labels.
+                km_figure <- km_figure |> layout(
+                    xaxis       = list(range  = x_display_range,
+                                       title  = list(text = t_col)),
+                    showlegend  = FALSE,
+                    margin      = list(t = 80, l = left_margin, r = 60,
+                                       b = 30, autoexpand = TRUE),
+                    annotations = table_annotations
+                )
+
+            } else {
+                # No table to show — just apply ranges and titles directly.
+                km_figure <- km_figure |> layout(
+                    xaxis      = list(range = x_display_range,
+                                      title = list(text = t_col)),
+                    yaxis      = list(range = c(0, 105)),
+                    showlegend = FALSE,
+                    margin     = list(t = 80, l = 90, r = 60,
+                                      b = 60, autoexpand = TRUE)
+                )
+            }
+
 
             # ── Add reference lines from the Lines tab ────────────────────────
             # The Lines tab inputs (hline.intercepts, vline.intercepts, etc.) are
@@ -320,11 +499,12 @@ survivalCurvePlotServer <- function(
                 abline.opacities  = isolate_fn(input$abline.opacities)
             )
 
+
             # ── Apply plotly toolbar config ───────────────────────────────────
             # Adds drawing tools and sets the download image format chosen by
             # the user in the module_tack_ui Download Format selector.
-            plot_config  <- .sci_plot_config(download.format = download_format)
-            km_figure <- do.call(plotly::config, c(list(p = km_figure), plot_config))
+            plot_config <- .sci_plot_config(download.format = download_format)
+            km_figure   <- do.call(plotly::config, c(list(p = km_figure), plot_config))
 
             km_figure
         })
