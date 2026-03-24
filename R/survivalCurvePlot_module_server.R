@@ -66,15 +66,22 @@ survivalCurvePlotServer <- function(
             }
         }, once = TRUE, ignoreNULL = TRUE)
 
-        # --- Auto-detect group column ----------------------------------------
-        group_col_name <- reactive({
+        # --- Update colour.by choices when data changes ----------------------
+        observeEvent(data(), {
             df <- data()
-            if (is.null(df) || ncol(df) == 0) return(NULL)
-            non_num <- names(df)[vapply(df, function(x) !is.numeric(x), logical(1))]
-            found <- grep("^group$|^strata$|^arm$|^treatment$|^cohort$",
-                          non_num, value = TRUE, ignore.case = TRUE)
-            if (length(found) > 0) return(found[1])
-            if (length(non_num) > 0) non_num[1] else NULL
+            if (is.null(df) || ncol(df) == 0) return()
+            choices  <- .colour_by_choices(df)
+            current  <- isolate(input$colour.by)
+            selected <- if (!is.null(current) && current %in% choices) current else choices[1]
+            updateSelectInput(session, "colour.by", choices = choices, selected = selected)
+        }, ignoreNULL = TRUE)
+
+        # --- Group column driven by colour.by input --------------------------
+        group_col_name <- reactive({
+            cb <- input$colour.by
+            if (is.null(cb) || cb == "None" || !nzchar(cb)) return(NULL)
+            df <- data()
+            if (!is.null(df) && cb %in% names(df)) cb else NULL
         })
 
         # --- Auto-detect n.risk column ---------------------------------------
@@ -151,6 +158,10 @@ survivalCurvePlotServer <- function(
             updateSelectInput(session, "line.type",     selected = "solid")
             shinyWidgets::updateMaterialSwitch(session, "show.markers", value = TRUE)
             updateSelectInput(session, "marker.symbol", selected = "circle")
+            # Reset colour.by to auto-detected default
+            choices    <- .colour_by_choices(df)
+            default_cb <- .default_colour_by(df)
+            updateSelectInput(session, "colour.by", choices = choices, selected = default_cb)
             VizModules:::.reset_axes_inputs(session)
             VizModules:::.reset_lines_inputs(session)
         })

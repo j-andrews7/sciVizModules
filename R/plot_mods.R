@@ -19,6 +19,39 @@
 }
 
 
+# ---- Colour-by column helpers ----------------------------------------------
+
+#' Return categorical column choices for a colour-by selector
+#'
+#' @param df A data frame.
+#' @return A character vector: `"None"` followed by the names of all
+#'   non-numeric columns in `df`, or just `"None"` when there are none.
+#' @noRd
+.colour_by_choices <- function(df) {
+    cat_cols <- names(df)[vapply(df, function(x) !is.numeric(x), logical(1))]
+    if (length(cat_cols) > 0) c("None", cat_cols) else "None"
+}
+
+#' Guess the best default colour-by column
+#'
+#' Prefers columns whose names match common grouping terms
+#' (`group`, `strata`, `arm`, `treatment`, `cohort`); falls back to the first
+#' non-numeric column, or `"None"` when no categorical columns exist.
+#'
+#' @param df A data frame.
+#' @return A single string: the column name to use as the default, or
+#'   `"None"`.
+#' @noRd
+.default_colour_by <- function(df) {
+    cat_cols <- names(df)[vapply(df, function(x) !is.numeric(x), logical(1))]
+    found <- grep("^group$|^strata$|^arm$|^treatment$|^cohort$",
+                  cat_cols, value = TRUE, ignore.case = TRUE)
+    if (length(found) > 0) return(found[1])
+    if (length(cat_cols) > 0) return(cat_cols[1])
+    "None"
+}
+
+
 # ---- Default colour palette (colourblind-friendly) -------------------------
 .default_sci_palette <- c(
     "#E69F00", "#56B4E9", "#009E73", "#F0E442",

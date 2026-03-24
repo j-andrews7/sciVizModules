@@ -1,8 +1,9 @@
 #' Input UI components for the survivalCurvePlot module
 #'
 #' Wraps [VizModules::linePlotInputsUI()] following the same design pattern as
-#' [volcanoPlotInputsUI()].  Survival-specific controls (marker toggle and
-#' marker shape selector) are prepended above the standard linePlot tabset.
+#' [volcanoPlotInputsUI()].  Survival-specific controls (marker toggle,
+#' marker shape selector, and colour-by group selector) are prepended above
+#' the standard linePlot tabset.
 #'
 #' Default column selections use the **first two columns** of the data frame:
 #' column 1 → x (time), column 2 → y (survival).  Irrelevant linePlot inputs
@@ -12,8 +13,8 @@
 #' @param id The ID for the Shiny module.
 #' @param data The data frame used for plot generation.
 #' @param defaults A named list of default values passed to
-#'   [VizModules::linePlotInputsUI()].  Key overrides: `x.value` (time column)
-#'   and `y.value` (survival column).
+#'   [VizModules::linePlotInputsUI()].  Key overrides: `x.value` (time column),
+#'   `y.value` (survival column), and `colour.by` (grouping column for colors).
 #' @param title An optional title displayed above the tabset panel.
 #' @param columns Number of columns for the UI grid layout.
 #' @return A Shiny `tagList` with survival-specific extras above the linePlot
@@ -51,8 +52,21 @@ survivalCurvePlotInputsUI <- function(id, data,
     # Force plot mode to lines (step-function)
     if (!"plot.type" %in% names(defaults)) defaults$plot.type <- "lines"
 
-    # --- Survival-specific extras (marker toggle + shape) --------------------
+    # --- Determine categorical columns for the colour.by selector ------------
+    colour_by_choices <- .colour_by_choices(data)
+    if (!"colour.by" %in% names(defaults)) {
+        defaults$colour.by <- .default_colour_by(data)
+    }
+
+    # --- Survival-specific extras (colour-by, marker toggle + shape) ---------
     extras <- tagList(
+        tipify(
+            selectInput(ns("colour.by"), "Color By:",
+                choices  = colour_by_choices,
+                selected = defaults$colour.by),
+            "Column used to group and color the survival curves.",
+            placement = "top", options = list(container = "body")
+        ),
         tipify(
             materialSwitch(ns("show.markers"), "Show Data Points:",
                 value  = TRUE,
