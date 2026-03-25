@@ -330,9 +330,11 @@ survivalCurvePlotServer <- function(
 
                 fig_risk <- fig_risk |> layout(
                     xaxis = list(range = x_range, showticklabels = FALSE,
-                                 showline = FALSE, ticks = ""),
+                                 showline = FALSE, ticks = "",
+                                 showgrid = FALSE, zeroline = FALSE),
                     yaxis = list(range = c(-0.1, n_groups + 0.6),
-                                 visible = FALSE, fixedrange = TRUE)
+                                 visible = FALSE, fixedrange = TRUE,
+                                 showgrid = FALSE, zeroline = FALSE)
                 )
 
                 # Proportional heights: risk table gets ~8% per group row
@@ -345,7 +347,7 @@ survivalCurvePlotServer <- function(
                     heights = c(km_h, risk_h),
                     shareX  = TRUE,
                     titleY  = TRUE,
-                    margin  = 0.02
+                    margin  = 0.04
                 )
 
                 # Dynamic left margin so group labels are never clipped
@@ -384,11 +386,25 @@ survivalCurvePlotServer <- function(
                     )
                 }
 
+                # X-axis title placed above the risk table (between the KM
+                # curve and the "Number at risk" header) using paper coords.
+                # risk_h marks the top boundary of the risk subplot, and the
+                # 0.04 inter-subplot margin gives it a little breathing room.
+                risk_anns[[length(risk_anns) + 1]] <- list(
+                    text      = tc,
+                    xref      = "paper", yref = "paper",
+                    x         = 0.5,
+                    y         = risk_h + 0.01,
+                    xanchor   = "center", yanchor = "bottom",
+                    showarrow = FALSE,
+                    font      = list(size = 12, color = "black")
+                )
+
                 fig <- fig |> layout(
-                    xaxis       = list(range = x_range, title = tc),
+                    xaxis       = list(range = x_range),
                     showlegend  = gc_valid,
                     margin      = list(t = 80, l = l_margin, r = 60,
-                                       b = 60, autoexpand = TRUE),
+                                       b = 40, autoexpand = TRUE),
                     annotations = risk_anns
                 )
             } else {
