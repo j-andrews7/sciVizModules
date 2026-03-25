@@ -1,12 +1,15 @@
 #' Input UI components for the survivalCurvePlot module
 #'
 #' Wraps [VizModules::linePlotInputsUI()] following the same design pattern as
-#' [volcanoPlotInputsUI()].  Survival-specific controls (marker toggle and
-#' marker shape selector) are prepended above the standard linePlot tabset.
+#' [volcanoPlotInputsUI()].  Survival-specific controls (marker toggle,
+#' marker shape selector, group column selector, and number-at-risk column
+#' selector) are prepended above the standard linePlot tabset.
 #'
 #' Default column selections use the **first two columns** of the data frame:
-#' column 1 → x (time), column 2 → y (survival).  Irrelevant linePlot inputs
-#' (`group.by`, `errorBar`, `order.by`, etc.) and the Facet tab are hidden by
+#' column 1 → x (time), column 2 → y (survival).  The group and n.risk columns
+#' must be selected explicitly via the provided dropdowns; there is no
+#' auto-detection.  Irrelevant linePlot inputs (`group.by`, `errorBar`,
+#' `order.by`, etc.) and the Facet tab are hidden by
 #' [survivalCurvePlotServer()].
 #'
 #' @param id The ID for the Shiny module.
@@ -41,6 +44,11 @@ survivalCurvePlotInputsUI <- function(id, data,
 
     col_names <- names(data)
 
+    # Columns available for group-by: all non-numeric first, then the rest
+    non_num_cols <- names(data)[vapply(data, function(x) !is.numeric(x), logical(1))]
+    num_cols     <- names(data)[vapply(data, is.numeric, logical(1))]
+    group_default <- if (length(non_num_cols) > 0) non_num_cols[1] else "None"
+
     # --- Simple position-based column defaults (first col = time, second = surv)
     if (!"x.value" %in% names(defaults)) {
         defaults$x.value <- col_names[1]
@@ -51,7 +59,7 @@ survivalCurvePlotInputsUI <- function(id, data,
     # Force plot mode to lines (step-function)
     if (!"plot.type" %in% names(defaults)) defaults$plot.type <- "lines"
 
-    # --- Survival-specific extras (marker toggle + shape) --------------------
+    # --- Survival-specific extras (marker toggle + shape + column selectors) --
     extras <- tagList(
         tipify(
             materialSwitch(ns("show.markers"), "Show Data Points:",
@@ -66,6 +74,20 @@ survivalCurvePlotInputsUI <- function(id, data,
                              "triangle-up", "triangle-down", "star", "pentagon"),
                 selected = "circle"),
             "Shape of the marker placed at each observed time point.",
+            placement = "top", options = list(container = "body")
+        ),
+        tipify(
+            selectInput(ns("group.by.col"), "Group By Column:",
+                choices  = c("None", non_num_cols, num_cols),
+                selected = group_default),
+            "Column used to color and stratify the KM curves. Select 'None' for a single overall curve.",
+            placement = "top", options = list(container = "body")
+        ),
+        tipify(
+            selectInput(ns("nrisk.col"), "Number at Risk Column:",
+                choices  = c("None", num_cols),
+                selected = "None"),
+            "Numeric column containing the number-at-risk counts for the risk table below the plot. Select 'None' to hide the table.",
             placement = "top", options = list(container = "body")
         )
     )

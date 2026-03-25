@@ -10,11 +10,11 @@
 #' tab are hidden via shinyjs after the dynamic UI renders.
 #'
 #' @section Risk table:
-#' When the data contains an `n.risk` column (detected by [grep()]), the
-#' server builds a second subplot below the KM curve using
-#' [plotly::subplot()].  Each group's at-risk counts are rendered as text
-#' scatter traces — so the table is part of the plotly figure and resizes
-#' correctly when the user drags the widget handles.
+#' The risk table is shown when the user selects a column from the
+#' "Number at Risk Column" dropdown in the UI (selecting "None" hides the
+#' table).  Each group's at-risk counts are rendered as text scatter traces so
+#' the table is part of the plotly figure and resizes correctly when the user
+#' drags the widget handles.
 #'
 #' @section Column defaults:
 #' Column 1 → time (x), column 2 → survival (y).  Both can be overridden via
@@ -66,24 +66,16 @@ survivalCurvePlotServer <- function(
             }
         }, once = TRUE, ignoreNULL = TRUE)
 
-        # --- Auto-detect group column ----------------------------------------
+        # --- Group column (user-selected via UI) -----------------------------
         group_col_name <- reactive({
-            df <- data()
-            if (is.null(df) || ncol(df) == 0) return(NULL)
-            non_num <- names(df)[vapply(df, function(x) !is.numeric(x), logical(1))]
-            found <- grep("^group$|^strata$|^arm$|^treatment$|^cohort$",
-                          non_num, value = TRUE, ignore.case = TRUE)
-            if (length(found) > 0) return(found[1])
-            if (length(non_num) > 0) non_num[1] else NULL
+            val <- input$group.by.col
+            if (is.null(val) || val == "None") NULL else val
         })
 
-        # --- Auto-detect n.risk column ---------------------------------------
+        # --- Number-at-risk column (user-selected via UI) --------------------
         nrisk_col_name <- reactive({
-            df <- data()
-            if (is.null(df)) return(NULL)
-            found <- grep("n[._]?risk|at[._]?risk",
-                          names(df), value = TRUE, ignore.case = TRUE)
-            if (length(found) > 0) found[1] else NULL
+            val <- input$nrisk.col
+            if (is.null(val) || val == "None") NULL else val
         })
 
         # --- Group levels ----------------------------------------------------
@@ -143,6 +135,7 @@ survivalCurvePlotServer <- function(
             df <- data()
             if (is.null(df)) return()
             col_names <- names(df)
+            non_num   <- col_names[vapply(df, function(x) !is.numeric(x), logical(1))]
             updateSelectInput(session, "x.value",
                 selected = col_names[1])
             updateSelectInput(session, "y.value",
@@ -151,6 +144,9 @@ survivalCurvePlotServer <- function(
             updateSelectInput(session, "line.type",     selected = "solid")
             shinyWidgets::updateMaterialSwitch(session, "show.markers", value = TRUE)
             updateSelectInput(session, "marker.symbol", selected = "circle")
+            updateSelectInput(session, "group.by.col",
+                selected = if (length(non_num) > 0) non_num[1] else "None")
+            updateSelectInput(session, "nrisk.col",     selected = "None")
             VizModules:::.reset_axes_inputs(session)
             VizModules:::.reset_lines_inputs(session)
         })
