@@ -329,7 +329,8 @@ survivalCurvePlotServer <- function(
                 }
 
                 fig_risk <- fig_risk |> layout(
-                    xaxis = list(range = x_range, visible = FALSE),
+                    xaxis = list(range = x_range, showticklabels = FALSE,
+                                 showline = FALSE, ticks = ""),
                     yaxis = list(range = c(-0.1, n_groups + 0.6),
                                  visible = FALSE, fixedrange = TRUE)
                 )
@@ -353,12 +354,15 @@ survivalCurvePlotServer <- function(
                 l_margin <- max(90, ceiling(max_label_chars * 7) + 20)
 
                 # After subplot(), risk subplot's axes are y2.
-                # Build annotations: header + group labels (yref = "y2")
+                # Build annotations: header + group labels (yref = "y2").
+                # Labels use xref="paper" so they stay in the left margin
+                # regardless of the data range, preventing overlap with the
+                # first value column.
                 risk_anns <- list(
                     list(
                         text      = "<b>Number at risk</b>",
-                        xref      = "x",  yref = "y2",
-                        x         = x_range[1],
+                        xref      = "paper", yref = "y2",
+                        x         = 0,
                         y         = n_groups + 0.5,
                         xanchor   = "left",
                         showarrow = FALSE,
@@ -371,8 +375,8 @@ survivalCurvePlotServer <- function(
                     y_pos <- n_groups - i + 0.5
                     risk_anns[[length(risk_anns) + 1]] <- list(
                         text      = as.character(g),
-                        xref      = "x",  yref = "y2",
-                        x         = x_range[1],
+                        xref      = "paper", yref = "y2",
+                        x         = 0,
                         y         = y_pos,
                         xanchor   = "right",
                         showarrow = FALSE,
@@ -384,7 +388,7 @@ survivalCurvePlotServer <- function(
                     xaxis       = list(range = x_range, title = tc),
                     showlegend  = gc_valid,
                     margin      = list(t = 80, l = l_margin, r = 60,
-                                       b = 30, autoexpand = TRUE),
+                                       b = 60, autoexpand = TRUE),
                     annotations = risk_anns
                 )
             } else {
