@@ -80,3 +80,31 @@
 #' @author Jared Andrews
 #' @keywords datasets
 "airway_voom"
+
+#' Example survival dataset (NCCTG lung cancer)
+#'
+#' A lightly cleaned version of the NCCTG lung cancer dataset from the
+#' \code{survival} package, provided as a ready-to-use example for the
+#' [survivalCurve()] module. Each row is one patient with a follow-up time,
+#' an event indicator, and a couple of grouping variables.
+#'
+#' @format A data frame with 228 rows and 5 columns:
+#' \describe{
+#'   \item{time}{Follow-up time in days}
+#'   \item{status}{Event indicator following the [survival::Surv()] convention
+#'     (1 = censored, 2 = dead)}
+#'   \item{age}{Patient age in years}
+#'   \item{sex}{Patient sex ("Male" or "Female")}
+#'   \item{ph.ecog}{ECOG performance status, as a labelled factor}
+#' }
+#'
+#' @source Derived from \code{survival::lung} (Loprinzi et al., North Central
+#' Cancer Treatment Group).
+#'
+#' @examples
+#' library(sciVizModules)
+#' head(survival_lung)
+#'
+#' @author Jared Andrews
+#' @keywords datasets
+"survival_lung"

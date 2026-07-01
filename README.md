@@ -26,3 +26,30 @@ devtools::install_github("j-andrews7/VizModules")
 devtools::install_github("j-andrews7/sciVizModules")
 ```
 
+## Available Modules
+
+Each module follows the VizModules trio contract: `*InputsUI(id, data, ...)` renders the
+controls, `*OutputUI(id)` renders the interactive plotly output, and `*Server(id, data, ...)`
+holds the logic. Every module also ships a standalone `*App()` you can run to see it in action.
+
+- **`volcanoPlot`** — differential-expression volcano plot with interactive significance and
+  fold-change thresholding (wraps `VizModules::dittoViz_scatterPlot`).
+- **`survivalCurve`** — Kaplan-Meier survival curve built on the
+  [survminer](https://cran.r-project.org/package=survminer) package. Accepts a tidy survival
+  data frame (a numeric follow-up `time` column, an event `status` column, and an optional
+  grouping column) and renders an interactive plotly curve with optional confidence intervals,
+  censoring marks, log-rank p-value, median-survival lines, and a number-at-risk table.
+
+### Example
+
+```r
+library(sciVizModules)
+
+# Launch the survival curve app with the bundled example data:
+survivalCurveApp()
+
+# Or build a figure directly:
+data(survival_lung)
+survivalCurve(survival_lung, time = "time", status = "status", group.by = "sex")
+```
+
