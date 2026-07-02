@@ -40,7 +40,7 @@ Imports:
     shinyWidgets,
     htmlwidgets
 Remotes:
-    j-andrews7/VizModules
+    j-andrews7/VizModules#307
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)

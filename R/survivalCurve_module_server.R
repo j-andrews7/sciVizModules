@@ -23,7 +23,7 @@
 #' [sciVizModules::survivalCurveApp()]
 #'
 #' @export
-#' @author Jared Andrews, Jacob Martin
+#' @author Jacob Martin
 survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL) {
     stopifnot(is.reactive(data))
     data_reactive <- data
@@ -90,6 +90,9 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL) 
             updateNumericInput(session, "break.time.by", value = NA)
             updateNumericInput(session, "xlim.min", value = NA)
             updateNumericInput(session, "xlim.max", value = NA)
+            reset_lines_inputs(session, defaults = defaults)
+            reset_axes_inputs(session, defaults)
+            reset_plotly_inputs(session, defaults)
         })
 
         # Build the plot (shared by the output and the source download).
@@ -129,7 +132,7 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL) 
 
             title <- isolate_fn(input$title)
 
-            survivalCurve(
+            fig <- survivalCurve(
                 data = d,
                 time = time_col,
                 status = status_col,
@@ -149,7 +152,37 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL) 
                 xlim = xlim,
                 title = title
             )
+            # VizModules layout, axis and line logic
+            fig <- apply_title_layout(fig, input, isolate_fn, title_y = 0.95, title_x = isolate_fn(input$axis.title.horizontal.position))
+            xaxis_style <- create_axis_styles(input, axis_side = "x", isolate_fn = isolate_fn)
+            yaxis_style <- create_axis_styles(input, axis_side = "y", isolate_fn = isolate_fn)
+            fig <- apply_subplot_axis_styling(fig, xaxis_style, yaxis_style)
+
+            fig <- add_reference_lines(fig,
+                hline.intercepts = isolate_fn(input$hline.intercepts),
+                hline.colors = isolate_fn(input$hline.colors),
+                hline.widths = isolate_fn(input$hline.widths),
+                hline.linetypes = isolate_fn(input$hline.linetypes),
+                hline.opacities = isolate_fn(input$hline.opacities),
+                vline.intercepts = isolate_fn(input$vline.intercepts),
+                vline.colors = isolate_fn(input$vline.colors),
+                vline.widths = isolate_fn(input$vline.widths),
+                vline.linetypes = isolate_fn(input$vline.linetypes),
+                vline.opacities = isolate_fn(input$vline.opacities),
+                abline.slopes = isolate_fn(input$abline.slopes),
+                abline.intercepts = isolate_fn(input$abline.intercepts),
+                abline.colors = isolate_fn(input$abline.colors),
+                abline.widths = isolate_fn(input$abline.widths),
+                abline.linetypes = isolate_fn(input$abline.linetypes),
+                abline.opacities = isolate_fn(input$abline.opacities)
+            )
+
+            config_list <- add_plot_config(download.format = isolate_fn(input$download.format), include.modebar.buttons = TRUE, facet.by = NULL)
+            fig <- do.call(config, c(list(p = fig), config_list))
+            fig <- apply_plotly_newshape(fig, input, isolate_fn)
+
         })
+
 
         output$survivalCurve <- renderPlotly({
             req(input$time, input$status)

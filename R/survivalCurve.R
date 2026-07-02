@@ -52,7 +52,7 @@
 #' @import plotly
 #'
 #' @export
-#' @author Jared Andrews, Jacob Martin
+#' @author Jacob Martin
 #' @seealso [survminer::ggsurvplot()], [survival::survfit()],
 #' [sciVizModules::survivalCurveInputsUI()], [sciVizModules::survivalCurveServer()],
 #' [sciVizModules::survivalCurveApp()]
