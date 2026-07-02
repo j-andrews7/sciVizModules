@@ -11,6 +11,8 @@
 #'   initialized and their values passed to the plot function, but the user will
 #'   not be able to see/adjust them in the UI.
 #' @param hide.tabs A character vector of tab names to hide.
+#' @param defaults A named list of default values used when resetting the
+#'   inputs. Typically the same list passed to [survivalCurveInputsUI()].
 #' @return The `moduleServer` function for the survivalCurve module.
 #'
 #' @import shiny
@@ -73,22 +75,22 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             req(df)
             num.choices <- names(df)[vapply(df, is.numeric, logical(1))]
 
-            updateSelectInput(session, "time", selected = .detect_time_col(df, num.choices))
-            updateSelectInput(session, "status", selected = .detect_status_col(df, num.choices))
-            updateSelectInput(session, "group.by", selected = "")
-            updateMaterialSwitch(session, "pval", value = TRUE)
-            updateMaterialSwitch(session, "risk.table", value = FALSE)
-            updateMaterialSwitch(session, "censor", value = TRUE)
-            updateSelectInput(session, "surv.median.line", selected = "none")
-            updateSelectInput(session, "fun", selected = "survival")
-            updateNumericInput(session, "line.size", value = 1)
-            updateTextInput(session, "title", value = "")
-            updateTextInput(session, "xlab", value = "Time")
-            updateTextInput(session, "ylab", value = "Survival probability")
-            updateTextInput(session, "legend.title", value = "")
-            updateNumericInput(session, "break.time.by", value = NA)
-            updateNumericInput(session, "xlim.min", value = NA)
-            updateNumericInput(session, "xlim.max", value = NA)
+            updateSelectInput(session, "time", selected = .sv_default(defaults, "time", .detect_time_col(df, num.choices)))
+            updateSelectInput(session, "status", selected = .sv_default(defaults, "status", .detect_status_col(df, num.choices)))
+            updateSelectInput(session, "group.by", selected = .sv_default(defaults, "group.by", ""))
+            updateMaterialSwitch(session, "pval", value = .sv_default(defaults, "pval", TRUE))
+            updateMaterialSwitch(session, "risk.table", value = .sv_default(defaults, "risk.table", FALSE))
+            updateMaterialSwitch(session, "censor", value = .sv_default(defaults, "censor", TRUE))
+            updateSelectInput(session, "surv.median.line", selected = .sv_default(defaults, "surv.median.line", "none"))
+            updateSelectInput(session, "fun", selected = .sv_default(defaults, "fun", "survival"))
+            updateNumericInput(session, "line.size", value = .sv_default(defaults, "line.size", 1))
+            updateTextInput(session, "title", value = .sv_default(defaults, "title", ""))
+            updateTextInput(session, "xlab", value = .sv_default(defaults, "xlab", "Time"))
+            updateTextInput(session, "ylab", value = .sv_default(defaults, "ylab", "Survival probability"))
+            updateTextInput(session, "legend.title", value = .sv_default(defaults, "legend.title", ""))
+            updateNumericInput(session, "break.time.by", value = .sv_default(defaults, "break.time.by", NA))
+            updateNumericInput(session, "xlim.min", value = .sv_default(defaults, "xlim.min", NA))
+            updateNumericInput(session, "xlim.max", value = .sv_default(defaults, "xlim.max", NA))
             reset_lines_inputs(session, defaults = defaults)
             reset_axes_inputs(session, defaults)
             reset_plotly_inputs(session, defaults)

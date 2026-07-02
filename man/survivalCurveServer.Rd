@@ -4,7 +4,7 @@
 \alias{survivalCurveServer}
 \title{Server logic for survivalCurve module}
 \usage{
-survivalCurveServer(id, data, hide.inputs = NULL, hide.tabs = NULL)
+survivalCurveServer(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL)
 }
 \arguments{
 \item{id}{The ID for the Shiny module.}
@@ -17,6 +17,9 @@ initialized and their values passed to the plot function, but the user will
 not be able to see/adjust them in the UI.}
 
 \item{hide.tabs}{A character vector of tab names to hide.}
+
+\item{defaults}{A named list of default values used when resetting the
+inputs. Typically the same list passed to \code{\link[=survivalCurveInputsUI]{survivalCurveInputsUI()}}.}
 }
 \value{
 The \code{moduleServer} function for the survivalCurve module.
