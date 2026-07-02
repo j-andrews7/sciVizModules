@@ -24,7 +24,7 @@
 #'
 #' @export
 #' @author Jacob Martin
-survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL) {
+survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL) {
     stopifnot(is.reactive(data))
     data_reactive <- data
 
@@ -76,7 +76,6 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL) 
             updateSelectInput(session, "time", selected = .detect_time_col(df, num.choices))
             updateSelectInput(session, "status", selected = .detect_status_col(df, num.choices))
             updateSelectInput(session, "group.by", selected = "")
-            updateMaterialSwitch(session, "conf.int", value = TRUE)
             updateMaterialSwitch(session, "pval", value = TRUE)
             updateMaterialSwitch(session, "risk.table", value = FALSE)
             updateMaterialSwitch(session, "censor", value = TRUE)
@@ -137,7 +136,6 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL) 
                 time = time_col,
                 status = status_col,
                 group.by = group.by,
-                conf.int = isolate_fn(input$conf.int),
                 pval = isolate_fn(input$pval),
                 risk.table = isolate_fn(input$risk.table),
                 censor = isolate_fn(input$censor),

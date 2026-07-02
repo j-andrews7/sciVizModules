@@ -98,9 +98,6 @@ survivalCurveInputsUI <- function(id, data, defaults = NULL, title = "Survival C
                 placement = "top", options = list(container = "body"))
         ),
         "Statistics" = tagList(
-            tipify(materialSwitch(ns("conf.int"), "Confidence Interval",
-                value = .sv_default(defaults, "conf.int", TRUE), status = "success"),
-                "Draw confidence interval ribbons.", placement = "top", options = list(container = "body")),
             tipify(materialSwitch(ns("pval"), "Log-rank p-value",
                 value = .sv_default(defaults, "pval", TRUE), status = "success"),
                 "Show the log-rank test p-value (only shown when stratified by a group).",
