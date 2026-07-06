@@ -33,7 +33,6 @@
 #'     or "cumhaz" (default: survival probability)
 #'   \item \code{line.size} - Line width (default: 1)
 #'   \item \code{palette.selection} - Colors for the strata (multiColorPicker)
-#'   \item \code{title}, \code{xlab}, \code{ylab}, \code{legend.title} - Text labels
 #'   \item \code{break.time.by} - Spacing between x-axis ticks (default: blank/auto)
 #'   \item \code{xlim.min}, \code{xlim.max} - X-axis limits (default: blank/auto)
 #' }
@@ -133,35 +132,9 @@ survivalCurveInputsUI <- function(id, data, defaults = NULL, title = "Survival C
                 "Width of the survival curve lines.",
                 placement = "top", options = list(container = "body"))
         ),
-        "Labels" = tagList(
-            tipify(textInput(ns("title"), "Title",
-                value = .sv_default(defaults, "title", "")),
-                "Plot title.", placement = "top", options = list(container = "body")),
-            tipify(textInput(ns("xlab"), "X-axis Label",
-                value = .sv_default(defaults, "xlab", "Time")),
-                "X-axis title.", placement = "top", options = list(container = "body")),
-            tipify(textInput(ns("ylab"), "Y-axis Label",
-                value = .sv_default(defaults, "ylab", "Survival probability")),
-                "Y-axis title.", placement = "top", options = list(container = "body")),
-            tipify(textInput(ns("legend.title"), "Legend Title",
-                value = .sv_default(defaults, "legend.title", "")),
-                "Legend title (defaults to the grouping column when stratified).",
-                placement = "top", options = list(container = "body")),
-            tipify(numericInput(ns("break.time.by"), "Time Axis Interval",
-                value = .sv_default(defaults, "break.time.by", NA), min = 0),
-                "Spacing between x-axis tick marks. Leave blank to auto-compute.",
-                placement = "top", options = list(container = "body")),
-            tipify(numericInput(ns("xlim.min"), "X Min",
-                value = .sv_default(defaults, "xlim.min", NA)),
-                "Lower x-axis limit. Leave blank to auto-compute.",
-                placement = "top", options = list(container = "body")),
-            tipify(numericInput(ns("xlim.max"), "X Max",
-                value = .sv_default(defaults, "xlim.max", NA)),
-                "Upper x-axis limit. Leave blank to auto-compute.",
-                placement = "top", options = list(container = "body"))
-        ),
         "Plotly" = uniform_plotly_inputs_ui(ns, defaults),
         "Axes" = uniform_axes_inputs_ui(ns, defaults, include.rotate = TRUE),
+        "Legend" = uniform_legend_inputs_ui(ns, defaults),
         "Lines" = uniform_lines_inputs_ui(ns, defaults)
     )
 

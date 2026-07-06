@@ -84,16 +84,12 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             updateSelectInput(session, "surv.median.line", selected = .sv_default(defaults, "surv.median.line", "none"))
             updateSelectInput(session, "fun", selected = .sv_default(defaults, "fun", "survival"))
             updateNumericInput(session, "line.size", value = .sv_default(defaults, "line.size", 1))
-            updateTextInput(session, "title", value = .sv_default(defaults, "title", ""))
-            updateTextInput(session, "xlab", value = .sv_default(defaults, "xlab", "Time"))
-            updateTextInput(session, "ylab", value = .sv_default(defaults, "ylab", "Survival probability"))
-            updateTextInput(session, "legend.title", value = .sv_default(defaults, "legend.title", ""))
             updateNumericInput(session, "break.time.by", value = .sv_default(defaults, "break.time.by", NA))
-            updateNumericInput(session, "xlim.min", value = .sv_default(defaults, "xlim.min", NA))
-            updateNumericInput(session, "xlim.max", value = .sv_default(defaults, "xlim.max", NA))
+            updateTextInput(session, "legend.title", value = .sv_default(defaults, "legend.title", ""))
             reset_lines_inputs(session, defaults = defaults)
             reset_axes_inputs(session, defaults)
             reset_plotly_inputs(session, defaults)
+            reset_legend_inputs(session, defaults)
         })
 
         # Build the plot (shared by the output and the source download).
@@ -120,19 +116,10 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             break.time.by <- isolate_fn(input$break.time.by)
             if (length(break.time.by) != 1 || is.na(break.time.by)) break.time.by <- NULL
 
-            xlim.min <- isolate_fn(input$xlim.min)
-            xlim.max <- isolate_fn(input$xlim.max)
-            xlim <- NULL
-            if (length(xlim.min) == 1 && length(xlim.max) == 1 &&
-                !is.na(xlim.min) && !is.na(xlim.max)) {
-                xlim <- c(xlim.min, xlim.max)
-            }
-
             legend.title <- isolate_fn(input$legend.title)
             if (is.null(legend.title) || !nzchar(legend.title)) legend.title <- NULL
-
-            title <- isolate_fn(input$title)
-
+          
+          
             fig <- survivalCurve(
                 data = d,
                 time = time_col,
@@ -145,17 +132,13 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 fun = fun,
                 palette.selection = palette_values,
                 line.size = isolate_fn(input$line.size),
-                xlab = isolate_fn(input$xlab),
-                ylab = isolate_fn(input$ylab),
-                legend.title = legend.title,
                 break.time.by = break.time.by,
-                xlim = xlim,
-                title = title
+                legend.title = legend.title
             )
             # VizModules layout, axis and line logic
             fig <- VizModules::apply_title_layout(fig, input, isolate_fn, title_y = 0.95, title_x = isolate_fn(input$axis.title.horizontal.position))
-            xaxis_style <- VizModules::create_axis_styles(input, axis_side = "x", isolate_fn = isolate_fn)
-            yaxis_style <- VizModules::create_axis_styles(input, axis_side = "y", isolate_fn = isolate_fn)
+            xaxis_style <- VizModules::create_axis_styles(input, axis_side = "x", isolate_fn = isolate_fn, ggplot.axis.styling = FALSE)
+            yaxis_style <- VizModules::create_axis_styles(input, axis_side = "y", isolate_fn = isolate_fn, ggplot.axis.styling = FALSE)
             fig <- VizModules::apply_subplot_axis_styling(fig, xaxis_style, yaxis_style)
 
             fig <- VizModules::add_reference_lines(fig,
@@ -180,7 +163,14 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             config_list <- add_plot_config(download.format = isolate_fn(input$download.format), include.modebar.buttons = TRUE, facet.by = NULL)
             fig <- do.call(config, c(list(p = fig), config_list))
             fig <- apply_plotly_newshape(fig, input, isolate_fn)
-          
+            
+            #Legend styling: 
+            fig <- apply_legend_styling(
+                fig,
+                title.size = isolate_fn(input$legend.title.size),
+                text.size = isolate_fn(input$legend.text.size),
+                position = "right"
+            )
             #Axis titles: 
             fig <- axis_titles_as_annotations(fig)
         })

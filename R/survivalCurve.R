@@ -23,6 +23,7 @@
 #' @param status The name of the event/status indicator column.
 #' @param group.by Optional name of a categorical column to stratify the curves
 #'   by. When `NULL` or `""` a single overall survival curve is drawn.
+#' @param legend.title Legend title. Defaults to `group.by` when stratified.
 #' @param conf.int Logical; draw confidence interval ribbons (default `TRUE`).
 #' @param pval Logical; display the log-rank test p-value. Only applied when
 #'   `group.by` defines more than one group (default `TRUE`).
@@ -38,12 +39,8 @@
 #' @param palette.selection Optional vector of colors used for the strata. Passed
 #'   through to the `palette` argument of [survminer::ggsurvplot()].
 #' @param line.size Numeric line width for the survival curves (default `1`).
-#' @param xlab X-axis title (default `"Time"`).
-#' @param ylab Y-axis title (default `"Survival probability"`).
-#' @param legend.title Legend title. Defaults to `group.by` when stratified.
 #' @param break.time.by Optional numeric spacing between x-axis tick marks.
-#' @param xlim Optional numeric vector of length two giving the x-axis limits.
-#' @param title Optional plot title.
+
 #'
 #' @return A [plotly::plot_ly()] object containing the interactive survival curve.
 #'
@@ -75,12 +72,9 @@ survivalCurve <- function(data,
                           fun = NULL,
                           palette.selection = NULL,
                           line.size = 1,
-                          xlab = "Time",
-                          ylab = "Survival probability",
-                          legend.title = NULL,
                           break.time.by = NULL,
-                          xlim = NULL,
-                          title = NULL) {
+                          legend.title = NULL
+                        ) {
     if (!requireNamespace("survminer", quietly = TRUE)) {
         stop("The 'survminer' package is required for survivalCurve(). Please install it.")
     }
@@ -130,10 +124,9 @@ survivalCurve <- function(data,
         censor = isTRUE(censor),
         surv.median.line = surv.median.line,
         size = line.size,
-        xlab = xlab,
-        ylab = ylab,
-        legend.title = legend.title,
-        ggtheme = survminer::theme_survminer()
+        ggtheme = survminer::theme_survminer(legend = "right"),
+        legend.title = legend.title
+        
     )
 
     if (!is.null(fun)) gg_args$fun <- fun
@@ -142,9 +135,6 @@ survivalCurve <- function(data,
     }
     if (!is.null(break.time.by) && is.numeric(break.time.by) && break.time.by > 0) {
         gg_args$break.time.by <- break.time.by
-    }
-    if (!is.null(xlim) && length(xlim) == 2 && all(is.finite(xlim))) {
-        gg_args$xlim <- xlim
     }
 
     gg <- do.call(survminer::ggsurvplot, gg_args)
@@ -166,10 +156,6 @@ survivalCurve <- function(data,
         }
     }
 
-    if (!is.null(title) && nzchar(title)) {
-        fig <- plotly::layout(fig, title = list(text = title))
-    }
-    
     fig
 }
 
@@ -183,7 +169,7 @@ survivalCurve <- function(data,
 #'   two-level factor/character.
 #' @return A numeric vector of 0 (censored) and 1 (event) values.
 #'
-#' @author Jared Andrews
+#' @author Jacob Martin
 #' @rdname INTERNAL_normalize_survival_status
 #' @keywords internal
 .normalize_survival_status <- function(x) {
