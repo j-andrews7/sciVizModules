@@ -99,7 +99,7 @@
       fig$x$data[[x]] <- NULL
 
       new_annotation <- list(
-        x = 0.1,
+        x = 0.08,
         y = 0.1,
         xref = "paper",
         yref = "paper",
