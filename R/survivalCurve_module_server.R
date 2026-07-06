@@ -19,6 +19,7 @@
 #' @import plotly
 #' @importFrom shinyjs hide
 #' @importFrom shinyWidgets updateMaterialSwitch
+#' @importFrom colourpicker updateColourInput
 #'
 #' @seealso [survminer::ggsurvplot()], [sciVizModules::survivalCurve()],
 #' [sciVizModules::survivalCurveInputsUI()], [sciVizModules::survivalCurveOutputUI()],
@@ -79,6 +80,8 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             updateSelectInput(session, "status", selected = .sv_default(defaults, "status", .detect_status_col(df, num.choices)))
             updateSelectInput(session, "group.by", selected = .sv_default(defaults, "group.by", ""))
             updateMaterialSwitch(session, "pval", value = .sv_default(defaults, "pval", TRUE))
+            updateNumericInput(session, "pval.size", value = .sv_default(defaults, "pval.size", 14))
+            colourpicker::updateColourInput(session, "pval.color", value = .sv_default(defaults, "pval.color", "black"))
             updateMaterialSwitch(session, "risk.table", value = .sv_default(defaults, "risk.table", FALSE))
             updateMaterialSwitch(session, "censor", value = .sv_default(defaults, "censor", TRUE))
             updateSelectInput(session, "surv.median.line", selected = .sv_default(defaults, "surv.median.line", "none"))
@@ -148,6 +151,9 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 xlab = isolate_fn(input$xlab),
                 ylab = isolate_fn(input$ylab),
                 legend.title = legend.title,
+                pval.size = isolate_fn(input$pval.size),
+                pval.color = isolate_fn(input$pval.color),
+                rotate = isTRUE(isolate_fn(input$rotate)),
                 break.time.by = break.time.by,
                 xlim = xlim,
                 title = title

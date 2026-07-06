@@ -26,6 +26,8 @@
 #'   \item \code{group.by} - Optional stratification column (default: none)
 #'   \item \code{conf.int} - Show confidence interval ribbons (default: TRUE)
 #'   \item \code{pval} - Show log-rank p-value (default: TRUE; only when stratified)
+#'   \item \code{pval.size} - Font size (px) of the p-value annotation (default: 14)
+#'   \item \code{pval.color} - Color of the p-value annotation (default: "black")
 #'   \item \code{risk.table} - Show "number at risk" table (default: FALSE)
 #'   \item \code{censor} - Show censoring marks (default: TRUE)
 #'   \item \code{surv.median.line} - Median survival reference lines (default: "none")
@@ -48,6 +50,7 @@
 #' @import shiny
 #' @importFrom shinyBS tipify
 #' @importFrom shinyWidgets materialSwitch
+#' @importFrom colourpicker colourInput
 #'
 #' @export
 #' @author Jacob Martin
@@ -101,6 +104,14 @@ survivalCurveInputsUI <- function(id, data, defaults = NULL, title = "Survival C
             tipify(materialSwitch(ns("pval"), "Log-rank p-value",
                 value = .sv_default(defaults, "pval", TRUE), status = "success"),
                 "Show the log-rank test p-value (only shown when stratified by a group).",
+                placement = "top", options = list(container = "body")),
+            tipify(numericInput(ns("pval.size"), "P-value Text Size",
+                value = .sv_default(defaults, "pval.size", 14), min = 1, step = 1),
+                "Font size (px) of the p-value annotation. Drag the annotation to reposition it.",
+                placement = "top", options = list(container = "body")),
+            tipify(colourpicker::colourInput(ns("pval.color"), "P-value Text Color",
+                value = .sv_default(defaults, "pval.color", "black")),
+                "Color of the p-value annotation.",
                 placement = "top", options = list(container = "body")),
             tipify(materialSwitch(ns("risk.table"), "Risk Table",
                 value = .sv_default(defaults, "risk.table", FALSE), status = "success"),

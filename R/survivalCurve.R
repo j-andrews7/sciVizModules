@@ -41,6 +41,15 @@
 #' @param xlab X-axis title (default `"Time"`).
 #' @param ylab Y-axis title (default `"Survival probability"`).
 #' @param legend.title Legend title. Defaults to `group.by` when stratified.
+#' @param legend.position Position of the legend. One of `"right"` (the default,
+#'   drawn vertically to the right of the plot), `"top"`, `"bottom"`, `"left"`,
+#'   or `"none"`.
+#' @param pval.size Numeric font size (in pixels) for the log-rank p-value
+#'   annotation (default `14`).
+#' @param pval.color Color for the log-rank p-value annotation (default
+#'   `"black"`).
+#' @param rotate Logical; when `TRUE` the x and y axes are swapped via
+#'   [ggplot2::coord_flip()] (default `FALSE`).
 #' @param break.time.by Optional numeric spacing between x-axis tick marks.
 #' @param xlim Optional numeric vector of length two giving the x-axis limits.
 #' @param title Optional plot title.
@@ -49,6 +58,7 @@
 #'
 #' @importFrom survival Surv
 #' @importFrom stats as.formula
+#' @importFrom ggplot2 coord_flip
 #' @import plotly
 #'
 #' @export
@@ -78,6 +88,10 @@ survivalCurve <- function(data,
                           xlab = "Time",
                           ylab = "Survival probability",
                           legend.title = NULL,
+                          legend.position = "right",
+                          pval.size = 14,
+                          pval.color = "black",
+                          rotate = FALSE,
                           break.time.by = NULL,
                           xlim = NULL,
                           title = NULL) {
@@ -117,6 +131,17 @@ survivalCurve <- function(data,
     # A log-rank p-value is only meaningful when there is more than one stratum.
     show_pval <- isTRUE(pval) && has_group
 
+    # Compute the log-rank p-value ourselves so it can be rendered as a
+    # customizable, draggable plotly annotation rather than baked into the
+    # ggplot (which would not be stylable/movable after conversion).
+    pval_txt <- NULL
+    if (show_pval) {
+        pval_txt <- tryCatch(
+            survminer::surv_pvalue(fit, data = df)$pval.txt,
+            error = function(e) NULL
+        )
+    }
+
     if (is.null(legend.title)) {
         legend.title <- if (has_group) group.by else ""
     }
@@ -125,7 +150,7 @@ survivalCurve <- function(data,
         fit = fit,
         data = df,
         conf.int = isTRUE(conf.int),
-        pval = show_pval,
+        pval = FALSE,
         risk.table = isTRUE(risk.table),
         censor = isTRUE(censor),
         surv.median.line = surv.median.line,
@@ -149,6 +174,12 @@ survivalCurve <- function(data,
 
     gg <- do.call(survminer::ggsurvplot, gg_args)
 
+    # Swap the x and y axes when requested. Done at the ggplot level so the
+    # underlying data (not just the axis styling) is actually rotated.
+    if (isTRUE(rotate)) {
+        gg$plot <- gg$plot + ggplot2::coord_flip()
+    }
+
     fig <- plotly::ggplotly(gg$plot)
 
     # Optionally stack the "number at risk" table beneath the curve. This is
@@ -166,11 +197,57 @@ survivalCurve <- function(data,
         }
     }
 
+    # Add the log-rank p-value as a draggable annotation with a customizable
+    # font. The module config enables `annotationPosition`, so users can drag it.
+    if (show_pval && !is.null(pval_txt) && nzchar(pval_txt)) {
+        fig <- plotly::add_annotations(fig,
+            text = pval_txt,
+            xref = "paper", yref = "paper",
+            x = 0.05, y = 0.05,
+            xanchor = "left", yanchor = "bottom",
+            showarrow = FALSE,
+            font = list(size = pval.size, color = pval.color)
+        )
+    }
+
+    # Position the legend. survminer draws it horizontally on top; by default we
+    # place it vertically to the right of the plot.
+    fig <- .apply_survival_legend(fig, legend.position, legend.title)
+
     if (!is.null(title) && nzchar(title)) {
         fig <- plotly::layout(fig, title = list(text = title))
     }
     
     fig
+}
+
+
+#' Apply legend positioning to a survival curve figure
+#'
+#' @param fig A `plotly` figure.
+#' @param position One of `"right"`, `"top"`, `"bottom"`, `"left"`, or `"none"`.
+#' @param legend.title Legend title text.
+#' @return The `plotly` figure with the legend repositioned.
+#'
+#' @author Jacob Martin
+#' @rdname INTERNAL_apply_survival_legend
+#' @keywords internal
+.apply_survival_legend <- function(fig, position = "right", legend.title = NULL) {
+    position <- match.arg(position, c("right", "top", "bottom", "left", "none"))
+    if (identical(position, "none")) {
+        return(plotly::layout(fig, showlegend = FALSE))
+    }
+
+    legend <- switch(position,
+        right = list(orientation = "v", x = 1.02, xanchor = "left", y = 1, yanchor = "top"),
+        left = list(orientation = "v", x = -0.15, xanchor = "right", y = 1, yanchor = "top"),
+        top = list(orientation = "h", x = 0.5, xanchor = "center", y = 1.1, yanchor = "bottom"),
+        bottom = list(orientation = "h", x = 0.5, xanchor = "center", y = -0.2, yanchor = "top")
+    )
+    if (!is.null(legend.title) && nzchar(legend.title)) {
+        legend$title <- list(text = legend.title)
+    }
+    plotly::layout(fig, showlegend = TRUE, legend = legend)
 }
 
 
