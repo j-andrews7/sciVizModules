@@ -20,10 +20,6 @@ survivalCurve(
   xlab = "Time",
   ylab = "Survival probability",
   legend.title = NULL,
-  legend.position = "right",
-  pval.size = 14,
-  pval.color = "black",
-  rotate = FALSE,
   break.time.by = NULL,
   xlim = NULL,
   title = NULL
@@ -67,19 +63,6 @@ through to the \code{palette} argument of \code{\link[survminer:ggsurvplot]{surv
 \item{ylab}{Y-axis title (default \code{"Survival probability"}).}
 
 \item{legend.title}{Legend title. Defaults to \code{group.by} when stratified.}
-
-\item{legend.position}{Position of the legend. One of \code{"right"} (the default,
-drawn vertically to the right of the plot), \code{"top"}, \code{"bottom"}, \code{"left"},
-or \code{"none"}.}
-
-\item{pval.size}{Numeric font size (in pixels) for the log-rank p-value
-annotation (default \code{14}).}
-
-\item{pval.color}{Color for the log-rank p-value annotation (default
-\code{"black"}).}
-
-\item{rotate}{Logical; when \code{TRUE} the x and y axes are swapped via
-\code{\link[ggplot2:coord_flip]{ggplot2::coord_flip()}} (default \code{FALSE}).}
 
 \item{break.time.by}{Optional numeric spacing between x-axis tick marks.}
 
