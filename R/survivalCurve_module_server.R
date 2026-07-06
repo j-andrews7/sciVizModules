@@ -172,6 +172,7 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 position = "right"
             )
             #Axis titles: 
+            fig <- .stats_annotation(fig)
             fig <- axis_titles_as_annotations(fig)
         })
 

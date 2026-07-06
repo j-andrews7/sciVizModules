@@ -66,3 +66,58 @@
     }
     if (length(num.choices) > 1) num.choices[2] else if (length(num.choices)) num.choices[1] else NULL
 }
+
+#' Move a p-value text trace into an editable Plotly annotation
+#'
+#' This function searches a Plotly figure for a text trace whose label looks
+#' like a p-value (for example, `"p = 0.0013"`), removes that trace from
+#' `fig$x$data`, and appends a new paper-positioned annotation to
+#' `fig$x$layout$annotations`.
+#'
+#' The added annotation is placed at `x = 0.1`, `y = 0.1` in paper
+#' coordinates, which makes it relative to the plotting area rather than the
+#' underlying data values. When combined with `plotly::config(editable = TRUE,
+#' edits = list(annotationPosition = TRUE))`, the annotation can be dragged by
+#' the user in the browser.
+#'
+#' @param fig A Plotly figure object.
+#' @return The modified Plotly figure with the p-value text trace replaced by
+#'   an annotation.
+#'
+#' @author Jacob Martin
+#' @keywords internal
+.stats_annotation <- function(fig) {
+  existing_annotations <- fig$x$layout$annotations
+  if (is.null(existing_annotations)) existing_annotations <- list()
+
+  for (x in seq_along(fig$x$data)) {
+    text <- fig$x$data[[x]]$text
+
+    if (!is.null(text) && any(grepl("p = ", text, fixed = TRUE))) {
+      stat_anno <- text[grep("p = ", text, fixed = TRUE)[1]]
+
+      fig$x$data[[x]] <- NULL
+
+      new_annotation <- list(
+        x = 0.1,
+        y = 0.1,
+        xref = "paper",
+        yref = "paper",
+        text = stat_anno,
+        showarrow = FALSE,
+        xanchor = "left",
+        yanchor = "bottom",
+        font = list(size = 14, color = "black")
+      )
+
+      fig <- plotly::layout(
+        fig,
+        annotations = c(existing_annotations, list(new_annotation))
+      )
+
+      break
+    }
+  }
+
+  fig
+}
