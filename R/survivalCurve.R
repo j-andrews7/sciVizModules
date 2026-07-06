@@ -169,7 +169,7 @@ survivalCurve <- function(data,
     if (!is.null(title) && nzchar(title)) {
         fig <- plotly::layout(fig, title = list(text = title))
     }
-
+    
     fig
 }
 

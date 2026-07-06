@@ -153,12 +153,12 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 title = title
             )
             # VizModules layout, axis and line logic
-            fig <- apply_title_layout(fig, input, isolate_fn, title_y = 0.95, title_x = isolate_fn(input$axis.title.horizontal.position))
-            xaxis_style <- create_axis_styles(input, axis_side = "x", isolate_fn = isolate_fn)
-            yaxis_style <- create_axis_styles(input, axis_side = "y", isolate_fn = isolate_fn)
-            fig <- apply_subplot_axis_styling(fig, xaxis_style, yaxis_style)
+            fig <- VizModules::apply_title_layout(fig, input, isolate_fn, title_y = 0.95, title_x = isolate_fn(input$axis.title.horizontal.position))
+            xaxis_style <- VizModules::create_axis_styles(input, axis_side = "x", isolate_fn = isolate_fn)
+            yaxis_style <- VizModules::create_axis_styles(input, axis_side = "y", isolate_fn = isolate_fn)
+            fig <- VizModules::apply_subplot_axis_styling(fig, xaxis_style, yaxis_style)
 
-            fig <- add_reference_lines(fig,
+            fig <- VizModules::add_reference_lines(fig,
                 hline.intercepts = isolate_fn(input$hline.intercepts),
                 hline.colors = isolate_fn(input$hline.colors),
                 hline.widths = isolate_fn(input$hline.widths),
@@ -180,14 +180,16 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             config_list <- add_plot_config(download.format = isolate_fn(input$download.format), include.modebar.buttons = TRUE, facet.by = NULL)
             fig <- do.call(config, c(list(p = fig), config_list))
             fig <- apply_plotly_newshape(fig, input, isolate_fn)
-
+          
+            #Axis titles: 
+            fig <- axis_titles_as_annotations(fig)
         })
 
 
         output$survivalCurve <- renderPlotly({
             req(input$time, input$status)
             tryCatch(
-                generate_survivalCurve(),
+                fig <- apply_render_margins(generate_survivalCurve(), input),
                 error = function(e) {
                     empty_plot(text = conditionMessage(e), plotly = TRUE)
                 }
