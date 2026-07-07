@@ -169,7 +169,7 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 fig,
                 title.size = isolate_fn(input$legend.title.size),
                 text.size = isolate_fn(input$legend.text.size),
-                position = "right"
+                position = c(1.02, "left", "v")
             )
             #Axis titles: 
             fig <- .stats_annotation(fig)
