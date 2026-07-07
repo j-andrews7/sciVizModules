@@ -14,8 +14,6 @@
     }
     fallback
 }
-
-
 #' Auto-detect a follow-up time column
 #'
 #' @param data A data frame.
@@ -38,8 +36,6 @@
     }
     num.choices[1]
 }
-
-
 #' Auto-detect an event/status column
 #'
 #' @param data A data frame.
@@ -66,7 +62,6 @@
     }
     if (length(num.choices) > 1) num.choices[2] else if (length(num.choices)) num.choices[1] else NULL
 }
-
 #' Move a p-value text trace into an editable Plotly annotation
 #'
 #' This function searches a Plotly figure for a text trace whose label looks
@@ -93,13 +88,13 @@
   for (x in seq_along(fig$x$data)) {
     text <- fig$x$data[[x]]$text
 
-    if (!is.null(text) && any(grepl("p = ", text, fixed = TRUE))) {
-      stat_anno <- text[grep("p = ", text, fixed = TRUE)[1]]
+    if (!is.null(text) && any(grepl("p = ", text, fixed = TRUE)) | any(grepl("p > ", text, fixed = TRUE)) | any(grepl("p < ", text, fixed = TRUE))) {
+      stat_anno <- text[grep("p ", text, fixed = TRUE)[1]]
 
       fig$x$data[[x]] <- NULL
 
       new_annotation <- list(
-        x = 0.1,
+        x = 0.08,
         y = 0.1,
         xref = "paper",
         yref = "paper",
