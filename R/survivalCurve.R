@@ -27,7 +27,10 @@
 #' @param conf.int Logical; draw confidence interval ribbons (default `TRUE`).
 #' @param pval Logical; display the log-rank test p-value. Only applied when
 #'   `group.by` defines more than one group (default `TRUE`).
-#' @param risk.table Logical; append a "number at risk" table beneath the curve
+#' @param risk.table Logical; show a "number at risk" table alongside the curve.
+#'   The table is returned as a standalone figure attached to the result via the
+#'   `"risk_table"` attribute (rather than stacked onto the curve) so it can be
+#'   rendered separately without sharing axes/grid lines with the main plot
 #'   (default `FALSE`).
 #' @param censor Logical; draw censoring marks (default `TRUE`).
 #' @param surv.median.line Character; draw median survival reference lines. One
@@ -43,6 +46,9 @@
 
 #'
 #' @return A [plotly::plot_ly()] object containing the interactive survival curve.
+#'   When `risk.table = TRUE` the accompanying "number at risk" table is attached
+#'   as a standalone [plotly::plot_ly()] figure in the `"risk_table"` attribute
+#'   of the returned object.
 #'
 #' @importFrom survival Surv
 #' @importFrom stats as.formula
@@ -141,18 +147,22 @@ survivalCurve <- function(data,
 
     fig <- plotly::ggplotly(gg$plot)
 
-    # Optionally stack the "number at risk" table beneath the curve. This is
-    # wrapped defensively so a conversion failure never breaks the main plot.
+    # Optionally build the "number at risk" table as a *standalone* interactive
+    # figure. Previously it was stacked beneath the curve with
+    # `plotly::subplot(shareX = TRUE)`, but sharing the x-axis forced shared grid
+    # lines onto the survival curve and interfered with the draggable
+    # title/axis-title annotations added downstream. Instead, the table is
+    # returned as an attribute on the main figure so callers (e.g. the Shiny
+    # module) can render it in a separate output, fully decoupled from the main
+    # plot's layout. The conversion is wrapped defensively so a failure never
+    # breaks the main plot.
     if (isTRUE(risk.table) && !is.null(gg$table)) {
-        tbl <- tryCatch(plotly::ggplotly(gg$table), error = function(e) NULL)
+        tbl <- tryCatch(
+            plotly::layout(plotly::ggplotly(gg$table), showlegend = FALSE),
+            error = function(e) NULL
+        )
         if (!is.null(tbl)) {
-            fig <- tryCatch(
-                plotly::subplot(fig, tbl,
-                    nrows = 2, heights = c(0.75, 0.25),
-                    shareX = TRUE, titleX = TRUE, titleY = TRUE, margin = 0.05
-                ),
-                error = function(e) fig
-            )
+            attr(fig, "risk_table") <- tbl
         }
     }
 

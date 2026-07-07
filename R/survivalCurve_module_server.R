@@ -31,6 +31,11 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
     data_reactive <- data
 
     moduleServer(id, function(input, output, session) {
+        # Holds the standalone "number at risk" table figure (or NULL). The risk
+        # table is rendered in its own output so it does not share axes/grid
+        # lines with, or otherwise disturb the layout of, the main survival curve.
+        risk_table_fig <- reactiveVal(NULL)
+
         # Hide individual inputs if requested.
         if (!is.null(hide.inputs)) {
             for (input.name in hide.inputs) hide(input.name)
@@ -135,6 +140,11 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 break.time.by = break.time.by,
                 legend.title = legend.title
             )
+            # The "number at risk" table (when requested) is attached as an
+            # attribute; capture it for its dedicated output and strip it from the
+            # main figure so the curve is processed on its own.
+            risk_table_fig(attr(fig, "risk_table"))
+            attr(fig, "risk_table") <- NULL
             # VizModules layout, axis and line logic
             fig <- VizModules::apply_title_layout(fig, input, isolate_fn, title_y = 0.95, title_x = isolate_fn(input$axis.title.horizontal.position))
             xaxis_style <- VizModules::create_axis_styles(input, axis_side = "x", isolate_fn = isolate_fn, ggplot.axis.styling = FALSE)
@@ -185,6 +195,17 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                     empty_plot(text = conditionMessage(e), plotly = TRUE)
                 }
             )
+        })
+
+        # Render the "number at risk" table in its own output, decoupled from the
+        # survival curve. `generate_survivalCurve()` is evaluated here so the table
+        # is kept in sync with the current inputs before it is read.
+        output$survivalCurveRiskTable <- renderPlotly({
+            req(input$time, input$status, isTRUE(input$risk.table))
+            generate_survivalCurve()
+            tbl <- risk_table_fig()
+            req(tbl)
+            tbl
         })
 
         # Capture all UI inputs for the source download.

@@ -40,7 +40,10 @@ by. When \code{NULL} or \code{""} a single overall survival curve is drawn.}
 \item{pval}{Logical; display the log-rank test p-value. Only applied when
 \code{group.by} defines more than one group (default \code{TRUE}).}
 
-\item{risk.table}{Logical; append a "number at risk" table beneath the curve
+\item{risk.table}{Logical; show a "number at risk" table alongside the curve.
+The table is returned as a standalone figure attached to the result via the
+\code{"risk_table"} attribute (rather than stacked onto the curve) so it can be
+rendered separately without sharing axes/grid lines with the main plot
 (default \code{FALSE}).}
 
 \item{censor}{Logical; draw censoring marks (default \code{TRUE}).}
@@ -72,6 +75,9 @@ through to the \code{palette} argument of \code{\link[survminer:ggsurvplot]{surv
 }
 \value{
 A \code{\link[plotly:plot_ly]{plotly::plot_ly()}} object containing the interactive survival curve.
+When \code{risk.table = TRUE} the accompanying "number at risk" table is attached
+as a standalone \code{\link[plotly:plot_ly]{plotly::plot_ly()}} figure in the \code{"risk_table"} attribute
+of the returned object.
 }
 \description{
 Builds a Kaplan-Meier survival curve from a survival-style data frame and

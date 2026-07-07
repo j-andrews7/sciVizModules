@@ -55,7 +55,7 @@ status/event/vital/dead/censor, else a numeric 0/1 or 1/2 column)
 \item \code{group.by} - Optional stratification column (default: none)
 \item \code{conf.int} - Show confidence interval ribbons (default: TRUE)
 \item \code{pval} - Show log-rank p-value (default: TRUE; only when stratified)
-\item \code{risk.table} - Show "number at risk" table (default: FALSE)
+\item \code{risk.table} - Show "number at risk" table in a separate panel (default: FALSE)
 \item \code{censor} - Show censoring marks (default: TRUE)
 \item \code{surv.median.line} - Median survival reference lines (default: "none")
 \item \code{fun} - Curve transformation: survival probability, "pct", "event",
