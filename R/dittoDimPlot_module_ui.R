@@ -147,7 +147,7 @@ dittoDimPlotInputsUI <- function(id, data, defaults = NULL, title = "DimPlot Set
                 placement = "top", options = list(container = "body"))
         ),
         "Plotly" = uniform_plotly_inputs_ui(ns, defaults),
-        "Axes" = uniform_axes_inputs_ui(ns, defaults, include.rotate = TRUE),
+        "Axes" = uniform_axes_inputs_ui(ns, defaults, include.rotate = FALSE),
         "Legend" = uniform_legend_inputs_ui(ns, defaults),
         "Lines" = uniform_lines_inputs_ui(ns, defaults)
     )
