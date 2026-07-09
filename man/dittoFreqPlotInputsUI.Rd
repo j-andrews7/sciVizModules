@@ -54,6 +54,7 @@ The following parameters can be accessed via UI inputs and/or the \code{defaults
 \item \code{max.normalize} - Scale each facet to its own max (default: FALSE)
 \item \code{jitter.size} - Jitter point size (default: 1)
 \item \code{jitter.width} - Horizontal spread of the jitter points (default: 0.2)
+\item \code{jitter.color} - Color of the jitter points (default: "#000000")
 \item \code{boxplot.width} - Width of the boxplots (default: 0.4)
 \item \code{vlnplot.width} - Relative width of the violins (default: 1)
 \item \code{palette.selection} - Colors for discrete groups (multiColorPicker)

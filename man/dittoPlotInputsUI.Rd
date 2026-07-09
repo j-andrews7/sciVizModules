@@ -51,6 +51,7 @@ The following parameters can be accessed via UI inputs and/or the \code{defaults
 \item \code{plots} - Representations to draw (default: c("jitter", "vlnplot"))
 \item \code{split.by} - Discrete metadata to facet by (default: none)
 \item \code{jitter.size} - Jitter point size (default: 1)
+\item \code{jitter.color} - Color of the jitter points (default: "#000000")
 \item \code{vlnplot.width} - Width of the violins (default: 1)
 \item \code{vlnplot.scaling} - Violin scaling method: "area", "count", or "width"
 (default: "area")

@@ -130,6 +130,7 @@ dittoRidgeJitterServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
                 ridgeplot.bins = isolate_fn(input$ridgeplot.bins),
                 jitter.size = isolate_fn(input$jitter.size),
                 jitter.width = isolate_fn(input$jitter.width),
+                jitter.color = isolate_fn(input$jitter.color),
                 color.panel = color.panel,
                 theme = theme_style
             )

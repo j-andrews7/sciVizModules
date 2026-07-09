@@ -24,6 +24,7 @@
 #'   \item \code{max.normalize} - Scale each facet to its own max (default: FALSE)
 #'   \item \code{jitter.size} - Jitter point size (default: 1)
 #'   \item \code{jitter.width} - Horizontal spread of the jitter points (default: 0.2)
+#'   \item \code{jitter.color} - Color of the jitter points (default: "#000000")
 #'   \item \code{boxplot.width} - Width of the boxplots (default: 0.4)
 #'   \item \code{vlnplot.width} - Relative width of the violins (default: 1)
 #'   \item \code{palette.selection} - Colors for discrete groups (multiColorPicker)
@@ -40,6 +41,7 @@
 #' @import shiny
 #' @importFrom shinyBS tipify
 #' @importFrom shinyWidgets materialSwitch
+#' @importFrom colourpicker colourInput
 #'
 #' @export
 #' @author Jared Andrews
@@ -93,10 +95,11 @@ dittoFreqPlotInputsUI <- function(id, data, defaults = NULL, title = "FreqPlot S
                 selected = .ditto_default(defaults, "scale", "percent"), selectize = FALSE
             ), "Show frequencies as a percentage or as raw counts.",
                 placement = "top", options = list(container = "body")),
-            tipify(checkboxGroupInput(ns("plots"), "Representations",
+            tipify(selectInput(ns("plots"), "Plots",
                 choices = c("Jitter" = "jitter", "Box" = "boxplot",
                     "Violin" = "vlnplot", "Ridge" = "ridgeplot"),
-                selected = .ditto_default(defaults, "plots", c("boxplot", "jitter"))
+                selected = .ditto_default(defaults, "plots", c("boxplot", "jitter")),
+                multiple = TRUE, selectize = TRUE
             ), "Data representations to draw, from back to front.",
                 placement = "top", options = list(container = "body"))
         ),
@@ -113,6 +116,10 @@ dittoFreqPlotInputsUI <- function(id, data, defaults = NULL, title = "FreqPlot S
             tipify(numericInput(ns("jitter.width"), "Jitter Width",
                 value = .ditto_default(defaults, "jitter.width", 0.2), min = 0, step = 0.05),
                 "Horizontal spread of the jitter points.",
+                placement = "top", options = list(container = "body")),
+            tipify(colourInput(ns("jitter.color"), "Jitter Point Color",
+                value = .ditto_default(defaults, "jitter.color", "#000000")),
+                "Color of the jitter points.",
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("boxplot.width"), "Box Width",
                 value = .ditto_default(defaults, "boxplot.width", 0.4), min = 0, step = 0.05),

@@ -24,6 +24,7 @@
 #'   \item \code{ridgeplot.shape} - Ridge shape: "smooth" density or "hist" (default: "smooth")
 #'   \item \code{ridgeplot.bins} - Number of bins when \code{ridgeplot.shape} is "hist" (default: 30)
 #'   \item \code{jitter.size} - Jitter point size (default: 1)
+#'   \item \code{jitter.color} - Color of the jitter points (default: "#000000")
 #'   \item \code{palette.selection} - Colors for discrete groups (multiColorPicker)
 #' }
 #'
@@ -37,6 +38,7 @@
 #'
 #' @import shiny
 #' @importFrom shinyBS tipify
+#' @importFrom colourpicker colourInput
 #'
 #' @export
 #' @author Jared Andrews
@@ -111,6 +113,10 @@ dittoRidgeJitterInputsUI <- function(id, data, defaults = NULL, title = "RidgeJi
             tipify(numericInput(ns("jitter.width"), "Jitter Width",
                 value = .ditto_default(defaults, "jitter.width", 0.2), min = 0, step = 0.05),
                 "Spread of the overlaid jitter points.",
+                placement = "top", options = list(container = "body")),
+            tipify(colourInput(ns("jitter.color"), "Jitter Point Color",
+                value = .ditto_default(defaults, "jitter.color", "#000000")),
+                "Color of the overlaid jitter points.",
                 placement = "top", options = list(container = "body"))
         ),
         "Plotly" = uniform_plotly_inputs_ui(ns, defaults),

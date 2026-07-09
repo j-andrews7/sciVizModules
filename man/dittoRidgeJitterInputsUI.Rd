@@ -54,6 +54,7 @@ The following parameters can be accessed via UI inputs and/or the \code{defaults
 \item \code{ridgeplot.shape} - Ridge shape: "smooth" density or "hist" (default: "smooth")
 \item \code{ridgeplot.bins} - Number of bins when \code{ridgeplot.shape} is "hist" (default: 30)
 \item \code{jitter.size} - Jitter point size (default: 1)
+\item \code{jitter.color} - Color of the jitter points (default: "#000000")
 \item \code{palette.selection} - Colors for discrete groups (multiColorPicker)
 }
 }

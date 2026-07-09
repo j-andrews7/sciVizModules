@@ -81,7 +81,7 @@ dittoFreqPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 if (length(disc) >= 2) disc[2] else if (length(disc)) disc[1] else ""))
             updateSelectInput(session, "color.by", selected = .ditto_default(defaults, "color.by", ""))
             updateSelectInput(session, "scale", selected = .ditto_default(defaults, "scale", "percent"))
-            updateCheckboxGroupInput(session, "plots",
+            updateSelectInput(session, "plots",
                 selected = .ditto_default(defaults, "plots", c("boxplot", "jitter")))
             updateMaterialSwitch(session, "max.normalize", value = .ditto_default(defaults, "max.normalize", FALSE))
             updateNumericInput(session, "jitter.size", value = .ditto_default(defaults, "jitter.size", 1))
@@ -136,6 +136,7 @@ dittoFreqPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 max.normalize = isolate_fn(input$max.normalize),
                 jitter.size = isolate_fn(input$jitter.size),
                 jitter.width = isolate_fn(input$jitter.width),
+                jitter.color = isolate_fn(input$jitter.color),
                 boxplot.width = isolate_fn(input$boxplot.width),
                 vlnplot.width = isolate_fn(input$vlnplot.width),
                 color.panel = color.panel, 

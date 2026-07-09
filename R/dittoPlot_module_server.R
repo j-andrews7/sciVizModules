@@ -134,6 +134,7 @@ dittoPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defa
                 split.by = split.by,
                 jitter.size = isolate_fn(input$jitter.size),
                 jitter.width = isolate_fn(input$jitter.width),
+                jitter.color = isolate_fn(input$jitter.color),
                 vlnplot.lineweight = isolate_fn(input$vlnplot.lineweight),
                 boxplot.width = isolate_fn(input$boxplot.width),
                 boxplot.lineweight = isolate_fn(input$boxplot.lineweight),

@@ -21,6 +21,7 @@
 #'   \item \code{plots} - Representations to draw (default: c("jitter", "vlnplot"))
 #'   \item \code{split.by} - Discrete metadata to facet by (default: none)
 #'   \item \code{jitter.size} - Jitter point size (default: 1)
+#'   \item \code{jitter.color} - Color of the jitter points (default: "#000000")
 #'   \item \code{vlnplot.width} - Width of the violins (default: 1)
 #'   \item \code{vlnplot.scaling} - Violin scaling method: "area", "count", or "width"
 #'     (default: "area")
@@ -40,6 +41,7 @@
 #'
 #' @import shiny
 #' @importFrom shinyBS tipify
+#' @importFrom colourpicker colourInput
 #'
 #' @export
 #' @author Jared Andrews
@@ -103,6 +105,10 @@ dittoPlotInputsUI <- function(id, data, defaults = NULL, title = "dittoPlot Sett
             tipify(numericInput(ns("jitter.width"), "Jitter Width",
                 value = .ditto_default(defaults, "jitter.width", 0.2), min = 0, step = 0.05),
                 "Horizontal spread of the jitter points.",
+                placement = "top", options = list(container = "body")),
+            tipify(colourInput(ns("jitter.color"), "Jitter Point Color",
+                value = .ditto_default(defaults, "jitter.color", "#000000")),
+                "Color of the jitter points.",
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("vlnplot.lineweight"), "Violin Line Weight",
                 value = .ditto_default(defaults, "vlnplot.lineweight", 1), min = 0, step = 0.1),
