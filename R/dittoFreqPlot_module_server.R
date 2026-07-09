@@ -116,6 +116,15 @@ dittoFreqPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 color.panel <- unname(palette_values[groups])
             }
 
+            # Making theme arguments for uniform aesthetic 
+            additional_theme <- create_ggplot_axis_style(input, isolate_fn = isolate_fn)
+            theme_style <- theme_bw() + theme(
+                panel.border = additional_theme$panel.border,
+                axis.line = additional_theme$axis.line,
+                axis.ticks = additional_theme$axis.ticks,
+                strip.background = element_blank()
+            )
+
             gg <- dittoSeq::dittoFreqPlot(
                 object = obj,
                 var = var,
@@ -129,7 +138,8 @@ dittoFreqPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 jitter.width = isolate_fn(input$jitter.width),
                 boxplot.width = isolate_fn(input$boxplot.width),
                 vlnplot.width = isolate_fn(input$vlnplot.width),
-                color.panel = color.panel
+                color.panel = color.panel, 
+                theme = theme_style
             )
 
             fig <- plotly::ggplotly(gg)
