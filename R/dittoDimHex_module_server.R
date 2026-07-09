@@ -75,6 +75,15 @@ dittoDimHexServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, de
             split.by <- isolate_fn(input$split.by)
             if (is.null(split.by) || !nzchar(split.by)) split.by <- NULL
 
+            # Making theme arguments for uniform aesthetic
+            additional_theme <- create_ggplot_axis_style(input, isolate_fn = isolate_fn)
+            theme_style <- theme_bw() + theme(
+                panel.border = additional_theme$panel.border,
+                axis.line = additional_theme$axis.line,
+                axis.ticks = additional_theme$axis.ticks,
+                strip.background = element_blank()
+            )
+
             gg <- dittoSeq::dittoDimHex(
                 object = obj,
                 color.var = color.var,
@@ -92,7 +101,8 @@ dittoDimHexServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, de
                 do.label = isolate_fn(input$do.label),
                 labels.size = isolate_fn(input$labels.size),
                 do.ellipse = isolate_fn(input$do.ellipse),
-                color.panel = default_palette_values
+                color.panel = default_palette_values,
+                theme = theme_style
             )
 
             fig <- plotly::ggplotly(gg)

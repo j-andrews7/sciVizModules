@@ -108,6 +108,15 @@ dittoScatterPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
                 color.panel <- unname(palette_values[groups])
             }
 
+            # Making theme arguments for uniform aesthetic
+            additional_theme <- create_ggplot_axis_style(input, isolate_fn = isolate_fn)
+            theme_style <- theme_bw() + theme(
+                panel.border = additional_theme$panel.border,
+                axis.line = additional_theme$axis.line,
+                axis.ticks = additional_theme$axis.ticks,
+                strip.background = element_blank()
+            )
+
             gg <- dittoSeq::dittoScatterPlot(
                 object = obj,
                 x.var = x.var,
@@ -124,7 +133,8 @@ dittoScatterPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
                 do.contour = isolate_fn(input$do.contour),
                 min.color = isolate_fn(input$min.color),
                 max.color = isolate_fn(input$max.color),
-                color.panel = color.panel
+                color.panel = color.panel,
+                theme = theme_style
             )
 
             fig <- plotly::ggplotly(gg)

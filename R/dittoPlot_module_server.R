@@ -116,6 +116,15 @@ dittoPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defa
                 color.panel <- unname(palette_values[groups])
             }
 
+            # Making theme arguments for uniform aesthetic
+            additional_theme <- create_ggplot_axis_style(input, isolate_fn = isolate_fn)
+            theme_style <- theme_bw() + theme(
+                panel.border = additional_theme$panel.border,
+                axis.line = additional_theme$axis.line,
+                axis.ticks = additional_theme$axis.ticks,
+                strip.background = element_blank()
+            )
+
             gg <- dittoSeq::dittoPlot(
                 object = obj,
                 var = var,
@@ -132,7 +141,8 @@ dittoPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defa
                 vlnplot.scaling = isolate_fn(input$vlnplot.scaling),
                 ridgeplot.scale = isolate_fn(input$ridgeplot.scale),
                 ridgeplot.lineweight = isolate_fn(input$ridgeplot.lineweight),
-                color.panel = color.panel
+                color.panel = color.panel,
+                theme = theme_style
             )
 
             fig <- plotly::ggplotly(gg)

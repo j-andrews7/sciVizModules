@@ -108,6 +108,15 @@ dittoBarPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, d
                 color.panel <- unname(palette_values[groups])
             }
 
+            # Making theme arguments for uniform aesthetic
+            additional_theme <- create_ggplot_axis_style(input, isolate_fn = isolate_fn)
+            theme_style <- theme_bw() + theme(
+                panel.border = additional_theme$panel.border,
+                axis.line = additional_theme$axis.line,
+                axis.ticks = additional_theme$axis.ticks,
+                strip.background = element_blank()
+            )
+
             gg <- dittoSeq::dittoBarPlot(
                 object = obj,
                 var = var,
@@ -118,7 +127,8 @@ dittoBarPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, d
                 split.ncol = split.ncol,
                 x.labels.rotate = isolate_fn(input$x.labels.rotate),
                 retain.factor.levels = isolate_fn(input$retain.factor.levels),
-                color.panel = color.panel
+                color.panel = color.panel,
+                theme = theme_style
             )
 
             fig <- plotly::ggplotly(gg)
