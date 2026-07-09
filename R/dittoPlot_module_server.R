@@ -83,6 +83,11 @@ dittoPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defa
             updateNumericInput(session, "jitter.width", value = .ditto_default(defaults, "jitter.width", 0.2))
             updateNumericInput(session, "vlnplot.lineweight", value = .ditto_default(defaults, "vlnplot.lineweight", 1))
             updateNumericInput(session, "boxplot.width", value = .ditto_default(defaults, "boxplot.width", 0.2))
+            updateNumericInput(session, "boxplot.lineweight", value = .ditto_default(defaults, "boxplot.lineweight", 1))
+            updateNumericInput(session, "vlnplot.width", value = .ditto_default(defaults, "vlnplot.width", 1))
+            updateSelectInput(session, "vlnplot.scaling", selected = .ditto_default(defaults, "vlnplot.scaling", "area"))
+            updateNumericInput(session, "ridgeplot.scale", value = .ditto_default(defaults, "ridgeplot.scale", 1.25))
+            updateNumericInput(session, "ridgeplot.lineweight", value = .ditto_default(defaults, "ridgeplot.lineweight", 1))
             .ditto_reset_uniform(session, defaults)
         })
 
@@ -122,6 +127,11 @@ dittoPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defa
                 jitter.width = isolate_fn(input$jitter.width),
                 vlnplot.lineweight = isolate_fn(input$vlnplot.lineweight),
                 boxplot.width = isolate_fn(input$boxplot.width),
+                boxplot.lineweight = isolate_fn(input$boxplot.lineweight),
+                vlnplot.width = isolate_fn(input$vlnplot.width),
+                vlnplot.scaling = isolate_fn(input$vlnplot.scaling),
+                ridgeplot.scale = isolate_fn(input$ridgeplot.scale),
+                ridgeplot.lineweight = isolate_fn(input$ridgeplot.lineweight),
                 color.panel = color.panel
             )
 

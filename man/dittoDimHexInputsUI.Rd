@@ -53,6 +53,11 @@ The following parameters can be accessed via UI inputs and/or the \code{defaults
 metadata level) or for continuous data ("median", "mean", etc.)
 \item \code{split.by} - Discrete metadata to facet by (default: none)
 \item \code{min.color}, \code{max.color} - Colors for the continuous color scale
+\item \code{do.contour} - Overlay kernel-density contour lines (default: FALSE)
+\item \code{do.label} - Draw group labels for a discrete \code{color.var} (default: FALSE)
+\item \code{labels.size} - Text size of the group labels (default: 5)
+\item \code{labels.highlight} - White box behind group labels (default: TRUE)
+\item \code{do.ellipse} - Draw ellipses for a discrete \code{color.var} (default: FALSE)
 }
 }
 

@@ -21,6 +21,12 @@
 #'   \item \code{plots} - Representations to draw (default: c("jitter", "vlnplot"))
 #'   \item \code{split.by} - Discrete metadata to facet by (default: none)
 #'   \item \code{jitter.size} - Jitter point size (default: 1)
+#'   \item \code{vlnplot.width} - Width of the violins (default: 1)
+#'   \item \code{vlnplot.scaling} - Violin scaling method: "area", "count", or "width"
+#'     (default: "area")
+#'   \item \code{boxplot.lineweight} - Line weight of the boxplot outlines (default: 1)
+#'   \item \code{ridgeplot.scale} - Ridge overlap scale (default: 1.25)
+#'   \item \code{ridgeplot.lineweight} - Line weight of the ridge outlines (default: 1)
 #'   \item \code{palette.selection} - Colors for discrete groups (multiColorPicker)
 #' }
 #'
@@ -105,6 +111,27 @@ dittoPlotInputsUI <- function(id, data, defaults = NULL, title = "dittoPlot Sett
             tipify(numericInput(ns("boxplot.width"), "Box Width",
                 value = .ditto_default(defaults, "boxplot.width", 0.2), min = 0, step = 0.05),
                 "Width of the boxplots.",
+                placement = "top", options = list(container = "body")),
+            tipify(numericInput(ns("boxplot.lineweight"), "Box Line Weight",
+                value = .ditto_default(defaults, "boxplot.lineweight", 1), min = 0, step = 0.1),
+                "Line weight of the boxplot outlines.",
+                placement = "top", options = list(container = "body")),
+            tipify(numericInput(ns("vlnplot.width"), "Violin Width",
+                value = .ditto_default(defaults, "vlnplot.width", 1), min = 0, step = 0.05),
+                "Relative width of the violins.",
+                placement = "top", options = list(container = "body")),
+            tipify(selectInput(ns("vlnplot.scaling"), "Violin Scaling",
+                choices = c("Area" = "area", "Count" = "count", "Width" = "width"),
+                selected = .ditto_default(defaults, "vlnplot.scaling", "area"), selectize = FALSE
+            ), "How violin areas are scaled relative to each other.",
+                placement = "top", options = list(container = "body")),
+            tipify(numericInput(ns("ridgeplot.scale"), "Ridge Scale (overlap)",
+                value = .ditto_default(defaults, "ridgeplot.scale", 1.25), min = 0.1, step = 0.05),
+                "Vertical scaling of the ridges; larger values increase overlap.",
+                placement = "top", options = list(container = "body")),
+            tipify(numericInput(ns("ridgeplot.lineweight"), "Ridge Line Weight",
+                value = .ditto_default(defaults, "ridgeplot.lineweight", 1), min = 0, step = 0.1),
+                "Line weight of the ridge outlines.",
                 placement = "top", options = list(container = "body"))
         ),
         "Plotly" = uniform_plotly_inputs_ui(ns, defaults),

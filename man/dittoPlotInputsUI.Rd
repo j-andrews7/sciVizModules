@@ -51,6 +51,12 @@ The following parameters can be accessed via UI inputs and/or the \code{defaults
 \item \code{plots} - Representations to draw (default: c("jitter", "vlnplot"))
 \item \code{split.by} - Discrete metadata to facet by (default: none)
 \item \code{jitter.size} - Jitter point size (default: 1)
+\item \code{vlnplot.width} - Width of the violins (default: 1)
+\item \code{vlnplot.scaling} - Violin scaling method: "area", "count", or "width"
+(default: "area")
+\item \code{boxplot.lineweight} - Line weight of the boxplot outlines (default: 1)
+\item \code{ridgeplot.scale} - Ridge overlap scale (default: 1.25)
+\item \code{ridgeplot.lineweight} - Line weight of the ridge outlines (default: 1)
 \item \code{palette.selection} - Colors for discrete groups (multiColorPicker)
 }
 }

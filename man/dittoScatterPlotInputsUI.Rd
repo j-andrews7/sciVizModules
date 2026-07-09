@@ -54,6 +54,11 @@ The following parameters can be accessed via UI inputs and/or the \code{defaults
 \item \code{size} - Point size (default: 1)
 \item \code{opacity} - Point opacity (default: 1)
 \item \code{order} - Point plotting order (default: "unordered")
+\item \code{do.label} - Draw group labels at cluster centers (default: FALSE)
+\item \code{labels.size} - Text size of the group labels (default: 5)
+\item \code{labels.highlight} - White box behind group labels (default: TRUE)
+\item \code{do.ellipse} - Draw grouping ellipses (default: FALSE)
+\item \code{do.contour} - Overlay kernel-density contour lines (default: FALSE)
 \item \code{min.color}, \code{max.color} - Colors for continuous color scales
 \item \code{palette.selection} - Colors for discrete groups (multiColorPicker)
 }

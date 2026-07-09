@@ -76,6 +76,8 @@ dittoBarPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, d
                 if (length(disc) >= 2) disc[2] else if (length(disc)) disc[1] else ""))
             updateSelectInput(session, "scale", selected = .ditto_default(defaults, "scale", "percent"))
             updateSelectInput(session, "split.by", selected = .ditto_default(defaults, "split.by", ""))
+            updateNumericInput(session, "split.nrow", value = .ditto_default(defaults, "split.nrow", NA))
+            updateNumericInput(session, "split.ncol", value = .ditto_default(defaults, "split.ncol", NA))
             updateMaterialSwitch(session, "x.labels.rotate", value = .ditto_default(defaults, "x.labels.rotate", TRUE))
             updateMaterialSwitch(session, "retain.factor.levels", value = .ditto_default(defaults, "retain.factor.levels", FALSE))
             .ditto_reset_uniform(session, defaults)
@@ -94,6 +96,11 @@ dittoBarPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, d
             split.by <- isolate_fn(input$split.by)
             if (is.null(split.by) || !nzchar(split.by)) split.by <- NULL
 
+            split.nrow <- isolate_fn(input$split.nrow)
+            if (is.null(split.nrow) || is.na(split.nrow)) split.nrow <- NULL
+            split.ncol <- isolate_fn(input$split.ncol)
+            if (is.null(split.ncol) || is.na(split.ncol)) split.ncol <- NULL
+
             groups <- isolate_fn(palette_groups())
             color.panel <- default_palette_values
             if (length(groups) > 0) {
@@ -107,6 +114,8 @@ dittoBarPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, d
                 group.by = group.by,
                 scale = isolate_fn(input$scale),
                 split.by = split.by,
+                split.nrow = split.nrow,
+                split.ncol = split.ncol,
                 x.labels.rotate = isolate_fn(input$x.labels.rotate),
                 retain.factor.levels = isolate_fn(input$retain.factor.levels),
                 color.panel = color.panel

@@ -49,6 +49,8 @@ The following parameters can be accessed via UI inputs and/or the \code{defaults
 \item \code{group.by} - Discrete metadata used for the x-axis groups
 \item \code{scale} - "percent" or "count" (default: "percent")
 \item \code{split.by} - Discrete metadata to facet by (default: none)
+\item \code{split.nrow}, \code{split.ncol} - Number of rows/columns for the facet
+layout when \code{split.by} is set (default: automatic)
 \item \code{x.labels.rotate} - Rotate x-axis labels (default: TRUE)
 \item \code{palette.selection} - Colors for the \code{var} levels (multiColorPicker)
 }

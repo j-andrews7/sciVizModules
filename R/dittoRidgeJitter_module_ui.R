@@ -21,6 +21,8 @@
 #'   \item \code{color.by} - Discrete metadata used for fill colors (default: `group.by`)
 #'   \item \code{split.by} - Discrete metadata to facet by (default: none)
 #'   \item \code{ridgeplot.scale} - Ridge overlap scale (default: 1.25)
+#'   \item \code{ridgeplot.shape} - Ridge shape: "smooth" density or "hist" (default: "smooth")
+#'   \item \code{ridgeplot.bins} - Number of bins when \code{ridgeplot.shape} is "hist" (default: 30)
 #'   \item \code{jitter.size} - Jitter point size (default: 1)
 #'   \item \code{palette.selection} - Colors for discrete groups (multiColorPicker)
 #' }
@@ -92,6 +94,15 @@ dittoRidgeJitterInputsUI <- function(id, data, defaults = NULL, title = "RidgeJi
             tipify(numericInput(ns("ridgeplot.lineweight"), "Ridge Line Weight",
                 value = .ditto_default(defaults, "ridgeplot.lineweight", 1), min = 0, step = 0.1),
                 "Line weight of the ridge outlines.",
+                placement = "top", options = list(container = "body")),
+            tipify(selectInput(ns("ridgeplot.shape"), "Ridge Shape",
+                choices = c("Smooth" = "smooth", "Histogram" = "hist"),
+                selected = .ditto_default(defaults, "ridgeplot.shape", "smooth"), selectize = FALSE
+            ), "Draw ridges as smoothed densities or as histograms.",
+                placement = "top", options = list(container = "body")),
+            tipify(numericInput(ns("ridgeplot.bins"), "Ridge Bins",
+                value = .ditto_default(defaults, "ridgeplot.bins", 30), min = 2, step = 1),
+                "Number of bins used when the ridge shape is 'Histogram'.",
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("jitter.size"), "Jitter Size",
                 value = .ditto_default(defaults, "jitter.size", 1), min = 0.1, step = 0.1),

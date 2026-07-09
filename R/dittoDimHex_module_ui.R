@@ -23,6 +23,11 @@
 #'     metadata level) or for continuous data ("median", "mean", etc.)
 #'   \item \code{split.by} - Discrete metadata to facet by (default: none)
 #'   \item \code{min.color}, \code{max.color} - Colors for the continuous color scale
+#'   \item \code{do.contour} - Overlay kernel-density contour lines (default: FALSE)
+#'   \item \code{do.label} - Draw group labels for a discrete `color.var` (default: FALSE)
+#'   \item \code{labels.size} - Text size of the group labels (default: 5)
+#'   \item \code{labels.highlight} - White box behind group labels (default: TRUE)
+#'   \item \code{do.ellipse} - Draw ellipses for a discrete `color.var` (default: FALSE)
 #' }
 #'
 #' @param id The ID for the Shiny module.
@@ -35,6 +40,7 @@
 #'
 #' @import shiny
 #' @importFrom shinyBS tipify
+#' @importFrom shinyWidgets materialSwitch
 #' @importFrom colourpicker colourInput
 #'
 #' @export
@@ -111,6 +117,26 @@ dittoDimHexInputsUI <- function(id, data, defaults = NULL, title = "DimHex Setti
             tipify(numericInput(ns("max.opacity"), "Max Opacity",
                 value = .ditto_default(defaults, "max.opacity", 1), min = 0, max = 1, step = 0.05),
                 "Opacity of the most-dense hexagons.",
+                placement = "top", options = list(container = "body")),
+            tipify(materialSwitch(ns("do.contour"), "Density Contours",
+                value = .ditto_default(defaults, "do.contour", FALSE), status = "success"),
+                "Overlay kernel-density contour lines over the hexagons.",
+                placement = "top", options = list(container = "body")),
+            tipify(materialSwitch(ns("do.label"), "Label Groups",
+                value = .ditto_default(defaults, "do.label", FALSE), status = "success"),
+                "Overlay text labels at the center of each group (discrete color variable only).",
+                placement = "top", options = list(container = "body")),
+            tipify(numericInput(ns("labels.size"), "Label Size",
+                value = .ditto_default(defaults, "labels.size", 5), min = 1, step = 0.5),
+                "Text size of the group labels (used when 'Label Groups' is on).",
+                placement = "top", options = list(container = "body")),
+            tipify(materialSwitch(ns("labels.highlight"), "Label Highlight",
+                value = .ditto_default(defaults, "labels.highlight", TRUE), status = "success"),
+                "Draw a white box behind each group label for readability.",
+                placement = "top", options = list(container = "body")),
+            tipify(materialSwitch(ns("do.ellipse"), "Group Ellipses",
+                value = .ditto_default(defaults, "do.ellipse", FALSE), status = "success"),
+                "Draw a covariance ellipse around each group (discrete color variable only).",
                 placement = "top", options = list(container = "body"))
         ),
         "Plotly" = uniform_plotly_inputs_ui(ns, defaults),

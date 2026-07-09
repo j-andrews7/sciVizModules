@@ -80,6 +80,8 @@ dittoRidgeJitterServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
             updateSelectInput(session, "split.by", selected = .ditto_default(defaults, "split.by", ""))
             updateNumericInput(session, "ridgeplot.scale", value = .ditto_default(defaults, "ridgeplot.scale", 1.25))
             updateNumericInput(session, "ridgeplot.lineweight", value = .ditto_default(defaults, "ridgeplot.lineweight", 1))
+            updateSelectInput(session, "ridgeplot.shape", selected = .ditto_default(defaults, "ridgeplot.shape", "smooth"))
+            updateNumericInput(session, "ridgeplot.bins", value = .ditto_default(defaults, "ridgeplot.bins", 30))
             updateNumericInput(session, "jitter.size", value = .ditto_default(defaults, "jitter.size", 1))
             updateNumericInput(session, "jitter.width", value = .ditto_default(defaults, "jitter.width", 0.2))
             .ditto_reset_uniform(session, defaults)
@@ -115,6 +117,8 @@ dittoRidgeJitterServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
                 split.by = split.by,
                 ridgeplot.scale = isolate_fn(input$ridgeplot.scale),
                 ridgeplot.lineweight = isolate_fn(input$ridgeplot.lineweight),
+                ridgeplot.shape = isolate_fn(input$ridgeplot.shape),
+                ridgeplot.bins = isolate_fn(input$ridgeplot.bins),
                 jitter.size = isolate_fn(input$jitter.size),
                 jitter.width = isolate_fn(input$jitter.width),
                 color.panel = color.panel

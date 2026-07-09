@@ -85,6 +85,9 @@ dittoFreqPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 selected = .ditto_default(defaults, "plots", c("boxplot", "jitter")))
             updateMaterialSwitch(session, "max.normalize", value = .ditto_default(defaults, "max.normalize", FALSE))
             updateNumericInput(session, "jitter.size", value = .ditto_default(defaults, "jitter.size", 1))
+            updateNumericInput(session, "jitter.width", value = .ditto_default(defaults, "jitter.width", 0.2))
+            updateNumericInput(session, "boxplot.width", value = .ditto_default(defaults, "boxplot.width", 0.4))
+            updateNumericInput(session, "vlnplot.width", value = .ditto_default(defaults, "vlnplot.width", 1))
             .ditto_reset_uniform(session, defaults)
         })
 
@@ -123,6 +126,9 @@ dittoFreqPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 plots = plots,
                 max.normalize = isolate_fn(input$max.normalize),
                 jitter.size = isolate_fn(input$jitter.size),
+                jitter.width = isolate_fn(input$jitter.width),
+                boxplot.width = isolate_fn(input$boxplot.width),
+                vlnplot.width = isolate_fn(input$vlnplot.width),
                 color.panel = color.panel
             )
 

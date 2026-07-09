@@ -15,6 +15,7 @@
 #' @import shiny
 #' @import plotly
 #' @importFrom shinyjs hide
+#' @importFrom shinyWidgets updateMaterialSwitch
 #' @importFrom dittoSeq dittoDimHex
 #'
 #' @seealso [dittoSeq::dittoDimHex()], [sciVizModules::dittoDimHexInputsUI()],
@@ -49,6 +50,11 @@ dittoDimHexServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, de
             updateSelectInput(session, "split.by", selected = .ditto_default(defaults, "split.by", ""))
             updateNumericInput(session, "min.opacity", value = .ditto_default(defaults, "min.opacity", 0.2))
             updateNumericInput(session, "max.opacity", value = .ditto_default(defaults, "max.opacity", 1))
+            updateMaterialSwitch(session, "do.contour", value = .ditto_default(defaults, "do.contour", FALSE))
+            updateMaterialSwitch(session, "do.label", value = .ditto_default(defaults, "do.label", FALSE))
+            updateNumericInput(session, "labels.size", value = .ditto_default(defaults, "labels.size", 5))
+            updateMaterialSwitch(session, "labels.highlight", value = .ditto_default(defaults, "labels.highlight", TRUE))
+            updateMaterialSwitch(session, "do.ellipse", value = .ditto_default(defaults, "do.ellipse", FALSE))
             .ditto_reset_uniform(session, defaults)
         })
 
@@ -83,6 +89,11 @@ dittoDimHexServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, de
                 max.color = isolate_fn(input$max.color),
                 min.opacity = isolate_fn(input$min.opacity),
                 max.opacity = isolate_fn(input$max.opacity),
+                do.contour = isolate_fn(input$do.contour),
+                do.label = isolate_fn(input$do.label),
+                labels.size = isolate_fn(input$labels.size),
+                labels.highlight = isolate_fn(input$labels.highlight),
+                do.ellipse = isolate_fn(input$do.ellipse),
                 color.panel = default_palette_values
             )
 

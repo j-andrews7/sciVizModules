@@ -19,6 +19,8 @@
 #'   \item \code{group.by} - Discrete metadata used for the x-axis groups
 #'   \item \code{scale} - "percent" or "count" (default: "percent")
 #'   \item \code{split.by} - Discrete metadata to facet by (default: none)
+#'   \item \code{split.nrow}, \code{split.ncol} - Number of rows/columns for the facet
+#'     layout when \code{split.by} is set (default: automatic)
 #'   \item \code{x.labels.rotate} - Rotate x-axis labels (default: TRUE)
 #'   \item \code{palette.selection} - Colors for the `var` levels (multiColorPicker)
 #' }
@@ -80,6 +82,14 @@ dittoBarPlotInputsUI <- function(id, data, defaults = NULL, title = "BarPlot Set
                 choices = split.choices,
                 selected = .ditto_default(defaults, "split.by", ""), selectize = FALSE
             ), "Discrete metadata to split the plot into facets.",
+                placement = "top", options = list(container = "body")),
+            tipify(numericInput(ns("split.nrow"), "Facet Rows",
+                value = .ditto_default(defaults, "split.nrow", NA), min = 1, step = 1),
+                "Number of rows for the facet layout (leave blank for automatic).",
+                placement = "top", options = list(container = "body")),
+            tipify(numericInput(ns("split.ncol"), "Facet Columns",
+                value = .ditto_default(defaults, "split.ncol", NA), min = 1, step = 1),
+                "Number of columns for the facet layout (leave blank for automatic).",
                 placement = "top", options = list(container = "body"))
         ),
         "Aesthetics" = tagList(

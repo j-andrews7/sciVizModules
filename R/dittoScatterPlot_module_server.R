@@ -15,6 +15,7 @@
 #' @import shiny
 #' @import plotly
 #' @importFrom shinyjs hide
+#' @importFrom shinyWidgets updateMaterialSwitch
 #' @importFrom dittoSeq dittoScatterPlot
 #'
 #' @seealso [dittoSeq::dittoScatterPlot()], [sciVizModules::dittoScatterPlotInputsUI()],
@@ -76,6 +77,11 @@ dittoScatterPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
             updateSelectInput(session, "order", selected = .ditto_default(defaults, "order", "unordered"))
             updateNumericInput(session, "size", value = .ditto_default(defaults, "size", 1))
             updateNumericInput(session, "opacity", value = .ditto_default(defaults, "opacity", 1))
+            updateMaterialSwitch(session, "do.label", value = .ditto_default(defaults, "do.label", FALSE))
+            updateNumericInput(session, "labels.size", value = .ditto_default(defaults, "labels.size", 5))
+            updateMaterialSwitch(session, "labels.highlight", value = .ditto_default(defaults, "labels.highlight", TRUE))
+            updateMaterialSwitch(session, "do.ellipse", value = .ditto_default(defaults, "do.ellipse", FALSE))
+            updateMaterialSwitch(session, "do.contour", value = .ditto_default(defaults, "do.contour", FALSE))
             .ditto_reset_uniform(session, defaults)
         })
 
@@ -113,6 +119,11 @@ dittoScatterPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
                 size = isolate_fn(input$size),
                 opacity = isolate_fn(input$opacity),
                 order = isolate_fn(input$order),
+                do.label = isolate_fn(input$do.label),
+                labels.size = isolate_fn(input$labels.size),
+                labels.highlight = isolate_fn(input$labels.highlight),
+                do.ellipse = isolate_fn(input$do.ellipse),
+                do.contour = isolate_fn(input$do.contour),
                 min.color = isolate_fn(input$min.color),
                 max.color = isolate_fn(input$max.color),
                 color.panel = color.panel

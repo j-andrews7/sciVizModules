@@ -22,6 +22,10 @@
 #'   \item \code{scale} - "percent" or "count" (default: "percent")
 #'   \item \code{plots} - Representations to draw (default: c("boxplot", "jitter"))
 #'   \item \code{max.normalize} - Scale each facet to its own max (default: FALSE)
+#'   \item \code{jitter.size} - Jitter point size (default: 1)
+#'   \item \code{jitter.width} - Horizontal spread of the jitter points (default: 0.2)
+#'   \item \code{boxplot.width} - Width of the boxplots (default: 0.4)
+#'   \item \code{vlnplot.width} - Relative width of the violins (default: 1)
 #'   \item \code{palette.selection} - Colors for discrete groups (multiColorPicker)
 #' }
 #'
@@ -105,6 +109,18 @@ dittoFreqPlotInputsUI <- function(id, data, defaults = NULL, title = "FreqPlot S
             tipify(numericInput(ns("jitter.size"), "Jitter Size",
                 value = .ditto_default(defaults, "jitter.size", 1), min = 0.1, step = 0.1),
                 "Size of the jitter points.",
+                placement = "top", options = list(container = "body")),
+            tipify(numericInput(ns("jitter.width"), "Jitter Width",
+                value = .ditto_default(defaults, "jitter.width", 0.2), min = 0, step = 0.05),
+                "Horizontal spread of the jitter points.",
+                placement = "top", options = list(container = "body")),
+            tipify(numericInput(ns("boxplot.width"), "Box Width",
+                value = .ditto_default(defaults, "boxplot.width", 0.4), min = 0, step = 0.05),
+                "Width of the boxplots.",
+                placement = "top", options = list(container = "body")),
+            tipify(numericInput(ns("vlnplot.width"), "Violin Width",
+                value = .ditto_default(defaults, "vlnplot.width", 1), min = 0, step = 0.05),
+                "Relative width of the violins.",
                 placement = "top", options = list(container = "body"))
         ),
         "Plotly" = uniform_plotly_inputs_ui(ns, defaults),
