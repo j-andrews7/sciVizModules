@@ -54,7 +54,7 @@ The following parameters can be accessed via UI inputs and/or the \code{defaults
 \item \code{size} - Point size (default: 1)
 \item \code{opacity} - Point opacity (default: 1)
 \item \code{order} - Point plotting order (default: "unordered")
-\item \code{do.label} - Draw group labels at cluster centers (default: FALSE)
+\item \code{do.label} - Draw group labels at group centers (default: FALSE)
 \item \code{labels.size} - Text size of the group labels (default: 5)
 \item \code{labels.highlight} - White box behind group labels (default: TRUE)
 \item \code{do.ellipse} - Draw grouping ellipses (default: FALSE)

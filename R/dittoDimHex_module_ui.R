@@ -19,15 +19,15 @@
 #'   \item \code{reduction.use} - Dimensionality reduction to plot (default: auto-detected)
 #'   \item \code{dim.1}, \code{dim.2} - Which dimensions to plot on x/y (default: 1 and 2)
 #'   \item \code{bins} - Number of hexagonal bins (default: 30)
-#'   \item \code{color.method} - Summary method for discrete `color.var` ("max.prop" or a
+#'   \item \code{color.method} - Summary method for discrete \code{color.var} ("max.prop" or a
 #'     metadata level) or for continuous data ("median", "mean", etc.)
 #'   \item \code{split.by} - Discrete metadata to facet by (default: none)
 #'   \item \code{min.color}, \code{max.color} - Colors for the continuous color scale
 #'   \item \code{do.contour} - Overlay kernel-density contour lines (default: FALSE)
-#'   \item \code{do.label} - Draw group labels for a discrete `color.var` (default: FALSE)
+#'   \item \code{do.label} - Draw group labels for a discrete \code{color.var} (default: FALSE)
 #'   \item \code{labels.size} - Text size of the group labels (default: 5)
 #'   \item \code{labels.highlight} - White box behind group labels (default: TRUE)
-#'   \item \code{do.ellipse} - Draw ellipses for a discrete `color.var` (default: FALSE)
+#'   \item \code{do.ellipse} - Draw ellipses for a discrete \code{color.var} (default: FALSE)
 #' }
 #'
 #' @param id The ID for the Shiny module.
