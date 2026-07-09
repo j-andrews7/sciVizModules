@@ -38,7 +38,11 @@ Imports:
     jsonlite,
     methods,
     shinyWidgets,
-    htmlwidgets
+    htmlwidgets,
+    dittoSeq,
+    SingleCellExperiment,
+    SummarizedExperiment,
+    S4Vectors
 Remotes:
     j-andrews7/VizModules#307
 Encoding: UTF-8

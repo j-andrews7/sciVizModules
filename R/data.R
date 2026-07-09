@@ -108,3 +108,33 @@
 #' @author Jared Andrews
 #' @keywords datasets
 "survival_lung"
+
+#' Example single-cell RNA-seq dataset (simulated)
+#'
+#' A small, simulated [SingleCellExperiment::SingleCellExperiment] provided as a
+#' ready-to-use example for the dittoSeq-based modules ([dittoDimPlotServer()],
+#' [dittoScatterPlotServer()], [dittoPlotServer()], [dittoBarPlotServer()],
+#' [dittoDimHexServer()], [dittoFreqPlotServer()], and
+#' [dittoRidgeJitterServer()]).
+#'
+#' @format A [SingleCellExperiment::SingleCellExperiment] with 40 genes and 240
+#' cells containing:
+#' \describe{
+#'   \item{assays}{\code{counts} and \code{logcounts}}
+#'   \item{reducedDims}{\code{PCA}, \code{TSNE}, and \code{UMAP} embeddings}
+#'   \item{colData}{\code{clustering}, \code{celltype}, \code{condition}, and
+#'     \code{sample} (discrete), plus \code{nCount} and \code{percent.mito}
+#'     (continuous)}
+#' }
+#'
+#' @source Simulated in \code{data-raw/generate_example_sce.R}; no real
+#' biological data are included.
+#'
+#' @examples
+#' library(sciVizModules)
+#' data(example_sce)
+#' example_sce
+#'
+#' @author Jared Andrews
+#' @keywords datasets
+"example_sce"
