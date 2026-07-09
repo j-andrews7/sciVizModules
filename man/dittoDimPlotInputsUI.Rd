@@ -59,7 +59,6 @@ priority UMAP > t-SNE > PCA)
 \item \code{order} - Point plotting order (default: "unordered")
 \item \code{do.label} - Draw cluster/group labels (default: FALSE)
 \item \code{labels.size} - Text size of the group labels (default: 5)
-\item \code{labels.highlight} - White box behind group labels (default: TRUE)
 \item \code{do.ellipse} - Draw grouping ellipses (default: FALSE)
 \item \code{do.contour} - Overlay kernel-density contour lines (default: FALSE)
 \item \code{min.color}, \code{max.color} - Colors for continuous color scales

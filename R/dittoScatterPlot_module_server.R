@@ -79,7 +79,6 @@ dittoScatterPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
             updateNumericInput(session, "opacity", value = .ditto_default(defaults, "opacity", 1))
             updateMaterialSwitch(session, "do.label", value = .ditto_default(defaults, "do.label", FALSE))
             updateNumericInput(session, "labels.size", value = .ditto_default(defaults, "labels.size", 5))
-            updateMaterialSwitch(session, "labels.highlight", value = .ditto_default(defaults, "labels.highlight", TRUE))
             updateMaterialSwitch(session, "do.ellipse", value = .ditto_default(defaults, "do.ellipse", FALSE))
             updateMaterialSwitch(session, "do.contour", value = .ditto_default(defaults, "do.contour", FALSE))
             .ditto_reset_uniform(session, defaults)
@@ -121,7 +120,6 @@ dittoScatterPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
                 order = isolate_fn(input$order),
                 do.label = isolate_fn(input$do.label),
                 labels.size = isolate_fn(input$labels.size),
-                labels.highlight = isolate_fn(input$labels.highlight),
                 do.ellipse = isolate_fn(input$do.ellipse),
                 do.contour = isolate_fn(input$do.contour),
                 min.color = isolate_fn(input$min.color),

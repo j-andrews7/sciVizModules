@@ -26,7 +26,6 @@
 #'   \item \code{order} - Point plotting order (default: "unordered")
 #'   \item \code{do.label} - Draw group labels at group centers (default: FALSE)
 #'   \item \code{labels.size} - Text size of the group labels (default: 5)
-#'   \item \code{labels.highlight} - White box behind group labels (default: TRUE)
 #'   \item \code{do.ellipse} - Draw grouping ellipses (default: FALSE)
 #'   \item \code{do.contour} - Overlay kernel-density contour lines (default: FALSE)
 #'   \item \code{min.color}, \code{max.color} - Colors for continuous color scales
@@ -129,10 +128,6 @@ dittoScatterPlotInputsUI <- function(id, data, defaults = NULL, title = "Scatter
             tipify(numericInput(ns("labels.size"), "Label Size",
                 value = .ditto_default(defaults, "labels.size", 5), min = 1, step = 0.5),
                 "Text size of the group labels (used when 'Label Groups' is on).",
-                placement = "top", options = list(container = "body")),
-            tipify(materialSwitch(ns("labels.highlight"), "Label Highlight",
-                value = .ditto_default(defaults, "labels.highlight", TRUE), status = "success"),
-                "Draw a white box behind each group label for readability.",
                 placement = "top", options = list(container = "body")),
             tipify(materialSwitch(ns("do.ellipse"), "Group Ellipses",
                 value = .ditto_default(defaults, "do.ellipse", FALSE), status = "success"),

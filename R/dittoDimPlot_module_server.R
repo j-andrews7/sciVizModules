@@ -87,7 +87,6 @@ dittoDimPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, d
             updateMaterialSwitch(session, "do.ellipse", value = .ditto_default(defaults, "do.ellipse", FALSE))
             updateMaterialSwitch(session, "do.contour", value = .ditto_default(defaults, "do.contour", FALSE))
             updateNumericInput(session, "labels.size", value = .ditto_default(defaults, "labels.size", 5))
-            updateMaterialSwitch(session, "labels.highlight", value = .ditto_default(defaults, "labels.highlight", TRUE))
             .ditto_reset_uniform(session, defaults)
         })
 
@@ -129,7 +128,6 @@ dittoDimPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, d
                 do.ellipse = isolate_fn(input$do.ellipse),
                 do.contour = isolate_fn(input$do.contour),
                 labels.size = isolate_fn(input$labels.size),
-                labels.highlight = isolate_fn(input$labels.highlight),
                 min.color = isolate_fn(input$min.color),
                 max.color = isolate_fn(input$max.color),
                 color.panel = color.panel
