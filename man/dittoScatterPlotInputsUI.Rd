@@ -56,7 +56,6 @@ The following parameters can be accessed via UI inputs and/or the \code{defaults
 \item \code{order} - Point plotting order (default: "unordered")
 \item \code{do.label} - Draw group labels at group centers (default: FALSE)
 \item \code{labels.size} - Text size of the group labels (default: 5)
-\item \code{labels.highlight} - White box behind group labels (default: TRUE)
 \item \code{do.ellipse} - Draw grouping ellipses (default: FALSE)
 \item \code{do.contour} - Overlay kernel-density contour lines (default: FALSE)
 \item \code{min.color}, \code{max.color} - Colors for continuous color scales

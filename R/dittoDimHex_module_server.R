@@ -53,7 +53,6 @@ dittoDimHexServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, de
             updateMaterialSwitch(session, "do.contour", value = .ditto_default(defaults, "do.contour", FALSE))
             updateMaterialSwitch(session, "do.label", value = .ditto_default(defaults, "do.label", FALSE))
             updateNumericInput(session, "labels.size", value = .ditto_default(defaults, "labels.size", 5))
-            updateMaterialSwitch(session, "labels.highlight", value = .ditto_default(defaults, "labels.highlight", TRUE))
             updateMaterialSwitch(session, "do.ellipse", value = .ditto_default(defaults, "do.ellipse", FALSE))
             .ditto_reset_uniform(session, defaults)
         })
@@ -92,7 +91,6 @@ dittoDimHexServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, de
                 do.contour = isolate_fn(input$do.contour),
                 do.label = isolate_fn(input$do.label),
                 labels.size = isolate_fn(input$labels.size),
-                labels.highlight = isolate_fn(input$labels.highlight),
                 do.ellipse = isolate_fn(input$do.ellipse),
                 color.panel = default_palette_values
             )
