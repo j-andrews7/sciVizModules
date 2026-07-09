@@ -40,6 +40,29 @@ holds the logic. Every module also ships a standalone `*App()` you can run to se
   grouping column) and renders an interactive plotly curve with optional confidence intervals,
   censoring marks, log-rank p-value, median-survival lines, and a number-at-risk table.
 
+### RNA-seq / single-cell modules (dittoSeq)
+
+These modules wrap [dittoSeq](https://bioconductor.org/packages/dittoSeq/) and accept a
+`SingleCellExperiment`, `Seurat`, or `SummarizedExperiment` object (passed to `*Server()` as a
+`reactive()`). Each renders the corresponding `dittoSeq` figure as an interactive plotly output
+and reuses the standard VizModules aesthetic/axis/legend/reference-line controls. The bundled
+`example_sce` dataset is used as the default in every `*App()`.
+
+- **`dittoDimPlot`** — dimensionality-reduction (UMAP/tSNE/PCA) embedding colored by a gene or
+  metadata variable (wraps `dittoSeq::dittoDimPlot`).
+- **`dittoScatterPlot`** — scatter plot of any two genes/metadata with optional color variable
+  (wraps `dittoSeq::dittoScatterPlot`).
+- **`dittoPlot`** — per-group violin/box/jitter/ridge distribution of a gene or continuous
+  variable (wraps `dittoSeq::dittoPlot`).
+- **`dittoBarPlot`** — composition bar plot of a discrete variable per group, as counts or
+  proportions (wraps `dittoSeq::dittoBarPlot`).
+- **`dittoDimHex`** — hex-binned embedding summarising a color variable over cells
+  (wraps `dittoSeq::dittoDimHex`).
+- **`dittoFreqPlot`** — per-sample frequency of a discrete variable across groups
+  (wraps `dittoSeq::dittoFreqPlot`).
+- **`dittoRidgeJitter`** — ridgeline-with-jitter distribution plot
+  (wraps `dittoSeq::dittoRidgeJitter`).
+
 ### Example
 
 ```r
@@ -51,5 +74,8 @@ survivalCurveApp()
 # Or build a figure directly:
 data(survival_lung)
 survivalCurve(survival_lung, time = "time", status = "status", group.by = "sex")
+
+# Launch an RNA-seq module app with the bundled example SingleCellExperiment:
+dittoDimPlotApp()
 ```
 
