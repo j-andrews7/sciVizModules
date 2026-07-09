@@ -4,13 +4,19 @@
 \alias{dittoBarPlotInputsUI}
 \title{Input UI components for the dittoBarPlot module}
 \usage{
-dittoBarPlotInputsUI(id, data, defaults = NULL, title = "BarPlot Settings", columns = 2)
+dittoBarPlotInputsUI(
+  id,
+  data,
+  defaults = NULL,
+  title = "BarPlot Settings",
+  columns = 2
+)
 }
 \arguments{
 \item{id}{The ID for the Shiny module.}
 
-\item{data}{A \code{SingleCellExperiment}, \code{Seurat}, or
-\code{SummarizedExperiment} object used to populate the input choices.}
+\item{data}{A \code{SingleCellExperiment}, \code{Seurat}, or \code{SummarizedExperiment} object
+used to populate the input choices.}
 
 \item{defaults}{A named list of default values for the inputs.}
 
@@ -19,16 +25,44 @@ dittoBarPlotInputsUI(id, data, defaults = NULL, title = "BarPlot Settings", colu
 \item{columns}{Number of columns for the UI grid.}
 }
 \value{
-A Shiny tagList containing the UI elements.
+A Shiny tagList containing the UI elements
 }
 \description{
 This should be placed in the UI where the inputs should be shown, with an \code{id}
 that matches the \code{id} used in the \code{dittoBarPlotServer()} and
-\code{dittoBarPlotOutputUI()} functions. The module renders a composition bar plot of a discrete variable per group (counts or proportions)
-via \code{\link[dittoSeq:dittoBarPlot]{dittoSeq::dittoBarPlot()}}.
+\code{dittoBarPlotOutputUI()} functions.
+}
+\details{
+The user inputs for this module are separated from the outputs to allow for
+more flexible UI design.
+
+This module wraps \code{\link[dittoSeq:dittoBarPlot]{dittoSeq::dittoBarPlot()}}, showing the composition (counts
+or percentages) of a discrete \code{var} across discrete \code{group.by} groups as a
+stacked bar plot. The resulting \code{ggplot} is converted to an interactive
+\code{plotly} figure.
+}
+\section{Plot parameters and defaults}{
+
+The following parameters can be accessed via UI inputs and/or the \code{defaults} argument:
+\itemize{
+\item \code{var} - Discrete metadata to quantify within each group
+\item \code{group.by} - Discrete metadata used for the x-axis groups
+\item \code{scale} - "percent" or "count" (default: "percent")
+\item \code{split.by} - Discrete metadata to facet by (default: none)
+\item \code{x.labels.rotate} - Rotate x-axis labels (default: TRUE)
+\item \code{palette.selection} - Colors for the \code{var} levels (multiColorPicker)
+}
+}
+
+\examples{
+library(sciVizModules)
+data(example_sce)
+dittoBarPlotInputsUI("dittoBarPlot", example_sce)
 }
 \seealso{
-\code{\link[dittoSeq:dittoBarPlot]{dittoSeq::dittoBarPlot()}}, \code{\link[=dittoBarPlotOutputUI]{dittoBarPlotOutputUI()}}, \code{\link[=dittoBarPlotServer]{dittoBarPlotServer()}}, \code{\link[=dittoBarPlotApp]{dittoBarPlotApp()}}
+\code{\link[dittoSeq:dittoBarPlot]{dittoSeq::dittoBarPlot()}}, \code{\link[VizModules:organize_inputs]{VizModules::organize_inputs()}},
+\code{\link[=dittoBarPlotOutputUI]{dittoBarPlotOutputUI()}}, \code{\link[=dittoBarPlotServer]{dittoBarPlotServer()}},
+\code{\link[=dittoBarPlotApp]{dittoBarPlotApp()}}
 }
 \author{
 Jared Andrews

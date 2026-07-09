@@ -4,30 +4,37 @@
 \alias{dittoBarPlotServer}
 \title{Server logic for the dittoBarPlot module}
 \usage{
-dittoBarPlotServer(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL)
+dittoBarPlotServer(
+  id,
+  data,
+  hide.inputs = NULL,
+  hide.tabs = NULL,
+  defaults = NULL
+)
 }
 \arguments{
 \item{id}{The ID for the Shiny module.}
 
-\item{data}{A \code{reactive} returning a \code{SingleCellExperiment},
-\code{Seurat}, or \code{SummarizedExperiment} object.}
+\item{data}{A \code{reactive} returning a \code{SingleCellExperiment}, \code{Seurat}, or
+\code{SummarizedExperiment} object.}
 
 \item{hide.inputs}{A character vector of input IDs to hide.}
 
 \item{hide.tabs}{A character vector of tab names to hide.}
 
 \item{defaults}{A named list of default values used when resetting the inputs.
-Typically the same list passed to \code{dittoBarPlotInputsUI()}.}
+Typically the same list passed to \code{\link[=dittoBarPlotInputsUI]{dittoBarPlotInputsUI()}}.}
 }
 \value{
 The \code{moduleServer} function for the dittoBarPlot module.
 }
 \description{
-This module builds a composition bar plot of a discrete variable per group (counts or proportions) with \code{\link[dittoSeq:dittoBarPlot]{dittoSeq::dittoBarPlot()}} and renders it as an interactive
-\code{plotly} figure.
+This module builds a stacked composition bar plot with
+\code{\link[dittoSeq:dittoBarPlot]{dittoSeq::dittoBarPlot()}} and renders it as an interactive \code{plotly} figure.
 }
 \seealso{
-\code{\link[dittoSeq:dittoBarPlot]{dittoSeq::dittoBarPlot()}}, \code{\link[=dittoBarPlotInputsUI]{dittoBarPlotInputsUI()}}, \code{\link[=dittoBarPlotOutputUI]{dittoBarPlotOutputUI()}}, \code{\link[=dittoBarPlotApp]{dittoBarPlotApp()}}
+\code{\link[dittoSeq:dittoBarPlot]{dittoSeq::dittoBarPlot()}}, \code{\link[=dittoBarPlotInputsUI]{dittoBarPlotInputsUI()}},
+\code{\link[=dittoBarPlotOutputUI]{dittoBarPlotOutputUI()}}, \code{\link[=dittoBarPlotApp]{dittoBarPlotApp()}}
 }
 \author{
 Jared Andrews

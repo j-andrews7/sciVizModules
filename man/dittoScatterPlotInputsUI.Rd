@@ -4,13 +4,19 @@
 \alias{dittoScatterPlotInputsUI}
 \title{Input UI components for the dittoScatterPlot module}
 \usage{
-dittoScatterPlotInputsUI(id, data, defaults = NULL, title = "ScatterPlot Settings", columns = 2)
+dittoScatterPlotInputsUI(
+  id,
+  data,
+  defaults = NULL,
+  title = "ScatterPlot Settings",
+  columns = 2
+)
 }
 \arguments{
 \item{id}{The ID for the Shiny module.}
 
-\item{data}{A \code{SingleCellExperiment}, \code{Seurat}, or
-\code{SummarizedExperiment} object used to populate the input choices.}
+\item{data}{A \code{SingleCellExperiment}, \code{Seurat}, or \code{SummarizedExperiment} object
+used to populate the input choices.}
 
 \item{defaults}{A named list of default values for the inputs.}
 
@@ -19,16 +25,49 @@ dittoScatterPlotInputsUI(id, data, defaults = NULL, title = "ScatterPlot Setting
 \item{columns}{Number of columns for the UI grid.}
 }
 \value{
-A Shiny tagList containing the UI elements.
+A Shiny tagList containing the UI elements
 }
 \description{
 This should be placed in the UI where the inputs should be shown, with an \code{id}
 that matches the \code{id} used in the \code{dittoScatterPlotServer()} and
-\code{dittoScatterPlotOutputUI()} functions. The module renders a scatter plot of any two genes/metadata with an optional color variable
-via \code{\link[dittoSeq:dittoScatterPlot]{dittoSeq::dittoScatterPlot()}}.
+\code{dittoScatterPlotOutputUI()} functions.
+}
+\details{
+The user inputs for this module are separated from the outputs to allow for
+more flexible UI design.
+
+This module wraps \code{\link[dittoSeq:dittoScatterPlot]{dittoSeq::dittoScatterPlot()}}, plotting any two continuous
+variables (genes or numeric metadata) from a \code{SingleCellExperiment}, \code{Seurat},
+or \code{SummarizedExperiment} object against one another, optionally colored by a
+third gene/metadata. The resulting \code{ggplot} is converted to an interactive
+\code{plotly} figure.
+}
+\section{Plot parameters and defaults}{
+
+The following parameters can be accessed via UI inputs and/or the \code{defaults} argument:
+\itemize{
+\item \code{x.var} - Continuous variable on the x-axis (gene or numeric metadata)
+\item \code{y.var} - Continuous variable on the y-axis (gene or numeric metadata)
+\item \code{color.var} - Gene or metadata used for coloring (default: none)
+\item \code{shape.by} - Discrete metadata mapped to point shape (default: none)
+\item \code{split.by} - Discrete metadata to facet by (default: none)
+\item \code{size} - Point size (default: 1)
+\item \code{opacity} - Point opacity (default: 1)
+\item \code{order} - Point plotting order (default: "unordered")
+\item \code{min.color}, \code{max.color} - Colors for continuous color scales
+\item \code{palette.selection} - Colors for discrete groups (multiColorPicker)
+}
+}
+
+\examples{
+library(sciVizModules)
+data(example_sce)
+dittoScatterPlotInputsUI("dittoScatterPlot", example_sce)
 }
 \seealso{
-\code{\link[dittoSeq:dittoScatterPlot]{dittoSeq::dittoScatterPlot()}}, \code{\link[=dittoScatterPlotOutputUI]{dittoScatterPlotOutputUI()}}, \code{\link[=dittoScatterPlotServer]{dittoScatterPlotServer()}}, \code{\link[=dittoScatterPlotApp]{dittoScatterPlotApp()}}
+\code{\link[dittoSeq:dittoScatterPlot]{dittoSeq::dittoScatterPlot()}}, \code{\link[VizModules:organize_inputs]{VizModules::organize_inputs()}},
+\code{\link[=dittoScatterPlotOutputUI]{dittoScatterPlotOutputUI()}}, \code{\link[=dittoScatterPlotServer]{dittoScatterPlotServer()}},
+\code{\link[=dittoScatterPlotApp]{dittoScatterPlotApp()}}
 }
 \author{
 Jared Andrews

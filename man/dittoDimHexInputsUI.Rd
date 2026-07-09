@@ -4,13 +4,19 @@
 \alias{dittoDimHexInputsUI}
 \title{Input UI components for the dittoDimHex module}
 \usage{
-dittoDimHexInputsUI(id, data, defaults = NULL, title = "DimHex Settings", columns = 2)
+dittoDimHexInputsUI(
+  id,
+  data,
+  defaults = NULL,
+  title = "DimHex Settings",
+  columns = 2
+)
 }
 \arguments{
 \item{id}{The ID for the Shiny module.}
 
-\item{data}{A \code{SingleCellExperiment}, \code{Seurat}, or
-\code{SummarizedExperiment} object used to populate the input choices.}
+\item{data}{A \code{SingleCellExperiment}, \code{Seurat}, or \code{SummarizedExperiment} object
+used to populate the input choices.}
 
 \item{defaults}{A named list of default values for the inputs.}
 
@@ -19,16 +25,46 @@ dittoDimHexInputsUI(id, data, defaults = NULL, title = "DimHex Settings", column
 \item{columns}{Number of columns for the UI grid.}
 }
 \value{
-A Shiny tagList containing the UI elements.
+A Shiny tagList containing the UI elements
 }
 \description{
 This should be placed in the UI where the inputs should be shown, with an \code{id}
 that matches the \code{id} used in the \code{dittoDimHexServer()} and
-\code{dittoDimHexOutputUI()} functions. The module renders a hex-binned embedding summarising a color variable over cells
-via \code{\link[dittoSeq:dittoDimHex]{dittoSeq::dittoDimHex()}}.
+\code{dittoDimHexOutputUI()} functions.
+}
+\details{
+The user inputs for this module are separated from the outputs to allow for
+more flexible UI design.
+
+This module wraps \code{\link[dittoSeq:dittoDimHex]{dittoSeq::dittoDimHex()}}, which bins the cells/samples of a
+dimensionality reduction embedding into hexagons and (optionally) summarizes a
+gene/metadata within each bin. The resulting \code{ggplot} is converted to an
+interactive \code{plotly} figure.
+}
+\section{Plot parameters and defaults}{
+
+The following parameters can be accessed via UI inputs and/or the \code{defaults} argument:
+\itemize{
+\item \code{color.var} - Gene or metadata summarized within each hex (default: density only)
+\item \code{reduction.use} - Dimensionality reduction to plot (default: auto-detected)
+\item \code{dim.1}, \code{dim.2} - Which dimensions to plot on x/y (default: 1 and 2)
+\item \code{bins} - Number of hexagonal bins (default: 30)
+\item \code{color.method} - Summary method for discrete \code{color.var} ("max.prop" or a
+metadata level) or for continuous data ("median", "mean", etc.)
+\item \code{split.by} - Discrete metadata to facet by (default: none)
+\item \code{min.color}, \code{max.color} - Colors for the continuous color scale
+}
+}
+
+\examples{
+library(sciVizModules)
+data(example_sce)
+dittoDimHexInputsUI("dittoDimHex", example_sce)
 }
 \seealso{
-\code{\link[dittoSeq:dittoDimHex]{dittoSeq::dittoDimHex()}}, \code{\link[=dittoDimHexOutputUI]{dittoDimHexOutputUI()}}, \code{\link[=dittoDimHexServer]{dittoDimHexServer()}}, \code{\link[=dittoDimHexApp]{dittoDimHexApp()}}
+\code{\link[dittoSeq:dittoDimHex]{dittoSeq::dittoDimHex()}}, \code{\link[VizModules:organize_inputs]{VizModules::organize_inputs()}},
+\code{\link[=dittoDimHexOutputUI]{dittoDimHexOutputUI()}}, \code{\link[=dittoDimHexServer]{dittoDimHexServer()}},
+\code{\link[=dittoDimHexApp]{dittoDimHexApp()}}
 }
 \author{
 Jared Andrews

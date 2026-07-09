@@ -4,30 +4,37 @@
 \alias{dittoPlotServer}
 \title{Server logic for the dittoPlot module}
 \usage{
-dittoPlotServer(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL)
+dittoPlotServer(
+  id,
+  data,
+  hide.inputs = NULL,
+  hide.tabs = NULL,
+  defaults = NULL
+)
 }
 \arguments{
 \item{id}{The ID for the Shiny module.}
 
-\item{data}{A \code{reactive} returning a \code{SingleCellExperiment},
-\code{Seurat}, or \code{SummarizedExperiment} object.}
+\item{data}{A \code{reactive} returning a \code{SingleCellExperiment}, \code{Seurat}, or
+\code{SummarizedExperiment} object.}
 
 \item{hide.inputs}{A character vector of input IDs to hide.}
 
 \item{hide.tabs}{A character vector of tab names to hide.}
 
 \item{defaults}{A named list of default values used when resetting the inputs.
-Typically the same list passed to \code{dittoPlotInputsUI()}.}
+Typically the same list passed to \code{\link[=dittoPlotInputsUI]{dittoPlotInputsUI()}}.}
 }
 \value{
 The \code{moduleServer} function for the dittoPlot module.
 }
 \description{
-This module builds a per-group violin/box/jitter/ridge distribution of a gene or continuous variable with \code{\link[dittoSeq:dittoPlot]{dittoSeq::dittoPlot()}} and renders it as an interactive
-\code{plotly} figure.
+This module builds a per-group continuous-data plot with
+\code{\link[dittoSeq:dittoPlot]{dittoSeq::dittoPlot()}} and renders it as an interactive \code{plotly} figure.
 }
 \seealso{
-\code{\link[dittoSeq:dittoPlot]{dittoSeq::dittoPlot()}}, \code{\link[=dittoPlotInputsUI]{dittoPlotInputsUI()}}, \code{\link[=dittoPlotOutputUI]{dittoPlotOutputUI()}}, \code{\link[=dittoPlotApp]{dittoPlotApp()}}
+\code{\link[dittoSeq:dittoPlot]{dittoSeq::dittoPlot()}}, \code{\link[=dittoPlotInputsUI]{dittoPlotInputsUI()}},
+\code{\link[=dittoPlotOutputUI]{dittoPlotOutputUI()}}, \code{\link[=dittoPlotApp]{dittoPlotApp()}}
 }
 \author{
 Jared Andrews

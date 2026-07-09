@@ -4,30 +4,37 @@
 \alias{dittoFreqPlotServer}
 \title{Server logic for the dittoFreqPlot module}
 \usage{
-dittoFreqPlotServer(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL)
+dittoFreqPlotServer(
+  id,
+  data,
+  hide.inputs = NULL,
+  hide.tabs = NULL,
+  defaults = NULL
+)
 }
 \arguments{
 \item{id}{The ID for the Shiny module.}
 
-\item{data}{A \code{reactive} returning a \code{SingleCellExperiment},
-\code{Seurat}, or \code{SummarizedExperiment} object.}
+\item{data}{A \code{reactive} returning a \code{SingleCellExperiment}, \code{Seurat}, or
+\code{SummarizedExperiment} object.}
 
 \item{hide.inputs}{A character vector of input IDs to hide.}
 
 \item{hide.tabs}{A character vector of tab names to hide.}
 
 \item{defaults}{A named list of default values used when resetting the inputs.
-Typically the same list passed to \code{dittoFreqPlotInputsUI()}.}
+Typically the same list passed to \code{\link[=dittoFreqPlotInputsUI]{dittoFreqPlotInputsUI()}}.}
 }
 \value{
 The \code{moduleServer} function for the dittoFreqPlot module.
 }
 \description{
-This module builds a per-sample frequency of a discrete variable across groups with \code{\link[dittoSeq:dittoFreqPlot]{dittoSeq::dittoFreqPlot()}} and renders it as an interactive
-\code{plotly} figure.
+This module builds a per-sample frequency plot with
+\code{\link[dittoSeq:dittoFreqPlot]{dittoSeq::dittoFreqPlot()}} and renders it as an interactive \code{plotly} figure.
 }
 \seealso{
-\code{\link[dittoSeq:dittoFreqPlot]{dittoSeq::dittoFreqPlot()}}, \code{\link[=dittoFreqPlotInputsUI]{dittoFreqPlotInputsUI()}}, \code{\link[=dittoFreqPlotOutputUI]{dittoFreqPlotOutputUI()}}, \code{\link[=dittoFreqPlotApp]{dittoFreqPlotApp()}}
+\code{\link[dittoSeq:dittoFreqPlot]{dittoSeq::dittoFreqPlot()}}, \code{\link[=dittoFreqPlotInputsUI]{dittoFreqPlotInputsUI()}},
+\code{\link[=dittoFreqPlotOutputUI]{dittoFreqPlotOutputUI()}}, \code{\link[=dittoFreqPlotApp]{dittoFreqPlotApp()}}
 }
 \author{
 Jared Andrews

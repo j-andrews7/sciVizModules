@@ -62,7 +62,6 @@ status/event/vital/dead/censor, else a numeric 0/1 or 1/2 column)
 or "cumhaz" (default: survival probability)
 \item \code{line.size} - Line width (default: 1)
 \item \code{palette.selection} - Colors for the strata (multiColorPicker)
-\item \code{title}, \code{xlab}, \code{ylab}, \code{legend.title} - Text labels
 \item \code{break.time.by} - Spacing between x-axis ticks (default: blank/auto)
 \item \code{xlim.min}, \code{xlim.max} - X-axis limits (default: blank/auto)
 }
@@ -79,5 +78,5 @@ survivalCurveInputsUI("survivalCurve", survival_lung)
 \code{\link[=survivalCurveApp]{survivalCurveApp()}}
 }
 \author{
-Jared Andrews, Jacob Martin
+Jacob Martin
 }

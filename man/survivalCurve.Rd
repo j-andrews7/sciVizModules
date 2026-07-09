@@ -17,12 +17,8 @@ survivalCurve(
   fun = NULL,
   palette.selection = NULL,
   line.size = 1,
-  xlab = "Time",
-  ylab = "Survival probability",
-  legend.title = NULL,
   break.time.by = NULL,
-  xlim = NULL,
-  title = NULL
+  legend.title = NULL
 )
 }
 \arguments{
@@ -58,17 +54,9 @@ through to the \code{palette} argument of \code{\link[survminer:ggsurvplot]{surv
 
 \item{line.size}{Numeric line width for the survival curves (default \code{1}).}
 
-\item{xlab}{X-axis title (default \code{"Time"}).}
-
-\item{ylab}{Y-axis title (default \code{"Survival probability"}).}
-
-\item{legend.title}{Legend title. Defaults to \code{group.by} when stratified.}
-
 \item{break.time.by}{Optional numeric spacing between x-axis tick marks.}
 
-\item{xlim}{Optional numeric vector of length two giving the x-axis limits.}
-
-\item{title}{Optional plot title.}
+\item{legend.title}{Legend title. Defaults to \code{group.by} when stratified.}
 }
 \value{
 A \code{\link[plotly:plot_ly]{plotly::plot_ly()}} object containing the interactive survival curve.
@@ -107,5 +95,5 @@ if (interactive()) fig
 \code{\link[=survivalCurveApp]{survivalCurveApp()}}
 }
 \author{
-Jared Andrews, Jacob Martin
+Jacob Martin
 }

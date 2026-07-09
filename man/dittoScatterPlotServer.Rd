@@ -4,30 +4,37 @@
 \alias{dittoScatterPlotServer}
 \title{Server logic for the dittoScatterPlot module}
 \usage{
-dittoScatterPlotServer(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL)
+dittoScatterPlotServer(
+  id,
+  data,
+  hide.inputs = NULL,
+  hide.tabs = NULL,
+  defaults = NULL
+)
 }
 \arguments{
 \item{id}{The ID for the Shiny module.}
 
-\item{data}{A \code{reactive} returning a \code{SingleCellExperiment},
-\code{Seurat}, or \code{SummarizedExperiment} object.}
+\item{data}{A \code{reactive} returning a \code{SingleCellExperiment}, \code{Seurat}, or
+\code{SummarizedExperiment} object.}
 
 \item{hide.inputs}{A character vector of input IDs to hide.}
 
 \item{hide.tabs}{A character vector of tab names to hide.}
 
 \item{defaults}{A named list of default values used when resetting the inputs.
-Typically the same list passed to \code{dittoScatterPlotInputsUI()}.}
+Typically the same list passed to \code{\link[=dittoScatterPlotInputsUI]{dittoScatterPlotInputsUI()}}.}
 }
 \value{
 The \code{moduleServer} function for the dittoScatterPlot module.
 }
 \description{
-This module builds a scatter plot of any two genes/metadata with an optional color variable with \code{\link[dittoSeq:dittoScatterPlot]{dittoSeq::dittoScatterPlot()}} and renders it as an interactive
-\code{plotly} figure.
+This module builds a scatter plot with \code{\link[dittoSeq:dittoScatterPlot]{dittoSeq::dittoScatterPlot()}} and
+renders it as an interactive \code{plotly} figure.
 }
 \seealso{
-\code{\link[dittoSeq:dittoScatterPlot]{dittoSeq::dittoScatterPlot()}}, \code{\link[=dittoScatterPlotInputsUI]{dittoScatterPlotInputsUI()}}, \code{\link[=dittoScatterPlotOutputUI]{dittoScatterPlotOutputUI()}}, \code{\link[=dittoScatterPlotApp]{dittoScatterPlotApp()}}
+\code{\link[dittoSeq:dittoScatterPlot]{dittoSeq::dittoScatterPlot()}}, \code{\link[=dittoScatterPlotInputsUI]{dittoScatterPlotInputsUI()}},
+\code{\link[=dittoScatterPlotOutputUI]{dittoScatterPlotOutputUI()}}, \code{\link[=dittoScatterPlotApp]{dittoScatterPlotApp()}}
 }
 \author{
 Jared Andrews

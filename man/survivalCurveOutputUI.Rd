@@ -19,5 +19,5 @@ A Shiny plotlyOutput for the survival curve
 This should be placed in the UI where the plot should be shown.
 }
 \author{
-Jared Andrews
+Jacob Martin
 }

@@ -4,30 +4,37 @@
 \alias{dittoDimHexServer}
 \title{Server logic for the dittoDimHex module}
 \usage{
-dittoDimHexServer(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL)
+dittoDimHexServer(
+  id,
+  data,
+  hide.inputs = NULL,
+  hide.tabs = NULL,
+  defaults = NULL
+)
 }
 \arguments{
 \item{id}{The ID for the Shiny module.}
 
-\item{data}{A \code{reactive} returning a \code{SingleCellExperiment},
-\code{Seurat}, or \code{SummarizedExperiment} object.}
+\item{data}{A \code{reactive} returning a \code{SingleCellExperiment}, \code{Seurat}, or
+\code{SummarizedExperiment} object.}
 
 \item{hide.inputs}{A character vector of input IDs to hide.}
 
 \item{hide.tabs}{A character vector of tab names to hide.}
 
 \item{defaults}{A named list of default values used when resetting the inputs.
-Typically the same list passed to \code{dittoDimHexInputsUI()}.}
+Typically the same list passed to \code{\link[=dittoDimHexInputsUI]{dittoDimHexInputsUI()}}.}
 }
 \value{
 The \code{moduleServer} function for the dittoDimHex module.
 }
 \description{
-This module builds a hex-binned embedding summarising a color variable over cells with \code{\link[dittoSeq:dittoDimHex]{dittoSeq::dittoDimHex()}} and renders it as an interactive
-\code{plotly} figure.
+This module builds a hexagonal-bin dimensionality-reduction plot with
+\code{\link[dittoSeq:dittoDimHex]{dittoSeq::dittoDimHex()}} and renders it as an interactive \code{plotly} figure.
 }
 \seealso{
-\code{\link[dittoSeq:dittoDimHex]{dittoSeq::dittoDimHex()}}, \code{\link[=dittoDimHexInputsUI]{dittoDimHexInputsUI()}}, \code{\link[=dittoDimHexOutputUI]{dittoDimHexOutputUI()}}, \code{\link[=dittoDimHexApp]{dittoDimHexApp()}}
+\code{\link[dittoSeq:dittoDimHex]{dittoSeq::dittoDimHex()}}, \code{\link[=dittoDimHexInputsUI]{dittoDimHexInputsUI()}},
+\code{\link[=dittoDimHexOutputUI]{dittoDimHexOutputUI()}}, \code{\link[=dittoDimHexApp]{dittoDimHexApp()}}
 }
 \author{
 Jared Andrews

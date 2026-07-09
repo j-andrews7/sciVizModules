@@ -7,26 +7,32 @@
 dittoDimHexApp(object_list = NULL)
 }
 \arguments{
-\item{object_list}{An optional named list of \code{SingleCellExperiment},
-\code{Seurat}, or \code{SummarizedExperiment} objects. If \code{NULL} (the
-default), \code{list("example_sce" = example_sce)} is used as example data.}
+\item{object_list}{An optional named list of \code{SingleCellExperiment}, \code{Seurat},
+or \code{SummarizedExperiment} objects. If \code{NULL} (the default),
+\code{list("example_sce" = example_sce)} is used as example data.}
 }
 \value{
 A Shiny app object.
 }
 \description{
-This function generates a Shiny application with modular dittoDimHex components,
-featuring a \strong{Data} section for selecting among the provided objects, a
-read-only metadata preview, and a \strong{Plot} area for configuring and
+This function generates a Shiny application with modular hex-plot components.
+The app features a \strong{Data} section for selecting among the provided objects,
+a read-only \strong{Metadata Preview}, and a \strong{Plot} area for configuring and
 displaying an interactive \code{\link[dittoSeq:dittoDimHex]{dittoSeq::dittoDimHex()}}.
+}
+\details{
+When \code{object_list} is not provided (or \code{NULL}), the app launches with the
+bundled \code{example_sce} dataset.
 }
 \examples{
 library(sciVizModules)
+# Launch with default example data:
 app <- dittoDimHexApp()
 if (interactive()) shiny::runApp(app)
 }
 \seealso{
-\code{\link[dittoSeq:dittoDimHex]{dittoSeq::dittoDimHex()}}, \code{\link[=dittoDimHexInputsUI]{dittoDimHexInputsUI()}}, \code{\link[=dittoDimHexOutputUI]{dittoDimHexOutputUI()}}, \code{\link[=dittoDimHexServer]{dittoDimHexServer()}}, \code{\link[=example_sce]{example_sce}}
+\code{\link[=dittoDimHexInputsUI]{dittoDimHexInputsUI()}}, \code{\link[=dittoDimHexOutputUI]{dittoDimHexOutputUI()}},
+\code{\link[=dittoDimHexServer]{dittoDimHexServer()}}, \link{example_sce}
 }
 \author{
 Jared Andrews

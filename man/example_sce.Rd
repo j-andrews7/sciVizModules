@@ -8,11 +8,11 @@
 A \link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment} with 40 genes and 240
 cells containing:
 \describe{
-  \item{assays}{\code{counts} and \code{logcounts}}
-  \item{reducedDims}{\code{PCA}, \code{TSNE}, and \code{UMAP} embeddings}
-  \item{colData}{\code{clustering}, \code{celltype}, \code{condition}, and
-    \code{sample} (discrete), plus \code{nCount} and \code{percent.mito}
-    (continuous)}
+\item{assays}{\code{counts} and \code{logcounts}}
+\item{reducedDims}{\code{PCA}, \code{TSNE}, and \code{UMAP} embeddings}
+\item{colData}{\code{clustering}, \code{celltype}, \code{condition}, and
+\code{sample} (discrete), plus \code{nCount} and \code{percent.mito}
+(continuous)}
 }
 }
 \source{
@@ -33,6 +33,7 @@ ready-to-use example for the dittoSeq-based modules (\code{\link[=dittoDimPlotSe
 library(sciVizModules)
 data(example_sce)
 example_sce
+
 }
 \author{
 Jared Andrews

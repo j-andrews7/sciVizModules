@@ -2,25 +2,21 @@
 % Please edit documentation in R/dittoDimPlot_module_ui.R
 \name{dittoDimPlotOutputUI}
 \alias{dittoDimPlotOutputUI}
-\title{Output UI for the dittoDimPlot module}
+\title{Output UI components for the dittoDimPlot module}
 \usage{
 dittoDimPlotOutputUI(id, resizable = TRUE)
 }
 \arguments{
 \item{id}{The ID for the Shiny module.}
 
-\item{resizable}{Logical; whether the plot output should be resizable.}
+\item{resizable}{Logical; when \code{TRUE} (the default) the plot output is
+wrapped in \code{\link[shinyjqui:jqui_resizable]{shinyjqui::jqui_resizable()}} so it can be resized by dragging.}
 }
 \value{
-A Shiny tagList containing the plotly output element.
+A Shiny plotlyOutput for the dim plot.
 }
 \description{
-This should be placed in the UI where the plot should be shown, with an \code{id}
-that matches the \code{id} used in the \code{dittoDimPlotServer()} and
-\code{dittoDimPlotInputsUI()} functions.
-}
-\seealso{
-\code{\link[dittoSeq:dittoDimPlot]{dittoSeq::dittoDimPlot()}}, \code{\link[=dittoDimPlotInputsUI]{dittoDimPlotInputsUI()}}, \code{\link[=dittoDimPlotServer]{dittoDimPlotServer()}}, \code{\link[=dittoDimPlotApp]{dittoDimPlotApp()}}
+This should be placed in the UI where the plot should be shown.
 }
 \author{
 Jared Andrews

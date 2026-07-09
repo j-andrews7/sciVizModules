@@ -2,25 +2,21 @@
 % Please edit documentation in R/dittoDimHex_module_ui.R
 \name{dittoDimHexOutputUI}
 \alias{dittoDimHexOutputUI}
-\title{Output UI for the dittoDimHex module}
+\title{Output UI components for the dittoDimHex module}
 \usage{
 dittoDimHexOutputUI(id, resizable = TRUE)
 }
 \arguments{
 \item{id}{The ID for the Shiny module.}
 
-\item{resizable}{Logical; whether the plot output should be resizable.}
+\item{resizable}{Logical; when \code{TRUE} (the default) the plot output is
+wrapped in \code{\link[shinyjqui:jqui_resizable]{shinyjqui::jqui_resizable()}} so it can be resized by dragging.}
 }
 \value{
-A Shiny tagList containing the plotly output element.
+A Shiny plotlyOutput for the hex plot.
 }
 \description{
-This should be placed in the UI where the plot should be shown, with an \code{id}
-that matches the \code{id} used in the \code{dittoDimHexServer()} and
-\code{dittoDimHexInputsUI()} functions.
-}
-\seealso{
-\code{\link[dittoSeq:dittoDimHex]{dittoSeq::dittoDimHex()}}, \code{\link[=dittoDimHexInputsUI]{dittoDimHexInputsUI()}}, \code{\link[=dittoDimHexServer]{dittoDimHexServer()}}, \code{\link[=dittoDimHexApp]{dittoDimHexApp()}}
+This should be placed in the UI where the plot should be shown.
 }
 \author{
 Jared Andrews

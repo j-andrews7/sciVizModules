@@ -7,26 +7,32 @@
 dittoDimPlotApp(object_list = NULL)
 }
 \arguments{
-\item{object_list}{An optional named list of \code{SingleCellExperiment},
-\code{Seurat}, or \code{SummarizedExperiment} objects. If \code{NULL} (the
-default), \code{list("example_sce" = example_sce)} is used as example data.}
+\item{object_list}{An optional named list of \code{SingleCellExperiment}, \code{Seurat},
+or \code{SummarizedExperiment} objects. If \code{NULL} (the default),
+\code{list("example_sce" = example_sce)} is used as example data.}
 }
 \value{
 A Shiny app object.
 }
 \description{
-This function generates a Shiny application with modular dittoDimPlot components,
-featuring a \strong{Data} section for selecting among the provided objects, a
-read-only metadata preview, and a \strong{Plot} area for configuring and
+This function generates a Shiny application with modular dim-plot components.
+The app features a \strong{Data} section for selecting among the provided objects,
+a read-only \strong{Metadata Preview}, and a \strong{Plot} area for configuring and
 displaying an interactive \code{\link[dittoSeq:dittoDimPlot]{dittoSeq::dittoDimPlot()}}.
+}
+\details{
+When \code{object_list} is not provided (or \code{NULL}), the app launches with the
+bundled \code{example_sce} dataset.
 }
 \examples{
 library(sciVizModules)
+# Launch with default example data:
 app <- dittoDimPlotApp()
 if (interactive()) shiny::runApp(app)
 }
 \seealso{
-\code{\link[dittoSeq:dittoDimPlot]{dittoSeq::dittoDimPlot()}}, \code{\link[=dittoDimPlotInputsUI]{dittoDimPlotInputsUI()}}, \code{\link[=dittoDimPlotOutputUI]{dittoDimPlotOutputUI()}}, \code{\link[=dittoDimPlotServer]{dittoDimPlotServer()}}, \code{\link[=example_sce]{example_sce}}
+\code{\link[=dittoDimPlotInputsUI]{dittoDimPlotInputsUI()}}, \code{\link[=dittoDimPlotOutputUI]{dittoDimPlotOutputUI()}},
+\code{\link[=dittoDimPlotServer]{dittoDimPlotServer()}}, \link{example_sce}
 }
 \author{
 Jared Andrews

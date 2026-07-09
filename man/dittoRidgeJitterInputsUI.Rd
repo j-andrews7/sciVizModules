@@ -4,13 +4,19 @@
 \alias{dittoRidgeJitterInputsUI}
 \title{Input UI components for the dittoRidgeJitter module}
 \usage{
-dittoRidgeJitterInputsUI(id, data, defaults = NULL, title = "RidgeJitter Settings", columns = 2)
+dittoRidgeJitterInputsUI(
+  id,
+  data,
+  defaults = NULL,
+  title = "RidgeJitter Settings",
+  columns = 2
+)
 }
 \arguments{
 \item{id}{The ID for the Shiny module.}
 
-\item{data}{A \code{SingleCellExperiment}, \code{Seurat}, or
-\code{SummarizedExperiment} object used to populate the input choices.}
+\item{data}{A \code{SingleCellExperiment}, \code{Seurat}, or \code{SummarizedExperiment} object
+used to populate the input choices.}
 
 \item{defaults}{A named list of default values for the inputs.}
 
@@ -19,16 +25,46 @@ dittoRidgeJitterInputsUI(id, data, defaults = NULL, title = "RidgeJitter Setting
 \item{columns}{Number of columns for the UI grid.}
 }
 \value{
-A Shiny tagList containing the UI elements.
+A Shiny tagList containing the UI elements
 }
 \description{
 This should be placed in the UI where the inputs should be shown, with an \code{id}
 that matches the \code{id} used in the \code{dittoRidgeJitterServer()} and
-\code{dittoRidgeJitterOutputUI()} functions. The module renders a ridgeline-with-jitter distribution plot
-via \code{\link[dittoSeq:dittoRidgeJitter]{dittoSeq::dittoRidgeJitter()}}.
+\code{dittoRidgeJitterOutputUI()} functions.
+}
+\details{
+The user inputs for this module are separated from the outputs to allow for
+more flexible UI design.
+
+This module wraps \code{\link[dittoSeq:dittoRidgeJitter]{dittoSeq::dittoRidgeJitter()}} (a convenience wrapper of
+\code{\link[dittoSeq:dittoPlot]{dittoSeq::dittoPlot()}} with \code{plots = c("ridgeplot", "jitter")}), drawing a
+ridgeline density with overlaid jitter points for continuous data (gene
+expression or numeric metadata) per discrete group. The resulting \code{ggplot} is
+converted to an interactive \code{plotly} figure.
+}
+\section{Plot parameters and defaults}{
+
+The following parameters can be accessed via UI inputs and/or the \code{defaults} argument:
+\itemize{
+\item \code{var} - Continuous variable to plot (gene or numeric metadata)
+\item \code{group.by} - Discrete metadata used for the ridge groups
+\item \code{color.by} - Discrete metadata used for fill colors (default: \code{group.by})
+\item \code{split.by} - Discrete metadata to facet by (default: none)
+\item \code{ridgeplot.scale} - Ridge overlap scale (default: 1.25)
+\item \code{jitter.size} - Jitter point size (default: 1)
+\item \code{palette.selection} - Colors for discrete groups (multiColorPicker)
+}
+}
+
+\examples{
+library(sciVizModules)
+data(example_sce)
+dittoRidgeJitterInputsUI("dittoRidgeJitter", example_sce)
 }
 \seealso{
-\code{\link[dittoSeq:dittoRidgeJitter]{dittoSeq::dittoRidgeJitter()}}, \code{\link[=dittoRidgeJitterOutputUI]{dittoRidgeJitterOutputUI()}}, \code{\link[=dittoRidgeJitterServer]{dittoRidgeJitterServer()}}, \code{\link[=dittoRidgeJitterApp]{dittoRidgeJitterApp()}}
+\code{\link[dittoSeq:dittoRidgeJitter]{dittoSeq::dittoRidgeJitter()}}, \code{\link[VizModules:organize_inputs]{VizModules::organize_inputs()}},
+\code{\link[=dittoRidgeJitterOutputUI]{dittoRidgeJitterOutputUI()}}, \code{\link[=dittoRidgeJitterServer]{dittoRidgeJitterServer()}},
+\code{\link[=dittoRidgeJitterApp]{dittoRidgeJitterApp()}}
 }
 \author{
 Jared Andrews

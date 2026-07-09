@@ -2,25 +2,21 @@
 % Please edit documentation in R/dittoFreqPlot_module_ui.R
 \name{dittoFreqPlotOutputUI}
 \alias{dittoFreqPlotOutputUI}
-\title{Output UI for the dittoFreqPlot module}
+\title{Output UI components for the dittoFreqPlot module}
 \usage{
 dittoFreqPlotOutputUI(id, resizable = TRUE)
 }
 \arguments{
 \item{id}{The ID for the Shiny module.}
 
-\item{resizable}{Logical; whether the plot output should be resizable.}
+\item{resizable}{Logical; when \code{TRUE} (the default) the plot output is
+wrapped in \code{\link[shinyjqui:jqui_resizable]{shinyjqui::jqui_resizable()}} so it can be resized by dragging.}
 }
 \value{
-A Shiny tagList containing the plotly output element.
+A Shiny plotlyOutput for the frequency plot.
 }
 \description{
-This should be placed in the UI where the plot should be shown, with an \code{id}
-that matches the \code{id} used in the \code{dittoFreqPlotServer()} and
-\code{dittoFreqPlotInputsUI()} functions.
-}
-\seealso{
-\code{\link[dittoSeq:dittoFreqPlot]{dittoSeq::dittoFreqPlot()}}, \code{\link[=dittoFreqPlotInputsUI]{dittoFreqPlotInputsUI()}}, \code{\link[=dittoFreqPlotServer]{dittoFreqPlotServer()}}, \code{\link[=dittoFreqPlotApp]{dittoFreqPlotApp()}}
+This should be placed in the UI where the plot should be shown.
 }
 \author{
 Jared Andrews

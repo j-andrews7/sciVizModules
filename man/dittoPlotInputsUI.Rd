@@ -4,13 +4,19 @@
 \alias{dittoPlotInputsUI}
 \title{Input UI components for the dittoPlot module}
 \usage{
-dittoPlotInputsUI(id, data, defaults = NULL, title = "dittoPlot Settings", columns = 2)
+dittoPlotInputsUI(
+  id,
+  data,
+  defaults = NULL,
+  title = "dittoPlot Settings",
+  columns = 2
+)
 }
 \arguments{
 \item{id}{The ID for the Shiny module.}
 
-\item{data}{A \code{SingleCellExperiment}, \code{Seurat}, or
-\code{SummarizedExperiment} object used to populate the input choices.}
+\item{data}{A \code{SingleCellExperiment}, \code{Seurat}, or \code{SummarizedExperiment} object
+used to populate the input choices.}
 
 \item{defaults}{A named list of default values for the inputs.}
 
@@ -19,16 +25,45 @@ dittoPlotInputsUI(id, data, defaults = NULL, title = "dittoPlot Settings", colum
 \item{columns}{Number of columns for the UI grid.}
 }
 \value{
-A Shiny tagList containing the UI elements.
+A Shiny tagList containing the UI elements
 }
 \description{
 This should be placed in the UI where the inputs should be shown, with an \code{id}
 that matches the \code{id} used in the \code{dittoPlotServer()} and
-\code{dittoPlotOutputUI()} functions. The module renders a per-group violin/box/jitter/ridge distribution of a gene or continuous variable
-via \code{\link[dittoSeq:dittoPlot]{dittoSeq::dittoPlot()}}.
+\code{dittoPlotOutputUI()} functions.
+}
+\details{
+The user inputs for this module are separated from the outputs to allow for
+more flexible UI design.
+
+This module wraps \code{\link[dittoSeq:dittoPlot]{dittoSeq::dittoPlot()}}, plotting continuous data (gene
+expression or numeric metadata) per discrete group as any combination of
+jitter, violin, box, and ridge representations. The resulting \code{ggplot} is
+converted to an interactive \code{plotly} figure.
+}
+\section{Plot parameters and defaults}{
+
+The following parameters can be accessed via UI inputs and/or the \code{defaults} argument:
+\itemize{
+\item \code{var} - Continuous variable to plot (gene or numeric metadata)
+\item \code{group.by} - Discrete metadata used for the x-axis groups
+\item \code{color.by} - Discrete metadata used for fill colors (default: \code{group.by})
+\item \code{plots} - Representations to draw (default: c("jitter", "vlnplot"))
+\item \code{split.by} - Discrete metadata to facet by (default: none)
+\item \code{jitter.size} - Jitter point size (default: 1)
+\item \code{palette.selection} - Colors for discrete groups (multiColorPicker)
+}
+}
+
+\examples{
+library(sciVizModules)
+data(example_sce)
+dittoPlotInputsUI("dittoPlot", example_sce)
 }
 \seealso{
-\code{\link[dittoSeq:dittoPlot]{dittoSeq::dittoPlot()}}, \code{\link[=dittoPlotOutputUI]{dittoPlotOutputUI()}}, \code{\link[=dittoPlotServer]{dittoPlotServer()}}, \code{\link[=dittoPlotApp]{dittoPlotApp()}}
+\code{\link[dittoSeq:dittoPlot]{dittoSeq::dittoPlot()}}, \code{\link[VizModules:organize_inputs]{VizModules::organize_inputs()}},
+\code{\link[=dittoPlotOutputUI]{dittoPlotOutputUI()}}, \code{\link[=dittoPlotServer]{dittoPlotServer()}},
+\code{\link[=dittoPlotApp]{dittoPlotApp()}}
 }
 \author{
 Jared Andrews

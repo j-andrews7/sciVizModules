@@ -4,30 +4,38 @@
 \alias{dittoRidgeJitterServer}
 \title{Server logic for the dittoRidgeJitter module}
 \usage{
-dittoRidgeJitterServer(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL)
+dittoRidgeJitterServer(
+  id,
+  data,
+  hide.inputs = NULL,
+  hide.tabs = NULL,
+  defaults = NULL
+)
 }
 \arguments{
 \item{id}{The ID for the Shiny module.}
 
-\item{data}{A \code{reactive} returning a \code{SingleCellExperiment},
-\code{Seurat}, or \code{SummarizedExperiment} object.}
+\item{data}{A \code{reactive} returning a \code{SingleCellExperiment}, \code{Seurat}, or
+\code{SummarizedExperiment} object.}
 
 \item{hide.inputs}{A character vector of input IDs to hide.}
 
 \item{hide.tabs}{A character vector of tab names to hide.}
 
 \item{defaults}{A named list of default values used when resetting the inputs.
-Typically the same list passed to \code{dittoRidgeJitterInputsUI()}.}
+Typically the same list passed to \code{\link[=dittoRidgeJitterInputsUI]{dittoRidgeJitterInputsUI()}}.}
 }
 \value{
 The \code{moduleServer} function for the dittoRidgeJitter module.
 }
 \description{
-This module builds a ridgeline-with-jitter distribution plot with \code{\link[dittoSeq:dittoRidgeJitter]{dittoSeq::dittoRidgeJitter()}} and renders it as an interactive
-\code{plotly} figure.
+This module builds a ridgeline-with-jitter plot with
+\code{\link[dittoSeq:dittoRidgeJitter]{dittoSeq::dittoRidgeJitter()}} and renders it as an interactive \code{plotly}
+figure.
 }
 \seealso{
-\code{\link[dittoSeq:dittoRidgeJitter]{dittoSeq::dittoRidgeJitter()}}, \code{\link[=dittoRidgeJitterInputsUI]{dittoRidgeJitterInputsUI()}}, \code{\link[=dittoRidgeJitterOutputUI]{dittoRidgeJitterOutputUI()}}, \code{\link[=dittoRidgeJitterApp]{dittoRidgeJitterApp()}}
+\code{\link[dittoSeq:dittoRidgeJitter]{dittoSeq::dittoRidgeJitter()}}, \code{\link[=dittoRidgeJitterInputsUI]{dittoRidgeJitterInputsUI()}},
+\code{\link[=dittoRidgeJitterOutputUI]{dittoRidgeJitterOutputUI()}}, \code{\link[=dittoRidgeJitterApp]{dittoRidgeJitterApp()}}
 }
 \author{
 Jared Andrews

@@ -4,13 +4,19 @@
 \alias{dittoFreqPlotInputsUI}
 \title{Input UI components for the dittoFreqPlot module}
 \usage{
-dittoFreqPlotInputsUI(id, data, defaults = NULL, title = "FreqPlot Settings", columns = 2)
+dittoFreqPlotInputsUI(
+  id,
+  data,
+  defaults = NULL,
+  title = "FreqPlot Settings",
+  columns = 2
+)
 }
 \arguments{
 \item{id}{The ID for the Shiny module.}
 
-\item{data}{A \code{SingleCellExperiment}, \code{Seurat}, or
-\code{SummarizedExperiment} object used to populate the input choices.}
+\item{data}{A \code{SingleCellExperiment}, \code{Seurat}, or \code{SummarizedExperiment} object
+used to populate the input choices.}
 
 \item{defaults}{A named list of default values for the inputs.}
 
@@ -19,16 +25,46 @@ dittoFreqPlotInputsUI(id, data, defaults = NULL, title = "FreqPlot Settings", co
 \item{columns}{Number of columns for the UI grid.}
 }
 \value{
-A Shiny tagList containing the UI elements.
+A Shiny tagList containing the UI elements
 }
 \description{
 This should be placed in the UI where the inputs should be shown, with an \code{id}
 that matches the \code{id} used in the \code{dittoFreqPlotServer()} and
-\code{dittoFreqPlotOutputUI()} functions. The module renders a per-sample frequency of a discrete variable across groups
-via \code{\link[dittoSeq:dittoFreqPlot]{dittoSeq::dittoFreqPlot()}}.
+\code{dittoFreqPlotOutputUI()} functions.
+}
+\details{
+The user inputs for this module are separated from the outputs to allow for
+more flexible UI design.
+
+This module wraps \code{\link[dittoSeq:dittoFreqPlot]{dittoSeq::dittoFreqPlot()}}, which computes the per-sample
+frequency (or count) of each level of a discrete \code{var} and plots those
+frequencies across groups as jitter/box/violin/ridge representations. The
+resulting \code{ggplot} is converted to an interactive \code{plotly} figure.
+}
+\section{Plot parameters and defaults}{
+
+The following parameters can be accessed via UI inputs and/or the \code{defaults} argument:
+\itemize{
+\item \code{var} - Discrete metadata whose frequencies are computed
+\item \code{sample.by} - Discrete metadata identifying individual samples
+\item \code{group.by} - Discrete metadata used for the x-axis groups
+\item \code{color.by} - Discrete metadata used for fill colors (default: \code{group.by})
+\item \code{scale} - "percent" or "count" (default: "percent")
+\item \code{plots} - Representations to draw (default: c("boxplot", "jitter"))
+\item \code{max.normalize} - Scale each facet to its own max (default: FALSE)
+\item \code{palette.selection} - Colors for discrete groups (multiColorPicker)
+}
+}
+
+\examples{
+library(sciVizModules)
+data(example_sce)
+dittoFreqPlotInputsUI("dittoFreqPlot", example_sce)
 }
 \seealso{
-\code{\link[dittoSeq:dittoFreqPlot]{dittoSeq::dittoFreqPlot()}}, \code{\link[=dittoFreqPlotOutputUI]{dittoFreqPlotOutputUI()}}, \code{\link[=dittoFreqPlotServer]{dittoFreqPlotServer()}}, \code{\link[=dittoFreqPlotApp]{dittoFreqPlotApp()}}
+\code{\link[dittoSeq:dittoFreqPlot]{dittoSeq::dittoFreqPlot()}}, \code{\link[VizModules:organize_inputs]{VizModules::organize_inputs()}},
+\code{\link[=dittoFreqPlotOutputUI]{dittoFreqPlotOutputUI()}}, \code{\link[=dittoFreqPlotServer]{dittoFreqPlotServer()}},
+\code{\link[=dittoFreqPlotApp]{dittoFreqPlotApp()}}
 }
 \author{
 Jared Andrews
