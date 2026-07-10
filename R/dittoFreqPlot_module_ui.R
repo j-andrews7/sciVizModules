@@ -95,13 +95,17 @@ dittoFreqPlotInputsUI <- function(id, data, defaults = NULL, title = "FreqPlot S
                 selected = get_default(defaults, "scale", "percent"), selectize = FALSE
             ), "Show frequencies as a percentage or as raw counts.",
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("plots"), "Plot type:",
-                choices = c("Jitter" = "jitter", "Box" = "boxplot",
-                    "Violin" = "vlnplot", "Ridge" = "ridgeplot"),
-                selected = get_default(defaults, "plots", c("boxplot", "jitter")),
+            tipify(selectInput(
+                ns("plots"),
+                "Plots",
+                choices = c("Violin" = "vlnplot", "Box" = "boxplot", "Jitter" = "jitter", "Ridge" = "ridgeplot"),
+                selected = get_default(
+                    defaults, "plots", c("boxplot", "jitter"),
+                    function(x) all(x %in% c("vlnplot", "boxplot", "jitter", "ridgeplot"))
+                ),
                 multiple = TRUE, selectize = TRUE
-            ), "Data representations to draw, from back to front.",
-                placement = "top", options = list(container = "body"))
+                ), documentParameters$plots, placement = "top", options = list(container = "body")),
+                helpText("Order not currently respected")
         ),
         "Aesthetics" = tagList(
             uiOutput(ns("palette.selection")),
