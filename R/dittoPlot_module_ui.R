@@ -58,6 +58,20 @@ dittoPlotInputsUI <- function(id, data, defaults = NULL, title = "dittoPlot Sett
 
     if (is.null(defaults)) defaults <- list()
 
+    selected <- list(
+        "var", "group.by", "color.by", "plots", "split.by",
+        c("jitter.size", "jitter.width", "jitter.color"),
+        "vlnplot.lineweight",
+        c("boxplot.width", "boxplot.lineweight"),
+        c("vlnplot.width", "vlnplot.scaling"),
+        c("ridgeplot.scale", "ridgeplot.lineweight")
+    )
+
+    documentParameters <- get_documentation(
+        package_name = "dittoSeq::dittoPlot", type = "param",
+        selected = selected, cap = TRUE
+    )
+
     cont.choices <- .ditto_continuous_choices(data, include.blank = FALSE)
     cont.flat <- unlist(cont.choices, use.names = FALSE)
     disc <- .ditto_discrete_metas(data)
@@ -72,72 +86,72 @@ dittoPlotInputsUI <- function(id, data, defaults = NULL, title = "dittoPlot Sett
             tipify(selectInput(ns("var"), "Variable (gene / metadata)",
                 choices = cont.choices,
                 selected = default.var, selectize = FALSE
-            ), "Continuous gene or metadata plotted on the y-axis.",
+            ), documentParameters$var,
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("group.by"), "Group By",
                 choices = group.choices,
                 selected = default.group, selectize = FALSE
-            ), "Discrete metadata used to separate the data into x-axis groups.",
+            ), documentParameters$group.by,
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("color.by"), "Color By",
                 choices = color.choices,
                 selected = get_default(defaults, "color.by", ""), selectize = FALSE
-            ), "Discrete metadata used for fill colors. Defaults to the grouping.",
+            ), documentParameters$color.by,
                 placement = "top", options = list(container = "body")),
             tipify(checkboxGroupInput(ns("plots"), "Representations",
                 choices = c("Jitter" = "jitter", "Violin" = "vlnplot",
                     "Box" = "boxplot", "Ridge" = "ridgeplot"),
                 selected = get_default(defaults, "plots", c("jitter", "vlnplot"))
-            ), "Data representations to draw, from back to front.",
+            ), documentParameters$plots,
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("split.by"), "Split By (facet)",
                 choices = color.choices,
                 selected = get_default(defaults, "split.by", ""), selectize = FALSE
-            ), "Discrete metadata to split the plot into facets.",
+            ), documentParameters$split.by,
                 placement = "top", options = list(container = "body"))
         ),
         "Aesthetics" = tagList(
             uiOutput(ns("palette.selection")),
             tipify(numericInput(ns("jitter.size"), "Jitter Size",
                 value = get_default(defaults, "jitter.size", 1), min = 0.1, step = 0.1),
-                "Size of the jitter points.",
+                documentParameters$jitter.size,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("jitter.width"), "Jitter Width",
                 value = get_default(defaults, "jitter.width", 0.2), min = 0, step = 0.05),
-                "Horizontal spread of the jitter points.",
+                documentParameters$jitter.width,
                 placement = "top", options = list(container = "body")),
             tipify(colourInput(ns("jitter.color"), "Jitter Point Color",
                 value = get_default(defaults, "jitter.color", "#000000")),
-                "Color of the jitter points.",
+                documentParameters$jitter.color,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("vlnplot.lineweight"), "Violin Line Weight",
                 value = get_default(defaults, "vlnplot.lineweight", 1), min = 0, step = 0.1),
-                "Line weight of the violin outlines.",
+                documentParameters$vlnplot.lineweight,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("boxplot.width"), "Box Width",
                 value = get_default(defaults, "boxplot.width", 0.2), min = 0, step = 0.05),
-                "Width of the boxplots.",
+                documentParameters$boxplot.width,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("boxplot.lineweight"), "Box Line Weight",
                 value = get_default(defaults, "boxplot.lineweight", 1), min = 0, step = 0.1),
-                "Line weight of the boxplot outlines.",
+                documentParameters$boxplot.lineweight,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("vlnplot.width"), "Violin Width",
                 value = get_default(defaults, "vlnplot.width", 1), min = 0, step = 0.05),
-                "Relative width of the violins.",
+                documentParameters$vlnplot.width,
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("vlnplot.scaling"), "Violin Scaling",
                 choices = c("Area" = "area", "Count" = "count", "Width" = "width"),
                 selected = get_default(defaults, "vlnplot.scaling", "area"), selectize = FALSE
-            ), "How violin areas are scaled relative to each other.",
+            ), documentParameters$vlnplot.scaling,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("ridgeplot.scale"), "Ridge Scale (overlap)",
                 value = get_default(defaults, "ridgeplot.scale", 1.25), min = 0.1, step = 0.05),
-                "Vertical scaling of the ridges; larger values increase overlap.",
+                documentParameters$ridgeplot.scale,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("ridgeplot.lineweight"), "Ridge Line Weight",
                 value = get_default(defaults, "ridgeplot.lineweight", 1), min = 0, step = 0.1),
-                "Line weight of the ridge outlines.",
+                documentParameters$ridgeplot.lineweight,
                 placement = "top", options = list(container = "body"))
         ),
         "Plotly" = uniform_plotly_inputs_ui(ns, defaults),

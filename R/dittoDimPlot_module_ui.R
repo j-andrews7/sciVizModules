@@ -63,6 +63,20 @@ dittoDimPlotInputsUI <- function(id, data, defaults = NULL, title = "DimPlot Set
 
     if (is.null(defaults)) defaults <- list()
 
+    selected <- list(
+        "var", "reduction.use", c("dim.1", "dim.2"),
+        "shape.by", "split.by",
+        "min.color", "max.color",
+        "order", "size", "opacity",
+        "do.label", "labels.size",
+        "do.ellipse", "do.contour"
+    )
+
+    documentParameters <- get_documentation(
+        package_name = "dittoSeq::dittoDimPlot", type = "param",
+        selected = selected, cap = TRUE
+    )
+
     var.choices <- .ditto_var_choices(data, include.blank = FALSE)
     disc.choices <- c("None" = "", stats::setNames(
         .ditto_discrete_metas(data), .ditto_discrete_metas(data)
@@ -80,70 +94,70 @@ dittoDimPlotInputsUI <- function(id, data, defaults = NULL, title = "DimPlot Set
             tipify(selectInput(ns("var"), "Color By (gene / metadata)",
                 choices = var.choices,
                 selected = default.var, selectize = FALSE
-            ), "Gene or metadata used to color the points.",
+            ), documentParameters$var,
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("reduction.use"), "Reduction",
                 choices = red.choices,
                 selected = default.red, selectize = FALSE
-            ), "Dimensionality reduction embedding to plot.",
+            ), documentParameters$reduction.use,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("dim.1"), "X Dimension",
                 value = get_default(defaults, "dim.1", 1), min = 1, step = 1),
-                "Which dimension of the reduction to plot on the x-axis.",
+                documentParameters$dim.1,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("dim.2"), "Y Dimension",
                 value = get_default(defaults, "dim.2", 2), min = 1, step = 1),
-                "Which dimension of the reduction to plot on the y-axis.",
+                documentParameters$dim.2,
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("shape.by"), "Shape By",
                 choices = disc.choices,
                 selected = get_default(defaults, "shape.by", ""), selectize = FALSE
-            ), "Discrete metadata mapped to point shape.",
+            ), documentParameters$shape.by,
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("split.by"), "Split By (facet)",
                 choices = disc.choices,
                 selected = get_default(defaults, "split.by", ""), selectize = FALSE
-            ), "Discrete metadata to split the plot into facets.",
+            ), documentParameters$split.by,
                 placement = "top", options = list(container = "body"))
         ),
         "Aesthetics" = tagList(
             uiOutput(ns("palette.selection")),
             tipify(colourInput(ns("min.color"), "Min Color",
                 value = get_default(defaults, "min.color", "#F0E442")),
-                "Low end of the color scale for continuous coloring.",
+                documentParameters$min.color,
                 placement = "top", options = list(container = "body")),
             tipify(colourInput(ns("max.color"), "Max Color",
                 value = get_default(defaults, "max.color", "#0072B2")),
-                "High end of the color scale for continuous coloring.",
+                documentParameters$max.color,
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("order"), "Point Order",
                 choices = c("unordered", "increasing", "decreasing", "randomize"),
                 selected = get_default(defaults, "order", "unordered"), selectize = FALSE
-            ), "Order in which points are drawn.",
+            ), documentParameters$order,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("size"), "Point Size",
                 value = get_default(defaults, "size", 1), min = 0.1, step = 0.1),
-                "Size of the plotted points.",
+                documentParameters$size,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("opacity"), "Point Opacity",
                 value = get_default(defaults, "opacity", 1), min = 0, max = 1, step = 0.05),
-                "Opacity of the plotted points.",
+                documentParameters$opacity,
                 placement = "top", options = list(container = "body")),
             tipify(materialSwitch(ns("do.label"), "Label Groups",
                 value = get_default(defaults, "do.label", FALSE), status = "success"),
-                "Overlay text labels at the center of each discrete group.",
+                documentParameters$do.label,
                 placement = "top", options = list(container = "body")),
             tipify(materialSwitch(ns("do.ellipse"), "Group Ellipses",
                 value = get_default(defaults, "do.ellipse", FALSE), status = "success"),
-                "Draw a covariance ellipse around each discrete group.",
+                documentParameters$do.ellipse,
                 placement = "top", options = list(container = "body")),
             tipify(materialSwitch(ns("do.contour"), "Density Contours",
                 value = get_default(defaults, "do.contour", FALSE), status = "success"),
-                "Overlay kernel-density contour lines over the points.",
+                documentParameters$do.contour,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("labels.size"), "Label Size",
                 value = get_default(defaults, "labels.size", 5), min = 1, step = 0.5),
-                "Text size of the group labels (used when 'Label Groups' is on).",
+                documentParameters$labels.size,
                 placement = "top", options = list(container = "body"))
         ),
         "Plotly" = uniform_plotly_inputs_ui(ns, defaults),

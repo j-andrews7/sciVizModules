@@ -58,6 +58,18 @@ dittoFreqPlotInputsUI <- function(id, data, defaults = NULL, title = "FreqPlot S
 
     if (is.null(defaults)) defaults <- list()
 
+    selected <- list(
+        "var", "sample.by", "group.by", "color.by",
+        "scale", "plots", "max.normalize",
+        c("jitter.size", "jitter.width", "jitter.color"),
+        c("boxplot.width", "vlnplot.width")
+    )
+
+    documentParameters <- get_documentation(
+        package_name = "dittoSeq::dittoFreqPlot", type = "param",
+        selected = selected, cap = TRUE
+    )
+
     disc <- .ditto_discrete_metas(data)
     var.choices <- stats::setNames(disc, disc)
     group.choices <- stats::setNames(disc, disc)
@@ -73,27 +85,27 @@ dittoFreqPlotInputsUI <- function(id, data, defaults = NULL, title = "FreqPlot S
             tipify(selectInput(ns("var"), "Variable",
                 choices = var.choices,
                 selected = default.var, selectize = FALSE
-            ), "Discrete metadata whose per-sample frequencies are computed.",
+            ), documentParameters$var,
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("sample.by"), "Sample By",
                 choices = sample.choices,
                 selected = get_default(defaults, "sample.by", ""), selectize = FALSE
-            ), "Discrete metadata identifying individual samples (one frequency per sample).",
+            ), documentParameters$sample.by,
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("group.by"), "Group By",
                 choices = group.choices,
                 selected = default.group, selectize = FALSE
-            ), "Discrete metadata used to separate the samples into x-axis groups.",
+            ), documentParameters$group.by,
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("color.by"), "Color By",
                 choices = color.choices,
                 selected = get_default(defaults, "color.by", ""), selectize = FALSE
-            ), "Discrete metadata used for fill colors. Defaults to the grouping.",
+            ), documentParameters$color.by,
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("scale"), "Scale",
                 choices = c("Percent" = "percent", "Count" = "count"),
                 selected = get_default(defaults, "scale", "percent"), selectize = FALSE
-            ), "Show frequencies as a percentage or as raw counts.",
+            ), documentParameters$scale,
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(
                 ns("plots"),
@@ -111,27 +123,27 @@ dittoFreqPlotInputsUI <- function(id, data, defaults = NULL, title = "FreqPlot S
             uiOutput(ns("palette.selection")),
             tipify(materialSwitch(ns("max.normalize"), "Max Normalize",
                 value = get_default(defaults, "max.normalize", FALSE), status = "success"),
-                "Scale each var-level's frequencies to its own maximum.",
+                documentParameters$max.normalize,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("jitter.size"), "Jitter Size",
                 value = get_default(defaults, "jitter.size", 1), min = 0.1, step = 0.1),
-                "Size of the jitter points.",
+                documentParameters$jitter.size,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("jitter.width"), "Jitter Width",
                 value = get_default(defaults, "jitter.width", 0.2), min = 0, step = 0.05),
-                "Horizontal spread of the jitter points.",
+                documentParameters$jitter.width,
                 placement = "top", options = list(container = "body")),
             tipify(colourInput(ns("jitter.color"), "Jitter Point Color",
                 value = get_default(defaults, "jitter.color", "#000000")),
-                "Color of the jitter points.",
+                documentParameters$jitter.color,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("boxplot.width"), "Box Width",
                 value = get_default(defaults, "boxplot.width", 0.4), min = 0, step = 0.05),
-                "Width of the boxplots.",
+                documentParameters$boxplot.width,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("vlnplot.width"), "Violin Width",
                 value = get_default(defaults, "vlnplot.width", 1), min = 0, step = 0.05),
-                "Relative width of the violins.",
+                documentParameters$vlnplot.width,
                 placement = "top", options = list(container = "body"))
         ),
         "Plotly" = uniform_plotly_inputs_ui(ns, defaults),

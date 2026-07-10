@@ -55,6 +55,18 @@ dittoRidgeJitterInputsUI <- function(id, data, defaults = NULL, title = "RidgeJi
 
     if (is.null(defaults)) defaults <- list()
 
+    selected <- list(
+        "var", "group.by", "color.by", "split.by",
+        c("ridgeplot.scale", "ridgeplot.lineweight"),
+        c("ridgeplot.shape", "ridgeplot.bins"),
+        c("jitter.size", "jitter.width", "jitter.color")
+    )
+
+    documentParameters <- get_documentation(
+        package_name = "dittoSeq::dittoRidgeJitter", type = "param",
+        selected = selected, cap = TRUE
+    )
+
     cont.choices <- .ditto_continuous_choices(data, include.blank = FALSE)
     cont.flat <- unlist(cont.choices, use.names = FALSE)
     disc <- .ditto_discrete_metas(data)
@@ -69,54 +81,54 @@ dittoRidgeJitterInputsUI <- function(id, data, defaults = NULL, title = "RidgeJi
             tipify(selectInput(ns("var"), "Variable (gene / metadata)",
                 choices = cont.choices,
                 selected = default.var, selectize = FALSE
-            ), "Continuous gene or metadata plotted along the ridge axis.",
+            ), documentParameters$var,
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("group.by"), "Group By",
                 choices = group.choices,
                 selected = default.group, selectize = FALSE
-            ), "Discrete metadata used to separate the data into ridges.",
+            ), documentParameters$group.by,
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("color.by"), "Color By",
                 choices = color.choices,
                 selected = get_default(defaults, "color.by", ""), selectize = FALSE
-            ), "Discrete metadata used for fill colors. Defaults to the grouping.",
+            ), documentParameters$color.by,
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("split.by"), "Split By (facet)",
                 choices = color.choices,
                 selected = get_default(defaults, "split.by", ""), selectize = FALSE
-            ), "Discrete metadata to split the plot into facets.",
+            ), documentParameters$split.by,
                 placement = "top", options = list(container = "body"))
         ),
         "Aesthetics" = tagList(
             uiOutput(ns("palette.selection")),
             tipify(numericInput(ns("ridgeplot.scale"), "Ridge Scale (overlap)",
                 value = get_default(defaults, "ridgeplot.scale", 1.25), min = 0.1, step = 0.05),
-                "Vertical scaling of the ridges; larger values increase overlap.",
+                documentParameters$ridgeplot.scale,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("ridgeplot.lineweight"), "Ridge Line Weight",
                 value = get_default(defaults, "ridgeplot.lineweight", 1), min = 0, step = 0.1),
-                "Line weight of the ridge outlines.",
+                documentParameters$ridgeplot.lineweight,
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("ridgeplot.shape"), "Ridge Shape",
                 choices = c("Smooth" = "smooth", "Histogram" = "hist"),
                 selected = get_default(defaults, "ridgeplot.shape", "smooth"), selectize = FALSE
-            ), "Draw ridges as smoothed densities or as histograms.",
+            ), documentParameters$ridgeplot.shape,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("ridgeplot.bins"), "Ridge Bins",
                 value = get_default(defaults, "ridgeplot.bins", 30), min = 2, step = 1),
-                "Number of bins used when the ridge shape is 'Histogram'.",
+                documentParameters$ridgeplot.bins,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("jitter.size"), "Jitter Size",
                 value = get_default(defaults, "jitter.size", 1), min = 0.1, step = 0.1),
-                "Size of the overlaid jitter points.",
+                documentParameters$jitter.size,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("jitter.width"), "Jitter Width",
                 value = get_default(defaults, "jitter.width", 0.2), min = 0, step = 0.05),
-                "Spread of the overlaid jitter points.",
+                documentParameters$jitter.width,
                 placement = "top", options = list(container = "body")),
             tipify(colourInput(ns("jitter.color"), "Jitter Point Color",
                 value = get_default(defaults, "jitter.color", "#000000")),
-                "Color of the overlaid jitter points.",
+                documentParameters$jitter.color,
                 placement = "top", options = list(container = "body"))
         ),
         "Plotly" = uniform_plotly_inputs_ui(ns, defaults),

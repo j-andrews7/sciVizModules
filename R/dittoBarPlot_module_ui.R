@@ -52,6 +52,17 @@ dittoBarPlotInputsUI <- function(id, data, defaults = NULL, title = "BarPlot Set
 
     if (is.null(defaults)) defaults <- list()
 
+    selected <- list(
+        "var", "group.by", "scale",
+        "split.by", c("split.nrow", "split.ncol"),
+        "x.labels.rotate", "retain.factor.levels"
+    )
+
+    documentParameters <- get_documentation(
+        package_name = "dittoSeq::dittoBarPlot", type = "param",
+        selected = selected, cap = TRUE
+    )
+
     disc <- .ditto_discrete_metas(data)
     var.choices <- stats::setNames(disc, disc)
     group.choices <- stats::setNames(disc, disc)
@@ -66,41 +77,41 @@ dittoBarPlotInputsUI <- function(id, data, defaults = NULL, title = "BarPlot Set
             tipify(selectInput(ns("var"), "Variable",
                 choices = var.choices,
                 selected = default.var, selectize = FALSE
-            ), "Discrete metadata whose composition is quantified within each group.",
+            ), documentParameters$var,
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("group.by"), "Group By",
                 choices = group.choices,
                 selected = default.group, selectize = FALSE
-            ), "Discrete metadata used to separate the data into x-axis groups.",
+            ), documentParameters$group.by,
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("scale"), "Scale",
                 choices = c("Percent" = "percent", "Count" = "count"),
                 selected = get_default(defaults, "scale", "percent"), selectize = FALSE
-            ), "Show composition as a percentage or as raw counts.",
+            ), documentParameters$scale,
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("split.by"), "Split By (facet)",
                 choices = split.choices,
                 selected = get_default(defaults, "split.by", ""), selectize = FALSE
-            ), "Discrete metadata to split the plot into facets.",
+            ), documentParameters$split.by,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("split.nrow"), "Facet Rows",
                 value = get_default(defaults, "split.nrow", NA), min = 1, step = 1),
-                "Number of rows for the facet layout (leave blank for automatic).",
+                documentParameters$split.nrow,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("split.ncol"), "Facet Columns",
                 value = get_default(defaults, "split.ncol", NA), min = 1, step = 1),
-                "Number of columns for the facet layout (leave blank for automatic).",
+                documentParameters$split.ncol,
                 placement = "top", options = list(container = "body"))
         ),
         "Aesthetics" = tagList(
             uiOutput(ns("palette.selection")),
             tipify(materialSwitch(ns("x.labels.rotate"), "Rotate X Labels",
                 value = get_default(defaults, "x.labels.rotate", TRUE), status = "success"),
-                "Rotate the x-axis group labels by 45 degrees.",
+                documentParameters$x.labels.rotate,
                 placement = "top", options = list(container = "body")),
             tipify(materialSwitch(ns("retain.factor.levels"), "Retain Factor Levels",
                 value = get_default(defaults, "retain.factor.levels", FALSE), status = "success"),
-                "Respect factor level ordering of the var and grouping data.",
+                documentParameters$retain.factor.levels,
                 placement = "top", options = list(container = "body"))
         ),
         "Plotly" = uniform_plotly_inputs_ui(ns, defaults),

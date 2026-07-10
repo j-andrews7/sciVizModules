@@ -57,6 +57,19 @@ dittoDimHexInputsUI <- function(id, data, defaults = NULL, title = "DimHex Setti
 
     if (is.null(defaults)) defaults <- list()
 
+    selected <- list(
+        "color.var", "reduction.use", c("dim.1", "dim.2"),
+        "bins", "color.method", "split.by",
+        "min.color", "max.color",
+        c("min.opacity", "max.opacity"),
+        "do.contour", "do.label", "labels.size", "do.ellipse"
+    )
+
+    documentParameters <- get_documentation(
+        package_name = "dittoSeq::dittoDimHex", type = "param",
+        selected = selected, cap = TRUE
+    )
+
     var.choices <- .ditto_var_choices(data, include.blank = TRUE)
     disc.choices <- c("None" = "", stats::setNames(
         .ditto_discrete_metas(data), .ditto_discrete_metas(data)
@@ -69,69 +82,67 @@ dittoDimHexInputsUI <- function(id, data, defaults = NULL, title = "DimHex Setti
             tipify(selectInput(ns("color.var"), "Color By (gene / metadata)",
                 choices = var.choices,
                 selected = get_default(defaults, "color.var", ""), selectize = FALSE
-            ), "Gene or metadata summarized within each hexagonal bin. Leave blank to show density.",
+            ), documentParameters$color.var,
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("reduction.use"), "Reduction",
                 choices = red.choices,
                 selected = default.red, selectize = FALSE
-            ), "Dimensionality reduction embedding to plot.",
+            ), documentParameters$reduction.use,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("dim.1"), "X Dimension",
                 value = get_default(defaults, "dim.1", 1), min = 1, step = 1),
-                "Which dimension of the reduction to plot on the x-axis.",
+                documentParameters$dim.1,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("dim.2"), "Y Dimension",
                 value = get_default(defaults, "dim.2", 2), min = 1, step = 1),
-                "Which dimension of the reduction to plot on the y-axis.",
+                documentParameters$dim.2,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("bins"), "Hex Bins",
                 value = get_default(defaults, "bins", 30), min = 2, step = 1),
-                "Number of hexagonal bins across the plotting area.",
+                documentParameters$bins,
                 placement = "top", options = list(container = "body")),
             tipify(textInput(ns("color.method"), "Color Method",
                 value = get_default(defaults, "color.method", "")),
-                paste("Summary method for the color variable. For continuous data:",
-                    "'median' (default), 'mean', 'max', 'min', or 'sd'.",
-                    "For discrete data: 'max' (default), 'max.prop', or a specific level."),
+                documentParameters$color.method,
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("split.by"), "Split By (facet)",
                 choices = disc.choices,
                 selected = get_default(defaults, "split.by", ""), selectize = FALSE
-            ), "Discrete metadata to split the plot into facets.",
+            ), documentParameters$split.by,
                 placement = "top", options = list(container = "body"))
         ),
         "Aesthetics" = tagList(
             tipify(colourInput(ns("min.color"), "Min Color",
                 value = get_default(defaults, "min.color", "#F0E442")),
-                "Low end of the color scale.",
+                documentParameters$min.color,
                 placement = "top", options = list(container = "body")),
             tipify(colourInput(ns("max.color"), "Max Color",
                 value = get_default(defaults, "max.color", "#0072B2")),
-                "High end of the color scale.",
+                documentParameters$max.color,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("min.opacity"), "Min Opacity",
                 value = get_default(defaults, "min.opacity", 0.2), min = 0, max = 1, step = 0.05),
-                "Opacity of the least-dense hexagons.",
+                documentParameters$min.opacity,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("max.opacity"), "Max Opacity",
                 value = get_default(defaults, "max.opacity", 1), min = 0, max = 1, step = 0.05),
-                "Opacity of the most-dense hexagons.",
+                documentParameters$max.opacity,
                 placement = "top", options = list(container = "body")),
             tipify(materialSwitch(ns("do.contour"), "Density Contours",
                 value = get_default(defaults, "do.contour", FALSE), status = "success"),
-                "Overlay kernel-density contour lines over the hexagons.",
+                documentParameters$do.contour,
                 placement = "top", options = list(container = "body")),
             tipify(materialSwitch(ns("do.label"), "Label Groups",
                 value = get_default(defaults, "do.label", FALSE), status = "success"),
-                "Overlay text labels at the center of each group (discrete color variable only).",
+                documentParameters$do.label,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("labels.size"), "Label Size",
                 value = get_default(defaults, "labels.size", 5), min = 1, step = 0.5),
-                "Text size of the group labels (used when 'Label Groups' is on).",
+                documentParameters$labels.size,
                 placement = "top", options = list(container = "body")),
             tipify(materialSwitch(ns("do.ellipse"), "Group Ellipses",
                 value = get_default(defaults, "do.ellipse", FALSE), status = "success"),
-                "Draw a covariance ellipse around each group (discrete color variable only).",
+                documentParameters$do.ellipse,
                 placement = "top", options = list(container = "body"))
         ),
         "Plotly" = uniform_plotly_inputs_ui(ns, defaults),
