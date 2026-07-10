@@ -71,5 +71,5 @@ dittoDimHexInputsUI("dittoDimHex", example_sce)
 \code{\link[=dittoDimHexApp]{dittoDimHexApp()}}
 }
 \author{
-Jared Andrews
+Jacob Martin
 }

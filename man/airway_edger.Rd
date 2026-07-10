@@ -33,6 +33,6 @@ head(airway_edger)
 
 }
 \author{
-Jared Andrews
+Jacob Martin, Jared Andrews
 }
 \keyword{datasets}

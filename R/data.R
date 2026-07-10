@@ -22,7 +22,7 @@
 #' library(VizModules)
 #' head(airway_deseq2)
 #'
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 #' @keywords datasets
 "airway_deseq2"
 
@@ -49,7 +49,7 @@
 #' library(VizModules)
 #' head(airway_edger)
 #'
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 #' @keywords datasets
 "airway_edger"
 
@@ -77,7 +77,7 @@
 #' library(VizModules)
 #' head(airway_voom)
 #'
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 #' @keywords datasets
 "airway_voom"
 
@@ -105,7 +105,7 @@
 #' library(sciVizModules)
 #' head(survival_lung)
 #'
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 #' @keywords datasets
 "survival_lung"
 
@@ -135,6 +135,6 @@
 #' data(example_sce)
 #' example_sce
 #'
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 #' @keywords datasets
 "example_sce"

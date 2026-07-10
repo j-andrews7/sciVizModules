@@ -22,7 +22,7 @@
 #' [sciVizModules::dittoBarPlotOutputUI()], [sciVizModules::dittoBarPlotApp()]
 #'
 #' @export
-#' @author Jared Andrews
+#' @author Jacob Martin
 dittoBarPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL) {
     stopifnot(is.reactive(data))
     data_reactive <- data

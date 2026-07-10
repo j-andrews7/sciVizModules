@@ -17,6 +17,6 @@ or \code{Seurat} object, otherwise \code{FALSE}.
 Check whether an object is a dittoSeq-compatible object
 }
 \author{
-Jared Andrews
+Jacob Martin, Jared Andrews
 }
 \keyword{internal}

@@ -24,6 +24,6 @@ plotly figure produced from a \code{dittoSeq} \code{ggplot} respects the module'
 controls. Mirrors the styling stack used by \code{\link[=survivalCurveServer]{survivalCurveServer()}}.
 }
 \author{
-Jared Andrews
+Jacob Martin, Jared Andrews
 }
 \keyword{internal}

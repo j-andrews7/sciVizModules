@@ -38,5 +38,5 @@ figure.
 \code{\link[=dittoRidgeJitterOutputUI]{dittoRidgeJitterOutputUI()}}, \code{\link[=dittoRidgeJitterApp]{dittoRidgeJitterApp()}}
 }
 \author{
-Jared Andrews
+Jacob Martin, Jared Andrews
 }

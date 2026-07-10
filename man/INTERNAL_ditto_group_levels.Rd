@@ -18,6 +18,6 @@ A character vector of levels, or \code{character(0)}.
 Discrete levels of a metadata column, for palette groups
 }
 \author{
-Jared Andrews
+Jacob Martin, Jared Andrews
 }
 \keyword{internal}

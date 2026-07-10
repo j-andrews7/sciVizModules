@@ -36,6 +36,6 @@ example_sce
 
 }
 \author{
-Jared Andrews
+Jacob Martin, Jared Andrews
 }
 \keyword{datasets}

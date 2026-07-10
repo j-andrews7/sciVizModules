@@ -5,7 +5,7 @@
 #'   or `Seurat` object, otherwise `FALSE`.
 #'
 #' @importFrom methods is
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 #' @rdname INTERNAL_is_ditto_object
 #' @keywords internal
 .is_ditto_object <- function(object) {
@@ -20,7 +20,7 @@
 #' @param arg The argument name to report in the error message.
 #' @return Invisibly `TRUE` when valid; otherwise throws an error.
 #'
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 #' @rdname INTERNAL_assert_ditto_object
 #' @keywords internal
 .assert_ditto_object <- function(object, arg = "object") {
@@ -36,29 +36,13 @@
     invisible(TRUE)
 }
 
-#' Fetch a default value for a dittoSeq module input
-#'
-#' @param defaults A named list of defaults (may be `NULL`).
-#' @param key The default name to look up.
-#' @param fallback The value to return when `key` is absent.
-#' @return The stored default or `fallback`.
-#'
-#' @author Jared Andrews
-#' @rdname INTERNAL_ditto_default
-#' @keywords internal
-.ditto_default <- function(defaults, key, fallback = NULL) {
-    if (!is.null(defaults) && key %in% names(defaults)) {
-        return(defaults[[key]])
-    }
-    fallback
-}
 
 #' Safely list gene names in a dittoSeq object
 #'
 #' @param object A dittoSeq-compatible object.
 #' @return A character vector of gene names, or `character(0)`.
 #'
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 #' @rdname INTERNAL_ditto_genes
 #' @keywords internal
 .ditto_genes <- function(object) {
@@ -76,7 +60,7 @@
 #' @param object A dittoSeq-compatible object.
 #' @return A character vector of metadata names, or `character(0)`.
 #'
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 #' @rdname INTERNAL_ditto_metas
 #' @keywords internal
 .ditto_metas <- function(object) {
@@ -94,7 +78,7 @@
 #' @param object A dittoSeq-compatible object.
 #' @return A character vector of reduction names, or `character(0)`.
 #'
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 #' @rdname INTERNAL_ditto_reductions
 #' @keywords internal
 .ditto_reductions <- function(object) {
@@ -113,7 +97,7 @@
 #' @param meta The name of a metadata column.
 #' @return The metadata values, or `NULL` when unavailable.
 #'
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 #' @rdname INTERNAL_ditto_meta_values
 #' @keywords internal
 .ditto_meta_values <- function(object, meta) {
@@ -136,7 +120,7 @@
 #'   treated as discrete.
 #' @return A character vector of discrete metadata names.
 #'
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 #' @rdname INTERNAL_ditto_discrete_metas
 #' @keywords internal
 .ditto_discrete_metas <- function(object, max.levels = 30) {
@@ -162,7 +146,7 @@
 #'   treated as continuous.
 #' @return A character vector of continuous metadata names.
 #'
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 #' @rdname INTERNAL_ditto_continuous_metas
 #' @keywords internal
 .ditto_continuous_metas <- function(object, max.levels = 30) {
@@ -186,7 +170,7 @@
 #' @param include.blank Whether to prepend an empty choice.
 #' @return A named character vector suitable for `selectInput()` choices.
 #'
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 #' @rdname INTERNAL_ditto_var_choices
 #' @keywords internal
 .ditto_var_choices <- function(object, include.blank = TRUE) {
@@ -207,7 +191,7 @@
 #' @param include.blank Whether to prepend an empty choice.
 #' @return A named character vector suitable for `selectInput()` choices.
 #'
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 #' @rdname INTERNAL_ditto_continuous_choices
 #' @keywords internal
 .ditto_continuous_choices <- function(object, include.blank = TRUE) {
@@ -228,7 +212,7 @@
 #' @return The name of the best-guess reduction (priority UMAP > t-SNE > PCA),
 #'   or `NULL` when none exist.
 #'
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 #' @rdname INTERNAL_ditto_default_reduction
 #' @keywords internal
 .ditto_default_reduction <- function(object) {
@@ -251,7 +235,7 @@
 #' @param meta The name of a metadata column.
 #' @return A character vector of levels, or `character(0)`.
 #'
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 #' @rdname INTERNAL_ditto_group_levels
 #' @keywords internal
 .ditto_group_levels <- function(object, meta) {
@@ -283,7 +267,7 @@
 #' @return The styled `plotly` figure.
 #'
 #' @import plotly
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 #' @rdname INTERNAL_ditto_finalize_plotly
 #' @keywords internal
 .ditto_finalize_plotly <- function(fig, input, isolate_fn) {
@@ -348,7 +332,7 @@
 #' @return Invisibly `NULL`.
 #'
 #' @import shiny
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 #' @rdname INTERNAL_ditto_reset_uniform
 #' @keywords internal
 .ditto_reset_uniform <- function(session, defaults = NULL) {

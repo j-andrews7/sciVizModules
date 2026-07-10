@@ -34,6 +34,6 @@ head(survival_lung)
 
 }
 \author{
-Jared Andrews
+Jacob Martin, Jared Andrews
 }
 \keyword{datasets}

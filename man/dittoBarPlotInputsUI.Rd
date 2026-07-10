@@ -67,5 +67,5 @@ dittoBarPlotInputsUI("dittoBarPlot", example_sce)
 \code{\link[=dittoBarPlotApp]{dittoBarPlotApp()}}
 }
 \author{
-Jared Andrews
+Jacob Martin
 }

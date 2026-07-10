@@ -46,7 +46,7 @@
 #' @importFrom colourpicker colourInput
 #'
 #' @export
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 #' @seealso [dittoSeq::dittoScatterPlot()], [VizModules::organize_inputs()],
 #' [sciVizModules::dittoScatterPlotOutputUI()], [sciVizModules::dittoScatterPlotServer()],
 #' [sciVizModules::dittoScatterPlotApp()]
@@ -67,8 +67,8 @@ dittoScatterPlotInputsUI <- function(id, data, defaults = NULL, title = "Scatter
         .ditto_discrete_metas(data), .ditto_discrete_metas(data)
     ))
 
-    default.x <- .ditto_default(defaults, "x.var", if (length(cont.flat) >= 1) cont.flat[1] else "")
-    default.y <- .ditto_default(defaults, "y.var", if (length(cont.flat) >= 2) cont.flat[2] else default.x)
+    default.x <- get_default(defaults, "x.var", if (length(cont.flat) >= 1) cont.flat[1] else "")
+    default.y <- get_default(defaults, "y.var", if (length(cont.flat) >= 2) cont.flat[2] else default.x)
 
     inputs <- list(
         "Data" = tagList(
@@ -84,57 +84,57 @@ dittoScatterPlotInputsUI <- function(id, data, defaults = NULL, title = "Scatter
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("color.var"), "Color By",
                 choices = var.choices,
-                selected = .ditto_default(defaults, "color.var", ""), selectize = FALSE
+                selected = get_default(defaults, "color.var", ""), selectize = FALSE
             ), "Gene or metadata used to color the points.",
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("shape.by"), "Shape By",
                 choices = disc.choices,
-                selected = .ditto_default(defaults, "shape.by", ""), selectize = FALSE
+                selected = get_default(defaults, "shape.by", ""), selectize = FALSE
             ), "Discrete metadata mapped to point shape.",
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("split.by"), "Split By (facet)",
                 choices = disc.choices,
-                selected = .ditto_default(defaults, "split.by", ""), selectize = FALSE
+                selected = get_default(defaults, "split.by", ""), selectize = FALSE
             ), "Discrete metadata to split the plot into facets.",
                 placement = "top", options = list(container = "body"))
         ),
         "Aesthetics" = tagList(
             uiOutput(ns("palette.selection")),
             tipify(colourInput(ns("min.color"), "Min Color",
-                value = .ditto_default(defaults, "min.color", "#F0E442")),
+                value = get_default(defaults, "min.color", "#F0E442")),
                 "Low end of the color scale for continuous coloring.",
                 placement = "top", options = list(container = "body")),
             tipify(colourInput(ns("max.color"), "Max Color",
-                value = .ditto_default(defaults, "max.color", "#0072B2")),
+                value = get_default(defaults, "max.color", "#0072B2")),
                 "High end of the color scale for continuous coloring.",
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("order"), "Point Order",
                 choices = c("unordered", "increasing", "decreasing", "randomize"),
-                selected = .ditto_default(defaults, "order", "unordered"), selectize = FALSE
+                selected = get_default(defaults, "order", "unordered"), selectize = FALSE
             ), "Order in which points are drawn.",
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("size"), "Point Size",
-                value = .ditto_default(defaults, "size", 1), min = 0.1, step = 0.1),
+                value = get_default(defaults, "size", 1), min = 0.1, step = 0.1),
                 "Size of the plotted points.",
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("opacity"), "Point Opacity",
-                value = .ditto_default(defaults, "opacity", 1), min = 0, max = 1, step = 0.05),
+                value = get_default(defaults, "opacity", 1), min = 0, max = 1, step = 0.05),
                 "Opacity of the plotted points.",
                 placement = "top", options = list(container = "body")),
             tipify(materialSwitch(ns("do.label"), "Label Groups",
-                value = .ditto_default(defaults, "do.label", FALSE), status = "success"),
+                value = get_default(defaults, "do.label", FALSE), status = "success"),
                 "Overlay text labels at the center of each discrete color group.",
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("labels.size"), "Label Size",
-                value = .ditto_default(defaults, "labels.size", 5), min = 1, step = 0.5),
+                value = get_default(defaults, "labels.size", 5), min = 1, step = 0.5),
                 "Text size of the group labels (used when 'Label Groups' is on).",
                 placement = "top", options = list(container = "body")),
             tipify(materialSwitch(ns("do.ellipse"), "Group Ellipses",
-                value = .ditto_default(defaults, "do.ellipse", FALSE), status = "success"),
+                value = get_default(defaults, "do.ellipse", FALSE), status = "success"),
                 "Draw a covariance ellipse around each discrete color group.",
                 placement = "top", options = list(container = "body")),
             tipify(materialSwitch(ns("do.contour"), "Density Contours",
-                value = .ditto_default(defaults, "do.contour", FALSE), status = "success"),
+                value = get_default(defaults, "do.contour", FALSE), status = "success"),
                 "Overlay kernel-density contour lines over the points.",
                 placement = "top", options = list(container = "body"))
         ),
@@ -175,7 +175,7 @@ dittoScatterPlotInputsUI <- function(id, data, defaults = NULL, title = "Scatter
 #' @importFrom shinyjqui jqui_resizable
 #'
 #' @export
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 dittoScatterPlotOutputUI <- function(id, resizable = TRUE) {
     ns <- NS(id)
     plot_output <- plotlyOutput(ns("dittoScatterPlot"))

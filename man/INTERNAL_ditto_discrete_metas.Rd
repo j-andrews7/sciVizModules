@@ -20,6 +20,6 @@ Metadata are treated as discrete when they are factors, characters, logicals,
 or numeric columns with a small number of unique values (<= \code{max.levels}).
 }
 \author{
-Jared Andrews
+Jacob Martin, Jared Andrews
 }
 \keyword{internal}

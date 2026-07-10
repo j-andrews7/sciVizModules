@@ -17,7 +17,7 @@
 #' [sciVizModules::dittoPlotServer()], [sciVizModules::example_sce]
 #'
 #' @export
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 #' @examples
 #' library(sciVizModules)
 #' # Launch with default example data:

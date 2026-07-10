@@ -37,5 +37,5 @@ renders it as an interactive \code{plotly} figure.
 \code{\link[=dittoScatterPlotOutputUI]{dittoScatterPlotOutputUI()}}, \code{\link[=dittoScatterPlotApp]{dittoScatterPlotApp()}}
 }
 \author{
-Jared Andrews
+Jacob Martin, Jared Andrews
 }

@@ -17,6 +17,6 @@ or \code{NULL} when none exist.
 Choose a sensible default dimensionality reduction
 }
 \author{
-Jared Andrews
+Jacob Martin, Jared Andrews
 }
 \keyword{internal}

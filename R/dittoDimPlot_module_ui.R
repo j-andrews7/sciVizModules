@@ -49,7 +49,7 @@
 #' @importFrom colourpicker colourInput
 #'
 #' @export
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 #' @seealso [dittoSeq::dittoDimPlot()], [VizModules::organize_inputs()],
 #' [sciVizModules::dittoDimPlotOutputUI()], [sciVizModules::dittoDimPlotServer()],
 #' [sciVizModules::dittoDimPlotApp()]
@@ -69,11 +69,11 @@ dittoDimPlotInputsUI <- function(id, data, defaults = NULL, title = "DimPlot Set
     ))
     red.choices <- .ditto_reductions(data)
 
-    default.var <- .ditto_default(defaults, "var", {
+    default.var <- get_default(defaults, "var", {
         metas <- .ditto_metas(data)
         if (length(metas)) metas[1] else if (length(.ditto_genes(data))) .ditto_genes(data)[1] else ""
     })
-    default.red <- .ditto_default(defaults, "reduction.use", .ditto_default_reduction(data))
+    default.red <- get_default(defaults, "reduction.use", get_default_reduction(data))
 
     inputs <- list(
         "Data" = tagList(
@@ -88,61 +88,61 @@ dittoDimPlotInputsUI <- function(id, data, defaults = NULL, title = "DimPlot Set
             ), "Dimensionality reduction embedding to plot.",
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("dim.1"), "X Dimension",
-                value = .ditto_default(defaults, "dim.1", 1), min = 1, step = 1),
+                value = get_default(defaults, "dim.1", 1), min = 1, step = 1),
                 "Which dimension of the reduction to plot on the x-axis.",
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("dim.2"), "Y Dimension",
-                value = .ditto_default(defaults, "dim.2", 2), min = 1, step = 1),
+                value = get_default(defaults, "dim.2", 2), min = 1, step = 1),
                 "Which dimension of the reduction to plot on the y-axis.",
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("shape.by"), "Shape By",
                 choices = disc.choices,
-                selected = .ditto_default(defaults, "shape.by", ""), selectize = FALSE
+                selected = get_default(defaults, "shape.by", ""), selectize = FALSE
             ), "Discrete metadata mapped to point shape.",
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("split.by"), "Split By (facet)",
                 choices = disc.choices,
-                selected = .ditto_default(defaults, "split.by", ""), selectize = FALSE
+                selected = get_default(defaults, "split.by", ""), selectize = FALSE
             ), "Discrete metadata to split the plot into facets.",
                 placement = "top", options = list(container = "body"))
         ),
         "Aesthetics" = tagList(
             uiOutput(ns("palette.selection")),
             tipify(colourInput(ns("min.color"), "Min Color",
-                value = .ditto_default(defaults, "min.color", "#F0E442")),
+                value = get_default(defaults, "min.color", "#F0E442")),
                 "Low end of the color scale for continuous coloring.",
                 placement = "top", options = list(container = "body")),
             tipify(colourInput(ns("max.color"), "Max Color",
-                value = .ditto_default(defaults, "max.color", "#0072B2")),
+                value = get_default(defaults, "max.color", "#0072B2")),
                 "High end of the color scale for continuous coloring.",
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("order"), "Point Order",
                 choices = c("unordered", "increasing", "decreasing", "randomize"),
-                selected = .ditto_default(defaults, "order", "unordered"), selectize = FALSE
+                selected = get_default(defaults, "order", "unordered"), selectize = FALSE
             ), "Order in which points are drawn.",
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("size"), "Point Size",
-                value = .ditto_default(defaults, "size", 1), min = 0.1, step = 0.1),
+                value = get_default(defaults, "size", 1), min = 0.1, step = 0.1),
                 "Size of the plotted points.",
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("opacity"), "Point Opacity",
-                value = .ditto_default(defaults, "opacity", 1), min = 0, max = 1, step = 0.05),
+                value = get_default(defaults, "opacity", 1), min = 0, max = 1, step = 0.05),
                 "Opacity of the plotted points.",
                 placement = "top", options = list(container = "body")),
             tipify(materialSwitch(ns("do.label"), "Label Groups",
-                value = .ditto_default(defaults, "do.label", FALSE), status = "success"),
+                value = get_default(defaults, "do.label", FALSE), status = "success"),
                 "Overlay text labels at the center of each discrete group.",
                 placement = "top", options = list(container = "body")),
             tipify(materialSwitch(ns("do.ellipse"), "Group Ellipses",
-                value = .ditto_default(defaults, "do.ellipse", FALSE), status = "success"),
+                value = get_default(defaults, "do.ellipse", FALSE), status = "success"),
                 "Draw a covariance ellipse around each discrete group.",
                 placement = "top", options = list(container = "body")),
             tipify(materialSwitch(ns("do.contour"), "Density Contours",
-                value = .ditto_default(defaults, "do.contour", FALSE), status = "success"),
+                value = get_default(defaults, "do.contour", FALSE), status = "success"),
                 "Overlay kernel-density contour lines over the points.",
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("labels.size"), "Label Size",
-                value = .ditto_default(defaults, "labels.size", 5), min = 1, step = 0.5),
+                value = get_default(defaults, "labels.size", 5), min = 1, step = 0.5),
                 "Text size of the group labels (used when 'Label Groups' is on).",
                 placement = "top", options = list(container = "body"))
         ),
@@ -183,7 +183,7 @@ dittoDimPlotInputsUI <- function(id, data, defaults = NULL, title = "DimPlot Set
 #' @importFrom shinyjqui jqui_resizable
 #'
 #' @export
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 dittoDimPlotOutputUI <- function(id, resizable = TRUE) {
     ns <- NS(id)
     plot_output <- plotlyOutput(ns("dittoDimPlot"))

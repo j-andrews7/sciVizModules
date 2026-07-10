@@ -19,6 +19,6 @@ A character vector of continuous metadata names.
 Identify continuous metadata columns in a dittoSeq object
 }
 \author{
-Jared Andrews
+Jacob Martin, Jared Andrews
 }
 \keyword{internal}

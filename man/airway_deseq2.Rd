@@ -34,6 +34,6 @@ head(airway_deseq2)
 
 }
 \author{
-Jared Andrews
+Jacob Martin, Jared Andrews
 }
 \keyword{datasets}

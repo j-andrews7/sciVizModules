@@ -17,7 +17,7 @@
 #' [sciVizModules::dittoDimHexServer()], [sciVizModules::example_sce]
 #'
 #' @export
-#' @author Jared Andrews
+#' @author Jacob Martin
 #' @examples
 #' library(sciVizModules)
 #' # Launch with default example data:

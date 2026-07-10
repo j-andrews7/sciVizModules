@@ -37,5 +37,5 @@ This module builds a per-group continuous-data plot with
 \code{\link[=dittoPlotOutputUI]{dittoPlotOutputUI()}}, \code{\link[=dittoPlotApp]{dittoPlotApp()}}
 }
 \author{
-Jared Andrews
+Jacob Martin, Jared Andrews
 }

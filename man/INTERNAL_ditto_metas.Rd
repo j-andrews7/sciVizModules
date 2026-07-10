@@ -16,6 +16,6 @@ A character vector of metadata names, or \code{character(0)}.
 Safely list metadata column names in a dittoSeq object
 }
 \author{
-Jared Andrews
+Jacob Martin, Jared Andrews
 }
 \keyword{internal}

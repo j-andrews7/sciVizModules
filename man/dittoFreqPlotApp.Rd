@@ -35,5 +35,5 @@ if (interactive()) shiny::runApp(app)
 \code{\link[=dittoFreqPlotServer]{dittoFreqPlotServer()}}, \link{example_sce}
 }
 \author{
-Jared Andrews
+Jacob Martin, Jared Andrews
 }

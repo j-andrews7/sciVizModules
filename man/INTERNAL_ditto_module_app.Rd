@@ -28,6 +28,6 @@ interactive data-table used by \code{\link[VizModules:createModuleApp]{VizModule
 instead offers an object selector and a read-only metadata (\code{colData}) preview.
 }
 \author{
-Jared Andrews
+Jacob Martin
 }
 \keyword{internal}

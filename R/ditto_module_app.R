@@ -18,7 +18,7 @@
 #' @importFrom DT renderDT DTOutput
 #' @importFrom SummarizedExperiment colData
 #'
-#' @author Jared Andrews
+#' @author Jacob Martin
 #' @rdname INTERNAL_ditto_module_app
 #' @keywords internal
 .ditto_module_app <- function(inputs_ui_fn, output_ui_fn, server_fn, object_list, title) {

@@ -39,5 +39,5 @@ This module builds a dimensionality-reduction plot with
 \code{\link[=dittoDimPlotOutputUI]{dittoDimPlotOutputUI()}}, \code{\link[=dittoDimPlotApp]{dittoDimPlotApp()}}
 }
 \author{
-Jared Andrews
+Jacob Martin, Jared Andrews
 }

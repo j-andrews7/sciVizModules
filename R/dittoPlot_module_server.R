@@ -21,7 +21,7 @@
 #' [sciVizModules::dittoPlotOutputUI()], [sciVizModules::dittoPlotApp()]
 #'
 #' @export
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 dittoPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL) {
     stopifnot(is.reactive(data))
     data_reactive <- data
@@ -74,20 +74,20 @@ dittoPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defa
             req(obj)
             disc <- .ditto_discrete_metas(obj)
             updateSelectInput(session, "group.by",
-                selected = .ditto_default(defaults, "group.by", if (length(disc)) disc[1] else ""))
-            updateSelectInput(session, "color.by", selected = .ditto_default(defaults, "color.by", ""))
+                selected = get_default(defaults, "group.by", if (length(disc)) disc[1] else ""))
+            updateSelectInput(session, "color.by", selected = get_default(defaults, "color.by", ""))
             updateCheckboxGroupInput(session, "plots",
-                selected = .ditto_default(defaults, "plots", c("jitter", "vlnplot")))
-            updateSelectInput(session, "split.by", selected = .ditto_default(defaults, "split.by", ""))
-            updateNumericInput(session, "jitter.size", value = .ditto_default(defaults, "jitter.size", 1))
-            updateNumericInput(session, "jitter.width", value = .ditto_default(defaults, "jitter.width", 0.2))
-            updateNumericInput(session, "vlnplot.lineweight", value = .ditto_default(defaults, "vlnplot.lineweight", 1))
-            updateNumericInput(session, "boxplot.width", value = .ditto_default(defaults, "boxplot.width", 0.2))
-            updateNumericInput(session, "boxplot.lineweight", value = .ditto_default(defaults, "boxplot.lineweight", 1))
-            updateNumericInput(session, "vlnplot.width", value = .ditto_default(defaults, "vlnplot.width", 1))
-            updateSelectInput(session, "vlnplot.scaling", selected = .ditto_default(defaults, "vlnplot.scaling", "area"))
-            updateNumericInput(session, "ridgeplot.scale", value = .ditto_default(defaults, "ridgeplot.scale", 1.25))
-            updateNumericInput(session, "ridgeplot.lineweight", value = .ditto_default(defaults, "ridgeplot.lineweight", 1))
+                selected = get_default(defaults, "plots", c("jitter", "vlnplot")))
+            updateSelectInput(session, "split.by", selected = get_default(defaults, "split.by", ""))
+            updateNumericInput(session, "jitter.size", value = get_default(defaults, "jitter.size", 1))
+            updateNumericInput(session, "jitter.width", value = get_default(defaults, "jitter.width", 0.2))
+            updateNumericInput(session, "vlnplot.lineweight", value = get_default(defaults, "vlnplot.lineweight", 1))
+            updateNumericInput(session, "boxplot.width", value = get_default(defaults, "boxplot.width", 0.2))
+            updateNumericInput(session, "boxplot.lineweight", value = get_default(defaults, "boxplot.lineweight", 1))
+            updateNumericInput(session, "vlnplot.width", value = get_default(defaults, "vlnplot.width", 1))
+            updateSelectInput(session, "vlnplot.scaling", selected = get_default(defaults, "vlnplot.scaling", "area"))
+            updateNumericInput(session, "ridgeplot.scale", value = get_default(defaults, "ridgeplot.scale", 1.25))
+            updateNumericInput(session, "ridgeplot.lineweight", value = get_default(defaults, "ridgeplot.lineweight", 1))
             .ditto_reset_uniform(session, defaults)
         })
 

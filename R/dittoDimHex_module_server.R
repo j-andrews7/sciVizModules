@@ -22,7 +22,7 @@
 #' [sciVizModules::dittoDimHexOutputUI()], [sciVizModules::dittoDimHexApp()]
 #'
 #' @export
-#' @author Jared Andrews
+#' @author Jacob Martin
 dittoDimHexServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL) {
     stopifnot(is.reactive(data))
     data_reactive <- data
@@ -40,20 +40,20 @@ dittoDimHexServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, de
         observeEvent(input$reset, {
             obj <- data_reactive()
             req(obj)
-            updateSelectInput(session, "color.var", selected = .ditto_default(defaults, "color.var", ""))
+            updateSelectInput(session, "color.var", selected = get_default(defaults, "color.var", ""))
             updateSelectInput(session, "reduction.use",
-                selected = .ditto_default(defaults, "reduction.use", .ditto_default_reduction(obj)))
-            updateNumericInput(session, "dim.1", value = .ditto_default(defaults, "dim.1", 1))
-            updateNumericInput(session, "dim.2", value = .ditto_default(defaults, "dim.2", 2))
-            updateNumericInput(session, "bins", value = .ditto_default(defaults, "bins", 30))
-            updateTextInput(session, "color.method", value = .ditto_default(defaults, "color.method", ""))
-            updateSelectInput(session, "split.by", selected = .ditto_default(defaults, "split.by", ""))
-            updateNumericInput(session, "min.opacity", value = .ditto_default(defaults, "min.opacity", 0.2))
-            updateNumericInput(session, "max.opacity", value = .ditto_default(defaults, "max.opacity", 1))
-            updateMaterialSwitch(session, "do.contour", value = .ditto_default(defaults, "do.contour", FALSE))
-            updateMaterialSwitch(session, "do.label", value = .ditto_default(defaults, "do.label", FALSE))
-            updateNumericInput(session, "labels.size", value = .ditto_default(defaults, "labels.size", 5))
-            updateMaterialSwitch(session, "do.ellipse", value = .ditto_default(defaults, "do.ellipse", FALSE))
+                selected = get_default(defaults, "reduction.use", get_default_reduction(obj)))
+            updateNumericInput(session, "dim.1", value = get_default(defaults, "dim.1", 1))
+            updateNumericInput(session, "dim.2", value = get_default(defaults, "dim.2", 2))
+            updateNumericInput(session, "bins", value = get_default(defaults, "bins", 30))
+            updateTextInput(session, "color.method", value = get_default(defaults, "color.method", ""))
+            updateSelectInput(session, "split.by", selected = get_default(defaults, "split.by", ""))
+            updateNumericInput(session, "min.opacity", value = get_default(defaults, "min.opacity", 0.2))
+            updateNumericInput(session, "max.opacity", value = get_default(defaults, "max.opacity", 1))
+            updateMaterialSwitch(session, "do.contour", value = get_default(defaults, "do.contour", FALSE))
+            updateMaterialSwitch(session, "do.label", value = get_default(defaults, "do.label", FALSE))
+            updateNumericInput(session, "labels.size", value = get_default(defaults, "labels.size", 5))
+            updateMaterialSwitch(session, "do.ellipse", value = get_default(defaults, "do.ellipse", FALSE))
             .ditto_reset_uniform(session, defaults)
         })
 

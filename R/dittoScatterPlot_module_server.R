@@ -22,7 +22,7 @@
 #' [sciVizModules::dittoScatterPlotOutputUI()], [sciVizModules::dittoScatterPlotApp()]
 #'
 #' @export
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 dittoScatterPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL) {
     stopifnot(is.reactive(data))
     data_reactive <- data
@@ -71,16 +71,16 @@ dittoScatterPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
         observeEvent(input$reset, {
             obj <- data_reactive()
             req(obj)
-            updateSelectInput(session, "color.var", selected = .ditto_default(defaults, "color.var", ""))
-            updateSelectInput(session, "shape.by", selected = .ditto_default(defaults, "shape.by", ""))
-            updateSelectInput(session, "split.by", selected = .ditto_default(defaults, "split.by", ""))
-            updateSelectInput(session, "order", selected = .ditto_default(defaults, "order", "unordered"))
-            updateNumericInput(session, "size", value = .ditto_default(defaults, "size", 1))
-            updateNumericInput(session, "opacity", value = .ditto_default(defaults, "opacity", 1))
-            updateMaterialSwitch(session, "do.label", value = .ditto_default(defaults, "do.label", FALSE))
-            updateNumericInput(session, "labels.size", value = .ditto_default(defaults, "labels.size", 5))
-            updateMaterialSwitch(session, "do.ellipse", value = .ditto_default(defaults, "do.ellipse", FALSE))
-            updateMaterialSwitch(session, "do.contour", value = .ditto_default(defaults, "do.contour", FALSE))
+            updateSelectInput(session, "color.var", selected = get_default(defaults, "color.var", ""))
+            updateSelectInput(session, "shape.by", selected = get_default(defaults, "shape.by", ""))
+            updateSelectInput(session, "split.by", selected = get_default(defaults, "split.by", ""))
+            updateSelectInput(session, "order", selected = get_default(defaults, "order", "unordered"))
+            updateNumericInput(session, "size", value = get_default(defaults, "size", 1))
+            updateNumericInput(session, "opacity", value = get_default(defaults, "opacity", 1))
+            updateMaterialSwitch(session, "do.label", value = get_default(defaults, "do.label", FALSE))
+            updateNumericInput(session, "labels.size", value = get_default(defaults, "labels.size", 5))
+            updateMaterialSwitch(session, "do.ellipse", value = get_default(defaults, "do.ellipse", FALSE))
+            updateMaterialSwitch(session, "do.contour", value = get_default(defaults, "do.contour", FALSE))
             .ditto_reset_uniform(session, defaults)
         })
 

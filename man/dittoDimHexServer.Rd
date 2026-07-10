@@ -37,5 +37,5 @@ This module builds a hexagonal-bin dimensionality-reduction plot with
 \code{\link[=dittoDimHexOutputUI]{dittoDimHexOutputUI()}}, \code{\link[=dittoDimHexApp]{dittoDimHexApp()}}
 }
 \author{
-Jared Andrews
+Jacob Martin
 }

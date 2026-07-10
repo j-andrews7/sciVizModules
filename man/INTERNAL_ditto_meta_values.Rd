@@ -18,6 +18,6 @@ The metadata values, or \code{NULL} when unavailable.
 Fetch the values of a single metadata column
 }
 \author{
-Jared Andrews
+Jacob Martin, Jared Andrews
 }
 \keyword{internal}

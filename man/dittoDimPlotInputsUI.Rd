@@ -77,5 +77,5 @@ dittoDimPlotInputsUI("dittoDimPlot", example_sce)
 \code{\link[=dittoDimPlotApp]{dittoDimPlotApp()}}
 }
 \author{
-Jared Andrews
+Jacob Martin, Jared Andrews
 }

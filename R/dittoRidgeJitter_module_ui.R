@@ -41,7 +41,7 @@
 #' @importFrom colourpicker colourInput
 #'
 #' @export
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 #' @seealso [dittoSeq::dittoRidgeJitter()], [VizModules::organize_inputs()],
 #' [sciVizModules::dittoRidgeJitterOutputUI()], [sciVizModules::dittoRidgeJitterServer()],
 #' [sciVizModules::dittoRidgeJitterApp()]
@@ -61,8 +61,8 @@ dittoRidgeJitterInputsUI <- function(id, data, defaults = NULL, title = "RidgeJi
     group.choices <- stats::setNames(disc, disc)
     color.choices <- c("Same as Group" = "", stats::setNames(disc, disc))
 
-    default.var <- .ditto_default(defaults, "var", if (length(cont.flat)) cont.flat[1] else "")
-    default.group <- .ditto_default(defaults, "group.by", if (length(disc)) disc[1] else "")
+    default.var <- get_default(defaults, "var", if (length(cont.flat)) cont.flat[1] else "")
+    default.group <- get_default(defaults, "group.by", if (length(disc)) disc[1] else "")
 
     inputs <- list(
         "Data" = tagList(
@@ -78,44 +78,44 @@ dittoRidgeJitterInputsUI <- function(id, data, defaults = NULL, title = "RidgeJi
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("color.by"), "Color By",
                 choices = color.choices,
-                selected = .ditto_default(defaults, "color.by", ""), selectize = FALSE
+                selected = get_default(defaults, "color.by", ""), selectize = FALSE
             ), "Discrete metadata used for fill colors. Defaults to the grouping.",
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("split.by"), "Split By (facet)",
                 choices = color.choices,
-                selected = .ditto_default(defaults, "split.by", ""), selectize = FALSE
+                selected = get_default(defaults, "split.by", ""), selectize = FALSE
             ), "Discrete metadata to split the plot into facets.",
                 placement = "top", options = list(container = "body"))
         ),
         "Aesthetics" = tagList(
             uiOutput(ns("palette.selection")),
             tipify(numericInput(ns("ridgeplot.scale"), "Ridge Scale (overlap)",
-                value = .ditto_default(defaults, "ridgeplot.scale", 1.25), min = 0.1, step = 0.05),
+                value = get_default(defaults, "ridgeplot.scale", 1.25), min = 0.1, step = 0.05),
                 "Vertical scaling of the ridges; larger values increase overlap.",
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("ridgeplot.lineweight"), "Ridge Line Weight",
-                value = .ditto_default(defaults, "ridgeplot.lineweight", 1), min = 0, step = 0.1),
+                value = get_default(defaults, "ridgeplot.lineweight", 1), min = 0, step = 0.1),
                 "Line weight of the ridge outlines.",
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("ridgeplot.shape"), "Ridge Shape",
                 choices = c("Smooth" = "smooth", "Histogram" = "hist"),
-                selected = .ditto_default(defaults, "ridgeplot.shape", "smooth"), selectize = FALSE
+                selected = get_default(defaults, "ridgeplot.shape", "smooth"), selectize = FALSE
             ), "Draw ridges as smoothed densities or as histograms.",
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("ridgeplot.bins"), "Ridge Bins",
-                value = .ditto_default(defaults, "ridgeplot.bins", 30), min = 2, step = 1),
+                value = get_default(defaults, "ridgeplot.bins", 30), min = 2, step = 1),
                 "Number of bins used when the ridge shape is 'Histogram'.",
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("jitter.size"), "Jitter Size",
-                value = .ditto_default(defaults, "jitter.size", 1), min = 0.1, step = 0.1),
+                value = get_default(defaults, "jitter.size", 1), min = 0.1, step = 0.1),
                 "Size of the overlaid jitter points.",
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("jitter.width"), "Jitter Width",
-                value = .ditto_default(defaults, "jitter.width", 0.2), min = 0, step = 0.05),
+                value = get_default(defaults, "jitter.width", 0.2), min = 0, step = 0.05),
                 "Spread of the overlaid jitter points.",
                 placement = "top", options = list(container = "body")),
             tipify(colourInput(ns("jitter.color"), "Jitter Point Color",
-                value = .ditto_default(defaults, "jitter.color", "#000000")),
+                value = get_default(defaults, "jitter.color", "#000000")),
                 "Color of the overlaid jitter points.",
                 placement = "top", options = list(container = "body"))
         ),
@@ -156,7 +156,7 @@ dittoRidgeJitterInputsUI <- function(id, data, defaults = NULL, title = "RidgeJi
 #' @importFrom shinyjqui jqui_resizable
 #'
 #' @export
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 dittoRidgeJitterOutputUI <- function(id, resizable = TRUE) {
     ns <- NS(id)
     plot_output <- plotlyOutput(ns("dittoRidgeJitter"))

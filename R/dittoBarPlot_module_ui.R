@@ -38,7 +38,7 @@
 #' @importFrom shinyWidgets materialSwitch
 #'
 #' @export
-#' @author Jared Andrews
+#' @author Jacob Martin
 #' @seealso [dittoSeq::dittoBarPlot()], [VizModules::organize_inputs()],
 #' [sciVizModules::dittoBarPlotOutputUI()], [sciVizModules::dittoBarPlotServer()],
 #' [sciVizModules::dittoBarPlotApp()]
@@ -57,8 +57,8 @@ dittoBarPlotInputsUI <- function(id, data, defaults = NULL, title = "BarPlot Set
     group.choices <- stats::setNames(disc, disc)
     split.choices <- c("None" = "", stats::setNames(disc, disc))
 
-    default.var <- .ditto_default(defaults, "var", if (length(disc)) disc[1] else "")
-    default.group <- .ditto_default(defaults, "group.by",
+    default.var <- get_default(defaults, "var", if (length(disc)) disc[1] else "")
+    default.group <- get_default(defaults, "group.by",
         if (length(disc) >= 2) disc[2] else if (length(disc)) disc[1] else "")
 
     inputs <- list(
@@ -75,31 +75,31 @@ dittoBarPlotInputsUI <- function(id, data, defaults = NULL, title = "BarPlot Set
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("scale"), "Scale",
                 choices = c("Percent" = "percent", "Count" = "count"),
-                selected = .ditto_default(defaults, "scale", "percent"), selectize = FALSE
+                selected = get_default(defaults, "scale", "percent"), selectize = FALSE
             ), "Show composition as a percentage or as raw counts.",
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("split.by"), "Split By (facet)",
                 choices = split.choices,
-                selected = .ditto_default(defaults, "split.by", ""), selectize = FALSE
+                selected = get_default(defaults, "split.by", ""), selectize = FALSE
             ), "Discrete metadata to split the plot into facets.",
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("split.nrow"), "Facet Rows",
-                value = .ditto_default(defaults, "split.nrow", NA), min = 1, step = 1),
+                value = get_default(defaults, "split.nrow", NA), min = 1, step = 1),
                 "Number of rows for the facet layout (leave blank for automatic).",
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("split.ncol"), "Facet Columns",
-                value = .ditto_default(defaults, "split.ncol", NA), min = 1, step = 1),
+                value = get_default(defaults, "split.ncol", NA), min = 1, step = 1),
                 "Number of columns for the facet layout (leave blank for automatic).",
                 placement = "top", options = list(container = "body"))
         ),
         "Aesthetics" = tagList(
             uiOutput(ns("palette.selection")),
             tipify(materialSwitch(ns("x.labels.rotate"), "Rotate X Labels",
-                value = .ditto_default(defaults, "x.labels.rotate", TRUE), status = "success"),
+                value = get_default(defaults, "x.labels.rotate", TRUE), status = "success"),
                 "Rotate the x-axis group labels by 45 degrees.",
                 placement = "top", options = list(container = "body")),
             tipify(materialSwitch(ns("retain.factor.levels"), "Retain Factor Levels",
-                value = .ditto_default(defaults, "retain.factor.levels", FALSE), status = "success"),
+                value = get_default(defaults, "retain.factor.levels", FALSE), status = "success"),
                 "Respect factor level ordering of the var and grouping data.",
                 placement = "top", options = list(container = "body"))
         ),
@@ -140,7 +140,7 @@ dittoBarPlotInputsUI <- function(id, data, defaults = NULL, title = "BarPlot Set
 #' @importFrom shinyjqui jqui_resizable
 #'
 #' @export
-#' @author Jared Andrews
+#' @author Jacob Martin
 dittoBarPlotOutputUI <- function(id, resizable = TRUE) {
     ns <- NS(id)
     plot_output <- plotlyOutput(ns("dittoBarPlot"))

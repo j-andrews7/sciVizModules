@@ -72,5 +72,5 @@ dittoFreqPlotInputsUI("dittoFreqPlot", example_sce)
 \code{\link[=dittoFreqPlotApp]{dittoFreqPlotApp()}}
 }
 \author{
-Jared Andrews
+Jacob Martin, Jared Andrews
 }

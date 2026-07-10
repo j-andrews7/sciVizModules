@@ -19,6 +19,6 @@ Resets the uniform Plotly/Axes/Legend/Lines tabs to their defaults. Individual
 modules add their own data-tab resets on top of this.
 }
 \author{
-Jared Andrews
+Jacob Martin, Jared Andrews
 }
 \keyword{internal}

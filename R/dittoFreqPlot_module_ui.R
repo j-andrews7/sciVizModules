@@ -44,7 +44,7 @@
 #' @importFrom colourpicker colourInput
 #'
 #' @export
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 #' @seealso [dittoSeq::dittoFreqPlot()], [VizModules::organize_inputs()],
 #' [sciVizModules::dittoFreqPlotOutputUI()], [sciVizModules::dittoFreqPlotServer()],
 #' [sciVizModules::dittoFreqPlotApp()]
@@ -64,8 +64,8 @@ dittoFreqPlotInputsUI <- function(id, data, defaults = NULL, title = "FreqPlot S
     sample.choices <- c("None" = "", stats::setNames(disc, disc))
     color.choices <- c("Same as Group" = "", stats::setNames(disc, disc))
 
-    default.var <- .ditto_default(defaults, "var", if (length(disc)) disc[1] else "")
-    default.group <- .ditto_default(defaults, "group.by",
+    default.var <- get_default(defaults, "var", if (length(disc)) disc[1] else "")
+    default.group <- get_default(defaults, "group.by",
         if (length(disc) >= 2) disc[2] else if (length(disc)) disc[1] else "")
 
     inputs <- list(
@@ -77,7 +77,7 @@ dittoFreqPlotInputsUI <- function(id, data, defaults = NULL, title = "FreqPlot S
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("sample.by"), "Sample By",
                 choices = sample.choices,
-                selected = .ditto_default(defaults, "sample.by", ""), selectize = FALSE
+                selected = get_default(defaults, "sample.by", ""), selectize = FALSE
             ), "Discrete metadata identifying individual samples (one frequency per sample).",
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("group.by"), "Group By",
@@ -87,18 +87,18 @@ dittoFreqPlotInputsUI <- function(id, data, defaults = NULL, title = "FreqPlot S
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("color.by"), "Color By",
                 choices = color.choices,
-                selected = .ditto_default(defaults, "color.by", ""), selectize = FALSE
+                selected = get_default(defaults, "color.by", ""), selectize = FALSE
             ), "Discrete metadata used for fill colors. Defaults to the grouping.",
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("scale"), "Scale",
                 choices = c("Percent" = "percent", "Count" = "count"),
-                selected = .ditto_default(defaults, "scale", "percent"), selectize = FALSE
+                selected = get_default(defaults, "scale", "percent"), selectize = FALSE
             ), "Show frequencies as a percentage or as raw counts.",
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("plots"), "Plots",
+            tipify(selectInput(ns("plots"), "Plot type:",
                 choices = c("Jitter" = "jitter", "Box" = "boxplot",
                     "Violin" = "vlnplot", "Ridge" = "ridgeplot"),
-                selected = .ditto_default(defaults, "plots", c("boxplot", "jitter")),
+                selected = get_default(defaults, "plots", c("boxplot", "jitter")),
                 multiple = TRUE, selectize = TRUE
             ), "Data representations to draw, from back to front.",
                 placement = "top", options = list(container = "body"))
@@ -106,27 +106,27 @@ dittoFreqPlotInputsUI <- function(id, data, defaults = NULL, title = "FreqPlot S
         "Aesthetics" = tagList(
             uiOutput(ns("palette.selection")),
             tipify(materialSwitch(ns("max.normalize"), "Max Normalize",
-                value = .ditto_default(defaults, "max.normalize", FALSE), status = "success"),
+                value = get_default(defaults, "max.normalize", FALSE), status = "success"),
                 "Scale each var-level's frequencies to its own maximum.",
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("jitter.size"), "Jitter Size",
-                value = .ditto_default(defaults, "jitter.size", 1), min = 0.1, step = 0.1),
+                value = get_default(defaults, "jitter.size", 1), min = 0.1, step = 0.1),
                 "Size of the jitter points.",
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("jitter.width"), "Jitter Width",
-                value = .ditto_default(defaults, "jitter.width", 0.2), min = 0, step = 0.05),
+                value = get_default(defaults, "jitter.width", 0.2), min = 0, step = 0.05),
                 "Horizontal spread of the jitter points.",
                 placement = "top", options = list(container = "body")),
             tipify(colourInput(ns("jitter.color"), "Jitter Point Color",
-                value = .ditto_default(defaults, "jitter.color", "#000000")),
+                value = get_default(defaults, "jitter.color", "#000000")),
                 "Color of the jitter points.",
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("boxplot.width"), "Box Width",
-                value = .ditto_default(defaults, "boxplot.width", 0.4), min = 0, step = 0.05),
+                value = get_default(defaults, "boxplot.width", 0.4), min = 0, step = 0.05),
                 "Width of the boxplots.",
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("vlnplot.width"), "Violin Width",
-                value = .ditto_default(defaults, "vlnplot.width", 1), min = 0, step = 0.05),
+                value = get_default(defaults, "vlnplot.width", 1), min = 0, step = 0.05),
                 "Relative width of the violins.",
                 placement = "top", options = list(container = "body"))
         ),
@@ -167,7 +167,7 @@ dittoFreqPlotInputsUI <- function(id, data, defaults = NULL, title = "FreqPlot S
 #' @importFrom shinyjqui jqui_resizable
 #'
 #' @export
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 dittoFreqPlotOutputUI <- function(id, resizable = TRUE) {
     ns <- NS(id)
     plot_output <- plotlyOutput(ns("dittoFreqPlot"))

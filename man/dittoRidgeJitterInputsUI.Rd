@@ -70,5 +70,5 @@ dittoRidgeJitterInputsUI("dittoRidgeJitter", example_sce)
 \code{\link[=dittoRidgeJitterApp]{dittoRidgeJitterApp()}}
 }
 \author{
-Jared Andrews
+Jacob Martin, Jared Andrews
 }

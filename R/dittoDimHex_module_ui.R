@@ -43,7 +43,7 @@
 #' @importFrom colourpicker colourInput
 #'
 #' @export
-#' @author Jared Andrews
+#' @author Jacob Martin
 #' @seealso [dittoSeq::dittoDimHex()], [VizModules::organize_inputs()],
 #' [sciVizModules::dittoDimHexOutputUI()], [sciVizModules::dittoDimHexServer()],
 #' [sciVizModules::dittoDimHexApp()]
@@ -62,13 +62,13 @@ dittoDimHexInputsUI <- function(id, data, defaults = NULL, title = "DimHex Setti
         .ditto_discrete_metas(data), .ditto_discrete_metas(data)
     ))
     red.choices <- .ditto_reductions(data)
-    default.red <- .ditto_default(defaults, "reduction.use", .ditto_default_reduction(data))
+    default.red <- get_default(defaults, "reduction.use", get_default_reduction(data))
 
     inputs <- list(
         "Data" = tagList(
             tipify(selectInput(ns("color.var"), "Color By (gene / metadata)",
                 choices = var.choices,
-                selected = .ditto_default(defaults, "color.var", ""), selectize = FALSE
+                selected = get_default(defaults, "color.var", ""), selectize = FALSE
             ), "Gene or metadata summarized within each hexagonal bin. Leave blank to show density.",
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("reduction.use"), "Reduction",
@@ -77,60 +77,60 @@ dittoDimHexInputsUI <- function(id, data, defaults = NULL, title = "DimHex Setti
             ), "Dimensionality reduction embedding to plot.",
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("dim.1"), "X Dimension",
-                value = .ditto_default(defaults, "dim.1", 1), min = 1, step = 1),
+                value = get_default(defaults, "dim.1", 1), min = 1, step = 1),
                 "Which dimension of the reduction to plot on the x-axis.",
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("dim.2"), "Y Dimension",
-                value = .ditto_default(defaults, "dim.2", 2), min = 1, step = 1),
+                value = get_default(defaults, "dim.2", 2), min = 1, step = 1),
                 "Which dimension of the reduction to plot on the y-axis.",
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("bins"), "Hex Bins",
-                value = .ditto_default(defaults, "bins", 30), min = 2, step = 1),
+                value = get_default(defaults, "bins", 30), min = 2, step = 1),
                 "Number of hexagonal bins across the plotting area.",
                 placement = "top", options = list(container = "body")),
             tipify(textInput(ns("color.method"), "Color Method",
-                value = .ditto_default(defaults, "color.method", "")),
+                value = get_default(defaults, "color.method", "")),
                 paste("Summary method for the color variable. For continuous data:",
                     "'median' (default), 'mean', 'max', 'min', or 'sd'.",
                     "For discrete data: 'max' (default), 'max.prop', or a specific level."),
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("split.by"), "Split By (facet)",
                 choices = disc.choices,
-                selected = .ditto_default(defaults, "split.by", ""), selectize = FALSE
+                selected = get_default(defaults, "split.by", ""), selectize = FALSE
             ), "Discrete metadata to split the plot into facets.",
                 placement = "top", options = list(container = "body"))
         ),
         "Aesthetics" = tagList(
             tipify(colourInput(ns("min.color"), "Min Color",
-                value = .ditto_default(defaults, "min.color", "#F0E442")),
+                value = get_default(defaults, "min.color", "#F0E442")),
                 "Low end of the color scale.",
                 placement = "top", options = list(container = "body")),
             tipify(colourInput(ns("max.color"), "Max Color",
-                value = .ditto_default(defaults, "max.color", "#0072B2")),
+                value = get_default(defaults, "max.color", "#0072B2")),
                 "High end of the color scale.",
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("min.opacity"), "Min Opacity",
-                value = .ditto_default(defaults, "min.opacity", 0.2), min = 0, max = 1, step = 0.05),
+                value = get_default(defaults, "min.opacity", 0.2), min = 0, max = 1, step = 0.05),
                 "Opacity of the least-dense hexagons.",
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("max.opacity"), "Max Opacity",
-                value = .ditto_default(defaults, "max.opacity", 1), min = 0, max = 1, step = 0.05),
+                value = get_default(defaults, "max.opacity", 1), min = 0, max = 1, step = 0.05),
                 "Opacity of the most-dense hexagons.",
                 placement = "top", options = list(container = "body")),
             tipify(materialSwitch(ns("do.contour"), "Density Contours",
-                value = .ditto_default(defaults, "do.contour", FALSE), status = "success"),
+                value = get_default(defaults, "do.contour", FALSE), status = "success"),
                 "Overlay kernel-density contour lines over the hexagons.",
                 placement = "top", options = list(container = "body")),
             tipify(materialSwitch(ns("do.label"), "Label Groups",
-                value = .ditto_default(defaults, "do.label", FALSE), status = "success"),
+                value = get_default(defaults, "do.label", FALSE), status = "success"),
                 "Overlay text labels at the center of each group (discrete color variable only).",
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("labels.size"), "Label Size",
-                value = .ditto_default(defaults, "labels.size", 5), min = 1, step = 0.5),
+                value = get_default(defaults, "labels.size", 5), min = 1, step = 0.5),
                 "Text size of the group labels (used when 'Label Groups' is on).",
                 placement = "top", options = list(container = "body")),
             tipify(materialSwitch(ns("do.ellipse"), "Group Ellipses",
-                value = .ditto_default(defaults, "do.ellipse", FALSE), status = "success"),
+                value = get_default(defaults, "do.ellipse", FALSE), status = "success"),
                 "Draw a covariance ellipse around each group (discrete color variable only).",
                 placement = "top", options = list(container = "body"))
         ),
@@ -171,7 +171,7 @@ dittoDimHexInputsUI <- function(id, data, defaults = NULL, title = "DimHex Setti
 #' @importFrom shinyjqui jqui_resizable
 #'
 #' @export
-#' @author Jared Andrews
+#' @author Jacob Martin
 dittoDimHexOutputUI <- function(id, resizable = TRUE) {
     ns <- NS(id)
     plot_output <- plotlyOutput(ns("dittoDimHex"))

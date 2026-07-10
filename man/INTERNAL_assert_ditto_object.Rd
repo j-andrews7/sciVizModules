@@ -18,6 +18,6 @@ Invisibly \code{TRUE} when valid; otherwise throws an error.
 Stop when an object is not dittoSeq-compatible
 }
 \author{
-Jared Andrews
+Jacob Martin, Jared Andrews
 }
 \keyword{internal}

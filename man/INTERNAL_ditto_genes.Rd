@@ -16,6 +16,6 @@ A character vector of gene names, or \code{character(0)}.
 Safely list gene names in a dittoSeq object
 }
 \author{
-Jared Andrews
+Jacob Martin, Jared Andrews
 }
 \keyword{internal}

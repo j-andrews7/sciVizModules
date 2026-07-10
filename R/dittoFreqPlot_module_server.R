@@ -22,7 +22,7 @@
 #' [sciVizModules::dittoFreqPlotOutputUI()], [sciVizModules::dittoFreqPlotApp()]
 #'
 #' @export
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 dittoFreqPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL) {
     stopifnot(is.reactive(data))
     data_reactive <- data
@@ -75,19 +75,19 @@ dittoFreqPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             req(obj)
             disc <- .ditto_discrete_metas(obj)
             updateSelectInput(session, "var",
-                selected = .ditto_default(defaults, "var", if (length(disc)) disc[1] else ""))
-            updateSelectInput(session, "sample.by", selected = .ditto_default(defaults, "sample.by", ""))
-            updateSelectInput(session, "group.by", selected = .ditto_default(defaults, "group.by",
+                selected = get_default(defaults, "var", if (length(disc)) disc[1] else ""))
+            updateSelectInput(session, "sample.by", selected = get_default(defaults, "sample.by", ""))
+            updateSelectInput(session, "group.by", selected = get_default(defaults, "group.by",
                 if (length(disc) >= 2) disc[2] else if (length(disc)) disc[1] else ""))
-            updateSelectInput(session, "color.by", selected = .ditto_default(defaults, "color.by", ""))
-            updateSelectInput(session, "scale", selected = .ditto_default(defaults, "scale", "percent"))
+            updateSelectInput(session, "color.by", selected = get_default(defaults, "color.by", ""))
+            updateSelectInput(session, "scale", selected = get_default(defaults, "scale", "percent"))
             updateSelectInput(session, "plots",
-                selected = .ditto_default(defaults, "plots", c("boxplot", "jitter")))
-            updateMaterialSwitch(session, "max.normalize", value = .ditto_default(defaults, "max.normalize", FALSE))
-            updateNumericInput(session, "jitter.size", value = .ditto_default(defaults, "jitter.size", 1))
-            updateNumericInput(session, "jitter.width", value = .ditto_default(defaults, "jitter.width", 0.2))
-            updateNumericInput(session, "boxplot.width", value = .ditto_default(defaults, "boxplot.width", 0.4))
-            updateNumericInput(session, "vlnplot.width", value = .ditto_default(defaults, "vlnplot.width", 1))
+                selected = get_default(defaults, "plots", c("boxplot", "jitter")))
+            updateMaterialSwitch(session, "max.normalize", value = get_default(defaults, "max.normalize", FALSE))
+            updateNumericInput(session, "jitter.size", value = get_default(defaults, "jitter.size", 1))
+            updateNumericInput(session, "jitter.width", value = get_default(defaults, "jitter.width", 0.2))
+            updateNumericInput(session, "boxplot.width", value = get_default(defaults, "boxplot.width", 0.4))
+            updateNumericInput(session, "vlnplot.width", value = get_default(defaults, "vlnplot.width", 1))
             .ditto_reset_uniform(session, defaults)
         })
 

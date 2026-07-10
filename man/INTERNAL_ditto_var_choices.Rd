@@ -18,6 +18,6 @@ A named character vector suitable for \code{selectInput()} choices.
 Build the choices for a "color/var" selector (metadata + genes)
 }
 \author{
-Jared Andrews
+Jacob Martin, Jared Andrews
 }
 \keyword{internal}

@@ -22,7 +22,7 @@
 #' [sciVizModules::dittoRidgeJitterOutputUI()], [sciVizModules::dittoRidgeJitterApp()]
 #'
 #' @export
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 dittoRidgeJitterServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL) {
     stopifnot(is.reactive(data))
     data_reactive <- data
@@ -75,15 +75,15 @@ dittoRidgeJitterServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
             req(obj)
             disc <- .ditto_discrete_metas(obj)
             updateSelectInput(session, "group.by",
-                selected = .ditto_default(defaults, "group.by", if (length(disc)) disc[1] else ""))
-            updateSelectInput(session, "color.by", selected = .ditto_default(defaults, "color.by", ""))
-            updateSelectInput(session, "split.by", selected = .ditto_default(defaults, "split.by", ""))
-            updateNumericInput(session, "ridgeplot.scale", value = .ditto_default(defaults, "ridgeplot.scale", 1.25))
-            updateNumericInput(session, "ridgeplot.lineweight", value = .ditto_default(defaults, "ridgeplot.lineweight", 1))
-            updateSelectInput(session, "ridgeplot.shape", selected = .ditto_default(defaults, "ridgeplot.shape", "smooth"))
-            updateNumericInput(session, "ridgeplot.bins", value = .ditto_default(defaults, "ridgeplot.bins", 30))
-            updateNumericInput(session, "jitter.size", value = .ditto_default(defaults, "jitter.size", 1))
-            updateNumericInput(session, "jitter.width", value = .ditto_default(defaults, "jitter.width", 0.2))
+                selected = get_default(defaults, "group.by", if (length(disc)) disc[1] else ""))
+            updateSelectInput(session, "color.by", selected = get_default(defaults, "color.by", ""))
+            updateSelectInput(session, "split.by", selected = get_default(defaults, "split.by", ""))
+            updateNumericInput(session, "ridgeplot.scale", value = get_default(defaults, "ridgeplot.scale", 1.25))
+            updateNumericInput(session, "ridgeplot.lineweight", value = get_default(defaults, "ridgeplot.lineweight", 1))
+            updateSelectInput(session, "ridgeplot.shape", selected = get_default(defaults, "ridgeplot.shape", "smooth"))
+            updateNumericInput(session, "ridgeplot.bins", value = get_default(defaults, "ridgeplot.bins", 30))
+            updateNumericInput(session, "jitter.size", value = get_default(defaults, "jitter.size", 1))
+            updateNumericInput(session, "jitter.width", value = get_default(defaults, "jitter.width", 0.2))
             .ditto_reset_uniform(session, defaults)
         })
 

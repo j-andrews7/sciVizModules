@@ -37,5 +37,5 @@ This module builds a stacked composition bar plot with
 \code{\link[=dittoBarPlotOutputUI]{dittoBarPlotOutputUI()}}, \code{\link[=dittoBarPlotApp]{dittoBarPlotApp()}}
 }
 \author{
-Jared Andrews
+Jacob Martin
 }

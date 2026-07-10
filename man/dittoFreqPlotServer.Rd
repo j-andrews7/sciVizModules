@@ -37,5 +37,5 @@ This module builds a per-sample frequency plot with
 \code{\link[=dittoFreqPlotOutputUI]{dittoFreqPlotOutputUI()}}, \code{\link[=dittoFreqPlotApp]{dittoFreqPlotApp()}}
 }
 \author{
-Jared Andrews
+Jacob Martin, Jared Andrews
 }
