@@ -34,6 +34,10 @@ holds the logic. Every module also ships a standalone `*App()` you can run to se
 
 - **`volcanoPlot`** — differential-expression volcano plot with interactive significance and
   fold-change thresholding (wraps `VizModules::dittoViz_scatterPlot`).
+- **`enrichmentDotPlot`** — functional-enrichment dot plot for over-representation / GSEA
+  results (e.g. `clusterProfiler` output). Enrichment terms sit on the y-axis, a grouping
+  variable (e.g. `Cluster`) on the x-axis, dot size encodes the gene ratio, and dot color
+  encodes significance (`-log10` p-value) (wraps `VizModules::plotthis_DotPlot`).
 - **`survivalCurve`** — Kaplan-Meier survival curve built on the
   [survminer](https://cran.r-project.org/package=survminer) package. Accepts a tidy survival
   data frame (a numeric follow-up `time` column, an event `status` column, and an optional

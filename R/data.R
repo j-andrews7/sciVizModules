@@ -138,3 +138,40 @@
 #' @author Jacob Martin, Jared Andrews
 #' @keywords datasets
 "example_sce"
+
+#' Example functional enrichment results (simulated)
+#'
+#' A small, simulated `clusterProfiler`-style GO over-representation table
+#' provided as ready-to-use example data for the [enrichmentDotPlotServer()]
+#' module. Enrichment terms are tested across two gene clusters, mimicking the
+#' output of `clusterProfiler::compareCluster()`.
+#'
+#' @format A data frame with 14 rows and 10 columns:
+#' \describe{
+#'   \item{Cluster}{Gene cluster the term was enriched in ("Upregulated" or
+#'     "Downregulated"); used for the dot plot x-axis}
+#'   \item{ONTOLOGY}{GO ontology ("BP")}
+#'   \item{ID}{GO term identifier}
+#'   \item{Description}{Human-readable enrichment term; used for the dot plot
+#'     y-axis}
+#'   \item{GeneRatio}{Fraction of query genes in the term, as a "count/total"
+#'     string; parsed to a numeric ratio for dot size}
+#'   \item{BgRatio}{Fraction of background genes in the term, as a
+#'     "count/total" string}
+#'   \item{pvalue}{Over-representation p-value}
+#'   \item{p.adjust}{Benjamini-Hochberg adjusted p-value}
+#'   \item{qvalue}{q-value}
+#'   \item{Count}{Number of query genes in the term}
+#' }
+#'
+#' @source Simulated in \code{data-raw/generate_example_enrichment.R}; no real
+#' biological data are included.
+#'
+#' @examples
+#' library(sciVizModules)
+#' data(example_enrichment)
+#' head(example_enrichment)
+#'
+#' @author Jacob Martin, Jared Andrews
+#' @keywords datasets
+"example_enrichment"
