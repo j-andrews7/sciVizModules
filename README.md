@@ -38,6 +38,12 @@ holds the logic. Every module also ships a standalone `*App()` you can run to se
   results (e.g. `clusterProfiler` output). Enrichment terms sit on the y-axis, a grouping
   variable (e.g. `Cluster`) on the x-axis, dot size encodes the gene ratio, and dot color
   encodes significance (`-log10` p-value) (wraps `VizModules::plotthis_DotPlot`).
+- **`goFanPlot`** — Gene Ontology (GO) enrichment **sunburst** ("fan") plot that converts
+  the GO DAG into a clean circular layout, where each ring is a hierarchy level and each
+  segment is a GO term. Accepts an enrichment table with a GO-ID column and a numeric column
+  (e.g. `qvalue`) to colour by, and renders an interactive plotly sunburst (wraps
+  `GOfan::sunburstGO`). Requires the [GOfan](https://github.com/jianhong/GOfan) package and the
+  relevant organism annotation (`OrgDb`) package (e.g. `org.Hs.eg.db`).
 - **`survivalCurve`** — Kaplan-Meier survival curve built on the
   [survminer](https://cran.r-project.org/package=survminer) package. Accepts a tidy survival
   data frame (a numeric follow-up `time` column, an event `status` column, and an optional
