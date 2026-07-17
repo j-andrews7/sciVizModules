@@ -16,6 +16,6 @@ The name of a numeric column, or \code{NULL} when none is found.
 Prefers a \code{Count} column (converted to a proportion by \code{\link[GOfan:sunburstGO]{GOfan::sunburstGO()}}).
 }
 \author{
-Jacob Martin, Jared Andrews
+Jacob Martin
 }
 \keyword{internal}

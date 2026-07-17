@@ -13,11 +13,12 @@
 The name of the GO ID column, or \code{NULL} when none is found.
 }
 \description{
-Finds the first column whose values look like GO identifiers (\code{"GO:0006955"}).
-Falls back to a column literally named \code{"ID"} when no GO-like values are
-found.
+Finds the first column whose values contain GO identifiers matching
+\verb{GO:[0-9]+} (either exactly, e.g. \code{"GO:0006955"}, or embedded in free
+text, e.g. \code{"immune response (GO:0006955)"}). Falls back to a column
+literally named \code{"ID"} when no GO-like values are found.
 }
 \author{
-Jacob Martin, Jared Andrews
+Jacob Martin
 }
 \keyword{internal}

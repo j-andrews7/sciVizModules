@@ -9,6 +9,7 @@ goFanPlot(
   org = "org.Hs.eg.db",
   term.id = "ID",
   fill = "qvalue",
+  palette = "Viridis",
   sub_rect = NULL,
   onto = c("BP", "CC", "MF"),
   go.annotation.level.cutoff = 4,
@@ -32,6 +33,13 @@ annotation package (e.g. \code{"org.Hs.eg.db"}, \code{"org.Mm.eg.db"},
 
 \item{fill}{The name of the numeric column in \code{data} used to set the segment
 fill colours (default \code{"qvalue"}).}
+
+\item{palette}{The colour palette used to map the \code{fill} column onto the
+segments. A length-one character naming a built-in plotly continuous
+colorscale (e.g. \code{"Viridis"}, \code{"Blues"}, \code{"RdBu"}, \code{"Cividis"}), or a
+two-column \verb{[value, colour]} matrix/list accepted by plotly's
+\code{colorscale}. \code{NULL} leaves plotly's default colorscale in place.
+Defaults to \code{"Viridis"}.}
 
 \item{sub_rect}{Optional name of a numeric column in \code{data} used to draw a
 proportional sub-rectangle inside each segment (a value in \verb{[0, 1]}; count

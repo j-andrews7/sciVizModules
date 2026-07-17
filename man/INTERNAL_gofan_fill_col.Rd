@@ -18,6 +18,6 @@ Prefers significance columns in the order used by \code{\link[GOfan:sunburstGO]{
 known significance columns are present.
 }
 \author{
-Jacob Martin, Jared Andrews
+Jacob Martin
 }
 \keyword{internal}
