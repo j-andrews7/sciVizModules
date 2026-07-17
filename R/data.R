@@ -22,7 +22,7 @@
 #' library(VizModules)
 #' head(airway_deseq2)
 #'
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 #' @keywords datasets
 "airway_deseq2"
 
@@ -49,7 +49,7 @@
 #' library(VizModules)
 #' head(airway_edger)
 #'
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 #' @keywords datasets
 "airway_edger"
 
@@ -77,7 +77,7 @@
 #' library(VizModules)
 #' head(airway_voom)
 #'
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 #' @keywords datasets
 "airway_voom"
 
@@ -105,6 +105,73 @@
 #' library(sciVizModules)
 #' head(survival_lung)
 #'
-#' @author Jared Andrews
+#' @author Jacob Martin, Jared Andrews
 #' @keywords datasets
 "survival_lung"
+
+#' Example single-cell RNA-seq dataset (simulated)
+#'
+#' A small, simulated [SingleCellExperiment::SingleCellExperiment] provided as a
+#' ready-to-use example for the dittoSeq-based modules ([dittoDimPlotServer()],
+#' [dittoScatterPlotServer()], [dittoPlotServer()], [dittoBarPlotServer()],
+#' [dittoDimHexServer()], [dittoFreqPlotServer()], and
+#' [dittoRidgeJitterServer()]).
+#'
+#' @format A [SingleCellExperiment::SingleCellExperiment] with 40 genes and 240
+#' cells containing:
+#' \describe{
+#'   \item{assays}{\code{counts} and \code{logcounts}}
+#'   \item{reducedDims}{\code{PCA}, \code{TSNE}, and \code{UMAP} embeddings}
+#'   \item{colData}{\code{clustering}, \code{celltype}, \code{condition}, and
+#'     \code{sample} (discrete), plus \code{nCount} and \code{percent.mito}
+#'     (continuous)}
+#' }
+#'
+#' @source Simulated in \code{data-raw/generate_example_sce.R}; no real
+#' biological data are included.
+#'
+#' @examples
+#' library(sciVizModules)
+#' data(example_sce)
+#' example_sce
+#'
+#' @author Jacob Martin, Jared Andrews
+#' @keywords datasets
+"example_sce"
+
+#' Example functional enrichment results (simulated)
+#'
+#' A small, simulated `clusterProfiler`-style GO over-representation table
+#' provided as ready-to-use example data for the [enrichmentDotPlotServer()]
+#' module. Enrichment terms are tested across two gene clusters, mimicking the
+#' output of `clusterProfiler::compareCluster()`.
+#'
+#' @format A data frame with 14 rows and 10 columns:
+#' \describe{
+#'   \item{Cluster}{Gene cluster the term was enriched in ("Upregulated" or
+#'     "Downregulated"); used for the dot plot x-axis}
+#'   \item{ONTOLOGY}{GO ontology ("BP")}
+#'   \item{ID}{GO term identifier}
+#'   \item{Description}{Human-readable enrichment term; used for the dot plot
+#'     y-axis}
+#'   \item{GeneRatio}{Fraction of query genes in the term, as a "count/total"
+#'     string; parsed to a numeric ratio for dot size}
+#'   \item{BgRatio}{Fraction of background genes in the term, as a
+#'     "count/total" string}
+#'   \item{pvalue}{Over-representation p-value}
+#'   \item{p.adjust}{Benjamini-Hochberg adjusted p-value}
+#'   \item{qvalue}{q-value}
+#'   \item{Count}{Number of query genes in the term}
+#' }
+#'
+#' @source Simulated in \code{data-raw/generate_example_enrichment.R}; no real
+#' biological data are included.
+#'
+#' @examples
+#' library(sciVizModules)
+#' data(example_enrichment)
+#' head(example_enrichment)
+#'
+#' @author Jacob Martin, Jared Andrews
+#' @keywords datasets
+"example_enrichment"

@@ -31,8 +31,9 @@ an event indicator, and a couple of grouping variables.
 \examples{
 library(sciVizModules)
 head(survival_lung)
+
 }
 \author{
-Jared Andrews
+Jacob Martin, Jared Andrews
 }
 \keyword{datasets}

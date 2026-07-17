@@ -40,7 +40,7 @@ if (interactive()) shiny::runApp(app2)
 }
 \seealso{
 \code{\link[=survivalCurveInputsUI]{survivalCurveInputsUI()}}, \code{\link[=survivalCurveOutputUI]{survivalCurveOutputUI()}},
-\code{\link[=survivalCurveServer]{survivalCurveServer()}}, \code{\link{survival_lung}}
+\code{\link[=survivalCurveServer]{survivalCurveServer()}}, \link{survival_lung}
 }
 \author{
 Jared Andrews

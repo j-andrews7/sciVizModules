@@ -4,7 +4,13 @@
 \alias{survivalCurveServer}
 \title{Server logic for survivalCurve module}
 \usage{
-survivalCurveServer(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL)
+survivalCurveServer(
+  id,
+  data,
+  hide.inputs = NULL,
+  hide.tabs = NULL,
+  defaults = NULL
+)
 }
 \arguments{
 \item{id}{The ID for the Shiny module.}
@@ -35,5 +41,5 @@ it as an interactive \code{plotly} figure via \code{\link[=survivalCurve]{surviv
 \code{\link[=survivalCurveApp]{survivalCurveApp()}}
 }
 \author{
-Jared Andrews, Jacob Martin
+Jacob Martin
 }

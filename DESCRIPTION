@@ -38,13 +38,20 @@ Imports:
     jsonlite,
     methods,
     shinyWidgets,
-    htmlwidgets
+    htmlwidgets,
+    dittoSeq,
+    SingleCellExperiment,
+    SummarizedExperiment,
+    S4Vectors,
+    ggplot.multistats,
+    GOfan,
+    org.Hs.eg.db
 Remotes:
-    j-andrews7/VizModules#307
+    j-andrews7/VizModules@0.2.1,
+    jianhong/GOfan
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
 Suggests:
     knitr,
     rmarkdown,
@@ -53,3 +60,4 @@ Suggests:
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 URL: https://github.com/j-andrews7/sciVizModules
+Config/roxygen2/version: 8.0.0
