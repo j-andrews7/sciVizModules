@@ -43,9 +43,11 @@ Imports:
     SingleCellExperiment,
     SummarizedExperiment,
     S4Vectors,
-    ggplot.multistats
+    ggplot.multistats,
+    GOfan,
+    org.Hs.eg.db
 Remotes:
-    j-andrews7/VizModules#307,
+    j-andrews7/VizModules@0.2.1,
     jianhong/GOfan
 Encoding: UTF-8
 LazyData: true
@@ -54,9 +56,7 @@ Suggests:
     knitr,
     rmarkdown,
     shinytest2,
-    testthat (>= 3.0.0),
-    GOfan,
-    org.Hs.eg.db
+    testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 URL: https://github.com/j-andrews7/sciVizModules

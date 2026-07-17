@@ -95,6 +95,26 @@ goFanPlot <- function(data,
         stop("Fill column '", fill, "' not found in data.")
     }
 
+    # Extract the first GO:####### token from each cell so free-text
+    # columns like "immune response (GO:0006955)" or "GO:0006955 / foo"
+    # are handled gracefully. Also coerces factors and tibble subsets
+    # to plain character, which GOfan's downstream validators require.
+    df[[term.id]] <- .extract_go_id(df[[term.id]])
+    keep <- !is.na(df[[term.id]])
+    if (!any(keep)) {
+        stop(
+            "No valid GO IDs (format 'GO:0000000') found in column '",
+            term.id, "'."
+        )
+    }
+    if (any(!keep)) {
+        warning(
+            "Dropping ", sum(!keep), " row(s) from '", term.id,
+            "' with no extractable GO ID."
+        )
+        df <- df[keep, , drop = FALSE]
+    }
+
     orgdb <- .resolve_orgdb(org)
 
     args <- list(

@@ -4,7 +4,13 @@
 \alias{goFanPlotServer}
 \title{Server logic for the goFanPlot module}
 \usage{
-goFanPlotServer(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL)
+goFanPlotServer(
+  id,
+  data,
+  hide.inputs = NULL,
+  hide.tabs = NULL,
+  defaults = NULL
+)
 }
 \arguments{
 \item{id}{The ID for the Shiny module.}

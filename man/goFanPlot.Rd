@@ -34,7 +34,7 @@ annotation package (e.g. \code{"org.Hs.eg.db"}, \code{"org.Mm.eg.db"},
 fill colours (default \code{"qvalue"}).}
 
 \item{sub_rect}{Optional name of a numeric column in \code{data} used to draw a
-proportional sub-rectangle inside each segment (a value in \code{[0, 1]}; count
+proportional sub-rectangle inside each segment (a value in \verb{[0, 1]}; count
 columns are converted to a proportion). \code{NULL} or \code{""} disables it.}
 
 \item{onto}{The GO ontology category of the supplied IDs. One of \code{"BP"}
@@ -77,7 +77,7 @@ resolves the hierarchical relationships among the supplied GO terms using the
 organism annotation database given in \code{org}, so the appropriate \code{OrgDb}
 package (e.g. \code{org.Hs.eg.db} for human) must be installed.
 
-\code{\link[GOfan:sunburstGO]{GOfan::sunburstGO()}} is rendered with \code{plotBy = "plotly"} so the returned
+\code{GOfan::sunburstGO()} is rendered with \code{plotBy = "plotly"} so the returned
 figure is genuinely interactive: hovering a segment reveals its label and
 clicking a segment zooms into that GO term and its offspring.
 }

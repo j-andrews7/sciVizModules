@@ -1,24 +1,50 @@
 #' Detect the GO identifier column
 #'
-#' Finds the first column whose values look like GO identifiers (`"GO:0006955"`).
-#' Falls back to a column literally named `"ID"` when no GO-like values are
-#' found.
+#' Finds the first column whose values contain GO identifiers matching
+#' `GO:[0-9]+` (either exactly, e.g. `"GO:0006955"`, or embedded in free
+#' text, e.g. `"immune response (GO:0006955)"`). Falls back to a column
+#' literally named `"ID"` when no GO-like values are found.
 #'
 #' @param data A data frame of enrichment results.
 #' @return The name of the GO ID column, or `NULL` when none is found.
 #'
-#' @author Jacob Martin, Jared Andrews
+#' @author Jacob Martin
 #' @rdname INTERNAL_gofan_id_col
 #' @keywords internal
 .gofan_id_col <- function(data) {
     for (nm in names(data)) {
         vals <- as.character(data[[nm]])
         vals <- vals[!is.na(vals)]
-        if (length(vals) && any(grepl("^GO:[0-9]+$", vals))) {
+        if (length(vals) && any(grepl("GO:[0-9]+", vals))) {
             return(nm)
         }
     }
     if ("ID" %in% names(data)) "ID" else NULL
+}
+
+#' Extract GO IDs from a vector of possibly-messy strings
+#'
+#' Pulls the first `GO:[0-9]+` token out of each element and returns a
+#' character vector of the same length. Elements with no match become
+#' `NA`. Accepts factors and one-column tibble subsets as input.
+#'
+#' @param x A vector (character, factor, or coercible) that may contain
+#'   GO identifiers embedded in free text.
+#' @return A character vector of GO IDs, with `NA` where no ID was found.
+#'
+#' @author Jacob Martin,
+#' @rdname INTERNAL_extract_go_id
+#' @keywords internal
+.extract_go_id <- function(x) {
+    if (is.data.frame(x)) x <- x[[1]]
+    x <- as.character(x)
+    out <- rep(NA_character_, length(x))
+    pos <- regexpr("GO:[0-9]+", x)
+    hit <- !is.na(pos) & pos != -1
+    if (any(hit)) {
+        out[hit] <- regmatches(x[hit], regexpr("GO:[0-9]+", x[hit]))
+    }
+    out
 }
 
 #' Detect the GO ontology category
@@ -56,7 +82,7 @@
 #' @param data A data frame of enrichment results.
 #' @return The name of a numeric column, or `NULL` when none is found.
 #'
-#' @author Jacob Martin, Jared Andrews
+#' @author Jacob Martin
 #' @rdname INTERNAL_gofan_fill_col
 #' @keywords internal
 .gofan_fill_col <- function(data) {
@@ -80,7 +106,7 @@
 #' @param data A data frame of enrichment results.
 #' @return The name of a numeric column, or `NULL` when none is found.
 #'
-#' @author Jacob Martin, Jared Andrews
+#' @author Jacob Martin
 #' @rdname INTERNAL_gofan_subrect_col
 #' @keywords internal
 .gofan_subrect_col <- function(data) {
