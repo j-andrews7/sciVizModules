@@ -26,6 +26,12 @@
 #'   (default `"ID"`).
 #' @param fill The name of the numeric column in `data` used to set the segment
 #'   fill colours (default `"qvalue"`).
+#' @param palette The colour palette used to map the `fill` column onto the
+#'   segments. A length-one character naming a built-in plotly continuous
+#'   colorscale (e.g. `"Viridis"`, `"Blues"`, `"RdBu"`, `"Cividis"`), or a
+#'   two-column `[value, colour]` matrix/list accepted by plotly's
+#'   `colorscale`. `NULL` leaves plotly's default colorscale in place.
+#'   Defaults to `"Viridis"`.
 #' @param sub_rect Optional name of a numeric column in `data` used to draw a
 #'   proportional sub-rectangle inside each segment (a value in `[0, 1]`; count
 #'   columns are converted to a proportion). `NULL` or `""` disables it.
@@ -69,6 +75,7 @@ goFanPlot <- function(data,
                       org = "org.Hs.eg.db",
                       term.id = "ID",
                       fill = "qvalue",
+                      palette = "Viridis",
                       sub_rect = NULL,
                       onto = c("BP", "CC", "MF"),
                       go.annotation.level.cutoff = 4,
@@ -138,7 +145,22 @@ goFanPlot <- function(data,
     if (!is.null(must.keep) && length(must.keep) > 0) args$mustkeep <- must.keep
     if (!is.null(only.keep) && length(only.keep) > 0) args$onlyKeep <- only.keep
 
-    do.call(GOfan::sunburstGO, c(args, list(...)))
+    fig <- do.call(GOfan::sunburstGO, c(args, list(...)))
+
+# Palette handling 
+    if (!is.null(palette) &&
+        ((is.character(palette) && length(palette) == 1 && nzchar(palette)) ||
+            is.list(palette) || is.matrix(palette))) {
+        fig <- plotly::plotly_build(fig)
+        for (i in seq_along(fig$x$data)) {
+            if (identical(fig$x$data[[i]]$type, "sunburst")) {
+                fig$x$data[[i]]$marker$colorscale <- palette
+                fig$x$data[[i]]$marker$showscale <- TRUE
+            }
+        }
+    }
+
+    fig
 }
 
 

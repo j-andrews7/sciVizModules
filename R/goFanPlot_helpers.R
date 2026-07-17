@@ -117,3 +117,34 @@
     }
     NULL
 }
+
+#' Built-in colour palettes for the GO sunburst plot
+#'
+#' Named vector of plotly continuous colorscales suitable for the `palette`
+#' argument of [goFanPlot()] and the "Palette" UI input. Names are display
+#' labels; values are the colorscale identifiers passed to plotly.
+#'
+#' @return A named character vector of plotly colorscale names.
+#'
+#' @author Jacob Martin
+#' @rdname INTERNAL_gofan_palettes
+#' @keywords internal
+.gofan_palettes <- function() {
+    c(
+        "Viridis" = "Viridis",
+        "Cividis" = "Cividis",
+        "Blues" = "Blues",
+        "Greens" = "Greens",
+        "Reds" = "Reds",
+        "YlOrRd" = "YlOrRd",
+        "YlGnBu" = "YlGnBu",
+        "Hot" = "Hot",
+        "Blackbody" = "Blackbody",
+        "Electric" = "Electric",
+        "Jet" = "Jet",
+        "Portland" = "Portland",
+        "Picnic (diverging)" = "Picnic",
+        "RdBu (diverging)" = "RdBu",
+        "Earth (diverging)" = "Earth"
+    )
+}

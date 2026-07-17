@@ -53,6 +53,7 @@ goFanPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defa
             updateSelectInput(session, "onto", selected = get_default(defaults, "onto", .gofan_onto(df)))
             updateSelectInput(session, "org", selected = get_default(defaults, "org", "org.Hs.eg.db"))
             updateSelectInput(session, "fill", selected = get_default(defaults, "fill", detected.fill))
+            updateSelectInput(session, "palette", selected = get_default(defaults, "palette", "Viridis"))
             updateSelectInput(session, "sub_rect", selected = get_default(defaults, "sub_rect", ""))
             updateNumericInput(session, "go.annotation.level.cutoff",
                 value = get_default(defaults, "go.annotation.level.cutoff", 4))
@@ -81,6 +82,7 @@ goFanPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defa
                 org = isolate_fn(input$org),
                 term.id = term.id,
                 fill = fill,
+                palette = isolate_fn(input$palette),
                 sub_rect = sub_rect,
                 onto = isolate_fn(input$onto),
                 go.annotation.level.cutoff = isolate_fn(input$go.annotation.level.cutoff),
