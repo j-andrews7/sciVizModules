@@ -22,7 +22,7 @@ Note that this package is in development and may break at any time.
 VizModules must be installed first:
 
 ```r
-devtools::install_github("j-andrews7/VizModules")
+install.packages("VizModules")
 devtools::install_github("j-andrews7/sciVizModules")
 ```
 
