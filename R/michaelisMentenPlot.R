@@ -1,14 +1,15 @@
 #' Plot a Michaelis-Menten kinetics fit
 #'
 #' Draws the observed reaction velocities against substrate concentration and
-#' overlays the fitted Michaelis-Menten curve from a [drc::drm()] model. The
-#' fitted line (`mml`) is generated internally by predicting the model over a
-#' fine grid of substrate concentrations.
+#' overlays a pre-computed fitted Michaelis-Menten curve (`mml`).
 #'
-#' @param data A data frame of observations with a substrate-concentration
-#'   column `S` and a velocity column `v`.
-#' @param model A fitted model object (e.g. from [drc::drm()]) whose
-#'   `predict()` method returns velocities for new `S` values.
+#' @param data A data frame of observations containing the `x` and `y` columns.
+#' @param model A data frame of fitted-line coordinates (e.g. `mml`) containing
+#'   the same `x` and `y` columns as `data`. Drawn as the fitted curve.
+#' @param x Name of the column in `data` to plot on the x-axis (substrate
+#'   concentration). Defaults to `"S"`.
+#' @param y Name of the column in `data` to plot on the y-axis (velocity).
+#'   Defaults to `"v"`.
 #' @param theme A ggplot2 theme to apply. Defaults to [ggplot2::theme_bw()].
 #' @param jitter Logical; when `TRUE` (the default) the observed points are
 #'   plotted (jittered horizontally by `jitter_width`). When `FALSE`, the
@@ -19,10 +20,16 @@
 #' @param jitter_color Point colour, supplied as a hex string from the
 #'   VizModules [colourpicker::colourInput()] workflow. When `NULL`, ggplot2's
 #'   default point colour is used.
+#' @param jitter_alpha Opacity of the observed points, in `[0, 1]`. Defaults to
+#'   `0.5`.
+#' @param jitter_size Size of the observed points, passed to
+#'   [ggplot2::geom_point()]. Defaults to `1.5`.
 #' @param line_color Fitted-curve colour, supplied as a hex string from the
 #'   VizModules [colourpicker::colourInput()] workflow. When `NULL`, `"red"` is
 #'   used.
-#'
+#' @param linetype Line type for the fitted curve, passed to
+#'   [ggplot2::geom_line()] (e.g. `"solid"`, `"dashed"`, `"dotted"`,
+#'   `"dotdash"`, `"longdash"`, `"twodash"`). Defaults to `"solid"`.
 #' @return A [ggplot2::ggplot()] object.
 #'
 #' @import ggplot2
@@ -32,32 +39,39 @@
 #' @examples
 #' library(drc)
 #' mm_model <- drm(v ~ S, data = mm, fct = MM.2())
-#' michaelisMentenPlot(mm, mm_model)
-michaelisMentenPlot <- function(data, model, theme = theme_bw(), jitter = TRUE,
-                                jitter_width = NULL, jitter_color = NULL,
-                                line_color = NULL) {
-    stopifnot(is.data.frame(data), all(c("S", "v") %in% names(data)))
+#' mml <- data.frame(S = seq(min(mm$S), max(mm$S), length.out = 100))
+#' mml$v <- predict(mm_model, newdata = mml)
+#' michaelisMentenPlot(mm, mml, x = "S", y = "v")
+michaelisMentenPlot <- function(data, model, x = "S", y = "v", theme = theme_bw(),
+                                jitter = TRUE, jitter_width = NULL,
+                                jitter_color = NULL, jitter_alpha = 0.5,
+                                jitter_size = 1.5, line_color = NULL,
+                                linetype = "solid") {
+    stopifnot(is.data.frame(data), all(c(x, y) %in% names(data)))
+    stopifnot(is.data.frame(model), all(c(x, y) %in% names(model)))
 
-    # Build the fitted line (mml) by predicting the model over a fine grid.
-    mml <- data.frame(S = seq(min(data$S), max(data$S), length.out = 100))
-    mml$v <- stats::predict(model, newdata = mml)
+    mml <- model
 
     if (is.null(line_color)) line_color <- "red"
 
-    # Plot jittered points when enabled; omit points entirely when disabled.
+    #If jitter is FALSE
     point_layer <- if (!isTRUE(jitter)) {
         NULL
     } else {
         pos <- position_jitter(width = jitter_width, height = 0)
         if (is.null(jitter_color)) {
-            geom_point(alpha = 0.5, position = pos)
+            geom_point(alpha = jitter_alpha, size = jitter_size, position = pos)
         } else {
-            geom_point(alpha = 0.5, colour = jitter_color, position = pos)
+            geom_point(alpha = jitter_alpha, size = jitter_size, colour = jitter_color, position = pos)
         }
     }
 
-    ggplot(data, aes(x = S, y = v)) +
+    ggplot(data, aes(x = .data[[x]], y = .data[[y]])) +
         theme +
         point_layer +
-        geom_line(data = mml, aes(x = S, y = v), colour = line_color)
+        geom_line(
+            data = mml, aes(x = .data[[x]], y = .data[[y]]),
+            colour = line_color, linetype = linetype
+        )
 }
+

@@ -175,3 +175,78 @@
 #' @author Jacob Martin, Jared Andrews
 #' @keywords datasets
 "example_enrichment"
+
+#' Example Michaelis-Menten enzyme-kinetics observations (simulated)
+#'
+#' A small, self-contained set of enzyme-kinetics observations (substrate
+#' concentration versus reaction velocity) provided as ready-to-use example
+#' data for the [michaelisMentenServer()] module and [michaelisMentenPlot()].
+#'
+#' @format A data frame with 19 rows and 2 columns:
+#' \describe{
+#'   \item{S}{Substrate concentration (mM)}
+#'   \item{v}{Reaction velocity (dE/min)}
+#' }
+#'
+#' @source Simulated in \code{data-raw/generate_mm_kinetics.R}; no real
+#' biological data are included.
+#'
+#' @seealso [sciVizModules::mm_kinetics_line],
+#' [sciVizModules::mm_kinetics_fit]
+#'
+#' @examples
+#' library(sciVizModules)
+#' data(mm_kinetics)
+#' head(mm_kinetics)
+#'
+#' @author Jacob Martin
+#' @keywords datasets
+"mm_kinetics"
+
+#' Fitted Michaelis-Menten curve for the example kinetics data
+#'
+#' The fitted Michaelis-Menten curve for [mm_kinetics], predicted over a fine
+#' grid of substrate concentrations. This is the pre-computed line (`mml`)
+#' passed as the `model` argument to [michaelisMentenPlot()].
+#'
+#' @format A data frame with 100 rows and 2 columns:
+#' \describe{
+#'   \item{S}{Substrate concentration (mM)}
+#'   \item{v}{Predicted reaction velocity (dE/min)}
+#' }
+#'
+#' @source Predicted from [mm_kinetics_fit] in
+#' \code{data-raw/generate_mm_kinetics.R}.
+#'
+#' @seealso [sciVizModules::mm_kinetics], [sciVizModules::mm_kinetics_fit]
+#'
+#' @examples
+#' library(sciVizModules)
+#' data(mm_kinetics_line)
+#' head(mm_kinetics_line)
+#'
+#' @author Jacob Martin
+#' @keywords datasets
+"mm_kinetics_line"
+
+#' Fitted Michaelis-Menten model for the example kinetics data
+#'
+#' An [stats::nls()] fit of \eqn{v = V_m S / (K + S)} to [mm_kinetics]. Its
+#' coefficients (`K` and `Vm`) provide the Michaelis constant and maximum
+#' velocity used for the K / Vmax annotations in the [michaelisMentenServer()]
+#' module.
+#'
+#' @format An object of class \code{nls}.
+#'
+#' @source Fitted in \code{data-raw/generate_mm_kinetics.R}.
+#'
+#' @seealso [sciVizModules::mm_kinetics], [sciVizModules::mm_kinetics_line]
+#'
+#' @examples
+#' library(sciVizModules)
+#' data(mm_kinetics_fit)
+#' coef(mm_kinetics_fit)
+#'
+#' @author Jacob Martin
+#' @keywords datasets
+"mm_kinetics_fit"

@@ -49,6 +49,10 @@ holds the logic. Every module also ships a standalone `*App()` you can run to se
   data frame (a numeric follow-up `time` column, an event `status` column, and an optional
   grouping column) and renders an interactive plotly curve with optional confidence intervals,
   censoring marks, log-rank p-value, median-survival lines, and a number-at-risk table.
+- **`michaelisMentenPlot`** - Michaelis Menten plot to analyse enzyme-substate kinetics. This module is 
+  built uppon the outputs of the [drc](https://cran.r-project.org/web/packages/drc/index.html) package.
+  The module expects a data, model, and stats inputs generated from the **drc** michaelis-menten
+  workflow. 
 
 ### RNA-seq / single-cell modules (dittoSeq)
 

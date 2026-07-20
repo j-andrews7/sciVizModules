@@ -7,19 +7,29 @@
 michaelisMentenPlot(
   data,
   model,
+  x = "S",
+  y = "v",
   theme = theme_bw(),
   jitter = TRUE,
   jitter_width = NULL,
   jitter_color = NULL,
-  line_color = NULL
+  jitter_alpha = 0.5,
+  jitter_size = 1.5,
+  line_color = NULL,
+  linetype = "solid"
 )
 }
 \arguments{
-\item{data}{A data frame of observations with a substrate-concentration
-column \code{S} and a velocity column \code{v}.}
+\item{data}{A data frame of observations containing the \code{x} and \code{y} columns.}
 
-\item{model}{A fitted model object (e.g. from \code{\link[drc:drm]{drc::drm()}}) whose
-\code{predict()} method returns velocities for new \code{S} values.}
+\item{model}{A data frame of fitted-line coordinates (e.g. \code{mml}) containing
+the same \code{x} and \code{y} columns as \code{data}. Drawn as the fitted curve.}
+
+\item{x}{Name of the column in \code{data} to plot on the x-axis (substrate
+concentration). Defaults to \code{"S"}.}
+
+\item{y}{Name of the column in \code{data} to plot on the y-axis (velocity).
+Defaults to \code{"v"}.}
 
 \item{theme}{A ggplot2 theme to apply. Defaults to \code{\link[ggplot2:theme_bw]{ggplot2::theme_bw()}}.}
 
@@ -35,23 +45,33 @@ used.}
 VizModules \code{\link[colourpicker:colourInput]{colourpicker::colourInput()}} workflow. When \code{NULL}, ggplot2's
 default point colour is used.}
 
+\item{jitter_alpha}{Opacity of the observed points, in \verb{[0, 1]}. Defaults to
+\code{0.5}.}
+
+\item{jitter_size}{Size of the observed points, passed to
+\code{\link[ggplot2:geom_point]{ggplot2::geom_point()}}. Defaults to \code{1.5}.}
+
 \item{line_color}{Fitted-curve colour, supplied as a hex string from the
 VizModules \code{\link[colourpicker:colourInput]{colourpicker::colourInput()}} workflow. When \code{NULL}, \code{"red"} is
 used.}
+
+\item{linetype}{Line type for the fitted curve, passed to
+\code{\link[ggplot2:geom_line]{ggplot2::geom_line()}} (e.g. \code{"solid"}, \code{"dashed"}, \code{"dotted"},
+\code{"dotdash"}, \code{"longdash"}, \code{"twodash"}). Defaults to \code{"solid"}.}
 }
 \value{
 A \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} object.
 }
 \description{
 Draws the observed reaction velocities against substrate concentration and
-overlays the fitted Michaelis-Menten curve from a \code{\link[drc:drm]{drc::drm()}} model. The
-fitted line (\code{mml}) is generated internally by predicting the model over a
-fine grid of substrate concentrations.
+overlays a pre-computed fitted Michaelis-Menten curve (\code{mml}).
 }
 \examples{
 library(drc)
 mm_model <- drm(v ~ S, data = mm, fct = MM.2())
-michaelisMentenPlot(mm, mm_model)
+mml <- data.frame(S = seq(min(mm$S), max(mm$S), length.out = 100))
+mml$v <- predict(mm_model, newdata = mml)
+michaelisMentenPlot(mm, mml, x = "S", y = "v")
 }
 \author{
 Jacob Martin
