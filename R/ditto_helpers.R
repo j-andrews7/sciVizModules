@@ -91,6 +91,22 @@
     )
 }
 
+#' Choose a default dimensional reduction for a dittoSeq object
+#'
+#' Returns the name of the reduction to use by default: the first available
+#' reduction on the object, or an empty string when none are present.
+#'
+#' @param object A dittoSeq-compatible object.
+#' @return A length-one character naming a reduction, or `""` when none exist.
+#'
+#' @author Jacob Martin, Jared Andrews
+#' @rdname INTERNAL_get_default_reduction
+#' @keywords internal
+get_default_reduction <- function(object) {
+    reds <- .ditto_reductions(object)
+    if (length(reds)) reds[1] else ""
+}
+
 #' Fetch the values of a single metadata column
 #'
 #' @param object A dittoSeq-compatible object.

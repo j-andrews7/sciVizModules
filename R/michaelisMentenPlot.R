@@ -32,16 +32,18 @@
 #'   `"dotdash"`, `"longdash"`, `"twodash"`). Defaults to `"solid"`.
 #' @return A [ggplot2::ggplot()] object.
 #'
-#' @import ggplot2
+#' @rawNamespace import(ggplot2, except = last_plot)
 #'
 #' @export
 #' @author Jacob Martin
 #' @examples
-#' library(drc)
-#' mm_model <- drm(v ~ S, data = mm, fct = MM.2())
-#' mml <- data.frame(S = seq(min(mm$S), max(mm$S), length.out = 100))
-#' mml$v <- predict(mm_model, newdata = mml)
-#' michaelisMentenPlot(mm, mml, x = "S", y = "v")
+#' if (requireNamespace("drc", quietly = TRUE)) {
+#'     library(drc)
+#'     mm_model <- drm(v ~ S, data = mm_kinetics, fct = MM.2())
+#'     mml <- data.frame(S = seq(min(mm_kinetics$S), max(mm_kinetics$S), length.out = 100))
+#'     mml$v <- predict(mm_model, newdata = mml)
+#'     michaelisMentenPlot(mm_kinetics, mml, x = "S", y = "v")
+#' }
 michaelisMentenPlot <- function(data, model, x = "S", y = "v", theme = theme_bw(),
                                 jitter = TRUE, jitter_width = NULL,
                                 jitter_color = NULL, jitter_alpha = 0.5,

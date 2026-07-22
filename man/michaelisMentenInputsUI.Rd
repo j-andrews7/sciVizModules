@@ -41,7 +41,7 @@ plotly figure.
 }
 \examples{
 library(sciVizModules)
-michaelisMentenInputsUI("mm", mm)
+michaelisMentenInputsUI("mm", mm_kinetics)
 }
 \seealso{
 \code{\link[=michaelisMentenPlot]{michaelisMentenPlot()}},

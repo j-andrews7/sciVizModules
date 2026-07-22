@@ -52,14 +52,16 @@ app <- michaelisMentenApp()
 if (interactive()) shiny::runApp(app)
 
 # Launch with custom data:
-library(drc)
-mm_model <- drm(v ~ S, data = mm_kinetics, fct = MM.2())
-mml <- data.frame(S = seq(min(mm_kinetics$S), max(mm_kinetics$S), length.out = 100))
-mml$v <- predict(mm_model, newdata = mml)
-stats <- nls(v ~ Vm * S / (K + S), data = mm_kinetics,
-    start = list(K = max(mm_kinetics$v) / 2, Vm = max(mm_kinetics$v)))
-app2 <- michaelisMentenApp(mm_kinetics, mml, stats)
-if (interactive()) shiny::runApp(app2)
+if (requireNamespace("drc", quietly = TRUE)) {
+    library(drc)
+    mm_model <- drm(v ~ S, data = mm_kinetics, fct = MM.2())
+    mml <- data.frame(S = seq(min(mm_kinetics$S), max(mm_kinetics$S), length.out = 100))
+    mml$v <- predict(mm_model, newdata = mml)
+    stats <- nls(v ~ Vm * S / (K + S), data = mm_kinetics,
+        start = list(K = max(mm_kinetics$v) / 2, Vm = max(mm_kinetics$v)))
+    app2 <- michaelisMentenApp(mm_kinetics, mml, stats)
+    if (interactive()) shiny::runApp(app2)
+}
 }
 \seealso{
 \code{\link[=michaelisMentenInputsUI]{michaelisMentenInputsUI()}},

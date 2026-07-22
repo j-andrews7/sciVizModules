@@ -67,11 +67,13 @@ Draws the observed reaction velocities against substrate concentration and
 overlays a pre-computed fitted Michaelis-Menten curve (\code{mml}).
 }
 \examples{
-library(drc)
-mm_model <- drm(v ~ S, data = mm, fct = MM.2())
-mml <- data.frame(S = seq(min(mm$S), max(mm$S), length.out = 100))
-mml$v <- predict(mm_model, newdata = mml)
-michaelisMentenPlot(mm, mml, x = "S", y = "v")
+if (requireNamespace("drc", quietly = TRUE)) {
+    library(drc)
+    mm_model <- drm(v ~ S, data = mm_kinetics, fct = MM.2())
+    mml <- data.frame(S = seq(min(mm_kinetics$S), max(mm_kinetics$S), length.out = 100))
+    mml$v <- predict(mm_model, newdata = mml)
+    michaelisMentenPlot(mm_kinetics, mml, x = "S", y = "v")
+}
 }
 \author{
 Jacob Martin
