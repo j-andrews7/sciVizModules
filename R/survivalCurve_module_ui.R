@@ -26,7 +26,8 @@
 #'   \item \code{group.by} - Optional stratification column (default: none)
 #'   \item \code{conf.int} - Show confidence interval ribbons (default: TRUE)
 #'   \item \code{pval} - Show log-rank p-value (default: TRUE; only when stratified)
-#'   \item \code{risk.table} - Show "number at risk" table (default: FALSE)
+#'   \item \code{risk.table} - Show "number at risk" table in a separate panel
+#'     (default: FALSE)
 #'   \item \code{censor} - Show censoring marks (default: TRUE)
 #'   \item \code{surv.median.line} - Median survival reference lines (default: "none")
 #'   \item \code{fun} - Curve transformation: survival probability, "pct", "event",
@@ -103,7 +104,7 @@ survivalCurveInputsUI <- function(id, data, defaults = NULL, title = "Survival C
                 placement = "top", options = list(container = "body")),
             tipify(materialSwitch(ns("risk.table"), "Risk Table",
                 value = .sv_default(defaults, "risk.table", FALSE), status = "success"),
-                "Append a 'number at risk' table beneath the curve.",
+                "Show a 'number at risk' table in a separate panel beneath the curve.",
                 placement = "top", options = list(container = "body")),
             tipify(materialSwitch(ns("censor"), "Censoring Marks",
                 value = .sv_default(defaults, "censor", TRUE), status = "success"),
@@ -162,7 +163,8 @@ survivalCurveInputsUI <- function(id, data, defaults = NULL, title = "Survival C
 #' @param resizable Logical; when \code{TRUE} (the default) the plot output is
 #'   wrapped in [shinyjqui::jqui_resizable()] so it can be resized by dragging.
 #'
-#' @return A Shiny plotlyOutput for the survival curve
+#' @return A Shiny tagList with the survival curve output and a separate,
+#'   conditionally-shown "number at risk" table output.
 #'
 #' @import shiny
 #' @import plotly
@@ -176,5 +178,18 @@ survivalCurveOutputUI <- function(id, resizable = TRUE) {
     if (isTRUE(resizable)) {
         plot_output <- shinyjqui::jqui_resizable(plot_output)
     }
-    plot_output
+
+    # The "number at risk" table is rendered in its own output, shown only when
+    # the Risk Table switch is on, so it stays fully separate from the curve.
+    risk_table_output <- plotlyOutput(ns("survivalCurveRiskTable"), height = "200px")
+    if (isTRUE(resizable)) {
+        risk_table_output <- shinyjqui::jqui_resizable(risk_table_output)
+    }
+    risk_table_output <- conditionalPanel(
+        condition = "input['risk.table']",
+        ns = ns,
+        risk_table_output
+    )
+
+    tagList(plot_output, risk_table_output)
 }

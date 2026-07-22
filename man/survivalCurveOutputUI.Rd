@@ -13,7 +13,8 @@ survivalCurveOutputUI(id, resizable = TRUE)
 wrapped in \code{\link[shinyjqui:jqui_resizable]{shinyjqui::jqui_resizable()}} so it can be resized by dragging.}
 }
 \value{
-A Shiny plotlyOutput for the survival curve
+A Shiny tagList with the survival curve output and a separate,
+conditionally-shown "number at risk" table output.
 }
 \description{
 This should be placed in the UI where the plot should be shown.
