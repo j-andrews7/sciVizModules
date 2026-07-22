@@ -16,6 +16,6 @@ The name of a numeric p-value column, or \code{NULL} when none is found.
 Detect a p-value column for the enrichment dot color
 }
 \author{
-Jacob Martin, Jared Andrews
+Jacob Martin
 }
 \keyword{internal}

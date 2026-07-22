@@ -20,7 +20,7 @@ Depends:
     plotthis,
     dittoViz,
     plotly,
-    R (>= 3.5),
+    R (>= 4.5),
     shinyBS,
     VizModules
 Imports:

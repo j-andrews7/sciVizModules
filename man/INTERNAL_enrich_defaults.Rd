@@ -18,6 +18,6 @@ A named list of defaults keyed by DotPlot UI input IDs.
 User-supplied defaults take precedence over the auto-detected mappings.
 }
 \author{
-Jacob Martin, Jared Andrews
+Jacob Martin
 }
 \keyword{internal}

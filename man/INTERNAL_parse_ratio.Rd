@@ -17,6 +17,6 @@ Converts values such as \code{"8/196"} to \code{8 / 196}. Values that are alread
 numeric are returned unchanged; anything that cannot be parsed becomes \code{NA}.
 }
 \author{
-Jacob Martin, Jared Andrews
+Jacob Martin
 }
 \keyword{internal}

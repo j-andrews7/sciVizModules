@@ -16,6 +16,6 @@ The name of a numeric ratio-like column, or \code{NULL} when none is found.
 Detect a ratio-like column for the enrichment dot size
 }
 \author{
-Jacob Martin, Jared Andrews
+Jacob Martin
 }
 \keyword{internal}
