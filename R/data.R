@@ -250,3 +250,63 @@
 #' @author Jacob Martin
 #' @keywords datasets
 "mm_kinetics_fit"
+
+#' Example copy number segmentation results (simulated)
+#'
+#' A simulated `CNSegment`-class list, structured like the output of
+#' [sesame::cnSegmentation()], provided as ready-to-use example data for the
+#' [cnSegmentPlotServer()] module and [cnSegmentPlot()]. A handful of
+#' simulated gain/loss regions are baked into the per-bin signal and the
+#' called segment table, and a tiny "chrM"-like chromosome is included to
+#' exercise the default chromosome auto-selection logic.
+#'
+#' @format A list of class `"CNSegment"` with elements:
+#' \describe{
+#'   \item{seg.signals}{A data frame of called segments with `chrom`,
+#'     `loc.start`, `loc.end`, and `seg.mean` columns (plus `ID`, `num.mark`,
+#'     `pval`, `lcl`, `ucl`, matching [sesame::cnSegmentation()]'s output)}
+#'   \item{bin.coords}{A `GRanges` of genomic bins with `seqinfo` covering
+#'     `chr1`, `chr2`, `chr3`, and `chrM`}
+#'   \item{bin.signals}{A named numeric vector of per-bin log2 signal ratios}
+#'   \item{genomeInfo}{A list with `seqLength` and `gapInfo` elements}
+#' }
+#'
+#' @source Simulated in \code{data-raw/generate_example_cn_segment.R}; no real
+#' biological or methylation array data are included.
+#'
+#' @seealso [sciVizModules::example_cn_genes]
+#'
+#' @examples
+#' library(sciVizModules)
+#' data(example_cn_segment)
+#' cnSegmentPlot(example_cn_segment)
+#'
+#' @author Jacob Martin, Jared Andrews
+#' @keywords datasets
+"example_cn_segment"
+
+#' Example gene coordinates for copy number segment labeling (simulated)
+#'
+#' A small `GRanges` of example gene coordinates overlapping the simulated
+#' gain/loss regions in [example_cn_segment], provided as ready-to-use example
+#' data for gene labeling in the [cnSegmentPlotServer()] module and
+#' [cnSegmentPlot()].
+#'
+#' @format A `GRanges` with 6 ranges and 1 metadata column:
+#' \describe{
+#'   \item{gene_name}{Example gene symbol}
+#' }
+#'
+#' @source Simulated in \code{data-raw/generate_example_cn_segment.R}; no real
+#' biological data are included.
+#'
+#' @seealso [sciVizModules::example_cn_segment]
+#'
+#' @examples
+#' library(sciVizModules)
+#' data(example_cn_genes)
+#' example_cn_genes
+#'
+#' @author Jacob Martin, Jared Andrews
+#' @keywords datasets
+"example_cn_genes"

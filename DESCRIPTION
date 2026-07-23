@@ -43,6 +43,8 @@ Imports:
     SingleCellExperiment,
     SummarizedExperiment,
     S4Vectors,
+    GenomicRanges,
+    IRanges,
     ggplot.multistats,
     GOfan,
     org.Hs.eg.db
@@ -57,7 +59,8 @@ Suggests:
     rmarkdown,
     shinytest2,
     testthat (>= 3.0.0),
-    drc
+    drc,
+    sesame
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 URL: https://github.com/j-andrews7/sciVizModules
