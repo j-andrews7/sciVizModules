@@ -19,7 +19,8 @@ cnSegmentPlotInputsUI(
 \item{seg}{A \code{CNSegment} object used to populate the chromosome choices.}
 
 \item{genes}{An optional \code{GRanges} of gene coordinates, used to populate the
-gene label column ("Gene Label Column") choices.}
+gene label column choices and resolve identifiers entered in "Genes to
+Label".}
 
 \item{defaults}{A named list of default values for the inputs.}
 
@@ -39,8 +40,9 @@ This should be placed in the UI where the inputs should be shown, with an
 The user inputs for this module are separated from the outputs to
 allow for more flexible UI design. The module draws a genome-wide copy
 number scatter/segment plot from a \code{CNSegment} object (as returned by
-\code{\link[sesame:cnSegmentation]{sesame::cnSegmentation()}}), with optional gene labeling when a \code{genes}
-\code{GRanges} is supplied.
+\code{\link[sesame:cnSegmentation]{sesame::cnSegmentation()}}). When a \code{genes} \code{GRanges} is supplied, users can
+enter gene identifiers separated by commas or whitespace and choose the
+metadata column used to match and display those labels.
 }
 \examples{
 library(sciVizModules)

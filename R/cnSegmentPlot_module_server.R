@@ -3,7 +3,7 @@
 #' This module builds a genome-wide copy number segment plot with
 #' [cnSegmentPlot()] from a `CNSegment` object (as returned by
 #' [sesame::cnSegmentation()]), renders it as an interactive `plotly` figure,
-#' and optionally labels genes overlapping the called segments.
+#' and adds user-selected genes as draggable Plotly annotations.
 #'
 #' @param id The ID for the Shiny module.
 #' @param data A `reactive` returning a list with up to three elements:
@@ -75,8 +75,15 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             if (!is.null(genes) && length(genes) > 0 && !is.null(input$id.col)) {
                 id.col.choices <- names(GenomicRanges::mcols(genes))
                 default.id.col <- get_default(defaults, "id.col",
-                    if ("gene_name" %in% id.col.choices) "gene_name" else id.col.choices[1])
+                    if ("hgnc_symbol" %in% id.col.choices) {
+                        "hgnc_symbol"
+                    } else if ("gene_name" %in% id.col.choices) {
+                        "gene_name"
+                    } else {
+                        id.col.choices[1]
+                    })
                 updateSelectInput(session, "id.col", choices = id.col.choices, selected = default.id.col)
+                updateTextInput(session, "label.genes", value = get_default(defaults, "label.genes", ""))
             }
 
             updateNumericInput(session, "point.size", value = get_default(defaults, "point.size", 1.5))
@@ -111,6 +118,10 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             id.col <- if (!is.null(input$id.col)) isolate_fn(input$id.col) else NULL
             if (!is.null(id.col) && !nzchar(id.col)) id.col <- NULL
 
+            genes <- genes_obj()
+            label.genes <- if (!is.null(input$label.genes)) isolate_fn(input$label.genes) else ""
+            genes.to.label <- .cn_seg_select_genes(genes, id.col, label.genes)
+
             color.limit.low <- isolate_fn(input$color.limit.low)
             color.limit.high <- isolate_fn(input$color.limit.high)
             color.limits <- if (is.na(color.limit.low) || is.na(color.limit.high)) {
@@ -124,9 +135,9 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             y.max <- isolate_fn(input$y.max)
             if (is.na(y.max)) y.max <- NULL
 
-            gg <- cnSegmentPlot(
+            fig <- cnSegmentPlot(
                 seg = seg,
-                genes = genes_obj(),
+                genes = genes.to.label,
                 id.col = id.col,
                 centromere = centromere_obj(),
                 to.plot = to.plot,
@@ -143,8 +154,6 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 y.min = y.min,
                 y.max = y.max
             )
-
-            fig <- plotly::ggplotly(gg, tooltip = "text")
 
             fig <- apply_title_layout(
                 fig, input, isolate_fn,

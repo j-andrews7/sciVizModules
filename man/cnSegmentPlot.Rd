@@ -63,8 +63,8 @@ Defaults to \code{"green"}.}
 
 \item{color.limits}{Length-2 numeric vector giving the \code{c(low, high)} limits
 of the signal color scale, or \code{NULL} to scale to the data range.
-Out-of-bound values are squished to the nearest limit. Defaults to
-\code{c(-0.4, 0.4)}.}
+The limits must include 0. Out-of-bound values are squished to the nearest
+limit. Defaults to \code{c(-0.4, 0.4)}.}
 
 \item{color.seg}{Color of the segment mean line overlay. Defaults to
 \code{"blue"}.}
@@ -84,14 +84,15 @@ are squished to the limit rather than dropped. \code{NULL} (the default) leaves
 the upper bound automatic.}
 }
 \value{
-A \code{\link[ggplot2:ggplot]{ggplot2::ggplot()}} object.
+A \code{\link[plotly:plotly]{plotly::plotly()}} object. Gene labels are Plotly annotations and
+can be repositioned interactively.
 }
 \description{
 Draws a genome-wide copy number scatter/segment plot from the output of
 \code{\link[sesame:cnSegmentation]{sesame::cnSegmentation()}}: bin-level log2 signal ratios are plotted across
 the genome and colored by signal, with the called segment means overlaid as
 horizontal line segments. Optionally, genes overlapping the called segments
-can be labeled directly on the plot.
+can be labeled with draggable Plotly annotations.
 }
 \details{
 \code{seg} must be a \code{CNSegment} object as returned by
@@ -106,7 +107,8 @@ Both the color scale and the y-axis support explicit limits
 out-of-bound values are squished to the nearest limit (via
 \code{\link[scales:squish]{scales::squish()}}) rather than dropped, so points beyond the requested
 limits remain visible (clamped to the edge of the plot/color scale) instead
-of disappearing.
+of disappearing. The signal colorbar is shown, and \code{color.mid} is always
+mapped to signal 0, including when \code{color.limits} are asymmetric.
 }
 \examples{
 library(sciVizModules)

@@ -4,7 +4,7 @@
 #' [sesame::cnSegmentation()]: bin-level log2 signal ratios are plotted across
 #' the genome and colored by signal, with the called segment means overlaid as
 #' horizontal line segments. Optionally, genes overlapping the called segments
-#' can be labeled directly on the plot.
+#' can be labeled with draggable Plotly annotations.
 #'
 #' @details `seg` must be a `CNSegment` object as returned by
 #' [sesame::cnSegmentation()], a list with (at least) `bin.coords` (a
@@ -18,7 +18,8 @@
 #' out-of-bound values are squished to the nearest limit (via
 #' [scales::squish()]) rather than dropped, so points beyond the requested
 #' limits remain visible (clamped to the edge of the plot/color scale) instead
-#' of disappearing.
+#' of disappearing. The signal colorbar is shown, and `color.mid` is always
+#' mapped to signal 0, including when `color.limits` are asymmetric.
 #'
 #' @param seg A `CNSegment` object, as returned by [sesame::cnSegmentation()].
 #' @param genes An optional `GRanges` of gene coordinates. Genes overlapping a
@@ -47,8 +48,8 @@
 #'   Defaults to `"green"`.
 #' @param color.limits Length-2 numeric vector giving the `c(low, high)` limits
 #'   of the signal color scale, or `NULL` to scale to the data range.
-#'   Out-of-bound values are squished to the nearest limit. Defaults to
-#'   `c(-0.4, 0.4)`.
+#'   The limits must include 0. Out-of-bound values are squished to the nearest
+#'   limit. Defaults to `c(-0.4, 0.4)`.
 #' @param color.seg Color of the segment mean line overlay. Defaults to
 #'   `"blue"`.
 #' @param seg.line.width Line width of the segment mean line overlay. Defaults
@@ -62,11 +63,13 @@
 #'   are squished to the limit rather than dropped. `NULL` (the default) leaves
 #'   the upper bound automatic.
 #'
-#' @return A [ggplot2::ggplot()] object.
+#' @return A [plotly::plotly()] object. Gene labels are Plotly annotations and
+#'   can be repositioned interactively.
 #'
 #' @importFrom methods is
 #' @importFrom GenomicRanges seqinfo seqnames start end mcols
 #' @import ggplot2
+#' @importFrom plotly ggplotly add_annotations config
 #' @importFrom scales squish
 #' @importFrom stats setNames
 #'
@@ -97,6 +100,15 @@ cnSegmentPlot <- function(seg,
                           y.min = NULL,
                           y.max = NULL) {
     stopifnot(is(seg, "CNSegment"))
+    if (!is.null(color.limits)) {
+        if (length(color.limits) != 2 || anyNA(color.limits) ||
+            any(!is.finite(color.limits)) || color.limits[1] >= color.limits[2]) {
+            stop("`color.limits` must be a finite, increasing numeric vector of length 2.")
+        }
+        if (color.limits[1] > 0 || color.limits[2] < 0) {
+            stop("`color.limits` must include the fixed midpoint, 0.")
+        }
+    }
 
     bin.coords <- seg$bin.coords
     bin.signals <- seg$bin.signals
@@ -148,7 +160,9 @@ cnSegmentPlot <- function(seg,
     bin.coords$text <- if (length(hover.text.cols) > 0) {
         do.call(paste, c(
             lapply(hover.text.cols, function(n) {
-                paste0(n, ": ", round(mcols(bin.coords)[[n]], 4))
+                values <- mcols(bin.coords)[[n]]
+                if (is.numeric(values)) values <- round(values, 4)
+                paste0(n, ": ", values)
             }),
             list(sep = "\n")
         ))
@@ -183,6 +197,7 @@ cnSegmentPlot <- function(seg,
     p <- p +
         scale_x_continuous(labels = names(seqmids), breaks = as.numeric(seqmids) / totlen) +
         scale_colour_gradient2(
+            name = "Log2 Signal Ratio",
             low = color.low, mid = color.mid, high = color.high,
             midpoint = 0, limits = color.limits, oob = squish
         ) +
@@ -190,7 +205,6 @@ cnSegmentPlot <- function(seg,
         ylab("Log2 Signal Ratio") +
         theme_minimal() +
         theme(
-            legend.position = "none",
             axis.text.x = element_text(angle = 90, hjust = 0.5, vjust = 0.5),
             panel.grid.major.x = element_blank(),
             panel.grid.minor.x = element_blank()
@@ -206,26 +220,90 @@ cnSegmentPlot <- function(seg,
         )
     }
 
+    label.df <- NULL
     if (!is.null(genes) && length(genes) > 0) {
-        p <- .cn_seg_add_gene_labels(
-            p,
+        label.df <- .cn_seg_gene_label_data(
             genes = genes, id.col = id.col, sigs = sigs,
-            seqstart = seqstart, totlen = totlen, seq.names = seq.names,
-            label.size = label.size
+            seqstart = seqstart, totlen = totlen, seq.names = seq.names
         )
     }
 
-    p
+    fig <- ggplotly(p, tooltip = "text")
+
+    plotly.color.limits <- color.limits
+    if (is.null(plotly.color.limits)) {
+        plotly.color.limits <- range(df$signal, na.rm = TRUE)
+        if (any(!is.finite(plotly.color.limits))) {
+            plotly.color.limits <- c(-1, 1)
+        } else {
+            plotly.color.limits <- c(min(plotly.color.limits[1], 0), max(plotly.color.limits[2], 0))
+        }
+    }
+    if (plotly.color.limits[1] == plotly.color.limits[2]) {
+        plotly.color.limits <- c(-1, 1)
+    }
+    zero.position <- (0 - plotly.color.limits[1]) / diff(plotly.color.limits)
+    plotly.colorscale <- matrix(c(
+        0, color.low,
+        zero.position, color.mid,
+        1, color.high
+    ), ncol = 2, byrow = TRUE)
+
+    # ggplotly normalizes continuous colors to [0, 1]. Restore the raw signal
+    # values so Plotly's colorbar and fixed zero midpoint remain meaningful.
+    for (trace.idx in seq_along(fig$x$data)) {
+        if (!is.null(fig$x$data[[trace.idx]]$marker$colorscale)) {
+            fig$x$data[[trace.idx]]$marker$color <- fig$x$data[[trace.idx]]$y
+            fig$x$data[[trace.idx]]$marker$cmin <- plotly.color.limits[1]
+            fig$x$data[[trace.idx]]$marker$cmax <- plotly.color.limits[2]
+            fig$x$data[[trace.idx]]$marker$cmid <- 0
+            fig$x$data[[trace.idx]]$marker$colorscale <- plotly.colorscale
+            fig$x$data[[trace.idx]]$marker$showscale <- TRUE
+        }
+    }
+
+    if (!is.null(label.df) && nrow(label.df) > 0) {
+        for (label.idx in seq_len(nrow(label.df))) {
+            fig <- add_annotations(
+                fig,
+                x = label.df$x[label.idx], y = label.df$y[label.idx],
+                text = label.df$label[label.idx],
+                xref = "x", yref = "y", showarrow = FALSE,
+                xanchor = "center", yanchor = "bottom",
+                font = list(size = label.size * 3.78)
+            )
+        }
+    }
+
+    config(fig, edits = list(annotationPosition = TRUE, annotationText = TRUE))
 }
 
-#' Label genes on a copy number segment plot
+.cn_seg_select_genes <- function(genes, id.col, label.genes) {
+    if (is.null(genes) || length(genes) == 0 || is.null(label.genes) ||
+        length(label.genes) == 0 || !nzchar(trimws(label.genes))) {
+        return(NULL)
+    }
+
+    requested.genes <- unique(strsplit(trimws(label.genes), "[,[:space:]]+", perl = TRUE)[[1]])
+    if (is.null(id.col)) {
+        gene.labels <- names(genes)
+    } else if (id.col %in% names(mcols(genes))) {
+        gene.labels <- mcols(genes)[[id.col]]
+    } else {
+        stop("`id.col` '", id.col, "' not found in `genes` metadata columns.")
+    }
+
+    if (is.null(gene.labels)) {
+        return(NULL)
+    }
+    genes[!is.na(gene.labels) & as.character(gene.labels) %in% requested.genes]
+}
+
+#' Compute gene-label positions for a copy number segment plot
 #'
-#' Internal helper for [cnSegmentPlot()]. For each gene overlapping a called
-#' segment, a text label is placed at the gene's genome position and the
-#' overlapping segment's mean signal. Genes overlapping multiple segments are
-#' labeled at the segment with the largest overlap.
+#' Internal helper for [cnSegmentPlot()]. Genes overlapping multiple segments
+#' are assigned to the segment with the largest overlap.
 #'
-#' @param p A [ggplot2::ggplot()] object to add labels to.
 #' @param genes A `GRanges` of gene coordinates.
 #' @param id.col Name of the metadata column in `genes` holding the label. If
 #'   `NULL`, `names(genes)` is used.
@@ -234,22 +312,21 @@ cnSegmentPlot <- function(seg,
 #' @param seqstart Named numeric vector of per-chromosome genome-wide offsets.
 #' @param totlen Total genome length (sum of plotted chromosome lengths).
 #' @param seq.names Character vector of chromosome names being plotted.
-#' @param label.size Text size of the gene labels.
 #'
-#' @return The input `ggplot2::ggplot()` object, with gene labels added.
+#' @return A data frame containing annotation positions and labels, or `NULL`
+#'   when no genes overlap the plotted segments.
 #'
 #' @importFrom GenomicRanges GRanges seqnames start end mcols width findOverlaps
 #' @importFrom IRanges IRanges pintersect
 #' @importFrom S4Vectors queryHits subjectHits
-#' @importFrom ggplot2 geom_text aes
 #'
 #' @author Jared Andrews
-#' @rdname INTERNAL_cn_seg_add_gene_labels
+#' @rdname INTERNAL_cn_seg_gene_label_data
 #' @keywords internal
-.cn_seg_add_gene_labels <- function(p, genes, id.col, sigs, seqstart, totlen, seq.names, label.size) {
+.cn_seg_gene_label_data <- function(genes, id.col, sigs, seqstart, totlen, seq.names) {
     genes <- genes[as.vector(seqnames(genes)) %in% seq.names]
     if (length(genes) == 0) {
-        return(p)
+        return(NULL)
     }
 
     if (is.null(id.col)) {
@@ -263,7 +340,7 @@ cnSegmentPlot <- function(seg,
 
     sigs <- sigs[sigs$chrom %in% seq.names, , drop = FALSE]
     if (nrow(sigs) == 0) {
-        return(p)
+        return(NULL)
     }
 
     seg.gr <- GRanges(
@@ -273,7 +350,7 @@ cnSegmentPlot <- function(seg,
 
     hits <- findOverlaps(genes, seg.gr)
     if (length(hits) == 0) {
-        return(p)
+        return(NULL)
     }
 
     overlap.width <- width(pintersect(genes[queryHits(hits)], seg.gr[subjectHits(hits)]))
@@ -288,14 +365,10 @@ cnSegmentPlot <- function(seg,
 
     gene.mid <- (start(genes)[gene.idx] + end(genes)[gene.idx]) / 2
     gene.chr <- as.character(seqnames(genes))[gene.idx]
-    label.df <- data.frame(
+    data.frame(
         x = (seqstart[gene.chr] + gene.mid) / totlen,
         y = sigs$seg.mean[seg.idx],
-        label = gene.labels[gene.idx]
-    )
-
-    p + geom_text(
-        data = label.df, aes(x = .data$x, y = .data$y, label = .data$label),
-        inherit.aes = FALSE, size = label.size, vjust = -0.8, check_overlap = TRUE
+        label = gene.labels[gene.idx],
+        stringsAsFactors = FALSE
     )
 }

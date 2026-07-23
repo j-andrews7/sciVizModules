@@ -7,13 +7,15 @@
 #' @details The user inputs for this module are separated from the outputs to
 #' allow for more flexible UI design. The module draws a genome-wide copy
 #' number scatter/segment plot from a `CNSegment` object (as returned by
-#' [sesame::cnSegmentation()]), with optional gene labeling when a `genes`
-#' `GRanges` is supplied.
+#' [sesame::cnSegmentation()]). When a `genes` `GRanges` is supplied, users can
+#' enter gene identifiers separated by commas or whitespace and choose the
+#' metadata column used to match and display those labels.
 #'
 #' @param id The ID for the Shiny module.
 #' @param seg A `CNSegment` object used to populate the chromosome choices.
 #' @param genes An optional `GRanges` of gene coordinates, used to populate the
-#'   gene label column ("Gene Label Column") choices.
+#'   gene label column choices and resolve identifiers entered in "Genes to
+#'   Label".
 #' @param defaults A named list of default values for the inputs.
 #' @param title An optional title for the UI grid.
 #' @param columns Number of columns for the UI grid.
@@ -51,7 +53,15 @@ cnSegmentPlotInputsUI <- function(id, seg, genes = NULL, defaults = NULL,
 
     id.col.choices <- if (!is.null(genes) && length(genes) > 0) names(mcols(genes)) else character(0)
     default.id.col <- get_default(defaults, "id.col",
-        if ("gene_name" %in% id.col.choices) "gene_name" else if (length(id.col.choices)) id.col.choices[1] else "")
+        if ("hgnc_symbol" %in% id.col.choices) {
+            "hgnc_symbol"
+        } else if ("gene_name" %in% id.col.choices) {
+            "gene_name"
+        } else if (length(id.col.choices)) {
+            id.col.choices[1]
+        } else {
+            ""
+        })
 
     data.inputs <- list(
         tipify(selectInput(ns("to.plot"), "Chromosomes to Plot",
@@ -73,6 +83,11 @@ cnSegmentPlotInputsUI <- function(id, seg, genes = NULL, defaults = NULL,
             tipify(selectInput(ns("id.col"), "Gene Label Column",
                 choices = id.col.choices, selected = default.id.col, selectize = FALSE
             ), "Metadata column in `genes` holding the label to display for each gene.",
+                placement = "top", options = list(container = "body")),
+            tipify(textInput(ns("label.genes"), "Genes to Label",
+                value = get_default(defaults, "label.genes", ""),
+                placeholder = "TP53, EGFR, MYC"),
+                "Gene labels separated by commas or whitespace. Leave empty for no labels.",
                 placement = "top", options = list(container = "body"))
         ))
     }

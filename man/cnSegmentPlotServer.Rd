@@ -39,7 +39,7 @@ The \code{moduleServer} function for the cnSegmentPlot module.
 This module builds a genome-wide copy number segment plot with
 \code{\link[=cnSegmentPlot]{cnSegmentPlot()}} from a \code{CNSegment} object (as returned by
 \code{\link[sesame:cnSegmentation]{sesame::cnSegmentation()}}), renders it as an interactive \code{plotly} figure,
-and optionally labels genes overlapping the called segments.
+and adds user-selected genes as draggable Plotly annotations.
 }
 \seealso{
 \code{\link[=cnSegmentPlot]{cnSegmentPlot()}},
