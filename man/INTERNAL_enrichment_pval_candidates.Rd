@@ -4,15 +4,12 @@
 \alias{.enrichment_pval_candidates}
 \title{Candidate significance / p-value column names for enrichment data}
 \usage{
-.enrichment_pval_candidates()
-}
-\value{
-A character vector of candidate column names.
+.enrichment_pval_candidates
 }
 \description{
-A single canonical, priority-ordered list of the significance columns
-produced by common enrichment tools, shared by the sunburst fill detector
-(\code{\link[=.gofan_fill_col]{.gofan_fill_col()}}) and the dot plot p-value detector
+A single canonical, priority-ordered vector of the significance columns
+produced by common enrichment tools, shared by the sunburst fill detection
+in \code{\link[=goFanPlot]{goFanPlot()}} and the dot plot p-value detector
 (\code{\link[=.enrich_pval_col]{.enrich_pval_col()}}) so the two modules agree on what counts as a
 significance column.
 }

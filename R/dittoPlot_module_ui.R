@@ -13,23 +13,22 @@
 #' converted to an interactive `plotly` figure.
 #'
 #' @section Plot parameters and defaults:
-#' The following parameters can be accessed via UI inputs and/or the \code{defaults} argument:
-#' \itemize{
-#'   \item \code{var} - Continuous variable to plot (gene or numeric metadata)
-#'   \item \code{group.by} - Discrete metadata used for the x-axis groups
-#'   \item \code{color.by} - Discrete metadata used for fill colors (default: `group.by`)
-#'   \item \code{plots} - Representations to draw (default: c("jitter", "vlnplot"))
-#'   \item \code{split.by} - Discrete metadata to facet by (default: none)
-#'   \item \code{jitter.size} - Jitter point size (default: 1)
-#'   \item \code{jitter.color} - Color of the jitter points (default: "#000000")
-#'   \item \code{vlnplot.width} - Width of the violins (default: 1)
-#'   \item \code{vlnplot.scaling} - Violin scaling method: "area", "count", or "width"
-#'     (default: "area")
-#'   \item \code{boxplot.lineweight} - Line weight of the boxplot outlines (default: 1)
-#'   \item \code{ridgeplot.scale} - Ridge overlap scale (default: 1.25)
-#'   \item \code{ridgeplot.lineweight} - Line weight of the ridge outlines (default: 1)
-#'   \item \code{palette.selection} - Colors for discrete groups (multiColorPicker)
-#' }
+#' The following parameters can be accessed via UI inputs and/or the `defaults` argument:
+#'
+#' - `var` - Continuous variable to plot (gene or numeric metadata)
+#' - `group.by` - Discrete metadata used for the x-axis groups
+#' - `color.by` - Discrete metadata used for fill colors (default: `group.by`)
+#' - `plots` - Representations to draw (default: c("jitter", "vlnplot"))
+#' - `split.by` - Discrete metadata to facet by (default: none)
+#' - `jitter.size` - Jitter point size (default: 1)
+#' - `jitter.color` - Color of the jitter points (default: "#000000")
+#' - `vlnplot.width` - Width of the violins (default: 1)
+#' - `vlnplot.scaling` - Violin scaling method: "area", "count", or "width"
+#'   (default: "area")
+#' - `boxplot.lineweight` - Line weight of the boxplot outlines (default: 1)
+#' - `ridgeplot.scale` - Ridge overlap scale (default: 1.25)
+#' - `ridgeplot.lineweight` - Line weight of the ridge outlines (default: 1)
+#' - `palette.selection` - Colors for discrete groups (multiColorPicker)
 #'
 #' @param id The ID for the Shiny module.
 #' @param data A `SingleCellExperiment`, `Seurat`, or `SummarizedExperiment` object
@@ -181,7 +180,7 @@ dittoPlotInputsUI <- function(id, data, defaults = NULL, title = "dittoPlot Sett
 #' This should be placed in the UI where the plot should be shown.
 #'
 #' @param id The ID for the Shiny module.
-#' @param resizable Logical; when \code{TRUE} (the default) the plot output is
+#' @param resizable Logical; when `TRUE` (the default) the plot output is
 #'   wrapped in [shinyjqui::jqui_resizable()] so it can be resized by dragging.
 #'
 #' @return A Shiny plotlyOutput for the plot.

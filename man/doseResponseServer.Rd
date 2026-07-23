@@ -32,7 +32,7 @@ The value returned by \code{\link[VizModules:dittoViz_scatterPlotServer]{VizModu
 \description{
 Dose-response curve fitting built on the VizModules scatter plot module
 (\code{\link[VizModules:dittoViz_scatterPlotServer]{VizModules::dittoViz_scatterPlotServer()}}). The module registers a
-\pkg{drc} \code{"drm"} model backend and delegates to the scatter plot server
+\strong{drc} \code{"drm"} model backend and delegates to the scatter plot server
 with dose-response defaults (dose on a log10 x-axis, response on the y-axis,
 and a \code{drc} log-logistic model drawn as the fitted curve). Tabs and inputs
 that are not relevant to a single dose-response curve are hidden.

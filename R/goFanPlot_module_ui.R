@@ -21,21 +21,19 @@
 #'
 #' @section Plot parameters and defaults:
 #' The following parameters can be accessed via UI inputs and/or the
-#' \code{defaults} argument:
-#' \itemize{
-#'   \item \code{term.id} - GO identifier column (auto-detected)
-#'   \item \code{onto} - GO ontology category: BP, CC, or MF (auto-detected)
-#'   \item \code{org} - Organism annotation package (e.g. \code{org.Hs.eg.db})
-#'   \item \code{fill} - Numeric column mapped to segment colour (default
-#'     \code{qvalue})
-#'   \item \code{sub_rect} - Optional numeric column drawn as a proportional
-#'     sub-rectangle (default: none)
-#'   \item \code{go.annotation.level.cutoff} - GO annotation level cutoff
-#'     (default 4)
-#'   \item \code{filter.nodes.by.edge.number} - Filter sub-graphs by edge number
-#'     (default 2)
-#'   \item \code{fill.na.by.0} - Fill missing colour values with 0 (default TRUE)
-#' }
+#' `defaults` argument:
+#'
+#' - `term.id` - GO identifier column (auto-detected)
+#' - `onto` - GO ontology category: BP, CC, or MF (auto-detected)
+#' - `org` - Organism annotation package (e.g. `org.Hs.eg.db`)
+#' - `fill` - Numeric column mapped to segment colour (default `qvalue`)
+#' - `sub_rect` - Optional numeric column drawn as a proportional
+#'   sub-rectangle (default: none)
+#' - `go.annotation.level.cutoff` - GO annotation level cutoff
+#'   (default 4)
+#' - `filter.nodes.by.edge.number` - Filter sub-graphs by edge number
+#'   (default 2)
+#' - `fill.na.by.0` - Fill missing colour values with 0 (default TRUE)
 #'
 #' @param id The ID for the Shiny module.
 #' @param data The enrichment results data frame used for plot generation.
@@ -74,7 +72,7 @@ goFanPlotInputsUI <- function(id, data, defaults = NULL, title = "GO Sunburst Se
 
     default.onto <- get_default(defaults, "onto", .gofan_onto(data))
 
-    detected.fill <- .gofan_fill_col(data)
+    detected.fill <- .detect_column(data, .enrichment_pval_candidates, numeric = TRUE)
     if (is.null(detected.fill)) detected.fill <- if (length(num.choices)) num.choices[1] else ""
     default.fill <- get_default(defaults, "fill", detected.fill)
     default.subrect <- get_default(defaults, "sub_rect", "")
@@ -164,7 +162,7 @@ goFanPlotInputsUI <- function(id, data, defaults = NULL, title = "GO Sunburst Se
 #' This should be placed in the UI where the plot should be shown.
 #'
 #' @param id The ID for the Shiny module.
-#' @param resizable Logical; when \code{TRUE} (the default) the plot output is
+#' @param resizable Logical; when `TRUE` (the default) the plot output is
 #'   wrapped in [shinyjqui::jqui_resizable()] so it can be resized by dragging.
 #'
 #' @return A Shiny plotlyOutput for the sunburst plot.

@@ -19,7 +19,7 @@ A Shiny app object.
 \description{
 Convenience wrapper around \code{\link[VizModules:createModuleApp]{VizModules::createModuleApp()}} that launches the
 dose-response module: a scatter plot of response versus dose (log10 x-axis)
-with a \pkg{drc} log-logistic model fitted as the curve. Irrelevant scatter
+with a \strong{drc} log-logistic model fitted as the curve. Irrelevant scatter
 plot tabs and inputs are hidden.
 }
 \details{

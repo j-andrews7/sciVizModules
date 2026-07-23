@@ -13,22 +13,21 @@
 #' resulting `ggplot` is converted to an interactive `plotly` figure.
 #'
 #' @section Plot parameters and defaults:
-#' The following parameters can be accessed via UI inputs and/or the \code{defaults} argument:
-#' \itemize{
-#'   \item \code{var} - Discrete metadata whose frequencies are computed
-#'   \item \code{sample.by} - Discrete metadata identifying individual samples
-#'   \item \code{group.by} - Discrete metadata used for the x-axis groups
-#'   \item \code{color.by} - Discrete metadata used for fill colors (default: `group.by`)
-#'   \item \code{scale} - "percent" or "count" (default: "percent")
-#'   \item \code{plots} - Representations to draw (default: c("boxplot", "jitter"))
-#'   \item \code{max.normalize} - Scale each facet to its own max (default: FALSE)
-#'   \item \code{jitter.size} - Jitter point size (default: 1)
-#'   \item \code{jitter.width} - Horizontal spread of the jitter points (default: 0.2)
-#'   \item \code{jitter.color} - Color of the jitter points (default: "#000000")
-#'   \item \code{boxplot.width} - Width of the boxplots (default: 0.4)
-#'   \item \code{vlnplot.width} - Relative width of the violins (default: 1)
-#'   \item \code{palette.selection} - Colors for discrete groups (multiColorPicker)
-#' }
+#' The following parameters can be accessed via UI inputs and/or the `defaults` argument:
+#'
+#' - `var` - Discrete metadata whose frequencies are computed
+#' - `sample.by` - Discrete metadata identifying individual samples
+#' - `group.by` - Discrete metadata used for the x-axis groups
+#' - `color.by` - Discrete metadata used for fill colors (default: `group.by`)
+#' - `scale` - "percent" or "count" (default: "percent")
+#' - `plots` - Representations to draw (default: c("boxplot", "jitter"))
+#' - `max.normalize` - Scale each facet to its own max (default: FALSE)
+#' - `jitter.size` - Jitter point size (default: 1)
+#' - `jitter.width` - Horizontal spread of the jitter points (default: 0.2)
+#' - `jitter.color` - Color of the jitter points (default: "#000000")
+#' - `boxplot.width` - Width of the boxplots (default: 0.4)
+#' - `vlnplot.width` - Relative width of the violins (default: 1)
+#' - `palette.selection` - Colors for discrete groups (multiColorPicker)
 #'
 #' @param id The ID for the Shiny module.
 #' @param data A `SingleCellExperiment`, `Seurat`, or `SummarizedExperiment` object
@@ -173,7 +172,7 @@ dittoFreqPlotInputsUI <- function(id, data, defaults = NULL, title = "FreqPlot S
 #' This should be placed in the UI where the plot should be shown.
 #'
 #' @param id The ID for the Shiny module.
-#' @param resizable Logical; when \code{TRUE} (the default) the plot output is
+#' @param resizable Logical; when `TRUE` (the default) the plot output is
 #'   wrapped in [shinyjqui::jqui_resizable()] so it can be resized by dragging.
 #'
 #' @return A Shiny plotlyOutput for the frequency plot.

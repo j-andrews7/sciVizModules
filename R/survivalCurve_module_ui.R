@@ -17,25 +17,24 @@
 #' categorical column to stratify by).
 #'
 #' @section Plot parameters and defaults:
-#' The following parameters can be accessed via UI inputs and/or the \code{defaults} argument:
-#' \itemize{
-#'   \item \code{time} - Follow-up time column (auto-detected from columns named
-#'     time/os/pfs/fu, else first numeric column)
-#'   \item \code{status} - Event/status column (auto-detected from columns named
-#'     status/event/vital/dead/censor, else a numeric 0/1 or 1/2 column)
-#'   \item \code{group.by} - Optional stratification column (default: none)
-#'   \item \code{conf.int} - Show confidence interval ribbons (default: TRUE)
-#'   \item \code{pval} - Show log-rank p-value (default: TRUE; only when stratified)
-#'   \item \code{risk.table} - Show "number at risk" table (default: FALSE)
-#'   \item \code{censor} - Show censoring marks (default: TRUE)
-#'   \item \code{surv.median.line} - Median survival reference lines (default: "none")
-#'   \item \code{fun} - Curve transformation: survival probability, "pct", "event",
-#'     or "cumhaz" (default: survival probability)
-#'   \item \code{line.size} - Line width (default: 1)
-#'   \item \code{palette.selection} - Colors for the strata (multiColorPicker)
-#'   \item \code{break.time.by} - Spacing between x-axis ticks (default: blank/auto)
-#'   \item \code{xlim.min}, \code{xlim.max} - X-axis limits (default: blank/auto)
-#' }
+#' The following parameters can be accessed via UI inputs and/or the `defaults` argument:
+#'
+#' - `time` - Follow-up time column (auto-detected from columns named
+#'   time/os/pfs/fu, else first numeric column)
+#' - `status` - Event/status column (auto-detected from columns named
+#'   status/event/vital/dead/censor, else a numeric 0/1 or 1/2 column)
+#' - `group.by` - Optional stratification column (default: none)
+#' - `conf.int` - Show confidence interval ribbons (default: TRUE)
+#' - `pval` - Show log-rank p-value (default: TRUE; only when stratified)
+#' - `risk.table` - Show "number at risk" table (default: FALSE)
+#' - `censor` - Show censoring marks (default: TRUE)
+#' - `surv.median.line` - Median survival reference lines (default: "none")
+#' - `fun` - Curve transformation: survival probability, "pct", "event",
+#'   or "cumhaz" (default: survival probability)
+#' - `line.size` - Line width (default: 1)
+#' - `palette.selection` - Colors for the strata (multiColorPicker)
+#' - `break.time.by` - Spacing between x-axis ticks (default: blank/auto)
+#' - `xlim.min`, `xlim.max` - X-axis limits (default: blank/auto)
 #'
 #' @param id The ID for the Shiny module.
 #' @param data The data frame used for plot generation.
@@ -159,7 +158,7 @@ survivalCurveInputsUI <- function(id, data, defaults = NULL, title = "Survival C
 #' This should be placed in the UI where the plot should be shown.
 #'
 #' @param id The ID for the Shiny module.
-#' @param resizable Logical; when \code{TRUE} (the default) the plot output is
+#' @param resizable Logical; when `TRUE` (the default) the plot output is
 #'   wrapped in [shinyjqui::jqui_resizable()] so it can be resized by dragging.
 #'
 #' @return A Shiny plotlyOutput for the survival curve

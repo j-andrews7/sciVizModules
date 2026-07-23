@@ -65,6 +65,7 @@ The following defaults are selected automatically (any value supplied via
 \item \code{size.by} - \code{GeneRatio} (or another detected ratio column)
 \item \code{fill.by} - \code{neg_log10_pvalue}
 }
+
 All other \code{\link[plotthis:DotPlot]{plotthis::DotPlot()}} parameters remain available via the wrapped UI.
 }
 

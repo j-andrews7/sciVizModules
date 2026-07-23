@@ -73,41 +73,6 @@
     "BP"
 }
 
-#' Detect a fill (colour) column for the sunburst plot
-#'
-#' Prefers significance columns in the order used by [GOfan::sunburstGO()]
-#' (`qvalue` first). Falls back to the first numeric column when none of the
-#' known significance columns are present.
-#'
-#' @param data A data frame of enrichment results.
-#' @return The name of a numeric column, or `NULL` when none is found.
-#'
-#' @author Jacob Martin
-#' @rdname INTERNAL_gofan_fill_col
-#' @keywords internal
-.gofan_fill_col <- function(data) {
-    hit <- .detect_column(data, .enrichment_pval_candidates, numeric = TRUE)
-    if (!is.null(hit)) {
-        return(hit)
-    }
-    num <- names(data)[vapply(data, is.numeric, logical(1))]
-    if (length(num)) num[1] else NULL
-}
-
-#' Detect a sub-rectangle (proportional area) column for the sunburst plot
-#'
-#' Prefers a `Count` column (converted to a proportion by [GOfan::sunburstGO()]).
-#'
-#' @param data A data frame of enrichment results.
-#' @return The name of a numeric column, or `NULL` when none is found.
-#'
-#' @author Jacob Martin
-#' @rdname INTERNAL_gofan_subrect_col
-#' @keywords internal
-.gofan_subrect_col <- function(data) {
-    .detect_column(data, c("Count", "count"), numeric = TRUE)
-}
-
 #' Built-in colour palettes for the GO sunburst plot
 #'
 #' Named vector of plotly continuous colorscales suitable for the `palette`

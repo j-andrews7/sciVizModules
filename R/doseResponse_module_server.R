@@ -2,7 +2,7 @@
 #'
 #' Dose-response curve fitting built on the VizModules scatter plot module
 #' ([VizModules::dittoViz_scatterPlotServer()]). The module registers a
-#' \pkg{drc} `"drm"` model backend and delegates to the scatter plot server
+#' **drc** `"drm"` model backend and delegates to the scatter plot server
 #' with dose-response defaults (dose on a log10 x-axis, response on the y-axis,
 #' and a `drc` log-logistic model drawn as the fitted curve). Tabs and inputs
 #' that are not relevant to a single dose-response curve are hidden.
@@ -47,6 +47,6 @@ doseResponseServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL,
         data = data,
         hide.inputs = union(dose_response_hidden_inputs, hide.inputs),
         hide.tabs = union(dose_response_hidden_tabs, hide.tabs),
-        defaults = list(dr_defaults)
+        defaults = dr_defaults
     )
 }

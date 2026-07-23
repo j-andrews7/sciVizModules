@@ -2,7 +2,7 @@
 #'
 #' Convenience wrapper around [VizModules::createModuleApp()] that launches the
 #' dose-response module: a scatter plot of response versus dose (log10 x-axis)
-#' with a \pkg{drc} log-logistic model fitted as the curve. Irrelevant scatter
+#' with a **drc** log-logistic model fitted as the curve. Irrelevant scatter
 #' plot tabs and inputs are hidden.
 #'
 #' When `data_list` is not provided, the app launches with the bundled

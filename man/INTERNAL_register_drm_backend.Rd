@@ -2,7 +2,7 @@
 % Please edit documentation in R/doseResponse_helpers.R
 \name{.register_drm_backend}
 \alias{.register_drm_backend}
-\title{Register the \pkg{drc} dose-response model backend}
+\title{Register the \strong{drc} dose-response model backend}
 \usage{
 .register_drm_backend()
 }

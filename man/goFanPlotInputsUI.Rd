@@ -55,8 +55,7 @@ The following parameters can be accessed via UI inputs and/or the
 \item \code{term.id} - GO identifier column (auto-detected)
 \item \code{onto} - GO ontology category: BP, CC, or MF (auto-detected)
 \item \code{org} - Organism annotation package (e.g. \code{org.Hs.eg.db})
-\item \code{fill} - Numeric column mapped to segment colour (default
-\code{qvalue})
+\item \code{fill} - Numeric column mapped to segment colour (default \code{qvalue})
 \item \code{sub_rect} - Optional numeric column drawn as a proportional
 sub-rectangle (default: none)
 \item \code{go.annotation.level.cutoff} - GO annotation level cutoff

@@ -4,10 +4,7 @@
 \alias{.gofan_palettes}
 \title{Built-in colour palettes for the GO sunburst plot}
 \usage{
-.gofan_palettes()
-}
-\value{
-A named character vector of plotly colorscale names.
+.gofan_palettes
 }
 \description{
 Named vector of plotly continuous colorscales suitable for the \code{palette}

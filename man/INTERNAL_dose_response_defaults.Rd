@@ -17,7 +17,7 @@ A named list of scatter plot module defaults.
 \description{
 Produces the \code{defaults} list handed to the scatter plot module so the
 dose-response module opens with sensible mappings: the dose column on the
-x-axis (log10-adjusted), the response column on the y-axis, and a \pkg{drc}
+x-axis (log10-adjusted), the response column on the y-axis, and a \strong{drc}
 log-logistic (\code{LL.4}) custom model enabled and drawn as the fitted curve.
 }
 \details{

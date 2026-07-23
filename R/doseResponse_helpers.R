@@ -1,51 +1,20 @@
-#' Register the \pkg{drc} dose-response model backend
+#' Default UI value producers for sciVizModules plot modules
 #'
-#' Adds a `"drm"` backend to the VizModules model registry so the scatter plot
-#' modelling machinery can fit dose-response curves with [drc::drm()]. The
-#' backend exposes a `drc_fct` select field for choosing the dose-response
-#' family (log-logistic and Weibull models). Registration runs once when the
-#' package namespace is loaded.
+#' This file collects the internal helpers that compute the `defaults` lists
+#' handed to the wrapped VizModules plot servers/UIs. Keeping them together keeps
+#' the auto-detected initial state and the reset state in one place per module.
 #'
-#' @return Invisibly `NULL`; called for its side effect of registering the
-#'   backend.
+#' All detection routes through [.detect_column()] (see `enrichment_helpers.R`).
 #'
-#' @importFrom VizModules register_model_backend
-#' @author Jacob Martin
-#' @rdname INTERNAL_register_drm_backend
+#' @name defaults_helpers
 #' @keywords internal
-.register_drm_backend <- function() {
-    register_model_backend("drm", list(
-        fit = function(formula, data, drc_fct = "LL.4", ...) {
-            fct_map <- list(
-                "LL.4" = drc::LL.4, "LL.3" = drc::LL.3, "LL.2" = drc::LL.2,
-                "W1.4" = drc::W1.4, "W2.4" = drc::W2.4
-            )
-            fct_fn <- fct_map[[drc_fct]]
-            if (is.null(fct_fn)) stop("Unknown drc family: ", drc_fct)
-            drc::drm(formula, data = data, fct = fct_fn())
-        },
-        predict = function(model, newdata) {
-            as.numeric(stats::predict(model, newdata = newdata))
-        },
-        validate_classes = "drc",
-        fields = list(
-            drc_fct = list(
-                type = "select",
-                args = list(
-                    choices = c("LL.4", "LL.3", "LL.2", "W1.4", "W2.4"),
-                    selected = "LL.4"
-                )
-            )
-        )
-    ))
-    invisible(NULL)
-}
+NULL
 
 #' Default UI values for the dose-response module
 #'
 #' Produces the `defaults` list handed to the scatter plot module so the
 #' dose-response module opens with sensible mappings: the dose column on the
-#' x-axis (log10-adjusted), the response column on the y-axis, and a \pkg{drc}
+#' x-axis (log10-adjusted), the response column on the y-axis, and a **drc**
 #' log-logistic (`LL.4`) custom model enabled and drawn as the fitted curve.
 #'
 #' User-supplied `defaults` take precedence over these auto-detected values.
@@ -93,11 +62,8 @@
     base <- list(
         x.by = dose_col,
         y.by = resp_col,
-        # Dose axes are conventionally shown on a log scale.
-        x.adj.fxn = "log10",
         # Points only; the fitted dose-response curve is the drc model line.
         linear.model = FALSE,
-        custom.model.enable = TRUE,
         custom.models = list(
             model1 = list(
                 model_type = "drm",
@@ -110,9 +76,54 @@
                 line_colour = "#D7191C",
                 line_width = 2
             )
-        )
+        ),
+        custom.model.enable = TRUE
     )
 
     # User-supplied defaults win.
     utils::modifyList(base, defaults)
 }
+
+#' Register the **drc** dose-response model backend
+#'
+#' Adds a `"drm"` backend to the VizModules model registry so the scatter plot
+#' modelling machinery can fit dose-response curves with [drc::drm()]. The
+#' backend exposes a `drc_fct` select field for choosing the dose-response
+#' family (log-logistic and Weibull models). Registration runs once when the
+#' package namespace is loaded.
+#'
+#' @return Invisibly `NULL`; called for its side effect of registering the
+#'   backend.
+#'
+#' @importFrom VizModules register_model_backend
+#' @author Jacob Martin
+#' @rdname INTERNAL_register_drm_backend
+#' @keywords internal
+.register_drm_backend <- function() {
+    register_model_backend("drm", list(
+        fit = function(formula, data, drc_fct = "LL.4", ...) {
+            fct_map <- list(
+                "LL.4" = drc::LL.4, "LL.3" = drc::LL.3, "LL.2" = drc::LL.2,
+                "W1.4" = drc::W1.4, "W2.4" = drc::W2.4
+            )
+            fct_fn <- fct_map[[drc_fct]]
+            if (is.null(fct_fn)) stop("Unknown drc family: ", drc_fct)
+            drc::drm(formula, data = data, fct = fct_fn())
+        },
+        predict = function(model, newdata) {
+            as.numeric(stats::predict(model, newdata = newdata))
+        },
+        validate_classes = "drc",
+        fields = list(
+            drc_fct = list(
+                type = "select",
+                args = list(
+                    choices = c("LL.4", "LL.3", "LL.2", "W1.4", "W2.4"),
+                    selected = "LL.4"
+                )
+            )
+        )
+    ))
+    invisible(NULL)
+}
+

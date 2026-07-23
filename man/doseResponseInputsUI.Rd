@@ -24,7 +24,7 @@ A Shiny tagList containing the UI elements.
 \description{
 Thin wrapper over \code{\link[VizModules:dittoViz_scatterPlotInputsUI]{VizModules::dittoViz_scatterPlotInputsUI()}} that applies
 dose-response defaults (dose on a log10 x-axis, response on the y-axis, and
-a \pkg{drc} log-logistic model enabled as the fitted curve). Tabs and inputs
+a \strong{drc} log-logistic model enabled as the fitted curve). Tabs and inputs
 that are irrelevant to a single dose-response curve are hidden by
 \code{\link[=doseResponseServer]{doseResponseServer()}}.
 }
