@@ -42,8 +42,12 @@ michaelisMentenInputsUI <- function(id, data, defaults = NULL,
     num.choices <- names(data)[vapply(data, is.numeric, logical(1))]
     if (length(num.choices) == 0) num.choices <- col.choices
 
-    default.x <- get_default(defaults, "x", if ("S" %in% col.choices) "S" else num.choices[1])
-    default.y <- get_default(defaults, "y", if ("v" %in% col.choices) "v" else num.choices[min(2, length(num.choices))])
+    detected.x <- .detect_column(data, "S")
+    detected.y <- .detect_column(data, "v")
+    default.x <- get_default(defaults, "x",
+        if (!is.null(detected.x)) detected.x else num.choices[1])
+    default.y <- get_default(defaults, "y",
+        if (!is.null(detected.y)) detected.y else num.choices[min(2, length(num.choices))])
 
     linetype.choices <- c(
         "Solid" = "solid", "Dashed" = "dashed", "Dotted" = "dotted",
@@ -119,7 +123,7 @@ michaelisMentenInputsUI <- function(id, data, defaults = NULL,
 #' This should be placed in the UI where the plot should be shown.
 #'
 #' @param id The ID for the Shiny module.
-#' @param resizable Logical; when \code{TRUE} (the default) the plot output is
+#' @param resizable Logical; when `TRUE` (the default) the plot output is
 #'   wrapped in [shinyjqui::jqui_resizable()] so it can be resized by dragging.
 #'
 #' @return A Shiny plotlyOutput for the Michaelis-Menten plot.

@@ -1,5 +1,29 @@
 {
   "sandbox": {
     "enabled": false
+  },
+  "permission": {
+    "edit": {
+      "*.R": "allow",
+      "*/DESCRIPTION": "allow"
+    },
+    "executeCode": {
+      "*": "allow"
+    },
+    "bash": {
+      "R *": "allow",
+      "head *": "allow",
+      "echo *": "allow",
+      "ls *": "allow",
+      "Rscript *": "allow",
+      "*": "allow"
+    },
+    "external_directory": {
+      "/tmp/*": "allow"
+    },
+    "read": {
+      "*.txt": "allow",
+      "*": "allow"
+    }
   }
 }

@@ -73,78 +73,29 @@
     "BP"
 }
 
-#' Detect a fill (colour) column for the sunburst plot
-#'
-#' Prefers significance columns in the order used by [GOfan::sunburstGO()]
-#' (`qvalue` first). Falls back to the first numeric column when none of the
-#' known significance columns are present.
-#'
-#' @param data A data frame of enrichment results.
-#' @return The name of a numeric column, or `NULL` when none is found.
-#'
-#' @author Jacob Martin
-#' @rdname INTERNAL_gofan_fill_col
-#' @keywords internal
-.gofan_fill_col <- function(data) {
-    candidates <- c(
-        "qvalue", "qvalues", "p.adjust", "padj", "FDR", "fdr",
-        "pvalue", "pval", "p.value"
-    )
-    for (nm in candidates) {
-        if (nm %in% names(data) && is.numeric(data[[nm]])) {
-            return(nm)
-        }
-    }
-    num <- names(data)[vapply(data, is.numeric, logical(1))]
-    if (length(num)) num[1] else NULL
-}
-
-#' Detect a sub-rectangle (proportional area) column for the sunburst plot
-#'
-#' Prefers a `Count` column (converted to a proportion by [GOfan::sunburstGO()]).
-#'
-#' @param data A data frame of enrichment results.
-#' @return The name of a numeric column, or `NULL` when none is found.
-#'
-#' @author Jacob Martin
-#' @rdname INTERNAL_gofan_subrect_col
-#' @keywords internal
-.gofan_subrect_col <- function(data) {
-    for (nm in c("Count", "count")) {
-        if (nm %in% names(data) && is.numeric(data[[nm]])) {
-            return(nm)
-        }
-    }
-    NULL
-}
-
 #' Built-in colour palettes for the GO sunburst plot
 #'
 #' Named vector of plotly continuous colorscales suitable for the `palette`
 #' argument of [goFanPlot()] and the "Palette" UI input. Names are display
 #' labels; values are the colorscale identifiers passed to plotly.
 #'
-#' @return A named character vector of plotly colorscale names.
-#'
 #' @author Jacob Martin
 #' @rdname INTERNAL_gofan_palettes
 #' @keywords internal
-.gofan_palettes <- function() {
-    c(
-        "Viridis" = "Viridis",
-        "Cividis" = "Cividis",
-        "Blues" = "Blues",
-        "Greens" = "Greens",
-        "Reds" = "Reds",
-        "YlOrRd" = "YlOrRd",
-        "YlGnBu" = "YlGnBu",
-        "Hot" = "Hot",
-        "Blackbody" = "Blackbody",
-        "Electric" = "Electric",
-        "Jet" = "Jet",
-        "Portland" = "Portland",
-        "Picnic (diverging)" = "Picnic",
-        "RdBu (diverging)" = "RdBu",
-        "Earth (diverging)" = "Earth"
-    )
-}
+.gofan_palettes <- c(
+    "Viridis" = "Viridis",
+    "Cividis" = "Cividis",
+    "Blues" = "Blues",
+    "Greens" = "Greens",
+    "Reds" = "Reds",
+    "YlOrRd" = "YlOrRd",
+    "YlGnBu" = "YlGnBu",
+    "Hot" = "Hot",
+    "Blackbody" = "Blackbody",
+    "Electric" = "Electric",
+    "Jet" = "Jet",
+    "Portland" = "Portland",
+    "Picnic (diverging)" = "Picnic",
+    "RdBu (diverging)" = "RdBu",
+    "Earth (diverging)" = "Earth"
+)

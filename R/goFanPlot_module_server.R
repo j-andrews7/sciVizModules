@@ -45,7 +45,7 @@ goFanPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defa
             detected.id <- .gofan_id_col(df)
             id.choices <- names(df)[vapply(df, function(x) !is.numeric(x), logical(1))]
             if (is.null(detected.id)) detected.id <- if (length(id.choices)) id.choices[1] else ""
-            detected.fill <- .gofan_fill_col(df)
+            detected.fill <- .detect_column(df, .enrichment_pval_candidates, numeric = TRUE)
             num.choices <- names(df)[vapply(df, is.numeric, logical(1))]
             if (is.null(detected.fill)) detected.fill <- if (length(num.choices)) num.choices[1] else ""
 

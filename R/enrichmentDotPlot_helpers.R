@@ -8,12 +8,10 @@
 #' @rdname INTERNAL_enrich_term_col
 #' @keywords internal
 .enrich_term_col <- function(data) {
-    candidates <- c(
+    .detect_column(data, c(
         "Description", "description", "Term", "term", "pathway", "Pathway",
         "name", "Name", "geneSet", "ID", "id"
-    )
-    hit <- intersect(candidates, names(data))
-    if (length(hit)) hit[1] else NULL
+    ))
 }
 
 #' Detect a categorical grouping column for the enrichment x-axis
@@ -51,17 +49,11 @@
 #' @rdname INTERNAL_enrich_ratio_col
 #' @keywords internal
 .enrich_ratio_col <- function(data) {
-    candidates <- c(
+    .detect_column(data, c(
         "GeneRatio", "generatio", "Ratio", "richFactor", "RichFactor",
         "rich_factor", "FoldEnrichment", "fold_enrichment", "foldEnrichment",
         "NES", "Count", "count"
-    )
-    for (nm in candidates) {
-        if (nm %in% names(data) && is.numeric(data[[nm]])) {
-            return(nm)
-        }
-    }
-    NULL
+    ), numeric = TRUE)
 }
 
 #' Detect a p-value column for the enrichment dot color
@@ -73,16 +65,10 @@
 #' @rdname INTERNAL_enrich_pval_col
 #' @keywords internal
 .enrich_pval_col <- function(data) {
-    candidates <- c(
+    .detect_column(data, c(
         "p.adjust", "padj", "p_adjust", "FDR", "fdr", "qvalue", "qvalues",
         "pvalue", "pval", "p.value", "PValue", "P.Value", "p"
-    )
-    for (nm in candidates) {
-        if (nm %in% names(data) && is.numeric(data[[nm]])) {
-            return(nm)
-        }
-    }
-    NULL
+    ), numeric = TRUE)
 }
 
 #' Parse a "GeneRatio"-style fraction string to a numeric ratio
@@ -171,22 +157,3 @@
     )
 }
 
-#' Merge enrichment default mappings into a user-supplied defaults list
-#'
-#' User-supplied defaults take precedence over the auto-detected mappings.
-#'
-#' @param defaults A named list of user defaults (or `NULL`).
-#' @param mapping The mapping list produced by [.prepare_enrichment()].
-#' @return A named list of defaults keyed by DotPlot UI input IDs.
-#'
-#' @author Jacob Martin, Jared Andrews
-#' @rdname INTERNAL_enrich_defaults
-#' @keywords internal
-.enrich_defaults <- function(defaults, mapping) {
-    if (is.null(defaults)) defaults <- list()
-    if (!is.null(mapping$y) && is.null(defaults[["y.data"]])) defaults[["y.data"]] <- mapping$y
-    if (!is.null(mapping$x) && is.null(defaults[["x.data"]])) defaults[["x.data"]] <- mapping$x
-    if (!is.null(mapping$size) && is.null(defaults[["size.by"]])) defaults[["size.by"]] <- mapping$size
-    if (!is.null(mapping$fill) && is.null(defaults[["fill.by"]])) defaults[["fill.by"]] <- mapping$fill
-    defaults
-}

@@ -13,17 +13,16 @@
 #' `plotly` figure.
 #'
 #' @section Plot parameters and defaults:
-#' The following parameters can be accessed via UI inputs and/or the \code{defaults} argument:
-#' \itemize{
-#'   \item \code{var} - Discrete metadata to quantify within each group
-#'   \item \code{group.by} - Discrete metadata used for the x-axis groups
-#'   \item \code{scale} - "percent" or "count" (default: "percent")
-#'   \item \code{split.by} - Discrete metadata to facet by (default: none)
-#'   \item \code{split.nrow}, \code{split.ncol} - Number of rows/columns for the facet
-#'     layout when \code{split.by} is set (default: automatic)
-#'   \item \code{x.labels.rotate} - Rotate x-axis labels (default: TRUE)
-#'   \item \code{palette.selection} - Colors for the `var` levels (multiColorPicker)
-#' }
+#' The following parameters can be accessed via UI inputs and/or the `defaults` argument:
+#'
+#' - `var` - Discrete metadata to quantify within each group
+#' - `group.by` - Discrete metadata used for the x-axis groups
+#' - `scale` - "percent" or "count" (default: "percent")
+#' - `split.by` - Discrete metadata to facet by (default: none)
+#' - `split.nrow`, `split.ncol` - Number of rows/columns for the facet
+#'   layout when `split.by` is set (default: automatic)
+#' - `x.labels.rotate` - Rotate x-axis labels (default: TRUE)
+#' - `palette.selection` - Colors for the `var` levels (multiColorPicker)
 #'
 #' @param id The ID for the Shiny module.
 #' @param data A `SingleCellExperiment`, `Seurat`, or `SummarizedExperiment` object
@@ -141,7 +140,7 @@ dittoBarPlotInputsUI <- function(id, data, defaults = NULL, title = "BarPlot Set
 #' This should be placed in the UI where the plot should be shown.
 #'
 #' @param id The ID for the Shiny module.
-#' @param resizable Logical; when \code{TRUE} (the default) the plot output is
+#' @param resizable Logical; when `TRUE` (the default) the plot output is
 #'   wrapped in [shinyjqui::jqui_resizable()] so it can be resized by dragging.
 #'
 #' @return A Shiny plotlyOutput for the bar plot.

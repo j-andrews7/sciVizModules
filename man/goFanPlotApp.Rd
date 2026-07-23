@@ -32,7 +32,7 @@ a warning.
 This is a convenience wrapper around \code{\link[VizModules:createModuleApp]{VizModules::createModuleApp()}}.
 }
 \note{
-Rendering the plot requires the \pkg{GOfan} package and the relevant
+Rendering the plot requires the \strong{GOfan} package and the relevant
 organism annotation (\code{OrgDb}) package (e.g. \code{org.Hs.eg.db}) to be installed.
 }
 \examples{

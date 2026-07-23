@@ -15,7 +15,7 @@
 #'   \item{ensembl}{Ensembl gene ID}
 #' }
 #'
-#' @source Generated from the \code{airway} Bioconductor package using DESeq2.
+#' @source Generated from the `airway` Bioconductor package using DESeq2.
 #' The contrast compares dexamethasone treatment ("trt") vs untreated ("untrt").
 #'
 #' @examples
@@ -42,7 +42,7 @@
 #'   \item{symbol}{Gene symbol}
 #' }
 #'
-#' @source Generated from the \code{airway} Bioconductor package using edgeR.
+#' @source Generated from the `airway` Bioconductor package using edgeR.
 #' The contrast compares dexamethasone treatment ("trt") vs untreated ("untrt").
 #'
 #' @examples
@@ -70,7 +70,7 @@
 #'   \item{symbol}{Gene symbol}
 #' }
 #'
-#' @source Generated from the \code{airway} Bioconductor package using limma.
+#' @source Generated from the `airway` Bioconductor package using limma.
 #' The contrast compares dexamethasone treatment ("trt") vs untreated ("untrt").
 #'
 #' @examples
@@ -84,7 +84,7 @@
 #' Example survival dataset (NCCTG lung cancer)
 #'
 #' A lightly cleaned version of the NCCTG lung cancer dataset from the
-#' \code{survival} package, provided as a ready-to-use example for the
+#' `survival` package, provided as a ready-to-use example for the
 #' [survivalCurve()] module. Each row is one patient with a follow-up time,
 #' an event indicator, and a couple of grouping variables.
 #'
@@ -98,7 +98,7 @@
 #'   \item{ph.ecog}{ECOG performance status, as a labelled factor}
 #' }
 #'
-#' @source Derived from \code{survival::lung} (Loprinzi et al., North Central
+#' @source Derived from `survival::lung` (Loprinzi et al., North Central
 #' Cancer Treatment Group).
 #'
 #' @examples
@@ -120,14 +120,14 @@
 #' @format A [SingleCellExperiment::SingleCellExperiment] with 40 genes and 240
 #' cells containing:
 #' \describe{
-#'   \item{assays}{\code{counts} and \code{logcounts}}
-#'   \item{reducedDims}{\code{PCA}, \code{TSNE}, and \code{UMAP} embeddings}
-#'   \item{colData}{\code{clustering}, \code{celltype}, \code{condition}, and
-#'     \code{sample} (discrete), plus \code{nCount} and \code{percent.mito}
+#'   \item{assays}{`counts` and `logcounts`}
+#'   \item{reducedDims}{`PCA`, `TSNE`, and `UMAP` embeddings}
+#'   \item{colData}{`clustering`, `celltype`, `condition`, and
+#'     `sample` (discrete), plus `nCount` and `percent.mito`
 #'     (continuous)}
 #' }
 #'
-#' @source Simulated in \code{data-raw/generate_example_sce.R}; no real
+#' @source Simulated in `data-raw/generate_example_sce.R`; no real
 #' biological data are included.
 #'
 #' @examples
@@ -164,7 +164,7 @@
 #'   \item{Count}{Number of query genes in the term}
 #' }
 #'
-#' @source Simulated in \code{data-raw/generate_example_enrichment.R}; no real
+#' @source Simulated in `data-raw/generate_example_enrichment.R`; no real
 #' biological data are included.
 #'
 #' @examples
@@ -188,7 +188,7 @@
 #'   \item{v}{Reaction velocity (dE/min)}
 #' }
 #'
-#' @source Simulated in \code{data-raw/generate_mm_kinetics.R}; no real
+#' @source Simulated in `data-raw/generate_mm_kinetics.R`; no real
 #' biological data are included.
 #'
 #' @seealso [sciVizModules::mm_kinetics_line],
@@ -216,7 +216,7 @@
 #' }
 #'
 #' @source Predicted from [mm_kinetics_fit] in
-#' \code{data-raw/generate_mm_kinetics.R}.
+#' `data-raw/generate_mm_kinetics.R`.
 #'
 #' @seealso [sciVizModules::mm_kinetics], [sciVizModules::mm_kinetics_fit]
 #'
@@ -236,9 +236,9 @@
 #' velocity used for the K / Vmax annotations in the [michaelisMentenServer()]
 #' module.
 #'
-#' @format An object of class \code{nls}.
+#' @format An object of class `nls`.
 #'
-#' @source Fitted in \code{data-raw/generate_mm_kinetics.R}.
+#' @source Fitted in `data-raw/generate_mm_kinetics.R`.
 #'
 #' @seealso [sciVizModules::mm_kinetics], [sciVizModules::mm_kinetics_line]
 #'
@@ -250,3 +250,35 @@
 #' @author Jacob Martin
 #' @keywords datasets
 "mm_kinetics_fit"
+
+#' Example dose-response data (simulated)
+#'
+#' A small, self-contained dose-response dataset: a serial dilution of doses
+#' with triplicate percent-response readings and per-dose mean and standard
+#' deviation. Provided as ready-to-use example data for the
+#' [doseResponseServer()] module. The response follows a smooth sigmoidal
+#' (log-logistic) shape suitable for [drc::drm()] fitting.
+#'
+#' @format A data frame with 9 rows and 6 columns:
+#' \describe{
+#'   \item{dose_uM}{Dose / concentration (uM)}
+#'   \item{rep1_response_pct}{Percent response, replicate 1}
+#'   \item{rep2_response_pct}{Percent response, replicate 2}
+#'   \item{rep3_response_pct}{Percent response, replicate 3}
+#'   \item{mean_response_pct}{Mean percent response across replicates}
+#'   \item{sd_response_pct}{Standard deviation of percent response}
+#' }
+#'
+#' @source Simulated in `data-raw/generate_dose_response.R`; no real
+#' biological data are included.
+#'
+#' @seealso [sciVizModules::doseResponseApp()]
+#'
+#' @examples
+#' library(sciVizModules)
+#' data(dose_response)
+#' head(dose_response)
+#'
+#' @author Jacob Martin
+#' @keywords datasets
+"dose_response"

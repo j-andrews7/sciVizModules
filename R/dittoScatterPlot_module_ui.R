@@ -14,23 +14,22 @@
 #' `plotly` figure.
 #'
 #' @section Plot parameters and defaults:
-#' The following parameters can be accessed via UI inputs and/or the \code{defaults} argument:
-#' \itemize{
-#'   \item \code{x.var} - Continuous variable on the x-axis (gene or numeric metadata)
-#'   \item \code{y.var} - Continuous variable on the y-axis (gene or numeric metadata)
-#'   \item \code{color.var} - Gene or metadata used for coloring (default: none)
-#'   \item \code{shape.by} - Discrete metadata mapped to point shape (default: none)
-#'   \item \code{split.by} - Discrete metadata to facet by (default: none)
-#'   \item \code{size} - Point size (default: 1)
-#'   \item \code{opacity} - Point opacity (default: 1)
-#'   \item \code{order} - Point plotting order (default: "unordered")
-#'   \item \code{do.label} - Draw group labels at group centers (default: FALSE)
-#'   \item \code{labels.size} - Text size of the group labels (default: 5)
-#'   \item \code{do.ellipse} - Draw grouping ellipses (default: FALSE)
-#'   \item \code{do.contour} - Overlay kernel-density contour lines (default: FALSE)
-#'   \item \code{min.color}, \code{max.color} - Colors for continuous color scales
-#'   \item \code{palette.selection} - Colors for discrete groups (multiColorPicker)
-#' }
+#' The following parameters can be accessed via UI inputs and/or the `defaults` argument:
+#'
+#' - `x.var` - Continuous variable on the x-axis (gene or numeric metadata)
+#' - `y.var` - Continuous variable on the y-axis (gene or numeric metadata)
+#' - `color.var` - Gene or metadata used for coloring (default: none)
+#' - `shape.by` - Discrete metadata mapped to point shape (default: none)
+#' - `split.by` - Discrete metadata to facet by (default: none)
+#' - `size` - Point size (default: 1)
+#' - `opacity` - Point opacity (default: 1)
+#' - `order` - Point plotting order (default: "unordered")
+#' - `do.label` - Draw group labels at group centers (default: FALSE)
+#' - `labels.size` - Text size of the group labels (default: 5)
+#' - `do.ellipse` - Draw grouping ellipses (default: FALSE)
+#' - `do.contour` - Overlay kernel-density contour lines (default: FALSE)
+#' - `min.color`, `max.color` - Colors for continuous color scales
+#' - `palette.selection` - Colors for discrete groups (multiColorPicker)
 #'
 #' @param id The ID for the Shiny module.
 #' @param data A `SingleCellExperiment`, `Seurat`, or `SummarizedExperiment` object
@@ -179,7 +178,7 @@ dittoScatterPlotInputsUI <- function(id, data, defaults = NULL, title = "Scatter
 #' This should be placed in the UI where the plot should be shown.
 #'
 #' @param id The ID for the Shiny module.
-#' @param resizable Logical; when \code{TRUE} (the default) the plot output is
+#' @param resizable Logical; when `TRUE` (the default) the plot output is
 #'   wrapped in [shinyjqui::jqui_resizable()] so it can be resized by dragging.
 #'
 #' @return A Shiny plotlyOutput for the scatter plot.
