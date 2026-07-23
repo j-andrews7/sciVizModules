@@ -113,7 +113,7 @@ goFanPlotInputsUI <- function(id, data, defaults = NULL, title = "GO Sunburst Se
             ), "Numeric column mapped onto the segment fill colour (e.g. qvalue).",
                 placement = "top", options = list(container = "body")),
             tipify(selectInput(ns("palette"), "Palette",
-                choices = .gofan_palettes(),
+                choices = .gofan_palettes,
                 selected = get_default(defaults, "palette", "Viridis"), selectize = FALSE
             ), "Colour palette used to map the 'Colour By' column onto the segments.",
                 placement = "top", options = list(container = "body")),

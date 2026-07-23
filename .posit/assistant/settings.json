@@ -1,5 +1,14 @@
 {
   "sandbox": {
     "enabled": false
+  },
+  "permission": {
+    "edit": {
+      "*.R": "allow",
+      "*/DESCRIPTION": "allow"
+    },
+    "executeCode": {
+      "*": "allow"
+    }
   }
 }

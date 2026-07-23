@@ -8,12 +8,10 @@
 #' @rdname INTERNAL_enrich_term_col
 #' @keywords internal
 .enrich_term_col <- function(data) {
-    candidates <- c(
+    .detect_column(data, c(
         "Description", "description", "Term", "term", "pathway", "Pathway",
         "name", "Name", "geneSet", "ID", "id"
-    )
-    hit <- intersect(candidates, names(data))
-    if (length(hit)) hit[1] else NULL
+    ))
 }
 
 #' Detect a categorical grouping column for the enrichment x-axis

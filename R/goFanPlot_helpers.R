@@ -86,14 +86,9 @@
 #' @rdname INTERNAL_gofan_fill_col
 #' @keywords internal
 .gofan_fill_col <- function(data) {
-    candidates <- c(
-        "qvalue", "qvalues", "p.adjust", "padj", "FDR", "fdr",
-        "pvalue", "pval", "p.value"
-    )
-    for (nm in candidates) {
-        if (nm %in% names(data) && is.numeric(data[[nm]])) {
-            return(nm)
-        }
+    hit <- .detect_column(data, .enrichment_pval_candidates, numeric = TRUE)
+    if (!is.null(hit)) {
+        return(hit)
     }
     num <- names(data)[vapply(data, is.numeric, logical(1))]
     if (length(num)) num[1] else NULL
@@ -110,12 +105,7 @@
 #' @rdname INTERNAL_gofan_subrect_col
 #' @keywords internal
 .gofan_subrect_col <- function(data) {
-    for (nm in c("Count", "count")) {
-        if (nm %in% names(data) && is.numeric(data[[nm]])) {
-            return(nm)
-        }
-    }
-    NULL
+    .detect_column(data, c("Count", "count"), numeric = TRUE)
 }
 
 #' Built-in colour palettes for the GO sunburst plot
@@ -124,27 +114,23 @@
 #' argument of [goFanPlot()] and the "Palette" UI input. Names are display
 #' labels; values are the colorscale identifiers passed to plotly.
 #'
-#' @return A named character vector of plotly colorscale names.
-#'
 #' @author Jacob Martin
 #' @rdname INTERNAL_gofan_palettes
 #' @keywords internal
-.gofan_palettes <- function() {
-    c(
-        "Viridis" = "Viridis",
-        "Cividis" = "Cividis",
-        "Blues" = "Blues",
-        "Greens" = "Greens",
-        "Reds" = "Reds",
-        "YlOrRd" = "YlOrRd",
-        "YlGnBu" = "YlGnBu",
-        "Hot" = "Hot",
-        "Blackbody" = "Blackbody",
-        "Electric" = "Electric",
-        "Jet" = "Jet",
-        "Portland" = "Portland",
-        "Picnic (diverging)" = "Picnic",
-        "RdBu (diverging)" = "RdBu",
-        "Earth (diverging)" = "Earth"
-    )
-}
+.gofan_palettes <- c(
+    "Viridis" = "Viridis",
+    "Cividis" = "Cividis",
+    "Blues" = "Blues",
+    "Greens" = "Greens",
+    "Reds" = "Reds",
+    "YlOrRd" = "YlOrRd",
+    "YlGnBu" = "YlGnBu",
+    "Hot" = "Hot",
+    "Blackbody" = "Blackbody",
+    "Electric" = "Electric",
+    "Jet" = "Jet",
+    "Portland" = "Portland",
+    "Picnic (diverging)" = "Picnic",
+    "RdBu (diverging)" = "RdBu",
+    "Earth (diverging)" = "Earth"
+)

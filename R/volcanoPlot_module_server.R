@@ -78,5 +78,5 @@ volcanoPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = c("Traje
         hide.inputs <- c(hide.inputs, "color.panel")
     }
 
-    dittoViz_scatterPlotServer(id = id, data = res$data, hide.inputs = hide.inputs, hide.tabs = hide.tabs, manual.colors = res$colors)
+    dittoViz_scatterPlotServer(id = id, data = res$data, hide.inputs = c(hide.inputs, "custom.models", "custom.model.enable"), hide.tabs = hide.tabs, manual.colors = res$colors)
 }

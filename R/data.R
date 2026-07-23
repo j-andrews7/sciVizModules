@@ -250,3 +250,35 @@
 #' @author Jacob Martin
 #' @keywords datasets
 "mm_kinetics_fit"
+
+#' Example dose-response data (simulated)
+#'
+#' A small, self-contained dose-response dataset: a serial dilution of doses
+#' with triplicate percent-response readings and per-dose mean and standard
+#' deviation. Provided as ready-to-use example data for the
+#' [doseResponseServer()] module. The response follows a smooth sigmoidal
+#' (log-logistic) shape suitable for [drc::drm()] fitting.
+#'
+#' @format A data frame with 9 rows and 6 columns:
+#' \describe{
+#'   \item{dose_uM}{Dose / concentration (uM)}
+#'   \item{rep1_response_pct}{Percent response, replicate 1}
+#'   \item{rep2_response_pct}{Percent response, replicate 2}
+#'   \item{rep3_response_pct}{Percent response, replicate 3}
+#'   \item{mean_response_pct}{Mean percent response across replicates}
+#'   \item{sd_response_pct}{Standard deviation of percent response}
+#' }
+#'
+#' @source Simulated in \code{data-raw/generate_dose_response.R}; no real
+#' biological data are included.
+#'
+#' @seealso [sciVizModules::doseResponseApp()]
+#'
+#' @examples
+#' library(sciVizModules)
+#' data(dose_response)
+#' head(dose_response)
+#'
+#' @author Jacob Martin
+#' @keywords datasets
+"dose_response"
