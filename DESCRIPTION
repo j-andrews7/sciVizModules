@@ -24,20 +24,22 @@ Depends:
     shinyBS,
     VizModules
 Imports:
+    colourpicker,
+    dplyr,
+    DT,
+    readxl,
     shinyjs,
     scales,
+    shinyjqui,
     survival,
     survminer,
+    ggplot2,
+    htmltools,
+    jsonlite,
+    methods,
     shinyWidgets,
     htmlwidgets,
     dittoSeq,
-    SingleCellExperiment,
-    SummarizedExperiment,
-    S4Vectors,
-    ggplot.multistats,
-    GOfan,
-    org.Hs.eg.db,
-    drc
 Remotes:
     j-andrews7/VizModules@0.3.0,
     jianhong/GOfan
