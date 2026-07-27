@@ -58,6 +58,7 @@ export(volcanoPlotOutputUI)
 export(volcanoPlotServer)
 import(VizModules)
 import(ggplot2, except = last_plot)
+
 import(plotly)
 import(shiny)
 importFrom(DT,DTOutput)

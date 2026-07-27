@@ -47,8 +47,6 @@ Imports:
     ggplot.multistats,
     GOfan,
     org.Hs.eg.db
-Remotes:
-    j-andrews7/VizModules@0.2.1
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
