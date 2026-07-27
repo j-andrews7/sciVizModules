@@ -15,15 +15,11 @@ cnSegmentPlotServer(
 \arguments{
 \item{id}{The ID for the Shiny module.}
 
-\item{data}{A \code{reactive} returning a list with up to three elements:
-\describe{
-\item{\code{seg}}{A \code{CNSegment} object (required).}
-\item{\code{genes}}{Optional \code{GRanges} of gene coordinates for labeling.}
-\item{\code{centromere}}{Optional \code{GRanges} of per-chromosome centromere
-coordinates, used to position chromosome axis tick labels.}
-}
-The list may also be unnamed with positions 1 = seg, 2 = genes,
-3 = centromere.}
+\item{data}{A \code{reactive} returning a single \code{CNSegment} object (as returned
+by \code{\link[sesame:cnSegmentation]{sesame::cnSegmentation()}}). Gene labels are taken from
+\code{seg$genomeInfo$genes} and chromosome tick/guide positions from
+\code{seg$genomeInfo$cytoBand}; genes overlapping each bin are read from the
+\code{bin.coords$genes} metadata column when present.}
 
 \item{hide.inputs}{A character vector of input IDs to hide.}
 

@@ -6,15 +6,11 @@
 #' and adds user-selected genes as draggable Plotly annotations.
 #'
 #' @param id The ID for the Shiny module.
-#' @param data A `reactive` returning a list with up to three elements:
-#'   \describe{
-#'     \item{`seg`}{A `CNSegment` object (required).}
-#'     \item{`genes`}{Optional `GRanges` of gene coordinates for labeling.}
-#'     \item{`centromere`}{Optional `GRanges` of per-chromosome centromere
-#'       coordinates, used to position chromosome axis tick labels.}
-#'   }
-#'   The list may also be unnamed with positions 1 = seg, 2 = genes,
-#'   3 = centromere.
+#' @param data A `reactive` returning a single `CNSegment` object (as returned
+#'   by [sesame::cnSegmentation()]). Gene labels are taken from
+#'   `seg$genomeInfo$genes` and chromosome tick/guide positions from
+#'   `seg$genomeInfo$cytoBand`; genes overlapping each bin are read from the
+#'   `bin.coords$genes` metadata column when present.
 #' @param hide.inputs A character vector of input IDs to hide.
 #' @param hide.tabs A character vector of tab names to hide.
 #' @param defaults A named list of default values used when resetting the
@@ -25,6 +21,8 @@
 #' @import plotly
 #' @importFrom shinyjs hide
 #' @importFrom methods is
+#' @importFrom colourpicker updateColourInput
+#' @importFrom GenomicRanges seqinfo seqnames mcols
 #' @import VizModules
 #'
 #' @seealso [sciVizModules::cnSegmentPlot()],
@@ -37,6 +35,25 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
     stopifnot(is.reactive(data))
     data_reactive <- data
 
+    base_defaults <- list(
+            label.genes = "TP53, EGFR, MYC, TERT, PTCH1, MGMT, CCNE1, KRAS, CDK4, CDK6, CCND1, CCND2, FGFR1, PDGFRA, RB1, MYCN, MDM4, GLI2, MYB, CDKN2A, PTEN, MDM2, NF1, PPM1D, NF2, SMARCB1",
+            label.size = 10,
+            show.grid.x = FALSE,
+            show.grid.y = FALSE,
+            margin.top = 70,
+            hline.intercepts = "0",
+            hline.colors = "#adadad",
+            hline.widths = "1",
+            hline.linetypes = "solid",
+            axis.tickangle.x = -45
+        )
+
+    if (!is.null(defaults)) {
+        defaults <- modifyList(base_defaults, defaults)
+    } else {
+        defaults <- base_defaults
+    }
+
     moduleServer(id, function(input, output, session) {
         if (!is.null(hide.inputs)) {
             for (input.name in hide.inputs) hide(input.name)
@@ -45,35 +62,28 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             for (tab.name in hide.tabs) hideTab(inputId = "cnSegmentPlotTabsetPanel", target = tab.name)
         }
 
-        # Pull the bundled inputs out of the reactive list (named or positional).
-        get_part <- function(bundle, name, pos) {
-            if (!is.null(bundle[[name]])) {
-                bundle[[name]]
-            } else if (length(bundle) >= pos) {
-                bundle[[pos]]
-            } else {
-                NULL
-            }
-        }
-        seg_obj <- reactive(get_part(data_reactive(), "seg", 1))
-        genes_obj <- reactive(get_part(data_reactive(), "genes", 2))
-        centromere_obj <- reactive(get_part(data_reactive(), "centromere", 3))
+        # The module consumes a single CNSegment object. Gene labels come from
+        # its `genomeInfo$genes` annotation; centromeres are derived internally
+        # from `genomeInfo$cytoBand` by cnSegmentPlot().
+        seg_obj <- reactive(data_reactive())
+        genes_obj <- reactive(seg_obj()$genomeInfo$genes)
 
         observeEvent(input$reset, {
             seg <- seg_obj()
             req(seg)
 
-            seq.choices <- as.character(GenomicRanges::seqinfo(seg$bin.coords)@seqnames)
-            hover.choices <- union(names(GenomicRanges::mcols(seg$bin.coords)), "signal")
+            seq.choices <- as.character(seqnames(seqinfo(seg$bin.coords)))
+            seq.choices <- seq.choices[seq.choices %in% c(paste0("chr", 1:22), "chrX", "chrY")]
+            hover.choices <- union(names(mcols(seg$bin.coords)), "signal")
 
             updateSelectInput(session, "to.plot",
                 choices = seq.choices, selected = get_default(defaults, "to.plot", character(0)))
             updateSelectInput(session, "hover.text.cols",
-                choices = hover.choices, selected = get_default(defaults, "hover.text.cols", "signal"))
+                choices = hover.choices, selected = get_default(defaults, "hover.text.cols", c("signal", "genes")))
 
             genes <- genes_obj()
             if (!is.null(genes) && length(genes) > 0 && !is.null(input$id.col)) {
-                id.col.choices <- names(GenomicRanges::mcols(genes))
+                id.col.choices <- names(mcols(genes))
                 default.id.col <- get_default(defaults, "id.col",
                     if ("hgnc_symbol" %in% id.col.choices) {
                         "hgnc_symbol"
@@ -88,15 +98,28 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
 
             updateNumericInput(session, "point.size", value = get_default(defaults, "point.size", 1.5))
             updateNumericInput(session, "point.alpha", value = get_default(defaults, "point.alpha", 0.8))
-            colourpicker::updateColourInput(session, "color.low", value = get_default(defaults, "color.low", "#FF0000"))
-            colourpicker::updateColourInput(session, "color.mid", value = get_default(defaults, "color.mid", "#808080"))
-            colourpicker::updateColourInput(session, "color.high",
-                value = get_default(defaults, "color.high", "#00FF00"))
+            updateColourInput(session, "color.low", value = get_default(defaults, "color.low", "#d400ff"))
+            updateColourInput(session, "color.zero",
+                value = get_default(defaults, "color.zero", "#C2C2C2"))
+            updateColourInput(session, "color.high",
+                value = get_default(defaults, "color.high", "#00b100"))
             updateNumericInput(session, "color.limit.low", value = get_default(defaults, "color.limit.low", -0.4))
             updateNumericInput(session, "color.limit.high", value = get_default(defaults, "color.limit.high", 0.4))
-            colourpicker::updateColourInput(session, "color.seg", value = get_default(defaults, "color.seg", "#0000FF"))
+            updateColourInput(session, "color.seg", value = get_default(defaults, "color.seg", "#0000FF"))
             updateNumericInput(session, "seg.line.width", value = get_default(defaults, "seg.line.width", 1))
-            updateNumericInput(session, "label.size", value = get_default(defaults, "label.size", 3))
+            updateColourInput(session, "centromere.color",
+                value = get_default(defaults, "centromere.color", "#B3B3B3"))
+            updateNumericInput(session, "centromere.width",
+                value = get_default(defaults, "centromere.width", 0.3))
+            updateSelectInput(session, "centromere.linetype",
+                selected = get_default(defaults, "centromere.linetype", "dashed"))
+            updateColourInput(session, "border.color",
+                value = get_default(defaults, "border.color", "#000000"))
+            updateNumericInput(session, "border.width",
+                value = get_default(defaults, "border.width", 0.3))
+            updateSelectInput(session, "border.linetype",
+                selected = get_default(defaults, "border.linetype", "solid"))
+            updateNumericInput(session, "label.size", value = get_default(defaults, "label.size", 10))
             updateNumericInput(session, "y.min", value = get_default(defaults, "y.min", NA))
             updateNumericInput(session, "y.max", value = get_default(defaults, "y.max", NA))
 
@@ -139,17 +162,22 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 seg = seg,
                 genes = genes.to.label,
                 id.col = id.col,
-                centromere = centromere_obj(),
                 to.plot = to.plot,
                 hover.text.cols = hover.text.cols,
                 point.size = isolate_fn(input$point.size),
                 point.alpha = isolate_fn(input$point.alpha),
                 color.low = isolate_fn(input$color.low),
-                color.mid = isolate_fn(input$color.mid),
+                color.zero = isolate_fn(input$color.zero),
                 color.high = isolate_fn(input$color.high),
                 color.limits = color.limits,
                 color.seg = isolate_fn(input$color.seg),
                 seg.line.width = isolate_fn(input$seg.line.width),
+                centromere.color = isolate_fn(input$centromere.color),
+                centromere.width = isolate_fn(input$centromere.width),
+                centromere.linetype = isolate_fn(input$centromere.linetype),
+                border.color = isolate_fn(input$border.color),
+                border.width = isolate_fn(input$border.width),
+                border.linetype = isolate_fn(input$border.linetype),
                 label.size = isolate_fn(input$label.size),
                 y.min = y.min,
                 y.max = y.max
@@ -160,14 +188,17 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 title_y = 0.95,
                 title_x = isolate_fn(input$axis.title.horizontal.position)
             )
+
             xaxis_style <- create_axis_styles(
                 input,
                 axis_side = "x", isolate_fn = isolate_fn, ggplot.axis.styling = FALSE
             )
+
             yaxis_style <- create_axis_styles(
                 input,
                 axis_side = "y", isolate_fn = isolate_fn, ggplot.axis.styling = FALSE
             )
+
             fig <- apply_subplot_axis_styling(fig, xaxis_style, yaxis_style)
 
             fig <- add_reference_lines(fig,
@@ -193,6 +224,7 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 download.format = isolate_fn(input$download.format),
                 include.modebar.buttons = TRUE, facet.by = NULL
             )
+
             fig <- do.call(config, c(list(p = fig), config_list))
             fig <- axis_titles_as_annotations(fig)
             fig

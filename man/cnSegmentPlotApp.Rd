@@ -6,22 +6,13 @@
 \usage{
 cnSegmentPlotApp(
   seg = example_cn_segment,
-  genes = example_cn_genes,
-  centromere = NULL,
   defaults = NULL,
-  title = "Modular Copy Number Segment Plot"
+  title = "Array Copy Number Segments"
 )
 }
 \arguments{
 \item{seg}{A \code{CNSegment} object, as returned by \code{\link[sesame:cnSegmentation]{sesame::cnSegmentation()}}.
 Defaults to the bundled \link{example_cn_segment}.}
-
-\item{genes}{An optional \code{GRanges} of gene coordinates for labeling.
-Defaults to the bundled \link{example_cn_genes}; pass \code{NULL} to disable gene
-labeling.}
-
-\item{centromere}{An optional \code{GRanges} of per-chromosome centromere
-coordinates. Defaults to \code{NULL}.}
 
 \item{defaults}{An optional named list of default input values.}
 
@@ -37,12 +28,13 @@ an output panel showing the interactive \code{plotly} figure.
 }
 \details{
 Unlike the upload-driven \code{\link[VizModules:createModuleApp]{VizModules::createModuleApp()}} wrapper, this app
-takes the data inputs directly because the module needs more than a single
-data frame: the \code{CNSegment} object and (optionally) a \code{genes} \code{GRanges} for
-gene labeling and a \code{centromere} \code{GRanges} for chromosome tick placement.
+takes the \code{CNSegment} object directly rather than a single data frame. Gene
+labels and centromere positions are derived from the object's \code{genomeInfo}
+(\code{genomeInfo$genes} and \code{genomeInfo$cytoBand}, respectively).
 
-When called with no arguments, the app launches with the bundled example
-data (\link{example_cn_segment} and \link{example_cn_genes}).
+When called with no arguments, the app launches with the bundled
+\link{example_cn_segment} object; a curated set of cancer genes is labeled
+initially.
 }
 \examples{
 library(sciVizModules)

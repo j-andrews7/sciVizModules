@@ -5,20 +5,16 @@
 #' an output panel showing the interactive `plotly` figure.
 #'
 #' Unlike the upload-driven [VizModules::createModuleApp()] wrapper, this app
-#' takes the data inputs directly because the module needs more than a single
-#' data frame: the `CNSegment` object and (optionally) a `genes` `GRanges` for
-#' gene labeling and a `centromere` `GRanges` for chromosome tick placement.
+#' takes the `CNSegment` object directly rather than a single data frame. Gene
+#' labels and centromere positions are derived from the object's `genomeInfo`
+#' (`genomeInfo$genes` and `genomeInfo$cytoBand`, respectively).
 #'
-#' When called with no arguments, the app launches with the bundled example
-#' data ([example_cn_segment] and [example_cn_genes]).
+#' When called with no arguments, the app launches with the bundled
+#' [example_cn_segment] object; a curated set of cancer genes is labeled
+#' initially.
 #'
 #' @param seg A `CNSegment` object, as returned by [sesame::cnSegmentation()].
 #'   Defaults to the bundled [example_cn_segment].
-#' @param genes An optional `GRanges` of gene coordinates for labeling.
-#'   Defaults to the bundled [example_cn_genes]; pass `NULL` to disable gene
-#'   labeling.
-#' @param centromere An optional `GRanges` of per-chromosome centromere
-#'   coordinates. Defaults to `NULL`.
 #' @param defaults An optional named list of default input values.
 #' @param title The app title.
 #' @return A Shiny app object.
@@ -38,18 +34,18 @@
 #' # Launch with the bundled example data:
 #' app <- cnSegmentPlotApp()
 #' if (interactive()) shiny::runApp(app)
-cnSegmentPlotApp <- function(seg = example_cn_segment, genes = example_cn_genes,
-                             centromere = NULL, defaults = NULL,
-                             title = "Modular Copy Number Segment Plot") {
+cnSegmentPlotApp <- function(seg = example_cn_segment,
+                             defaults = NULL,
+                             title = "Array Copy Number Segments") {
     stopifnot(is(seg, "CNSegment"))
 
     ui <- fluidPage(
         title = title,
-        shinyjs::useShinyjs(),
+        useShinyjs(),
         sidebarLayout(
             sidebarPanel(
                 cnSegmentPlotInputsUI(
-                    "cn_plot", seg, genes,
+                    "cn_plot", seg,
                     title = h3(title), defaults = defaults
                 )
             ),
@@ -60,8 +56,8 @@ cnSegmentPlotApp <- function(seg = example_cn_segment, genes = example_cn_genes,
     )
 
     server <- function(input, output, session) {
-        bundle <- reactive(list(seg = seg, genes = genes, centromere = centromere))
-        cnSegmentPlotServer("cn_plot", data = bundle, defaults = defaults)
+        seg_reactive <- reactive(seg)
+        cnSegmentPlotServer("cn_plot", data = seg_reactive, defaults = defaults)
     }
 
     shinyApp(ui, server)

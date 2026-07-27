@@ -10,16 +10,22 @@ cnSegmentPlot(
   id.col = NULL,
   centromere = NULL,
   to.plot = NULL,
-  hover.text.cols = "signal",
+  hover.text.cols = c("signal", "genes"),
   point.size = 1.5,
   point.alpha = 0.8,
   color.low = "red",
-  color.mid = "grey",
+  color.zero = "grey",
   color.high = "green",
   color.limits = c(-0.4, 0.4),
   color.seg = "blue",
   seg.line.width = 1,
-  label.size = 3,
+  centromere.color = "grey70",
+  centromere.width = 0.3,
+  centromere.linetype = "dashed",
+  border.color = "grey80",
+  border.width = 0.3,
+  border.linetype = "solid",
+  label.size = 10,
   y.min = NULL,
   y.max = NULL
 )
@@ -27,16 +33,19 @@ cnSegmentPlot(
 \arguments{
 \item{seg}{A \code{CNSegment} object, as returned by \code{\link[sesame:cnSegmentation]{sesame::cnSegmentation()}}.}
 
-\item{genes}{An optional \code{GRanges} of gene coordinates. Genes overlapping a
-called segment are labeled on the plot at the segment they overlap the
-most (by overlap width).}
+\item{genes}{An optional \code{GRanges} of gene coordinates. Each gene is matched
+to the plotted bin it overlaps most; its identifier is added to that bin's
+hover text and shown in an arrowed annotation.}
 
 \item{id.col}{Name of the metadata column in \code{genes} holding the label to
 display (e.g. a gene symbol column). If \code{NULL}, \code{names(genes)} is used.}
 
 \item{centromere}{An optional \code{GRanges} of per-chromosome centromere
-coordinates. When supplied, chromosome axis tick labels are placed at the
-centromere position rather than the chromosome midpoint.}
+coordinates used to place chromosome axis ticks and dashed guides. When
+\code{NULL} (the default), centromere positions are derived from
+\code{seg$genomeInfo$cytoBand} (the end of each chromosome's p-arm \code{"acen"}
+band, i.e. the p/q boundary); if that information is unavailable,
+chromosome midpoints are used.}
 
 \item{to.plot}{An optional character vector of chromosome names (as found in
 \code{seqinfo(seg$bin.coords)}) to restrict the plot to. If \code{NULL} (the
@@ -45,7 +54,8 @@ are shown (small scaffolds/contigs are dropped automatically).}
 
 \item{hover.text.cols}{Character vector of \code{bin.coords} metadata column
 names to include in the point hover text (used when the returned plot is
-converted to \code{plotly}). Defaults to \code{"signal"}.}
+converted to \code{plotly}). Defaults to \code{c("signal", "genes")}; columns that
+are absent from \code{bin.coords} are ignored.}
 
 \item{point.size}{Size of the bin-level points. Defaults to \code{1.5}.}
 
@@ -55,7 +65,7 @@ converted to \code{plotly}). Defaults to \code{"signal"}.}
 \item{color.low}{Color for the low end of the signal color scale. Defaults
 to \code{"red"}.}
 
-\item{color.mid}{Color for the midpoint (0) of the signal color scale.
+\item{color.zero}{Color for the 0 point of the signal color scale.
 Defaults to \code{"grey"}.}
 
 \item{color.high}{Color for the high end of the signal color scale.
@@ -72,8 +82,26 @@ limit. Defaults to \code{c(-0.4, 0.4)}.}
 \item{seg.line.width}{Line width of the segment mean line overlay. Defaults
 to \code{1}.}
 
-\item{label.size}{Text size of gene labels (only used when \code{genes} is
-supplied). Defaults to \code{3}.}
+\item{centromere.color}{Color of the centromere guide lines. Defaults to
+\code{"grey70"}.}
+
+\item{centromere.width}{Line width of the centromere guide lines. Defaults
+to \code{0.3}.}
+
+\item{centromere.linetype}{Line type of the centromere guide lines (e.g.
+\code{"dashed"}, \code{"solid"}, \code{"dotted"}). Defaults to \code{"dashed"}.}
+
+\item{border.color}{Color of the chromosome boundary lines. Defaults to
+\code{"grey80"}.}
+
+\item{border.width}{Line width of the chromosome boundary lines. Defaults to
+\code{0.3}.}
+
+\item{border.linetype}{Line type of the chromosome boundary lines. Defaults
+to \code{"solid"}.}
+
+\item{label.size}{Plotly font size of gene labels (only used when \code{genes} is
+supplied). Defaults to \code{10}.}
 
 \item{y.min}{Optional lower limit for the y-axis (log2 signal ratio).
 Values below this limit are squished to the limit rather than dropped.
@@ -91,8 +119,9 @@ can be repositioned interactively.
 Draws a genome-wide copy number scatter/segment plot from the output of
 \code{\link[sesame:cnSegmentation]{sesame::cnSegmentation()}}: bin-level log2 signal ratios are plotted across
 the genome and colored by signal, with the called segment means overlaid as
-horizontal line segments. Optionally, genes overlapping the called segments
-can be labeled with draggable Plotly annotations.
+horizontal line segments. Genes overlapping each bin (\code{bin.coords$genes}) are
+surfaced in the point hover text, and selected genes can additionally be
+labeled with draggable Plotly annotations.
 }
 \details{
 \code{seg} must be a \code{CNSegment} object as returned by
@@ -102,19 +131,25 @@ numeric vector of per-bin log2 signal ratios), and \code{seg.signals} (a
 \code{data.frame} of called segments with \code{chrom}, \code{loc.start}, \code{loc.end}, and
 \code{seg.mean} columns).
 
+Chromosome tick and dashed-guide positions are derived from
+\code{seg$genomeInfo$cytoBand} (see \code{centromere}), and gene labels from
+\code{seg$genomeInfo$genes} (see \code{genes}). Genes overlapping each plotted bin are
+read from the \code{bin.coords$genes} metadata column when present.
+
 Both the color scale and the y-axis support explicit limits
 (\code{color.limits} and \code{y.min}/\code{y.max}, respectively). In both cases,
 out-of-bound values are squished to the nearest limit (via
 \code{\link[scales:squish]{scales::squish()}}) rather than dropped, so points beyond the requested
 limits remain visible (clamped to the edge of the plot/color scale) instead
-of disappearing. The signal colorbar is shown, and \code{color.mid} is always
+of disappearing. The signal colorbar is shown, and \code{color.zero} is always
 mapped to signal 0, including when \code{color.limits} are asymmetric.
 }
 \examples{
 library(sciVizModules)
 data(example_cn_segment)
-data(example_cn_genes)
-cnSegmentPlot(example_cn_segment, genes = example_cn_genes, id.col = "gene_name")
+# Gene labels are drawn from the object's own gene annotation:
+cnSegmentPlot(example_cn_segment,
+    genes = example_cn_segment$genomeInfo$genes, id.col = "gene_name")
 }
 \seealso{
 \code{\link[sesame:cnSegmentation]{sesame::cnSegmentation()}}, \code{\link[=cnSegmentPlotInputsUI]{cnSegmentPlotInputsUI()}},

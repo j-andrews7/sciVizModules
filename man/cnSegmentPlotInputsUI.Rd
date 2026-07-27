@@ -7,7 +7,6 @@
 cnSegmentPlotInputsUI(
   id,
   seg,
-  genes = NULL,
   defaults = NULL,
   title = "CN Segment Settings",
   columns = 2
@@ -16,11 +15,9 @@ cnSegmentPlotInputsUI(
 \arguments{
 \item{id}{The ID for the Shiny module.}
 
-\item{seg}{A \code{CNSegment} object used to populate the chromosome choices.}
-
-\item{genes}{An optional \code{GRanges} of gene coordinates, used to populate the
-gene label column choices and resolve identifiers entered in "Genes to
-Label".}
+\item{seg}{A \code{CNSegment} object used to populate the chromosome choices. Gene
+label controls are populated from its \code{genomeInfo$genes} annotation when
+present.}
 
 \item{defaults}{A named list of default values for the inputs.}
 
@@ -40,15 +37,14 @@ This should be placed in the UI where the inputs should be shown, with an
 The user inputs for this module are separated from the outputs to
 allow for more flexible UI design. The module draws a genome-wide copy
 number scatter/segment plot from a \code{CNSegment} object (as returned by
-\code{\link[sesame:cnSegmentation]{sesame::cnSegmentation()}}). When a \code{genes} \code{GRanges} is supplied, users can
-enter gene identifiers separated by commas or whitespace and choose the
-metadata column used to match and display those labels.
+\code{\link[sesame:cnSegmentation]{sesame::cnSegmentation()}}). When the object carries a \code{genomeInfo$genes}
+\code{GRanges}, users can enter gene identifiers separated by commas or whitespace
+and choose the metadata column used to match and display those labels.
 }
 \examples{
 library(sciVizModules)
 data(example_cn_segment)
-data(example_cn_genes)
-cnSegmentPlotInputsUI("cn_plot", example_cn_segment, example_cn_genes)
+cnSegmentPlotInputsUI("cn_plot", example_cn_segment)
 }
 \seealso{
 \code{\link[=cnSegmentPlot]{cnSegmentPlot()}},
