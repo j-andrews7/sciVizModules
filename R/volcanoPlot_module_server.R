@@ -8,6 +8,8 @@
 #'   Must contain effect size (e.g., log2FoldChange) and significance (e.g., padj) columns.
 #' @param hide.inputs A character vector of input IDs to hide.
 #' @param hide.tabs A character vector of tab names to hide. Default hides: "Trajectory", "Facets", "Colors", "Legend/Scale".
+#' @param defaults A named list of default values. Merged over the module's
+#'   volcano defaults (user values win) and used to restore state on reset.
 #' @return The `moduleServer` function for the volcanoPlot module.
 #'
 #' @import shiny
@@ -19,7 +21,23 @@
 #' 
 #' @export
 #' @author Jared Andrews
-volcanoPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = c("Trajectory", "Facets", "Colors", "Legend/Scale")) {
+volcanoPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = c("Trajectory", "Facet", "Colors", "Legend/Scale"), defaults = NULL) {
+    # Volcano defaults, shared with volcanoPlotInputsUI so the initial state and
+    # the reset state match. Computed once from a snapshot of the data.
+    vol_defaults <- .volcano_defaults(
+        tryCatch(shiny::isolate(data()), error = function(e) data()),
+        defaults
+    )
+
+    # The wrapped scatter server validates its reset defaults as scalars, so
+    # only hand it the scalar scatter inputs it knows about. Volcano-only keys
+    # (thresholds, group colours) and multi-length keys (hover.data) are reset
+    # separately in the observer below.
+    scatter_default_keys <- c(
+        "x.by", "y.by", "color.by", "y.adj.fxn", "show.others"
+    )
+    scatter_defaults <- vol_defaults[intersect(scatter_default_keys, names(vol_defaults))]
+
     res <- moduleServer(id, function(input, output, session) {
         # Reactive data with group column based on thresholds
         data_reac <- reactive({
@@ -68,6 +86,19 @@ volcanoPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = c("Traje
             colors
         })
 
+        # Restore the volcano-specific extra inputs when the module's reset
+        # button is pressed. The wrapped scatter server resets its own inputs
+        # (using vol_defaults, passed below); this handles the controls it does
+        # not know about.
+        observeEvent(input$reset, {
+            updateNumericInput(session, "sig.thresh",
+                value = VizModules::get_default(vol_defaults, "sig.thresh", 0.05))
+            updateNumericInput(session, "fc.thresh",
+                value = VizModules::get_default(vol_defaults, "fc.thresh", 0))
+            VizModules::updateMultiColorPicker(session, "volcano.colors",
+                colors = .de_group_colors(vol_defaults))
+        })
+
         list(data = data_reac, colors = color_reac)
     })
 
@@ -78,5 +109,5 @@ volcanoPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = c("Traje
         hide.inputs <- c(hide.inputs, "color.panel")
     }
 
-    dittoViz_scatterPlotServer(id = id, data = res$data, hide.inputs = hide.inputs, hide.tabs = hide.tabs, manual.colors = res$colors)
+    dittoViz_scatterPlotServer(id = id, data = res$data, hide.inputs = c(hide.inputs, "custom.models", "custom.model.enable"), hide.tabs = hide.tabs, manual.colors = res$colors, defaults = scatter_defaults)
 }

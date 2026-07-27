@@ -16,26 +16,25 @@
 #'
 #' The data are automatically augmented before being passed to the wrapped
 #' DotPlot UI so that the appropriate defaults can be selected:
-#' \itemize{
-#'   \item A numeric \code{GeneRatio} column is derived when the incoming
-#'     \code{GeneRatio} is a \code{"count/total"} fraction string.
-#'   \item A \code{neg_log10_pvalue} column (\eqn{-\log_{10}(p)}) is derived from
-#'     the first available p-value column (\code{p.adjust}, \code{padj},
-#'     \code{FDR}, \code{qvalue}, \code{pvalue}, ...).
-#'   \item A categorical grouping column is guaranteed for the x-axis (a constant
-#'     \code{Group} column is added when none is detected).
-#' }
+#'
+#' - A numeric `GeneRatio` column is derived when the incoming
+#'   `GeneRatio` is a `"count/total"` fraction string.
+#' - A `neg_log10_pvalue` column (\eqn{-\log_{10}(p)}) is derived from
+#'   the first available p-value column (`p.adjust`, `padj`,
+#'   `FDR`, `qvalue`, `pvalue`, ...).
+#' - A categorical grouping column is guaranteed for the x-axis (a constant
+#'   `Group` column is added when none is detected).
 #'
 #' @section Enrichment defaults:
 #' The following defaults are selected automatically (any value supplied via
-#' \code{defaults} takes precedence):
-#' \itemize{
-#'   \item \code{y.data} - The enrichment term column (e.g. \code{Description})
-#'   \item \code{x.data} - A grouping column (e.g. \code{Cluster}) or a constant
-#'     \code{Group} column when none is present
-#'   \item \code{size.by} - \code{GeneRatio} (or another detected ratio column)
-#'   \item \code{fill.by} - \code{neg_log10_pvalue}
-#' }
+#' `defaults` takes precedence):
+#'
+#' - `y.data` - The enrichment term column (e.g. `Description`)
+#' - `x.data` - A grouping column (e.g. `Cluster`) or a constant
+#'   `Group` column when none is present
+#' - `size.by` - `GeneRatio` (or another detected ratio column)
+#' - `fill.by` - `neg_log10_pvalue`
+#'
 #' All other [plotthis::DotPlot()] parameters remain available via the wrapped UI.
 #'
 #' @param id The ID for the Shiny module.
@@ -78,7 +77,7 @@ enrichmentDotPlotInputsUI <- function(id, data, defaults = NULL, title = "Enrich
 #' This should be placed in the UI where the plot should be shown.
 #'
 #' @param id The ID for the Shiny module.
-#' @param resizable Logical; when \code{TRUE} (the default) the plot output is
+#' @param resizable Logical; when `TRUE` (the default) the plot output is
 #'   wrapped in [shinyjqui::jqui_resizable()] so it can be resized by dragging.
 #'
 #' @return A Shiny plotlyOutput for the enrichment dot plot.

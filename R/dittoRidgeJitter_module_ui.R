@@ -14,19 +14,18 @@
 #' converted to an interactive `plotly` figure.
 #'
 #' @section Plot parameters and defaults:
-#' The following parameters can be accessed via UI inputs and/or the \code{defaults} argument:
-#' \itemize{
-#'   \item \code{var} - Continuous variable to plot (gene or numeric metadata)
-#'   \item \code{group.by} - Discrete metadata used for the ridge groups
-#'   \item \code{color.by} - Discrete metadata used for fill colors (default: `group.by`)
-#'   \item \code{split.by} - Discrete metadata to facet by (default: none)
-#'   \item \code{ridgeplot.scale} - Ridge overlap scale (default: 1.25)
-#'   \item \code{ridgeplot.shape} - Ridge shape: "smooth" density or "hist" (default: "smooth")
-#'   \item \code{ridgeplot.bins} - Number of bins when \code{ridgeplot.shape} is "hist" (default: 30)
-#'   \item \code{jitter.size} - Jitter point size (default: 1)
-#'   \item \code{jitter.color} - Color of the jitter points (default: "#000000")
-#'   \item \code{palette.selection} - Colors for discrete groups (multiColorPicker)
-#' }
+#' The following parameters can be accessed via UI inputs and/or the `defaults` argument:
+#'
+#' - `var` - Continuous variable to plot (gene or numeric metadata)
+#' - `group.by` - Discrete metadata used for the ridge groups
+#' - `color.by` - Discrete metadata used for fill colors (default: `group.by`)
+#' - `split.by` - Discrete metadata to facet by (default: none)
+#' - `ridgeplot.scale` - Ridge overlap scale (default: 1.25)
+#' - `ridgeplot.shape` - Ridge shape: "smooth" density or "hist" (default: "smooth")
+#' - `ridgeplot.bins` - Number of bins when `ridgeplot.shape` is "hist" (default: 30)
+#' - `jitter.size` - Jitter point size (default: 1)
+#' - `jitter.color` - Color of the jitter points (default: "#000000")
+#' - `palette.selection` - Colors for discrete groups (multiColorPicker)
 #'
 #' @param id The ID for the Shiny module.
 #' @param data A `SingleCellExperiment`, `Seurat`, or `SummarizedExperiment` object
@@ -158,7 +157,7 @@ dittoRidgeJitterInputsUI <- function(id, data, defaults = NULL, title = "RidgeJi
 #' This should be placed in the UI where the plot should be shown.
 #'
 #' @param id The ID for the Shiny module.
-#' @param resizable Logical; when \code{TRUE} (the default) the plot output is
+#' @param resizable Logical; when `TRUE` (the default) the plot output is
 #'   wrapped in [shinyjqui::jqui_resizable()] so it can be resized by dragging.
 #'
 #' @return A Shiny plotlyOutput for the ridge/jitter plot.

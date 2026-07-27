@@ -13,21 +13,20 @@
 #' interactive `plotly` figure.
 #'
 #' @section Plot parameters and defaults:
-#' The following parameters can be accessed via UI inputs and/or the \code{defaults} argument:
-#' \itemize{
-#'   \item \code{color.var} - Gene or metadata summarized within each hex (default: density only)
-#'   \item \code{reduction.use} - Dimensionality reduction to plot (default: auto-detected)
-#'   \item \code{dim.1}, \code{dim.2} - Which dimensions to plot on x/y (default: 1 and 2)
-#'   \item \code{bins} - Number of hexagonal bins (default: 30)
-#'   \item \code{color.method} - Summary method for discrete \code{color.var} ("max.prop" or a
-#'     metadata level) or for continuous data ("median", "mean", etc.)
-#'   \item \code{split.by} - Discrete metadata to facet by (default: none)
-#'   \item \code{min.color}, \code{max.color} - Colors for the continuous color scale
-#'   \item \code{do.contour} - Overlay kernel-density contour lines (default: FALSE)
-#'   \item \code{do.label} - Draw group labels for a discrete \code{color.var} (default: FALSE)
-#'   \item \code{labels.size} - Text size of the group labels (default: 5)
-#'   \item \code{do.ellipse} - Draw ellipses for a discrete \code{color.var} (default: FALSE)
-#' }
+#' The following parameters can be accessed via UI inputs and/or the `defaults` argument:
+#'
+#' - `color.var` - Gene or metadata summarized within each hex (default: density only)
+#' - `reduction.use` - Dimensionality reduction to plot (default: auto-detected)
+#' - `dim.1`, `dim.2` - Which dimensions to plot on x/y (default: 1 and 2)
+#' - `bins` - Number of hexagonal bins (default: 30)
+#' - `color.method` - Summary method for discrete `color.var` ("max.prop" or a
+#'   metadata level) or for continuous data ("median", "mean", etc.)
+#' - `split.by` - Discrete metadata to facet by (default: none)
+#' - `min.color`, `max.color` - Colors for the continuous color scale
+#' - `do.contour` - Overlay kernel-density contour lines (default: FALSE)
+#' - `do.label` - Draw group labels for a discrete `color.var` (default: FALSE)
+#' - `labels.size` - Text size of the group labels (default: 5)
+#' - `do.ellipse` - Draw ellipses for a discrete `color.var` (default: FALSE)
 #'
 #' @param id The ID for the Shiny module.
 #' @param data A `SingleCellExperiment`, `Seurat`, or `SummarizedExperiment` object
@@ -172,7 +171,7 @@ dittoDimHexInputsUI <- function(id, data, defaults = NULL, title = "DimHex Setti
 #' This should be placed in the UI where the plot should be shown.
 #'
 #' @param id The ID for the Shiny module.
-#' @param resizable Logical; when \code{TRUE} (the default) the plot output is
+#' @param resizable Logical; when `TRUE` (the default) the plot output is
 #'   wrapped in [shinyjqui::jqui_resizable()] so it can be resized by dragging.
 #'
 #' @return A Shiny plotlyOutput for the hex plot.

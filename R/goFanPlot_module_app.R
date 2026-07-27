@@ -14,7 +14,7 @@
 #'
 #' This is a convenience wrapper around [VizModules::createModuleApp()].
 #'
-#' @note Rendering the plot requires the \pkg{GOfan} package and the relevant
+#' @note Rendering the plot requires the **GOfan** package and the relevant
 #'   organism annotation (`OrgDb`) package (e.g. `org.Hs.eg.db`) to be installed.
 #'
 #' @param data_list An optional named list of enrichment results data frames. If

@@ -8,12 +8,10 @@
 #' @rdname INTERNAL_enrich_term_col
 #' @keywords internal
 .enrich_term_col <- function(data) {
-    candidates <- c(
+    .detect_column(data, c(
         "Description", "description", "Term", "term", "pathway", "Pathway",
         "name", "Name", "geneSet", "ID", "id"
-    )
-    hit <- intersect(candidates, names(data))
-    if (length(hit)) hit[1] else NULL
+    ))
 }
 
 #' Detect a categorical grouping column for the enrichment x-axis
@@ -51,17 +49,11 @@
 #' @rdname INTERNAL_enrich_ratio_col
 #' @keywords internal
 .enrich_ratio_col <- function(data) {
-    candidates <- c(
+    .detect_column(data, c(
         "GeneRatio", "generatio", "Ratio", "richFactor", "RichFactor",
         "rich_factor", "FoldEnrichment", "fold_enrichment", "foldEnrichment",
         "NES", "Count", "count"
-    )
-    for (nm in candidates) {
-        if (nm %in% names(data) && is.numeric(data[[nm]])) {
-            return(nm)
-        }
-    }
-    NULL
+    ), numeric = TRUE)
 }
 
 #' Detect a p-value column for the enrichment dot color
@@ -73,16 +65,10 @@
 #' @rdname INTERNAL_enrich_pval_col
 #' @keywords internal
 .enrich_pval_col <- function(data) {
-    candidates <- c(
+    .detect_column(data, c(
         "p.adjust", "padj", "p_adjust", "FDR", "fdr", "qvalue", "qvalues",
         "pvalue", "pval", "p.value", "PValue", "P.Value", "p"
-    )
-    for (nm in candidates) {
-        if (nm %in% names(data) && is.numeric(data[[nm]])) {
-            return(nm)
-        }
-    }
-    NULL
+    ), numeric = TRUE)
 }
 
 #' Parse a "GeneRatio"-style fraction string to a numeric ratio

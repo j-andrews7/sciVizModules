@@ -8,7 +8,8 @@ volcanoPlotServer(
   id,
   data,
   hide.inputs = NULL,
-  hide.tabs = c("Trajectory", "Facets", "Colors", "Legend/Scale")
+  hide.tabs = c("Trajectory", "Facet", "Colors", "Legend/Scale"),
+  defaults = NULL
 )
 }
 \arguments{
@@ -20,6 +21,9 @@ Must contain effect size (e.g., log2FoldChange) and significance (e.g., padj) co
 \item{hide.inputs}{A character vector of input IDs to hide.}
 
 \item{hide.tabs}{A character vector of tab names to hide. Default hides: "Trajectory", "Facets", "Colors", "Legend/Scale".}
+
+\item{defaults}{A named list of default values. Merged over the module's
+volcano defaults (user values win) and used to restore state on reset.}
 }
 \value{
 The \code{moduleServer} function for the volcanoPlot module.
