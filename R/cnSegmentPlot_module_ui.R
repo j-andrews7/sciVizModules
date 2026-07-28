@@ -92,7 +92,11 @@ cnSegmentPlotInputsUI <- function(id, seg, defaults = NULL,
                 multiple = TRUE,
                 options = list(
                     `live-search` = TRUE,
-                    `actions-box` = TRUE
+                    `actions-box` = TRUE,
+                    # Render the menu on <body> so its search box and
+                    # select/deselect header are not clipped by a scrolling
+                    # sidebar/container.
+                    container = "body"
                 )
             ), "Chromosomes to include. Leave empty to auto-select chromosomes representing at least 1% of the genome.",
             placement = "top", options = list(container = "body")
@@ -287,8 +291,6 @@ cnSegmentPlotInputsUI <- function(id, seg, defaults = NULL,
         tack = module_tack_ui(ns, defaults = defaults),
         columns = columns
     )
-
-    browser()
 }
 
 
