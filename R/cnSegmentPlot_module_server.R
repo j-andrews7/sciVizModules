@@ -76,6 +76,7 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             seq.choices <- seq.choices[seq.choices %in% c(paste0("chr", 1:22), "chrX", "chrY")]
             hover.choices <- union(names(mcols(seg$bin.coords)), "signal")
 
+            updateTextInput(session, "main", value = get_default(defaults, "main", ""))
             updateSelectInput(session, "to.plot",
                 choices = seq.choices, selected = get_default(defaults, "to.plot", character(0)))
             updateSelectInput(session, "hover.text.cols",
@@ -180,7 +181,8 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 border.linetype = isolate_fn(input$border.linetype),
                 label.size = isolate_fn(input$label.size),
                 y.min = y.min,
-                y.max = y.max
+                y.max = y.max,
+                main = isolate_fn(input$main)
             )
 
             fig <- apply_title_layout(

@@ -34,6 +34,6 @@ head(airway_voom)
 
 }
 \author{
-Jacob Martin, Jared Andrews
+Jacob Martin
 }
 \keyword{datasets}

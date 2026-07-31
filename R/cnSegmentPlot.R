@@ -84,6 +84,8 @@
 #' @param y.max Optional upper limit for the y-axis. Values above this limit
 #'   are squished to the limit rather than dropped. `NULL` (the default) leaves
 #'   the upper bound automatic.
+#' @param main Optional plot title. `NULL` (the default) or an empty string
+#'   leaves the plot untitled.
 #'
 #' @return A [plotly::plotly()] object. Gene labels are Plotly annotations and
 #'   can be repositioned interactively.
@@ -93,7 +95,7 @@
 #' @importFrom Seqinfo seqinfo seqlengths seqnames
 #' @importFrom ggplot2 .data ggplot aes geom_point geom_segment geom_vline
 #' @importFrom ggplot2 scale_x_continuous scale_y_continuous scale_colour_gradient2
-#' @importFrom ggplot2 theme_minimal theme element_text element_blank xlab ylab
+#' @importFrom ggplot2 theme_minimal theme element_text element_blank xlab ylab ggtitle
 #' @importFrom plotly ggplotly add_annotations config
 #' @importFrom scales squish
 #' @importFrom stats setNames
@@ -130,7 +132,8 @@ cnSegmentPlot <- function(seg,
                           border.linetype = "solid",
                           label.size = 10,
                           y.min = NULL,
-                          y.max = NULL) {
+                          y.max = NULL,
+                          main = NULL) {
     stopifnot(is(seg, "CNSegment"))
     if (!is.null(color.limits)) {
         if (length(color.limits) != 2 || anyNA(color.limits) ||
@@ -308,6 +311,10 @@ cnSegmentPlot <- function(seg,
             oob = squish,
             expand = c(0,0)
         )
+    }
+
+    if (!is.null(main) && length(main) == 1 && !is.na(main) && nzchar(main)) {
+        p <- p + ggtitle(main)
     }
 
     fig <- ggplotly(p, tooltip = "text")

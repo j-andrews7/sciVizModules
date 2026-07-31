@@ -86,6 +86,12 @@ cnSegmentPlotInputsUI <- function(id, seg, defaults = NULL,
 
     data.inputs <- list(
         tipify(
+            textInput(ns("main"), "Plot Title",
+                value = get_default(defaults, "main", "")
+            ), "Title displayed above the plot. Leave empty for no title.",
+            placement = "top", options = list(container = "body")
+        ),
+        tipify(
             pickerInput(ns("to.plot"), "Chromosomes to Plot",
                 choices = seq.choices,
                 selected = get_default(defaults, "to.plot", character(0)),

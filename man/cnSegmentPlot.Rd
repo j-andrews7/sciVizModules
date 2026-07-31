@@ -27,7 +27,8 @@ cnSegmentPlot(
   border.linetype = "solid",
   label.size = 10,
   y.min = NULL,
-  y.max = NULL
+  y.max = NULL,
+  main = NULL
 )
 }
 \arguments{
@@ -110,6 +111,9 @@ Values below this limit are squished to the limit rather than dropped.
 \item{y.max}{Optional upper limit for the y-axis. Values above this limit
 are squished to the limit rather than dropped. \code{NULL} (the default) leaves
 the upper bound automatic.}
+
+\item{main}{Optional plot title. \code{NULL} (the default) or an empty string
+leaves the plot untitled.}
 }
 \value{
 A \code{\link[plotly:plotly]{plotly::plotly()}} object. Gene labels are Plotly annotations and
