@@ -1,0 +1,235 @@
+---
+title: "Quick Start with sciVizModules"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Quick Start}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>",
+    eval = FALSE
+)
+```
+
+## The modules
+
+**sciVizModules** extends [VizModules](https://github.com/j-andrews7/VizModules)
+with a curated set of domain-specific Shiny modules for the biological,
+chemical, and physical sciences. Each module wraps a plotting function with
+scientifically meaningful defaults, axis conventions, and annotation layers,
+while preserving the interactivity-first philosophy of the parent package.
+
+Every module ships a standalone `*App()` you can run to explore what it does,
+each pre-loaded with bundled example data:
+
+```{r run-apps}
+library(sciVizModules)
+
+if (interactive()) volcanoPlotApp()   # differential expression, airway_deseq2
+if (interactive()) dittoDimPlotApp()  # single-cell reduction, example_sce
+if (interactive()) doseResponseApp()  # pharmacology, dose_response
+```
+
+## Drop a module into your app
+
+All modules follow the same pattern: `*InputsUI()` for controls, `*OutputUI()`
+for the plot, and `*Server()` for the logic. Here is a minimal volcano plot
+using the bundled `airway_deseq2` differential-expression results:
+
+```{r volcano-example}
+library(sciVizModules)
+
+ui <- fluidPage(
+    sidebarLayout(
+        sidebarPanel(
+            volcanoPlotInputsUI("de",
+                airway_deseq2,
+                defaults = list(
+                    sig.thresh = 0.05,
+                    fc.thresh = 1
+                )
+            )
+        ),
+        mainPanel(volcanoPlotOutputUI("de"))
+    )
+)
+
+server <- function(input, output, session) {
+    volcanoPlotServer("de", data = reactive(airway_deseq2))
+}
+
+shinyApp(ui, server)
+```
+
+## Set defaults and hide controls
+
+- **Defaults**: Pass a named list to the `defaults` argument of `*InputsUI()` to
+  pre-fill inputs. Names match the underlying plot function arguments (e.g.,
+  `defaults = list(sig.thresh = 0.01)`).
+- **Hide inputs**: Use `hide.inputs` in the server call to remove controls while
+  still initializing their values. This is useful when your app sets certain
+  parameters itself or wants to hide control of various elements while still
+  passing their initial values.
+- **Hide tabs**: Use `hide.tabs` to remove whole groups of controls (e.g.,
+  `"Legend/Scale"` or `"Facet"`).
+
+```{r hide-controls}
+volcanoPlotServer(
+    "de",
+    data = reactive(airway_deseq2),
+    hide.inputs = c("sig.thresh"),
+    hide.tabs = c("Legend/Scale")
+)
+```
+
+Hidden inputs and tabs still feed their values into the plot, so the module
+stays fully configured while exposing only what your users need.
+
+## App factory with `createModuleApp()`
+
+Every `*App()` convenience function (e.g. `volcanoPlotApp()`,
+`survivalCurveApp()`, `dittoDimPlotApp()`) is a thin wrapper around VizModules'
+`createModuleApp()`, which returns a full standalone app with data import, a
+filterable data table, and dataset switching for any module:
+
+```{r create-module-app}
+library(sciVizModules)
+
+app <- createModuleApp(
+    inputs_ui_fn = volcanoPlotInputsUI,
+    output_ui_fn = volcanoPlotOutputUI,
+    server_fn    = volcanoPlotServer,
+    data_list    = list("Airway DESeq2" = airway_deseq2),
+    title        = "My Volcano Plot"
+)
+if (interactive()) runApp(app)
+```
+
+The data-frame modules take a `data_list`; the dittoSeq single-cell modules take
+an `object_list` of `SingleCellExperiment` / `Seurat` / `SummarizedExperiment`
+objects instead:
+
+```{r dittoseq-app}
+if (interactive()) {
+    dittoDimPlotApp(object_list = list("Example SCE" = example_sce))
+}
+```
+
+## Data format for each module
+
+sciVizModules modules split into two families by input type: **data-frame**
+modules and **dittoSeq / single-cell** modules. Every module below has a bundled
+example dataset you can inspect (e.g. `head(airway_deseq2)`).
+
+### Differential expression
+
+| Module | Server function | Data type | Expected data | Example data |
+|---|---|---|---|---|
+| Volcano plot | `volcanoPlotServer()` | `data.frame` | Effect-size column (e.g. `log2FoldChange`) and a significance column (e.g. `padj`) | `airway_deseq2` |
+| MA plot | `maPlotServer()` | `data.frame` | Mean-abundance column (`baseMean` / `logCPM` / `AveExpr`) and an effect-size column (`log2FoldChange` / `logFC`) | `airway_deseq2` |
+
+Column names differ between DE tools (`airway_deseq2`, `airway_edger`,
+`airway_voom` are all bundled). The modules auto-detect common conventions, and
+you can override the mapping via `defaults` (e.g.
+`defaults = list(x.by = "logFC", y.by = "logCPM")`).
+
+```{r de-format}
+head(airway_deseq2)
+#> baseMean, log2FoldChange, lfcSE, stat, pvalue, padj, symbol, ensembl
+```
+
+### GO / functional enrichment
+
+| Module | Server function | Data type | Expected data | Example data |
+|---|---|---|---|---|
+| Enrichment dot plot | `enrichmentDotPlotServer()` | `data.frame` | `clusterProfiler`-style table: a grouping column, a `Description` term column, a `"count/total"` `GeneRatio` string, and a p-value column | `example_enrichment` |
+| GO fan (sunburst) plot | `goFanPlotServer()` | `data.frame` | GO enrichment results with a GO-ID column (auto-detected), an ontology (BP/CC/MF), and a numeric `fill` column (e.g. `qvalue`) | `example_enrichment` |
+
+For the dot plot, dot size encodes the parsed `GeneRatio` and color encodes
+\eqn{-\log_{10}(p)}.
+
+```{r enrich-format}
+head(example_enrichment)
+#> Cluster, ONTOLOGY, ID, Description, GeneRatio, BgRatio, pvalue, p.adjust, qvalue, Count
+```
+
+### Survival analysis
+
+| Module | Server function | Data type | Expected data | Example data |
+|---|---|---|---|---|
+| Kaplan-Meier curve | `survivalCurveServer()` | `data.frame` | Numeric follow-up `time` column and a `status` event column (`survival::Surv()` convention: 1 = censored, 2 = event); optional grouping column for stratified curves | `survival_lung` |
+
+```{r surv-format}
+head(survival_lung)
+#> time, status, age, sex, ph.ecog
+```
+
+### Biochemical kinetics and pharmacology
+
+| Module | Server function | Data type | Expected data | Example data |
+|---|---|---|---|---|
+| Michaelis-Menten | `michaelisMentenServer()` | reactive `list` | A list with `data` (observed-points `data.frame`), `model` (fitted-line `data.frame`), and optional `stats` (an `nls` fit or named `K` / `Vmax` coefficients for annotation) | `mm_kinetics`, `mm_kinetics_line`, `mm_kinetics_fit` |
+| Dose-response | `doseResponseServer()` | `data.frame` | A dose column (plotted on a log10 scale) and a response column; the module fits a log-logistic curve with **drc** | `dose_response` |
+
+The Michaelis-Menten module consumes pre-computed pieces rather than a single
+data frame:
+
+```{r mm-format}
+str(list(
+    data  = mm_kinetics,       # columns S (substrate), v (velocity)
+    model = mm_kinetics_line,  # predicted S, v over a fine grid
+    stats = mm_kinetics_fit    # nls fit -> supplies K and Vmax
+))
+```
+
+```{r dr-format}
+head(dose_response)
+#> dose_uM, rep1_response_pct, ..., mean_response_pct, sd_response_pct
+```
+
+### Single-cell / RNA-seq (dittoSeq wrappers)
+
+These modules wrap `dittoSeq` plotting functions. They all accept a
+**`SingleCellExperiment`, `Seurat`, or `SummarizedExperiment`** object and take
+`object_list` (rather than `data_list`) in their `*App()` functions. The bundled
+`example_sce` (a simulated `SingleCellExperiment` with `PCA`/`TSNE`/`UMAP`
+reductions and both discrete and continuous metadata) works with all of them.
+
+All of these take the same **data type**: a `SingleCellExperiment`, `Seurat`,
+or `SummarizedExperiment` object.
+
+| Module | Server function | Purpose |
+|---|---|---|
+| Dimensional reduction | `dittoDimPlotServer()` | Cells in a reduction (UMAP/t-SNE/PCA), colored by a gene or metadata |
+| Hex-binned reduction | `dittoDimHexServer()` | Hex-binned version of the dim plot for dense embeddings |
+| Scatter | `dittoScatterPlotServer()` | Two continuous variables, optional third for color |
+| Distribution | `dittoPlotServer()` | A continuous variable across groups (jitter / violin / box / ridge) |
+| Ridge + jitter | `dittoRidgeJitterServer()` | Ridge plots with overlaid jitter |
+| Composition bar | `dittoBarPlotServer()` | Discrete composition per group (percent or count) |
+| Frequency | `dittoFreqPlotServer()` | Per-sample frequencies of a discrete variable across groups |
+
+```{r sce-format}
+data(example_sce)
+example_sce
+```
+
+## Which plot parameters are exposed?
+
+Modules wrap plotting functions from **dittoViz**, **plotthis**, **dittoSeq**,
+and several specialized packages. To see which arguments a module surfaces:
+
+1. Open the module input help page, e.g., `?volcanoPlotInputsUI` or
+   `?dittoDimPlotInputsUI`. The **Details** section notes which arguments from
+   the underlying plot function are wired through and any that are intentionally
+   omitted.
+2. Cross-reference the base plot documentation (`?dittoSeq::dittoDimPlot`, etc.).
+   Input names in `defaults` line up with those function arguments when they are
+   supported.
+
+If an argument is listed as missing or non-functional in the module docs, it has
+been intentionally hidden because it does not round-trip well in the interactive
+Plotly output.

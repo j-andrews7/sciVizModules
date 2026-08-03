@@ -5,7 +5,8 @@
   "permission": {
     "edit": {
       "*.R": "allow",
-      "*/DESCRIPTION": "allow"
+      "*/DESCRIPTION": "allow",
+      "*.Rmd": "allow"
     },
     "executeCode": {
       "*": "allow"
@@ -19,7 +20,8 @@
       "*": "allow"
     },
     "external_directory": {
-      "/tmp/*": "allow"
+      "/tmp/*": "allow",
+      "/Library/Frameworks/R.framework/Versions/4.6/Resources/library/VizModules/doc/*": "allow"
     },
     "read": {
       "*.txt": "allow",
