@@ -1,12 +1,16 @@
 Package: sciVizModules
 Title: Flexible, scientific based interactive plotting VizModules
-Version: 0.99.0.9000
+Version: 0.99.0
 Authors@R: 
-    c(person(given = "Jared", family = "Andrews", email = "jared.andrews07@gmail.com", role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0002-0780-6248")),
+    c(person(given = "Jared", 
+              family = "Andrews", 
+              email = "jared.andrews07@gmail.com",
+              role = c("aut", "cre"),
+              comment = c(ORCID = "0000-0002-0780-6248")),
         person(given = "Jacob",
                 family = "Martin",
                 role = c("aut"),
+                comment = c(ORCID = "0009-0007-6896-4796"),
                 email = "jacob@martin-email.com"))
 Description: sciVizModules extends VizModules with a curated collection of domain-specific Shiny modules tailored for the biological, chemical, 
     and physical sciences. Built on the flexible foundations of VizModules, these modules introduce plot types and interactive controls commonly needed 
@@ -16,26 +20,27 @@ Description: sciVizModules extends VizModules with a curated collection of domai
     scientific figures.
 License: MIT + file LICENSE
 Depends:
+    R (>= 4.5),
     shiny,
+<<<<<<< Updated upstream
     plotly,
     R (>= 4.5),
     shinyBS,
     VizModules (>= 0.3.0)
+=======
+    VizModules
+>>>>>>> Stashed changes
 Imports:
-    colourpicker,
-    dplyr,
-    DT,
-    readxl,
-    shinyjs,
-    scales,
-    shinyjqui,
-    survival,
-    survminer,
-    ggplot2,
+    dittoSeq,
     htmltools,
+    htmlwidgets,
     jsonlite,
     methods,
+    readxl,
+    scales,
+    shinyjqui,
     shinyWidgets,
+<<<<<<< Updated upstream
     htmlwidgets,
     dittoSeq,
     SingleCellExperiment,
@@ -47,18 +52,33 @@ Imports:
     ggplot.multistats,
     GOfan,
     org.Hs.eg.db
+=======
+    survival,
+    survminer
+>>>>>>> Stashed changes
 Encoding: UTF-8
-LazyData: true
 Roxygen: list(markdown = TRUE)
 Suggests:
     knitr,
+    GOfan,
     rmarkdown,
+<<<<<<< Updated upstream
     shinytest2,
     testthat (>= 3.0.0),
     drc,
     sesame,
     sesameData
+=======
+    testthat (>= 3.0.0),
+    drc
+>>>>>>> Stashed changes
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 URL: https://github.com/j-andrews7/sciVizModules
+BugReports: https://github.com/j-andrews7/sciVizModules/issues
 Config/roxygen2/version: 8.0.0
+biocViews: Visualization, ShinyApps, GUI, DifferentialExpression,
+    GeneExpression, SingleCell, GeneSetEnrichment, Pathways, GO, Survival
+
+
+
