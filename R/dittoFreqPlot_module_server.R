@@ -21,6 +21,10 @@
 #' @seealso [dittoSeq::dittoFreqPlot()], [sciVizModules::dittoFreqPlotInputsUI()],
 #' [sciVizModules::dittoFreqPlotOutputUI()], [sciVizModules::dittoFreqPlotApp()]
 #'
+#'
+#' @examples
+#' library(sciVizModules)
+#' if (interactive()) dittoFreqPlotApp()
 #' @export
 #' @author Jacob Martin, Jared Andrews
 dittoFreqPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL) {

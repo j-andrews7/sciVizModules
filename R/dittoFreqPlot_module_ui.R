@@ -181,6 +181,9 @@ dittoFreqPlotInputsUI <- function(id, data, defaults = NULL, title = "FreqPlot S
 #' @import plotly
 #' @importFrom shinyjqui jqui_resizable
 #'
+#'
+#' @examples
+#' dittoFreqPlotOutputUI("plot")
 #' @export
 #' @author Jacob Martin, Jared Andrews
 dittoFreqPlotOutputUI <- function(id, resizable = TRUE) {

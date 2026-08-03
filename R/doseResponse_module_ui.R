@@ -16,6 +16,9 @@
 #'
 #' @importFrom VizModules dittoViz_scatterPlotInputsUI
 #'
+#' @examples
+#' library(sciVizModules)
+#' doseResponseInputsUI("dose", dose_response)
 #' @export
 #' @author Jacob Martin
 #' @seealso [sciVizModules::doseResponseServer()],
@@ -40,6 +43,8 @@ doseResponseInputsUI <- function(id, data, defaults = NULL, title = NULL, column
 #'
 #' @importFrom VizModules dittoViz_scatterPlotOutputUI
 #'
+#' @examples
+#' doseResponseOutputUI("dose")
 #' @export
 #' @author Jacob Martin
 doseResponseOutputUI <- function(id, resizable = TRUE) {

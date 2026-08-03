@@ -167,6 +167,9 @@ survivalCurveInputsUI <- function(id, data, defaults = NULL, title = "Survival C
 #' @import plotly
 #' @importFrom shinyjqui jqui_resizable
 #'
+#'
+#' @examples
+#' survivalCurveOutputUI("plot")
 #' @export
 #' @author Jacob Martin
 survivalCurveOutputUI <- function(id, resizable = TRUE) {

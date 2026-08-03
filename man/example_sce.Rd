@@ -20,7 +20,7 @@ Simulated in \code{data-raw/generate_example_sce.R}; no real
 biological data are included.
 }
 \usage{
-example_sce
+data(example_sce)
 }
 \description{
 A small, simulated \link[SingleCellExperiment:SingleCellExperiment]{SingleCellExperiment::SingleCellExperiment} provided as a

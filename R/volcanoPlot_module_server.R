@@ -19,6 +19,10 @@
 #' @seealso [VizModules::dittoViz_scatterPlotServer()], [sciVizModules::volcanoPlotInputsUI()],
 #' [sciVizModules::volcanoPlotOutputUI()], [sciVizModules::volcanoPlotApp()]
 #' 
+#'
+#' @examples
+#' library(sciVizModules)
+#' if (interactive()) volcanoPlotApp()
 #' @export
 #' @author Jared Andrews
 volcanoPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = c("Trajectory", "Facet", "Colors", "Legend/Scale"), defaults = NULL) {
@@ -71,7 +75,7 @@ volcanoPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = c("Traje
             dat$group[dat[[y_col]] < sig_thresh & dat[[x_col]] < -fc_thresh] <- "Down"
 
             # Ensure group is a factor for consistent coloring
-            dat$group <- factor(dat$group, levels = c("Up", "Down", "n.s."))
+            dat$group <- factor(dat$group, levels = c("n.s.", "Up", "Down"))
             dat
         })
 

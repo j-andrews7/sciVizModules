@@ -21,6 +21,10 @@
 #' @seealso [dittoSeq::dittoBarPlot()], [sciVizModules::dittoBarPlotInputsUI()],
 #' [sciVizModules::dittoBarPlotOutputUI()], [sciVizModules::dittoBarPlotApp()]
 #'
+#'
+#' @examples
+#' library(sciVizModules)
+#' if (interactive()) dittoBarPlotApp()
 #' @export
 #' @author Jacob Martin
 dittoBarPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL) {

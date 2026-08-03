@@ -195,6 +195,9 @@ dittoDimPlotInputsUI <- function(id, data, defaults = NULL, title = "DimPlot Set
 #' @import plotly
 #' @importFrom shinyjqui jqui_resizable
 #'
+#'
+#' @examples
+#' dittoDimPlotOutputUI("plot")
 #' @export
 #' @author Jacob Martin, Jared Andrews
 dittoDimPlotOutputUI <- function(id, resizable = TRUE) {

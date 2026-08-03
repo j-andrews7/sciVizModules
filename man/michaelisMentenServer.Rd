@@ -47,6 +47,10 @@ The K/Vmax annotations are added here in the server using plotly
 \code{\link[plotly:add_annotations]{plotly::add_annotations()}} rather than inside the plotting function, so the
 annotation logic is kept separate from the ggplot construction.
 }
+\examples{
+library(sciVizModules)
+if (interactive()) michaelisMentenApp()
+}
 \seealso{
 \code{\link[=michaelisMentenPlot]{michaelisMentenPlot()}},
 \code{\link[=michaelisMentenInputsUI]{michaelisMentenInputsUI()}},

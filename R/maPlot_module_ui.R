@@ -130,6 +130,9 @@ maPlotInputsUI <- function(id, data, defaults = NULL, title = "MA Settings", col
 #'
 #' @import shiny
 #' @importFrom VizModules dittoViz_scatterPlotOutputUI
+#'
+#' @examples
+#' maPlotOutputUI("plot")
 #' @export
 #' @author Jared Andrews
 maPlotOutputUI <- function(id) {

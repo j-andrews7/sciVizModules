@@ -21,6 +21,10 @@
 #' @seealso [dittoSeq::dittoDimHex()], [sciVizModules::dittoDimHexInputsUI()],
 #' [sciVizModules::dittoDimHexOutputUI()], [sciVizModules::dittoDimHexApp()]
 #'
+#'
+#' @examples
+#' library(sciVizModules)
+#' if (interactive()) dittoDimHexApp()
 #' @export
 #' @author Jacob Martin
 dittoDimHexServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL) {

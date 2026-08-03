@@ -18,6 +18,9 @@ A Shiny plotlyOutput for the sunburst plot.
 \description{
 This should be placed in the UI where the plot should be shown.
 }
+\examples{
+goFanPlotOutputUI("plot")
+}
 \author{
 Jacob Martin, Jared Andrews
 }

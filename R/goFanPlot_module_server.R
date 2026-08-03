@@ -24,6 +24,10 @@
 #' [sciVizModules::goFanPlotInputsUI()], [sciVizModules::goFanPlotOutputUI()],
 #' [sciVizModules::goFanPlotApp()]
 #'
+#'
+#' @examples
+#' library(sciVizModules)
+#' if (interactive()) goFanPlotApp()
 #' @export
 #' @author Jacob Martin, Jared Andrews
 goFanPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL) {

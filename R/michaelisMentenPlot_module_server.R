@@ -35,6 +35,10 @@
 #' [sciVizModules::michaelisMentenInputsUI()],
 #' [sciVizModules::michaelisMentenOutputUI()], [sciVizModules::michaelisMentenApp()]
 #'
+#'
+#' @examples
+#' library(sciVizModules)
+#' if (interactive()) michaelisMentenApp()
 #' @export
 #' @author Jacob Martin
 michaelisMentenServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL) {

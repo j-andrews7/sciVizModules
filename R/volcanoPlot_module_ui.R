@@ -125,6 +125,9 @@ volcanoPlotInputsUI <- function(id, data, defaults = NULL, title = "Volcano Sett
 #' 
 #' @import shiny
 #' @importFrom VizModules dittoViz_scatterPlotOutputUI
+#'
+#' @examples
+#' volcanoPlotOutputUI("plot")
 #' @export
 #' @author Jared Andrews
 volcanoPlotOutputUI <- function(id) {

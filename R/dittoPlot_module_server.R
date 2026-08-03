@@ -20,6 +20,10 @@
 #' @seealso [dittoSeq::dittoPlot()], [sciVizModules::dittoPlotInputsUI()],
 #' [sciVizModules::dittoPlotOutputUI()], [sciVizModules::dittoPlotApp()]
 #'
+#'
+#' @examples
+#' library(sciVizModules)
+#' if (interactive()) dittoPlotApp()
 #' @export
 #' @author Jacob Martin, Jared Andrews
 dittoPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL) {

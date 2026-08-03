@@ -29,6 +29,10 @@
 #' [sciVizModules::cnSegmentPlotInputsUI()],
 #' [sciVizModules::cnSegmentPlotOutputUI()], [sciVizModules::cnSegmentPlotApp()]
 #'
+#'
+#' @examples
+#' library(sciVizModules)
+#' if (interactive()) cnSegmentPlotApp()
 #' @export
 #' @author Jared Andrews
 cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL) {
@@ -73,7 +77,7 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             req(seg)
 
             seq.choices <- as.character(seqnames(seqinfo(seg$bin.coords)))
-            seq.choices <- seq.choices[seq.choices %in% c(paste0("chr", 1:22), "chrX", "chrY")]
+            seq.choices <- seq.choices[seq.choices %in% c(paste0("chr", seq_len(22)), "chrX", "chrY")]
             hover.choices <- union(names(mcols(seg$bin.coords)), "signal")
 
             updateTextInput(session, "main", value = get_default(defaults, "main", ""))

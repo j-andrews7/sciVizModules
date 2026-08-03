@@ -15,6 +15,9 @@ A Shiny plotlyOutput for the volcano plot
 \description{
 This should be placed in the UI where the plot should be shown.
 }
+\examples{
+volcanoPlotOutputUI("plot")
+}
 \author{
 Jared Andrews
 }

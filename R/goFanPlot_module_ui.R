@@ -171,6 +171,9 @@ goFanPlotInputsUI <- function(id, data, defaults = NULL, title = "GO Sunburst Se
 #' @import plotly
 #' @importFrom shinyjqui jqui_resizable
 #'
+#'
+#' @examples
+#' goFanPlotOutputUI("plot")
 #' @export
 #' @author Jacob Martin, Jared Andrews
 goFanPlotOutputUI <- function(id, resizable = TRUE) {

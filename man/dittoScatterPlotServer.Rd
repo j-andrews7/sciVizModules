@@ -32,6 +32,10 @@ The \code{moduleServer} function for the dittoScatterPlot module.
 This module builds a scatter plot with \code{\link[dittoSeq:dittoScatterPlot]{dittoSeq::dittoScatterPlot()}} and
 renders it as an interactive \code{plotly} figure.
 }
+\examples{
+library(sciVizModules)
+if (interactive()) dittoScatterPlotApp()
+}
 \seealso{
 \code{\link[dittoSeq:dittoScatterPlot]{dittoSeq::dittoScatterPlot()}}, \code{\link[=dittoScatterPlotInputsUI]{dittoScatterPlotInputsUI()}},
 \code{\link[=dittoScatterPlotOutputUI]{dittoScatterPlotOutputUI()}}, \code{\link[=dittoScatterPlotApp]{dittoScatterPlotApp()}}

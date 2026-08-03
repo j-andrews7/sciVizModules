@@ -18,6 +18,9 @@ A Shiny plotlyOutput for the survival curve
 \description{
 This should be placed in the UI where the plot should be shown.
 }
+\examples{
+survivalCurveOutputUI("plot")
+}
 \author{
 Jacob Martin
 }

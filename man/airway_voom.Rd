@@ -22,7 +22,7 @@ Generated from the \code{airway} Bioconductor package using limma.
 The contrast compares dexamethasone treatment ("trt") vs untreated ("untrt").
 }
 \usage{
-airway_voom
+data(airway_voom)
 }
 \description{
 A dataset containing differential expression results from comparing treated vs untreated
