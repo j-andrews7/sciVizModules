@@ -14,7 +14,10 @@
 #' @param hide.inputs A character vector of input IDs to hide.
 #' @param hide.tabs A character vector of tab names to hide.
 #' @param defaults A named list of default values used when resetting the
-#'   inputs.
+#'   inputs. Individual entries may be a [shiny::reactive()]/`reactiveVal`, in
+#'   which case the parameter follows the parent app's state and is resolved
+#'   server-side (a single render, control kept in sync and still editable);
+#'   see [VizModules::setup_reactive_defaults()].
 #' @return The `moduleServer` function for the cnSegmentPlot module.
 #'
 #' @import shiny
@@ -55,6 +58,12 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
     }
 
     moduleServer(id, function(input, output, session) {
+        # Resolve any reactive `defaults` entries (e.g. a parent-driven title)
+        # into a server-side store so they update in the same reactive flush as
+        # the data -> a single render. NULL when no defaults are reactive, in
+        # which case behavior is unchanged. See setup_reactive_defaults().
+        params <- setup_reactive_defaults(defaults, input, session)
+
         if (!is.null(hide.inputs)) {
             for (input.name in hide.inputs) hide(input.name)
         }
@@ -130,7 +139,7 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
         })
 
         generate_cnSegmentPlot <- reactive({
-            isolate_fn <- setup_auto_update_logic(input)
+            isolate_fn <- setup_auto_update_logic(input, params)
 
             seg <- seg_obj()
             req(seg)
