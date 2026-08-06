@@ -16,7 +16,7 @@ Simulated in \code{data-raw/generate_mm_kinetics.R}; no real
 biological data are included.
 }
 \usage{
-mm_kinetics
+data(mm_kinetics)
 }
 \description{
 A small, self-contained set of enzyme-kinetics observations (substrate

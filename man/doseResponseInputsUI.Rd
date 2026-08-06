@@ -28,6 +28,10 @@ a \strong{drc} log-logistic model enabled as the fitted curve). Tabs and inputs
 that are irrelevant to a single dose-response curve are hidden by
 \code{\link[=doseResponseServer]{doseResponseServer()}}.
 }
+\examples{
+library(sciVizModules)
+doseResponseInputsUI("dose", dose_response)
+}
 \seealso{
 \code{\link[=doseResponseServer]{doseResponseServer()}},
 \code{\link[=doseResponseOutputUI]{doseResponseOutputUI()}}, \code{\link[=doseResponseApp]{doseResponseApp()}}

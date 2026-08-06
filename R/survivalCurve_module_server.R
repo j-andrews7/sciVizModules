@@ -24,6 +24,10 @@
 #' [sciVizModules::survivalCurveInputsUI()], [sciVizModules::survivalCurveOutputUI()],
 #' [sciVizModules::survivalCurveApp()]
 #'
+#'
+#' @examples
+#' library(sciVizModules)
+#' if (interactive()) survivalCurveApp()
 #' @export
 #' @author Jacob Martin
 survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL) {

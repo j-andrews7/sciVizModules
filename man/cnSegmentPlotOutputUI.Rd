@@ -18,6 +18,9 @@ A Shiny plotlyOutput for the copy number segment plot.
 \description{
 This should be placed in the UI where the plot should be shown.
 }
+\examples{
+cnSegmentPlotOutputUI("plot")
+}
 \author{
 Jared Andrews
 }

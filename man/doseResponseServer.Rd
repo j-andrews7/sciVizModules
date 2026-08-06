@@ -37,6 +37,10 @@ with dose-response defaults (dose on a log10 x-axis, response on the y-axis,
 and a \code{drc} log-logistic model drawn as the fitted curve). Tabs and inputs
 that are not relevant to a single dose-response curve are hidden.
 }
+\examples{
+library(sciVizModules)
+if (interactive()) doseResponseApp()
+}
 \seealso{
 \code{\link[=doseResponseInputsUI]{doseResponseInputsUI()}},
 \code{\link[=doseResponseOutputUI]{doseResponseOutputUI()}}, \code{\link[=doseResponseApp]{doseResponseApp()}}

@@ -48,4 +48,8 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 
-.posit/
+# macOS system files
+.DS_Store
+
+# R app history
+.Rapp.history

@@ -21,7 +21,7 @@ test_that("example_enrichment has the expected structure", {
 })
 
 test_that(".prepare_enrichment augments enrichment data with sensible mappings", {
-    prep <- sciVizModules:::.prepare_enrichment(example_enrichment)
+    prep <- .prepare_enrichment(example_enrichment)
 
     expect_true(is.numeric(prep$data$GeneRatio))
     expect_true("neg_log10_pvalue" %in% names(prep$data))
@@ -36,15 +36,15 @@ test_that(".prepare_enrichment creates a grouping column when none exists", {
         example_enrichment$Cluster == "Upregulated",
         c("ID", "Description", "GeneRatio", "pvalue", "p.adjust", "Count")
     ]
-    prep <- sciVizModules:::.prepare_enrichment(single)
+    prep <- .prepare_enrichment(single)
     expect_true("Group" %in% names(prep$data))
     expect_identical(prep$mapping$x, "Group")
 })
 
 test_that(".parse_ratio converts fraction strings to numeric ratios", {
-    expect_equal(sciVizModules:::.parse_ratio(c("8/196", "1/2")), c(8 / 196, 0.5))
-    expect_equal(sciVizModules:::.parse_ratio(c(0.5, 0.25)), c(0.5, 0.25))
-    expect_true(is.na(sciVizModules:::.parse_ratio("not_a_ratio")))
+    expect_equal(.parse_ratio(c("8/196", "1/2")), c(8 / 196, 0.5))
+    expect_equal(.parse_ratio(c(0.5, 0.25)), c(0.5, 0.25))
+    expect_true(is.na(.parse_ratio("not_a_ratio")))
 })
 
 test_that("OutputUI builds a plotly output container", {

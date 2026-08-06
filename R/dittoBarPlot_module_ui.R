@@ -149,6 +149,9 @@ dittoBarPlotInputsUI <- function(id, data, defaults = NULL, title = "BarPlot Set
 #' @import plotly
 #' @importFrom shinyjqui jqui_resizable
 #'
+#'
+#' @examples
+#' dittoBarPlotOutputUI("plot")
 #' @export
 #' @author Jacob Martin
 dittoBarPlotOutputUI <- function(id, resizable = TRUE) {

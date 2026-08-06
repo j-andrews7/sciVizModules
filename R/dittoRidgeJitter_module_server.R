@@ -21,6 +21,10 @@
 #' @seealso [dittoSeq::dittoRidgeJitter()], [sciVizModules::dittoRidgeJitterInputsUI()],
 #' [sciVizModules::dittoRidgeJitterOutputUI()], [sciVizModules::dittoRidgeJitterApp()]
 #'
+#'
+#' @examples
+#' library(sciVizModules)
+#' if (interactive()) dittoRidgeJitterApp()
 #' @export
 #' @author Jacob Martin, Jared Andrews
 dittoRidgeJitterServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL) {

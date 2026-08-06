@@ -166,6 +166,9 @@ dittoRidgeJitterInputsUI <- function(id, data, defaults = NULL, title = "RidgeJi
 #' @import plotly
 #' @importFrom shinyjqui jqui_resizable
 #'
+#'
+#' @examples
+#' dittoRidgeJitterOutputUI("plot")
 #' @export
 #' @author Jacob Martin, Jared Andrews
 dittoRidgeJitterOutputUI <- function(id, resizable = TRUE) {

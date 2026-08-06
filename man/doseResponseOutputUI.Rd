@@ -18,6 +18,9 @@ A Shiny plot output for the dose-response curve.
 \description{
 Thin wrapper over \code{\link[VizModules:dittoViz_scatterPlotOutputUI]{VizModules::dittoViz_scatterPlotOutputUI()}}.
 }
+\examples{
+doseResponseOutputUI("dose")
+}
 \author{
 Jacob Martin
 }

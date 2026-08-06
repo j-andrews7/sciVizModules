@@ -18,6 +18,9 @@ A Shiny plotlyOutput for the scatter plot.
 \description{
 This should be placed in the UI where the plot should be shown.
 }
+\examples{
+dittoScatterPlotOutputUI("plot")
+}
 \author{
 Jacob Martin, Jared Andrews
 }

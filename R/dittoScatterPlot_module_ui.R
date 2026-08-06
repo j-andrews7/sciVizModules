@@ -187,6 +187,9 @@ dittoScatterPlotInputsUI <- function(id, data, defaults = NULL, title = "Scatter
 #' @import plotly
 #' @importFrom shinyjqui jqui_resizable
 #'
+#'
+#' @examples
+#' dittoScatterPlotOutputUI("plot")
 #' @export
 #' @author Jacob Martin, Jared Andrews
 dittoScatterPlotOutputUI <- function(id, resizable = TRUE) {

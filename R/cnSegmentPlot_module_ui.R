@@ -67,7 +67,7 @@ cnSegmentPlotInputsUI <- function(id, seg, defaults = NULL,
     }
 
     seq.choices <- as.character(seqnames(seqinfo(seg$bin.coords)))
-    seq.choices <- seq.choices[seq.choices %in% c(paste0("chr", 1:22), "chrX", "chrY")]
+    seq.choices <- seq.choices[seq.choices %in% c(paste0("chr", seq_len(22)), "chrX", "chrY")]
     hover.choices <- union(names(mcols(seg$bin.coords)), "signal")
 
     id.col.choices <- if (!is.null(genes) && length(genes) > 0) names(mcols(genes)) else character(0)
@@ -314,6 +314,9 @@ cnSegmentPlotInputsUI <- function(id, seg, defaults = NULL,
 #' @importFrom shinyjqui jqui_resizable
 #' @importFrom plotly plotlyOutput
 #'
+#'
+#' @examples
+#' cnSegmentPlotOutputUI("plot")
 #' @export
 #' @author Jared Andrews
 cnSegmentPlotOutputUI <- function(id, resizable = TRUE) {

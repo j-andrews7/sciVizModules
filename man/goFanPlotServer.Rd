@@ -35,6 +35,10 @@ This module builds a GO enrichment sunburst ("fan") plot with
 \code{\link[GOfan:sunburstGO]{GOfan::sunburstGO()}} (via \code{\link[=goFanPlot]{goFanPlot()}}) and renders it as an interactive
 \code{plotly} figure.
 }
+\examples{
+library(sciVizModules)
+if (interactive()) goFanPlotApp()
+}
 \seealso{
 \code{\link[GOfan:sunburstGO]{GOfan::sunburstGO()}}, \code{\link[=goFanPlot]{goFanPlot()}},
 \code{\link[=goFanPlotInputsUI]{goFanPlotInputsUI()}}, \code{\link[=goFanPlotOutputUI]{goFanPlotOutputUI()}},

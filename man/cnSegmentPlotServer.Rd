@@ -37,6 +37,10 @@ This module builds a genome-wide copy number segment plot with
 \code{\link[sesame:cnSegmentation]{sesame::cnSegmentation()}}), renders it as an interactive \code{plotly} figure,
 and adds user-selected genes as draggable Plotly annotations.
 }
+\examples{
+library(sciVizModules)
+if (interactive()) cnSegmentPlotApp()
+}
 \seealso{
 \code{\link[=cnSegmentPlot]{cnSegmentPlot()}},
 \code{\link[=cnSegmentPlotInputsUI]{cnSegmentPlotInputsUI()}},

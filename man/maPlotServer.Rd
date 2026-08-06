@@ -33,6 +33,10 @@ The \code{moduleServer} function for the maPlot module.
 This module builds upon the \code{\link[VizModules:dittoViz_scatterPlotServer]{VizModules::dittoViz_scatterPlotServer()}} to provide an MA plot
 (log fold change versus mean abundance) with interactive significance and fold-change thresholding.
 }
+\examples{
+library(sciVizModules)
+if (interactive()) maPlotApp()
+}
 \seealso{
 \code{\link[VizModules:dittoViz_scatterPlotServer]{VizModules::dittoViz_scatterPlotServer()}}, \code{\link[=maPlotInputsUI]{maPlotInputsUI()}},
 \code{\link[=maPlotOutputUI]{maPlotOutputUI()}}, \code{\link[=maPlotApp]{maPlotApp()}}

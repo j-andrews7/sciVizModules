@@ -23,6 +23,10 @@
 #' [sciVizModules::enrichmentDotPlotInputsUI()], [sciVizModules::enrichmentDotPlotOutputUI()],
 #' [sciVizModules::enrichmentDotPlotApp()]
 #'
+#'
+#' @examples
+#' library(sciVizModules)
+#' if (interactive()) enrichmentDotPlotApp()
 #' @export
 #' @author Jacob Martin, Jared Andrews
 enrichmentDotPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL) {

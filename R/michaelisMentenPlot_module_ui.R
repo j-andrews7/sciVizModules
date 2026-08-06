@@ -132,6 +132,9 @@ michaelisMentenInputsUI <- function(id, data, defaults = NULL,
 #' @import plotly
 #' @importFrom shinyjqui jqui_resizable
 #'
+#'
+#' @examples
+#' michaelisMentenOutputUI("plot")
 #' @export
 #' @author Jacob Martin
 michaelisMentenOutputUI <- function(id, resizable = TRUE) {

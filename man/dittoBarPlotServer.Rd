@@ -32,6 +32,10 @@ The \code{moduleServer} function for the dittoBarPlot module.
 This module builds a stacked composition bar plot with
 \code{\link[dittoSeq:dittoBarPlot]{dittoSeq::dittoBarPlot()}} and renders it as an interactive \code{plotly} figure.
 }
+\examples{
+library(sciVizModules)
+if (interactive()) dittoBarPlotApp()
+}
 \seealso{
 \code{\link[dittoSeq:dittoBarPlot]{dittoSeq::dittoBarPlot()}}, \code{\link[=dittoBarPlotInputsUI]{dittoBarPlotInputsUI()}},
 \code{\link[=dittoBarPlotOutputUI]{dittoBarPlotOutputUI()}}, \code{\link[=dittoBarPlotApp]{dittoBarPlotApp()}}

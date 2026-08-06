@@ -1,0 +1,14 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^data-raw$
+^\.github$
+^man/PlotScreenShots$
+^BIOCONDUCTOR_SUBMISSION_PLAN\.md$
+^\.DS_Store$
+^LICENSE\.md$
+^\.Rbuildignore$
+^\.gitignore$
+^README\.Rmd$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$

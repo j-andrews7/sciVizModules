@@ -1,0 +1,115 @@
+---
+title: "Quick Start with sciVizModules"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Quick Start with sciVizModules}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>"
+)
+```
+
+## Overview
+
+**sciVizModules** extends [VizModules](https://cran.r-project.org/package=VizModules)
+with a curated set of domain-specific Shiny modules for the biological, chemical,
+and physical sciences. Each module wraps a plotting function with scientifically
+meaningful defaults, axis conventions, and annotation layers, while preserving
+the interactivity-first philosophy of the parent package.
+
+Every module follows the same three-function contract:
+
+- `*InputsUI(id, data, ...)` — the interactive controls.
+- `*OutputUI(id)` — the (Plotly) plot output.
+- `*Server(id, data, ...)` — the reactive logic that renders the plot.
+
+Servers share a common signature, with `data` supplied as a **reactive**:
+
+```r
+someModuleServer(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL)
+```
+
+Each module also ships a standalone `*App()` convenience function.
+
+## The module gallery
+
+To preview every module in one place, launch the bundled gallery app:
+
+```{r gallery}
+library(shiny)
+runApp(system.file("apps/module-gallery", package = "sciVizModules"))
+```
+
+## Drop a module into your app
+
+Here is a minimal volcano-plot app driven by the bundled `airway_deseq2` results:
+
+```{r volcano-example}
+library(sciVizModules)
+
+ui <- fluidPage(
+    sidebarLayout(
+        sidebarPanel(
+            volcanoPlotInputsUI("de", airway_deseq2)
+        ),
+        mainPanel(volcanoPlotOutputUI("de"))
+    )
+)
+
+server <- function(input, output, session) {
+    volcanoPlotServer("de", data = reactive(airway_deseq2))
+}
+
+shinyApp(ui, server)
+```
+
+## Try a module standalone
+
+The fastest way to explore a module is its `*App()` function:
+
+```{r apps}
+if (interactive()) volcanoPlotApp()   # differential expression, airway_deseq2
+if (interactive()) dittoDimPlotApp()  # single-cell reduction, example_sce
+if (interactive()) doseResponseApp()  # pharmacology, dose_response
+```
+
+## Set defaults and hide controls
+
+Pass a named `defaults` list to pre-fill inputs, and use `hide.inputs` /
+`hide.tabs` to trim the control panel. Hidden inputs still pass their values to
+the plot, so the module stays fully configured.
+
+```{r defaults}
+volcanoPlotServer(
+    "de",
+    data      = reactive(airway_deseq2),
+    defaults  = list(sig.thresh = 0.01, fc.thresh = 1),
+    hide.tabs = c("Legend/Scale")
+)
+```
+
+## Module data formats
+
+| Module family | Modules | Expected data |
+|---|---|---|
+| Differential expression | `volcanoPlot`, `maPlot` | `data.frame` with effect-size and significance columns |
+| Enrichment | `enrichmentDotPlot`, `goFanPlot` | `clusterProfiler`-style enrichment `data.frame` |
+| Survival | `survivalCurve` | `data.frame` with `time` and `status` columns |
+| Pharmacology / kinetics | `doseResponse`, `michaelisMenten` | dose/response `data.frame`; kinetics list |
+| Copy number | `cnSegmentPlot` | a `CNSegment` object from `sesame::cnSegmentation()` |
+| Single cell (dittoSeq) | `dittoDimPlot`, `dittoScatterPlot`, `dittoPlot`, `dittoBarPlot`, `dittoDimHex`, `dittoFreqPlot`, `dittoRidgeJitter` | `SingleCellExperiment` / `Seurat` / `SummarizedExperiment` |
+
+Each module ships a bundled example dataset (e.g. `airway_deseq2`,
+`example_enrichment`, `survival_lung`, `dose_response`, `example_sce`) so you can
+try it immediately.
+
+## Session info
+
+```{r session-info, eval = TRUE}
+sessionInfo()
+```

@@ -22,6 +22,10 @@
 #' @seealso [sciVizModules::doseResponseInputsUI()],
 #' [sciVizModules::doseResponseOutputUI()], [sciVizModules::doseResponseApp()]
 #'
+#'
+#' @examples
+#' library(sciVizModules)
+#' if (interactive()) doseResponseApp()
 #' @export
 #' @author Jacob Martin
 doseResponseServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL,

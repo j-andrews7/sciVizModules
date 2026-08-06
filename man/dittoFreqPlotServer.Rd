@@ -32,6 +32,10 @@ The \code{moduleServer} function for the dittoFreqPlot module.
 This module builds a per-sample frequency plot with
 \code{\link[dittoSeq:dittoFreqPlot]{dittoSeq::dittoFreqPlot()}} and renders it as an interactive \code{plotly} figure.
 }
+\examples{
+library(sciVizModules)
+if (interactive()) dittoFreqPlotApp()
+}
 \seealso{
 \code{\link[dittoSeq:dittoFreqPlot]{dittoSeq::dittoFreqPlot()}}, \code{\link[=dittoFreqPlotInputsUI]{dittoFreqPlotInputsUI()}},
 \code{\link[=dittoFreqPlotOutputUI]{dittoFreqPlotOutputUI()}}, \code{\link[=dittoFreqPlotApp]{dittoFreqPlotApp()}}

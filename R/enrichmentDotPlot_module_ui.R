@@ -85,6 +85,9 @@ enrichmentDotPlotInputsUI <- function(id, data, defaults = NULL, title = "Enrich
 #' @import shiny
 #' @importFrom VizModules plotthis_DotPlotOutputUI
 #'
+#'
+#' @examples
+#' enrichmentDotPlotOutputUI("plot")
 #' @export
 #' @author Jacob Martin, Jared Andrews
 enrichmentDotPlotOutputUI <- function(id, resizable = TRUE) {

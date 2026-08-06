@@ -35,6 +35,10 @@ This module builds an enrichment dot plot with
 column before being handed to the wrapped DotPlot server (see
 \code{\link[=enrichmentDotPlotInputsUI]{enrichmentDotPlotInputsUI()}} for details).
 }
+\examples{
+library(sciVizModules)
+if (interactive()) enrichmentDotPlotApp()
+}
 \seealso{
 \code{\link[plotthis:DotPlot]{plotthis::DotPlot()}}, \code{\link[VizModules:plotthis_DotPlotServer]{VizModules::plotthis_DotPlotServer()}},
 \code{\link[=enrichmentDotPlotInputsUI]{enrichmentDotPlotInputsUI()}}, \code{\link[=enrichmentDotPlotOutputUI]{enrichmentDotPlotOutputUI()}},

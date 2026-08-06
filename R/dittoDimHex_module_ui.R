@@ -180,6 +180,9 @@ dittoDimHexInputsUI <- function(id, data, defaults = NULL, title = "DimHex Setti
 #' @import plotly
 #' @importFrom shinyjqui jqui_resizable
 #'
+#'
+#' @examples
+#' dittoDimHexOutputUI("plot")
 #' @export
 #' @author Jacob Martin
 dittoDimHexOutputUI <- function(id, resizable = TRUE) {

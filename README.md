@@ -26,6 +26,17 @@ install.packages("VizModules")
 devtools::install_github("j-andrews7/sciVizModules")
 ```
 
+## Module Gallery
+
+To preview every module in one place, launch the bundled gallery app. It presents each
+module on its own tab, wired to the relevant bundled example dataset, so you can explore
+the plot types and their interactive controls without writing any code:
+
+```r
+library(shiny)
+runApp(system.file("apps/module-gallery", package = "sciVizModules"))
+```
+
 ## Available Modules
 
 Each module follows the VizModules trio contract: `*InputsUI(id, data, ...)` renders the

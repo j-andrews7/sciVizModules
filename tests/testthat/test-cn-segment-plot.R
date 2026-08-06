@@ -32,14 +32,14 @@ test_that("gene text selection accepts commas and whitespace", {
     data(example_cn_segment, package = "sciVizModules")
     genes <- example_cn_segment$genomeInfo$genes
 
-    selected <- sciVizModules:::.cn_seg_select_genes(
+    selected <- .cn_seg_select_genes(
         genes,
         id.col = "gene_name",
         label.genes = "TP53, EGFR\nMYC"
     )
 
     expect_setequal(GenomicRanges::mcols(selected)$gene_name, c("TP53", "EGFR", "MYC"))
-    expect_null(sciVizModules:::.cn_seg_select_genes(
+    expect_null(.cn_seg_select_genes(
         genes, id.col = "gene_name", label.genes = ""
     ))
 })
@@ -136,7 +136,7 @@ test_that("cnSegmentPlot uses centromeres for dashed guides", {
 test_that(".cn_seg_centromeres extracts p-arm acen ends and drives dashed guides", {
     data(example_cn_segment, package = "sciVizModules")
 
-    cent <- sciVizModules:::.cn_seg_centromeres(example_cn_segment)
+    cent <- .cn_seg_centromeres(example_cn_segment)
     expect_s4_class(cent, "GRanges")
     expect_gt(length(cent), 0)
 

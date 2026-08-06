@@ -32,6 +32,10 @@ The \code{moduleServer} function for the dittoDimHex module.
 This module builds a hexagonal-bin dimensionality-reduction plot with
 \code{\link[dittoSeq:dittoDimHex]{dittoSeq::dittoDimHex()}} and renders it as an interactive \code{plotly} figure.
 }
+\examples{
+library(sciVizModules)
+if (interactive()) dittoDimHexApp()
+}
 \seealso{
 \code{\link[dittoSeq:dittoDimHex]{dittoSeq::dittoDimHex()}}, \code{\link[=dittoDimHexInputsUI]{dittoDimHexInputsUI()}},
 \code{\link[=dittoDimHexOutputUI]{dittoDimHexOutputUI()}}, \code{\link[=dittoDimHexApp]{dittoDimHexApp()}}
