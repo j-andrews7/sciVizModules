@@ -1,0 +1,30 @@
+{
+  "permission": {
+    "bash": {
+      "cd *": "allow",
+      "gh pr view *": "allow",
+      "head *": "allow",
+      "echo *": "allow",
+      "gh pr diff *": "allow",
+      "Rscript *": "allow",
+      "sed *": "allow",
+      "which *": "allow",
+      "gh *": "allow",
+      "git remote *": "allow"
+    },
+    "webfetch": {
+      "https://raw.githubusercontent.com/*": "allow",
+      "https://jokergoo.github.io/*": "allow",
+      "https://api.github.com/*": "allow",
+      "https://github.com/*": "allow"
+    },
+    "executeCode": {
+      "*": "allow"
+    },
+    "edit": {
+      "*.R": "allow",
+      "*/DESCRIPTION": "allow",
+      "*.md": "allow"
+    }
+  }
+}

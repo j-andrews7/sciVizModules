@@ -317,3 +317,44 @@
 #' @author Jacob Martin
 #' @keywords datasets
 "dose_response"
+
+#' Example tidy mutation table (simulated)
+#'
+#' A small, self-contained tidy (long) mutation table provided as ready-to-use
+#' example data for the [oncoPlotServer()] module and [oncoPlot()]. Each row is
+#' one observed alteration in one sample, resembling a cancer mutation cohort.
+#'
+#' @format A data frame with one row per alteration and 8 columns:
+#' \describe{
+#'   \item{sample}{Sample / patient identifier (e.g. "S01")}
+#'   \item{gene}{Altered gene symbol (e.g. "TP53")}
+#'   \item{alteration}{Alteration type: one of "MUT" (mutation), "AMP"
+#'     (amplification), or "HOMDEL" (homozygous deletion)}
+#'   \item{stage}{Per-sample tumour stage ("I"-"IV"); constant within a sample}
+#'   \item{sex}{Per-sample sex ("Female"/"Male"); constant within a sample}
+#'   \item{tmb}{Per-sample tumour mutational burden (numeric); constant within a
+#'     sample}
+#'   \item{pathway}{Per-gene pathway label (e.g. "Cell cycle", "RTK-RAS");
+#'     constant within a gene}
+#'   \item{expression}{Per-gene mean expression (numeric); constant within a
+#'     gene}
+#' }
+#'
+#' The `stage`, `sex`, and `tmb` columns are per-sample attributes and the
+#' `pathway` and `expression` columns are per-gene attributes, provided so the
+#' [oncoPlotServer()] annotation adder has extra columns to build top/bottom
+#' (per-sample) and left/right (per-gene) annotation tracks from.
+#'
+#' @source Simulated in `data-raw/generate_example_mutations.R`; no real
+#' biological data are included.
+#'
+#' @seealso [sciVizModules::oncoPlot()], [sciVizModules::oncoPlotApp()]
+#'
+#' @examples
+#' library(sciVizModules)
+#' data(example_mutations)
+#' head(example_mutations)
+#'
+#' @author Jacob Martin, Jared Andrews
+#' @keywords datasets
+"example_mutations"

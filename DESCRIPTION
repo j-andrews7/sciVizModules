@@ -28,6 +28,7 @@ Depends:
     shiny,
     VizModules (>= 0.3.0)
 Imports:
+    colourpicker,
     dittoSeq,
     GenomicRanges,
     htmltools,
@@ -46,8 +47,10 @@ Imports:
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Suggests:
+    ComplexHeatmap,
     drc,
     GOfan,
+    InteractiveComplexHeatmap,
     knitr,
     org.Hs.eg.db,
     rmarkdown,
@@ -61,6 +64,4 @@ BugReports: https://github.com/j-andrews7/sciVizModules/issues
 Config/roxygen2/version: 8.0.0
 biocViews: Visualization, ShinyApps, GUI, DifferentialExpression,
     GeneExpression, SingleCell, GeneSetEnrichment, Pathways, GO, Survival
-
-
-
+LazyData: true
