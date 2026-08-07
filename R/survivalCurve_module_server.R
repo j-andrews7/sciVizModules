@@ -17,7 +17,6 @@
 #'
 #' @import shiny
 #' @import plotly
-#' @importFrom shinyjs hide
 #' @importFrom shinyWidgets updateMaterialSwitch
 #'
 #' @seealso [survminer::ggsurvplot()], [sciVizModules::survivalCurve()],
@@ -36,9 +35,7 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
 
     moduleServer(id, function(input, output, session) {
         # Hide individual inputs if requested.
-        if (!is.null(hide.inputs)) {
-            for (input.name in hide.inputs) hide(input.name)
-        }
+        hideInput(session, hide.inputs)
 
         # Hide whole tabs if requested.
         if (!is.null(hide.tabs)) {

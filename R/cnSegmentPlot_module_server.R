@@ -22,7 +22,6 @@
 #'
 #' @import shiny
 #' @import plotly
-#' @importFrom shinyjs hide
 #' @importFrom methods is
 #' @importFrom colourpicker updateColourInput
 #' @importFrom GenomicRanges seqinfo seqnames mcols
@@ -68,9 +67,7 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
         # which case behavior is unchanged. See setup_reactive_defaults().
         params <- setup_reactive_defaults(defaults, input, session)
 
-        if (!is.null(hide.inputs)) {
-            for (input.name in hide.inputs) hide(input.name)
-        }
+        hideInput(session, hide.inputs)
         if (!is.null(hide.tabs)) {
             for (tab.name in hide.tabs) hideTab(inputId = "cnSegmentPlotTabsetPanel", target = tab.name)
         }

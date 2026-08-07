@@ -15,7 +15,6 @@
 #'
 #' @import shiny
 #' @import plotly
-#' @importFrom shinyjs hide
 #' @importFrom dittoSeq dittoRidgeJitter
 #'
 #' @seealso [dittoSeq::dittoRidgeJitter()], [sciVizModules::dittoRidgeJitterInputsUI()],
@@ -34,9 +33,7 @@ dittoRidgeJitterServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
     moduleServer(id, function(input, output, session) {
         ns <- session$ns
 
-        if (!is.null(hide.inputs)) {
-            for (input.name in hide.inputs) hide(input.name)
-        }
+        hideInput(session, hide.inputs)
         if (!is.null(hide.tabs)) {
             for (tab.name in hide.tabs) hideTab(inputId = "dittoRidgeJitterTabsetPanel", target = tab.name)
         }
