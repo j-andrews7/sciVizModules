@@ -26,7 +26,10 @@ by \code{\link[sesame:cnSegmentation]{sesame::cnSegmentation()}}). Gene labels a
 \item{hide.tabs}{A character vector of tab names to hide.}
 
 \item{defaults}{A named list of default values used when resetting the
-inputs.}
+inputs. Individual entries may be a \code{\link[shiny:reactive]{shiny::reactive()}}/\code{reactiveVal}, in
+which case the parameter follows the parent app's state and is resolved
+server-side (a single render, control kept in sync and still editable);
+see \code{\link[VizModules:setup_reactive_defaults]{VizModules::setup_reactive_defaults()}}.}
 }
 \value{
 The \code{moduleServer} function for the cnSegmentPlot module.

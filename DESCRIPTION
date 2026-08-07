@@ -26,7 +26,7 @@ License: MIT + file LICENSE
 Depends:
     R (>= 4.6.0),
     shiny,
-    VizModules (>= 0.3.0)
+    VizModules (>= 0.4.0)
 Imports:
     dittoSeq,
     GenomicRanges,
