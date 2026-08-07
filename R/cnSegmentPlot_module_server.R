@@ -67,7 +67,7 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
         # which case behavior is unchanged. See setup_reactive_defaults().
         params <- setup_reactive_defaults(defaults, input, session)
 
-        hideInput(session, hide.inputs)
+        hide_input(session, hide.inputs)
         if (!is.null(hide.tabs)) {
             for (tab.name in hide.tabs) hideTab(inputId = "cnSegmentPlotTabsetPanel", target = tab.name)
         }

@@ -35,7 +35,7 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
 
     moduleServer(id, function(input, output, session) {
         # Hide individual inputs if requested.
-        hideInput(session, hide.inputs)
+        hide_input(session, hide.inputs)
 
         # Hide whole tabs if requested.
         if (!is.null(hide.tabs)) {

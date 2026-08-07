@@ -33,7 +33,7 @@ dittoScatterPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
     moduleServer(id, function(input, output, session) {
         ns <- session$ns
 
-        hideInput(session, hide.inputs)
+        hide_input(session, hide.inputs)
         if (!is.null(hide.tabs)) {
             for (tab.name in hide.tabs) hideTab(inputId = "dittoScatterPlotTabsetPanel", target = tab.name)
         }

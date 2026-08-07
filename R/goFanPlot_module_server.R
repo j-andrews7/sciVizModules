@@ -34,7 +34,7 @@ goFanPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defa
     data_reactive <- data
 
     moduleServer(id, function(input, output, session) {
-        hideInput(session, hide.inputs)
+        hide_input(session, hide.inputs)
         if (!is.null(hide.tabs)) {
             for (tab.name in hide.tabs) hideTab(inputId = "goFanPlotTabsetPanel", target = tab.name)
         }

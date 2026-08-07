@@ -33,7 +33,7 @@ dittoBarPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, d
     moduleServer(id, function(input, output, session) {
         ns <- session$ns
 
-        hideInput(session, hide.inputs)
+        hide_input(session, hide.inputs)
         if (!is.null(hide.tabs)) {
             for (tab.name in hide.tabs) hideTab(inputId = "dittoBarPlotTabsetPanel", target = tab.name)
         }
