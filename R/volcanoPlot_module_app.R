@@ -24,7 +24,7 @@
 #' [sciVizModules::volcanoPlotServer()], [sciVizModules::airway_deseq2]
 #'
 #' @export
-#' @author Jared Andrews
+#' @author Jacob Martin
 #' @examples
 #' library(sciVizModules)
 #' # Launch with default example data:

@@ -41,5 +41,5 @@ if (interactive()) volcanoPlotApp()
 \code{\link[=volcanoPlotOutputUI]{volcanoPlotOutputUI()}}, \code{\link[=volcanoPlotApp]{volcanoPlotApp()}}
 }
 \author{
-Jared Andrews
+Jacob Martin
 }

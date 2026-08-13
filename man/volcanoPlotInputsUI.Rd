@@ -87,5 +87,5 @@ volcanoPlotInputsUI("volcanoPlot", airway_deseq2)
 \code{\link[=volcanoPlotApp]{volcanoPlotApp()}}
 }
 \author{
-Jared Andrews
+Jacob Martin
 }

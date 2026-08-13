@@ -53,7 +53,7 @@
 #' @importFrom VizModules dittoViz_scatterPlotInputsUI
 #'
 #' @export
-#' @author Jared Andrews
+#' @author Jacob Martin
 #' @seealso [dittoViz::scatterPlot()], [VizModules::dittoViz_scatterPlotInputsUI()],
 #' [sciVizModules::volcanoPlotOutputUI()], [sciVizModules::volcanoPlotServer()],
 #' [sciVizModules::volcanoPlotApp()]

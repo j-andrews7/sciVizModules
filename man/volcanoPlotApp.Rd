@@ -43,5 +43,5 @@ if (interactive()) runApp(app2)
 \code{\link[=volcanoPlotServer]{volcanoPlotServer()}}, \link{airway_deseq2}
 }
 \author{
-Jared Andrews
+Jacob Martin
 }

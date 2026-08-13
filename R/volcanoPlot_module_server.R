@@ -24,7 +24,7 @@
 #' library(sciVizModules)
 #' if (interactive()) volcanoPlotApp()
 #' @export
-#' @author Jared Andrews
+#' @author Jacob Martin
 volcanoPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = c("Trajectory", "Facet", "Colors", "Legend/Scale"), defaults = NULL) {
     # Volcano defaults, shared with volcanoPlotInputsUI so the initial state and
     # the reset state match. Computed once from a snapshot of the data.
