@@ -33,6 +33,10 @@ This module builds a ridgeline-with-jitter plot with
 \code{\link[dittoSeq:dittoRidgeJitter]{dittoSeq::dittoRidgeJitter()}} and renders it as an interactive \code{plotly}
 figure.
 }
+\examples{
+library(sciVizModules)
+if (interactive()) dittoRidgeJitterApp()
+}
 \seealso{
 \code{\link[dittoSeq:dittoRidgeJitter]{dittoSeq::dittoRidgeJitter()}}, \code{\link[=dittoRidgeJitterInputsUI]{dittoRidgeJitterInputsUI()}},
 \code{\link[=dittoRidgeJitterOutputUI]{dittoRidgeJitterOutputUI()}}, \code{\link[=dittoRidgeJitterApp]{dittoRidgeJitterApp()}}

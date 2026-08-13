@@ -22,7 +22,7 @@ Generated from the \code{airway} Bioconductor package using DESeq2.
 The contrast compares dexamethasone treatment ("trt") vs untreated ("untrt").
 }
 \usage{
-airway_deseq2
+data(airway_deseq2)
 }
 \description{
 A dataset containing differential expression results from comparing treated vs untreated
@@ -34,6 +34,6 @@ head(airway_deseq2)
 
 }
 \author{
-Jacob Martin, Jared Andrews
+Jacob Martin
 }
 \keyword{datasets}

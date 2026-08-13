@@ -47,3 +47,9 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# macOS system files
+.DS_Store
+
+# R app history
+.Rapp.history

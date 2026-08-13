@@ -20,7 +20,7 @@ Simulated in \code{data-raw/generate_dose_response.R}; no real
 biological data are included.
 }
 \usage{
-dose_response
+data(dose_response)
 }
 \description{
 A small, self-contained dose-response dataset: a serial dilution of doses

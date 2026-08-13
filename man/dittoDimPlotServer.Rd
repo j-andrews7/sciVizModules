@@ -34,6 +34,10 @@ The \code{moduleServer} function for the dittoDimPlot module.
 This module builds a dimensionality-reduction plot with
 \code{\link[dittoSeq:dittoDimPlot]{dittoSeq::dittoDimPlot()}} and renders it as an interactive \code{plotly} figure.
 }
+\examples{
+library(sciVizModules)
+if (interactive()) dittoDimPlotApp()
+}
 \seealso{
 \code{\link[dittoSeq:dittoDimPlot]{dittoSeq::dittoDimPlot()}}, \code{\link[=dittoDimPlotInputsUI]{dittoDimPlotInputsUI()}},
 \code{\link[=dittoDimPlotOutputUI]{dittoDimPlotOutputUI()}}, \code{\link[=dittoDimPlotApp]{dittoDimPlotApp()}}

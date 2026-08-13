@@ -20,7 +20,7 @@ Derived from \code{survival::lung} (Loprinzi et al., North Central
 Cancer Treatment Group).
 }
 \usage{
-survival_lung
+data(survival_lung)
 }
 \description{
 A lightly cleaned version of the NCCTG lung cancer dataset from the
@@ -34,6 +34,6 @@ head(survival_lung)
 
 }
 \author{
-Jacob Martin, Jared Andrews
+Jacob Martin
 }
 \keyword{datasets}

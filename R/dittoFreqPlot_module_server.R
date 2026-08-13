@@ -14,13 +14,16 @@
 #'
 #' @import shiny
 #' @import plotly
-#' @importFrom shinyjs hide
 #' @importFrom shinyWidgets updateMaterialSwitch
 #' @importFrom dittoSeq dittoFreqPlot
 #'
 #' @seealso [dittoSeq::dittoFreqPlot()], [sciVizModules::dittoFreqPlotInputsUI()],
 #' [sciVizModules::dittoFreqPlotOutputUI()], [sciVizModules::dittoFreqPlotApp()]
 #'
+#'
+#' @examples
+#' library(sciVizModules)
+#' if (interactive()) dittoFreqPlotApp()
 #' @export
 #' @author Jacob Martin, Jared Andrews
 dittoFreqPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL) {
@@ -30,9 +33,7 @@ dittoFreqPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
     moduleServer(id, function(input, output, session) {
         ns <- session$ns
 
-        if (!is.null(hide.inputs)) {
-            for (input.name in hide.inputs) hide(input.name)
-        }
+        hide_input(session, hide.inputs)
         if (!is.null(hide.tabs)) {
             for (tab.name in hide.tabs) hideTab(inputId = "dittoFreqPlotTabsetPanel", target = tab.name)
         }

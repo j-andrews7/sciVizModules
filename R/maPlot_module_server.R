@@ -20,6 +20,10 @@
 #' @seealso [VizModules::dittoViz_scatterPlotServer()], [sciVizModules::maPlotInputsUI()],
 #' [sciVizModules::maPlotOutputUI()], [sciVizModules::maPlotApp()]
 #'
+#'
+#' @examples
+#' library(sciVizModules)
+#' if (interactive()) maPlotApp()
 #' @export
 #' @author Jared Andrews
 maPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = c("Trajectory", "Facet", "Colors", "Legend/Scale"), defaults = NULL) {
@@ -72,7 +76,7 @@ maPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = c("Trajectory
             dat$group[dat[[sig_col]] < sig_thresh & dat[[y_col]] < -fc_thresh] <- "Down"
 
             # Ensure group is a factor for consistent coloring
-            dat$group <- factor(dat$group, levels = c("Up", "Down", "n.s."))
+            dat$group <- factor(dat$group, levels = c("n.s.", "Up", "Down"))
             dat
         })
 

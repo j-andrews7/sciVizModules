@@ -32,10 +32,14 @@ The \code{moduleServer} function for the volcanoPlot module.
 This module builds upon the \code{\link[VizModules:dittoViz_scatterPlotServer]{VizModules::dittoViz_scatterPlotServer()}} to provide a volcano plot
 with interactive significance and fold-change thresholding.
 }
+\examples{
+library(sciVizModules)
+if (interactive()) volcanoPlotApp()
+}
 \seealso{
 \code{\link[VizModules:dittoViz_scatterPlotServer]{VizModules::dittoViz_scatterPlotServer()}}, \code{\link[=volcanoPlotInputsUI]{volcanoPlotInputsUI()}},
 \code{\link[=volcanoPlotOutputUI]{volcanoPlotOutputUI()}}, \code{\link[=volcanoPlotApp]{volcanoPlotApp()}}
 }
 \author{
-Jared Andrews
+Jacob Martin
 }

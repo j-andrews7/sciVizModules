@@ -16,7 +16,7 @@ Predicted from \link{mm_kinetics_fit} in
 \code{data-raw/generate_mm_kinetics.R}.
 }
 \usage{
-mm_kinetics_line
+data(mm_kinetics_line)
 }
 \description{
 The fitted Michaelis-Menten curve for \link{mm_kinetics}, predicted over a fine

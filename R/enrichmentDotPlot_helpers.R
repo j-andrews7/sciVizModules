@@ -4,7 +4,7 @@
 #' @return The name of the column holding the enrichment term/description, or
 #'   `NULL` when none is found.
 #'
-#' @author Jacob Martin, Jared Andrews
+#' @author Jacob Martin
 #' @rdname INTERNAL_enrich_term_col
 #' @keywords internal
 .enrich_term_col <- function(data) {
@@ -20,7 +20,7 @@
 #' @param exclude Column names to ignore (e.g. the term column).
 #' @return The name of a discrete grouping column, or `NULL` when none is found.
 #'
-#' @author Jacob Martin, Jared Andrews
+#' @author Jacob Martin
 #' @rdname INTERNAL_enrich_group_col
 #' @keywords internal
 .enrich_group_col <- function(data, exclude = NULL) {
@@ -45,7 +45,7 @@
 #' @param data A data frame of enrichment results.
 #' @return The name of a numeric ratio-like column, or `NULL` when none is found.
 #'
-#' @author Jacob Martin, Jared Andrews
+#' @author Jacob Martin
 #' @rdname INTERNAL_enrich_ratio_col
 #' @keywords internal
 .enrich_ratio_col <- function(data) {
@@ -61,7 +61,7 @@
 #' @param data A data frame of enrichment results.
 #' @return The name of a numeric p-value column, or `NULL` when none is found.
 #'
-#' @author Jacob Martin, Jared Andrews
+#' @author Jacob Martin
 #' @rdname INTERNAL_enrich_pval_col
 #' @keywords internal
 .enrich_pval_col <- function(data) {
@@ -79,7 +79,7 @@
 #' @param x A character or numeric vector.
 #' @return A numeric vector of ratios.
 #'
-#' @author Jacob Martin, Jared Andrews
+#' @author Jacob Martin
 #' @rdname INTERNAL_parse_ratio
 #' @keywords internal
 .parse_ratio <- function(x) {
@@ -111,7 +111,7 @@
 #' @return A list with elements `data` (the augmented data frame) and `mapping`
 #'   (a named list with `x`, `y`, `size`, and `fill` column names).
 #'
-#' @author Jacob Martin, Jared Andrews
+#' @author Jacob Martin
 #' @rdname INTERNAL_prepare_enrichment
 #' @keywords internal
 .prepare_enrichment <- function(data) {
@@ -157,3 +157,22 @@
     )
 }
 
+#' Merge enrichment default mappings into a user-supplied defaults list
+#'
+#' User-supplied defaults take precedence over the auto-detected mappings.
+#'
+#' @param defaults A named list of user defaults (or `NULL`).
+#' @param mapping The mapping list produced by [.prepare_enrichment()].
+#' @return A named list of defaults keyed by DotPlot UI input IDs.
+#'
+#' @author Jacob Martin
+#' @rdname INTERNAL_enrich_defaults
+#' @keywords internal
+.enrich_defaults <- function(defaults, mapping) {
+    if (is.null(defaults)) defaults <- list()
+    if (!is.null(mapping$y) && is.null(defaults[["y.data"]])) defaults[["y.data"]] <- mapping$y
+    if (!is.null(mapping$x) && is.null(defaults[["x.data"]])) defaults[["x.data"]] <- mapping$x
+    if (!is.null(mapping$size) && is.null(defaults[["size.by"]])) defaults[["size.by"]] <- mapping$size
+    if (!is.null(mapping$fill) && is.null(defaults[["fill.by"]])) defaults[["fill.by"]] <- mapping$fill
+    defaults
+}

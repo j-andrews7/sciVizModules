@@ -17,6 +17,6 @@ The name of the column holding the enrichment term/description, or
 Detect the enrichment term column
 }
 \author{
-Jacob Martin, Jared Andrews
+Jacob Martin
 }
 \keyword{internal}

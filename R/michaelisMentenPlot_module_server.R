@@ -28,13 +28,16 @@
 #'
 #' @import shiny
 #' @import plotly
-#' @importFrom shinyjs hide
 #' @importFrom shinyWidgets updateMaterialSwitch
 #'
 #' @seealso [sciVizModules::michaelisMentenPlot()],
 #' [sciVizModules::michaelisMentenInputsUI()],
 #' [sciVizModules::michaelisMentenOutputUI()], [sciVizModules::michaelisMentenApp()]
 #'
+#'
+#' @examples
+#' library(sciVizModules)
+#' if (interactive()) michaelisMentenApp()
 #' @export
 #' @author Jacob Martin
 michaelisMentenServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL) {
@@ -42,9 +45,7 @@ michaelisMentenServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL
     data_reactive <- data
 
     moduleServer(id, function(input, output, session) {
-        if (!is.null(hide.inputs)) {
-            for (input.name in hide.inputs) hide(input.name)
-        }
+        hide_input(session, hide.inputs)
         if (!is.null(hide.tabs)) {
             for (tab.name in hide.tabs) hideTab(inputId = "michaelisMentenTabsetPanel", target = tab.name)
         }

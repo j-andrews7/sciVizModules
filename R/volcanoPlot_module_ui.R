@@ -53,7 +53,7 @@
 #' @importFrom VizModules dittoViz_scatterPlotInputsUI
 #'
 #' @export
-#' @author Jared Andrews
+#' @author Jacob Martin
 #' @seealso [dittoViz::scatterPlot()], [VizModules::dittoViz_scatterPlotInputsUI()],
 #' [sciVizModules::volcanoPlotOutputUI()], [sciVizModules::volcanoPlotServer()],
 #' [sciVizModules::volcanoPlotApp()]
@@ -125,6 +125,9 @@ volcanoPlotInputsUI <- function(id, data, defaults = NULL, title = "Volcano Sett
 #' 
 #' @import shiny
 #' @importFrom VizModules dittoViz_scatterPlotOutputUI
+#'
+#' @examples
+#' volcanoPlotOutputUI("plot")
 #' @export
 #' @author Jared Andrews
 volcanoPlotOutputUI <- function(id) {

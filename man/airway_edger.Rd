@@ -21,7 +21,7 @@ Generated from the \code{airway} Bioconductor package using edgeR.
 The contrast compares dexamethasone treatment ("trt") vs untreated ("untrt").
 }
 \usage{
-airway_edger
+data(airway_edger)
 }
 \description{
 A dataset containing differential expression results from comparing treated vs untreated
@@ -33,6 +33,6 @@ head(airway_edger)
 
 }
 \author{
-Jacob Martin, Jared Andrews
+Jacob Martin
 }
 \keyword{datasets}

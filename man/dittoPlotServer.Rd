@@ -32,6 +32,10 @@ The \code{moduleServer} function for the dittoPlot module.
 This module builds a per-group continuous-data plot with
 \code{\link[dittoSeq:dittoPlot]{dittoSeq::dittoPlot()}} and renders it as an interactive \code{plotly} figure.
 }
+\examples{
+library(sciVizModules)
+if (interactive()) dittoPlotApp()
+}
 \seealso{
 \code{\link[dittoSeq:dittoPlot]{dittoSeq::dittoPlot()}}, \code{\link[=dittoPlotInputsUI]{dittoPlotInputsUI()}},
 \code{\link[=dittoPlotOutputUI]{dittoPlotOutputUI()}}, \code{\link[=dittoPlotApp]{dittoPlotApp()}}

@@ -14,13 +14,16 @@
 #'
 #' @import shiny
 #' @import plotly
-#' @importFrom shinyjs hide
 #' @importFrom shinyWidgets updateMaterialSwitch
 #' @importFrom dittoSeq dittoScatterPlot
 #'
 #' @seealso [dittoSeq::dittoScatterPlot()], [sciVizModules::dittoScatterPlotInputsUI()],
 #' [sciVizModules::dittoScatterPlotOutputUI()], [sciVizModules::dittoScatterPlotApp()]
 #'
+#'
+#' @examples
+#' library(sciVizModules)
+#' if (interactive()) dittoScatterPlotApp()
 #' @export
 #' @author Jacob Martin, Jared Andrews
 dittoScatterPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL) {
@@ -30,9 +33,7 @@ dittoScatterPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
     moduleServer(id, function(input, output, session) {
         ns <- session$ns
 
-        if (!is.null(hide.inputs)) {
-            for (input.name in hide.inputs) hide(input.name)
-        }
+        hide_input(session, hide.inputs)
         if (!is.null(hide.tabs)) {
             for (tab.name in hide.tabs) hideTab(inputId = "dittoScatterPlotTabsetPanel", target = tab.name)
         }

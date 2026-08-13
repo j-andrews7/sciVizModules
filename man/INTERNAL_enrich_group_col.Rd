@@ -18,6 +18,6 @@ The name of a discrete grouping column, or \code{NULL} when none is found.
 Detect a categorical grouping column for the enrichment x-axis
 }
 \author{
-Jacob Martin, Jared Andrews
+Jacob Martin
 }
 \keyword{internal}

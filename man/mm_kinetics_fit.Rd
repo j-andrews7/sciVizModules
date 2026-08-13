@@ -11,7 +11,7 @@ An object of class \code{nls}.
 Fitted in \code{data-raw/generate_mm_kinetics.R}.
 }
 \usage{
-mm_kinetics_fit
+data(mm_kinetics_fit)
 }
 \description{
 An \code{\link[stats:nls]{stats::nls()}} fit of \eqn{v = V_m S / (K + S)} to \link{mm_kinetics}. Its

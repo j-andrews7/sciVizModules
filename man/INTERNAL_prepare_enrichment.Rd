@@ -19,6 +19,6 @@ Augments an enrichment results table with a numeric \code{GeneRatio} column and 
 x-axis, and returns sensible default UI mappings for \code{\link[plotthis:DotPlot]{plotthis::DotPlot()}}.
 }
 \author{
-Jacob Martin, Jared Andrews
+Jacob Martin
 }
 \keyword{internal}

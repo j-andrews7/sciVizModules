@@ -22,7 +22,7 @@
 #' [sciVizModules::survivalCurveServer()], [sciVizModules::survival_lung]
 #'
 #' @export
-#' @author Jared Andrews
+#' @author Jacob Martin
 #' @examples
 #' library(sciVizModules)
 #' # Launch with default example data:

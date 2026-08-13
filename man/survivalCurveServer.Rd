@@ -35,6 +35,10 @@ This module fits a Kaplan-Meier survival curve with the
 \href{https://cran.r-project.org/package=survminer}{survminer} package and renders
 it as an interactive \code{plotly} figure via \code{\link[=survivalCurve]{survivalCurve()}}.
 }
+\examples{
+library(sciVizModules)
+if (interactive()) survivalCurveApp()
+}
 \seealso{
 \code{\link[survminer:ggsurvplot]{survminer::ggsurvplot()}}, \code{\link[=survivalCurve]{survivalCurve()}},
 \code{\link[=survivalCurveInputsUI]{survivalCurveInputsUI()}}, \code{\link[=survivalCurveOutputUI]{survivalCurveOutputUI()}},

@@ -43,5 +43,5 @@ if (interactive()) shiny::runApp(app2)
 \code{\link[=survivalCurveServer]{survivalCurveServer()}}, \link{survival_lung}
 }
 \author{
-Jared Andrews
+Jacob Martin
 }

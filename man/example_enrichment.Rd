@@ -28,7 +28,7 @@ Simulated in \code{data-raw/generate_example_enrichment.R}; no real
 biological data are included.
 }
 \usage{
-example_enrichment
+data(example_enrichment)
 }
 \description{
 A small, simulated \code{clusterProfiler}-style GO over-representation table
@@ -43,6 +43,6 @@ head(example_enrichment)
 
 }
 \author{
-Jacob Martin, Jared Andrews
+Jacob Martin
 }
 \keyword{datasets}

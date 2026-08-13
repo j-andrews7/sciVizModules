@@ -19,10 +19,18 @@ test_that("all goFanPlot functions are exported", {
 test_that("column-detection helpers pick sensible defaults from example_enrichment", {
     data(example_enrichment, package = "sciVizModules")
 
-    expect_identical(sciVizModules:::.gofan_id_col(example_enrichment), "ID")
-    expect_identical(sciVizModules:::.gofan_onto(example_enrichment), "BP")
-    expect_identical(sciVizModules:::.gofan_fill_col(example_enrichment), "qvalue")
-    expect_identical(sciVizModules:::.gofan_subrect_col(example_enrichment), "Count")
+    expect_identical(.gofan_id_col(example_enrichment), "ID")
+    expect_identical(.gofan_onto(example_enrichment), "BP")
+    # The module detects the fill (colour) column from the shared p-value
+    # candidate list, preferring "qvalue".
+    expect_identical(
+        .detect_column(
+            example_enrichment,
+            .enrichment_pval_candidates,
+            numeric = TRUE
+        ),
+        "qvalue"
+    )
 })
 
 test_that(".gofan_id_col detects GO-like values in non-ID columns", {
@@ -31,17 +39,17 @@ test_that(".gofan_id_col detects GO-like values in non-ID columns", {
         score = c(1, 2),
         stringsAsFactors = FALSE
     )
-    expect_identical(sciVizModules:::.gofan_id_col(df), "term")
+    expect_identical(.gofan_id_col(df), "term")
 })
 
 test_that(".gofan_onto defaults to BP when no ontology column is present", {
     df <- data.frame(ID = "GO:0006955", qvalue = 0.01, stringsAsFactors = FALSE)
-    expect_identical(sciVizModules:::.gofan_onto(df), "BP")
+    expect_identical(.gofan_onto(df), "BP")
 })
 
 test_that(".resolve_orgdb errors informatively for a missing package", {
     expect_error(
-        sciVizModules:::.resolve_orgdb("org.NotAReal.eg.db"),
+        .resolve_orgdb("org.NotAReal.eg.db"),
         "org.NotAReal.eg.db"
     )
 })

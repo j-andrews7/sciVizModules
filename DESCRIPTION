@@ -1,57 +1,66 @@
 Package: sciVizModules
-Title: Flexible, scientific based interactive plotting VizModules
-Version: 0.99.0.9000
+Title: Flexible, Science-Focused Interactive Plotting Modules
+Version: 0.99.0
 Authors@R: 
-    c(person(given = "Jared", family = "Andrews", email = "jared.andrews07@gmail.com", role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0002-0780-6248")),
+    c(person(given = "Jared", 
+              family = "Andrews", 
+              email = "jared.andrews07@gmail.com",
+              role = c("aut", "cre"),
+              comment = c(ORCID = "0000-0002-0780-6248")),
         person(given = "Jacob",
                 family = "Martin",
                 role = c("aut"),
+                comment = c(ORCID = "0009-0007-6896-4796"),
                 email = "jacob@martin-email.com"))
-Description: sciVizModules extends VizModules with a curated collection of domain-specific Shiny modulestailored for the biological, chemical, 
-    and physical sciences. Built on the flexible foundationsof VizModules, these modules introduce plot types and interactive controls commonly needed 
-    inscientific research. Each module preserves the interactivity-first philosophy of its parent packagewhile incorporating scientifically meaningful defaults, 
-    axis conventions, and annotation layersrelevant to each domain. sciVizModules enables researchers to rapidly deploy 
-    publication-ready,interactive visualizations with minimal code, bridging the gap between raw experimental dataand interpretable 
-    scientific figures.
+Description: sciVizModules extends VizModules with a curated collection of
+    domain-specific Shiny modules tailored for the biological, chemical, and
+    physical sciences. Built on the flexible foundations of VizModules, these
+    modules introduce plot types and interactive controls commonly needed in
+    scientific research. Each module preserves the interactivity-first
+    philosophy of its parent package while incorporating scientifically
+    meaningful defaults, axis conventions, and annotation layers relevant to
+    each domain. sciVizModules enables researchers to rapidly deploy
+    publication-ready, interactive visualizations with minimal code, bridging
+    the gap between raw experimental data and interpretable scientific figures.
 License: MIT + file LICENSE
 Depends:
+    R (>= 4.6.0),
     shiny,
-    plotthis,
-    dittoViz,
-    plotly,
-    R (>= 3.5),
-    shinyBS,
-    VizModules
+    VizModules (>= 0.4.0)
 Imports:
-    colourpicker,
-    dplyr,
-    DT,
-    readxl,
-    shinyjs,
-    scales,
-    shinyjqui,
-    survival,
-    survminer,
-    ggplot2,
+    dittoSeq,
+    GenomicRanges,
     htmltools,
+    htmlwidgets,
+    IRanges,
     jsonlite,
     methods,
+    readxl,
+    S4Vectors,
+    scales,
+    Seqinfo,
+    shinyjqui,
     shinyWidgets,
-    htmlwidgets,
-    dittoSeq,
-Remotes:
-    j-andrews7/VizModules@0.3.0,
-    jianhong/GOfan
+    SingleCellExperiment,
+    SummarizedExperiment
 Encoding: UTF-8
-LazyData: true
 Roxygen: list(markdown = TRUE)
 Suggests:
+    drc,
+    GOfan,
     knitr,
+    org.Hs.eg.db,
     rmarkdown,
-    shinytest2,
+    sesame,
+    sesameData,
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 URL: https://github.com/j-andrews7/sciVizModules
+BugReports: https://github.com/j-andrews7/sciVizModules/issues
 Config/roxygen2/version: 8.0.0
+biocViews: Visualization, ShinyApps, GUI, DifferentialExpression,
+    GeneExpression, SingleCell, GeneSetEnrichment, Pathways, GO, Survival
+
+
+

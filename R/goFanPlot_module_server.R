@@ -17,13 +17,16 @@
 #'
 #' @import shiny
 #' @import plotly
-#' @importFrom shinyjs hide
 #' @importFrom shinyWidgets updateMaterialSwitch
 #'
 #' @seealso [GOfan::sunburstGO()], [sciVizModules::goFanPlot()],
 #' [sciVizModules::goFanPlotInputsUI()], [sciVizModules::goFanPlotOutputUI()],
 #' [sciVizModules::goFanPlotApp()]
 #'
+#'
+#' @examples
+#' library(sciVizModules)
+#' if (interactive()) goFanPlotApp()
 #' @export
 #' @author Jacob Martin, Jared Andrews
 goFanPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL) {
@@ -31,9 +34,7 @@ goFanPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defa
     data_reactive <- data
 
     moduleServer(id, function(input, output, session) {
-        if (!is.null(hide.inputs)) {
-            for (input.name in hide.inputs) hide(input.name)
-        }
+        hide_input(session, hide.inputs)
         if (!is.null(hide.tabs)) {
             for (tab.name in hide.tabs) hideTab(inputId = "goFanPlotTabsetPanel", target = tab.name)
         }

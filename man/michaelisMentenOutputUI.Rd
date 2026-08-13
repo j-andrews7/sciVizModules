@@ -18,6 +18,9 @@ A Shiny plotlyOutput for the Michaelis-Menten plot.
 \description{
 This should be placed in the UI where the plot should be shown.
 }
+\examples{
+michaelisMentenOutputUI("plot")
+}
 \author{
 Jacob Martin
 }

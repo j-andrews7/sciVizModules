@@ -14,13 +14,16 @@
 #'
 #' @import shiny
 #' @import plotly
-#' @importFrom shinyjs hide
 #' @importFrom shinyWidgets updateMaterialSwitch
 #' @importFrom dittoSeq dittoDimHex
 #'
 #' @seealso [dittoSeq::dittoDimHex()], [sciVizModules::dittoDimHexInputsUI()],
 #' [sciVizModules::dittoDimHexOutputUI()], [sciVizModules::dittoDimHexApp()]
 #'
+#'
+#' @examples
+#' library(sciVizModules)
+#' if (interactive()) dittoDimHexApp()
 #' @export
 #' @author Jacob Martin
 dittoDimHexServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL) {
@@ -28,9 +31,7 @@ dittoDimHexServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, de
     data_reactive <- data
 
     moduleServer(id, function(input, output, session) {
-        if (!is.null(hide.inputs)) {
-            for (input.name in hide.inputs) hide(input.name)
-        }
+        hide_input(session, hide.inputs)
         if (!is.null(hide.tabs)) {
             for (tab.name in hide.tabs) hideTab(inputId = "dittoDimHexTabsetPanel", target = tab.name)
         }
