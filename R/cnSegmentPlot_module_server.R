@@ -87,7 +87,7 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             hover.choices <- union(names(mcols(seg$bin.coords)), "signal")
 
             updateTextInput(session, "main", value = get_default(defaults, "main", ""))
-            updateSelectInput(session, "to.plot",
+            update_viz_select(session, "to.plot",
                 choices = seq.choices, selected = get_default(defaults, "to.plot", character(0)))
             updateSelectInput(session, "hover.text.cols",
                 choices = hover.choices, selected = get_default(defaults, "hover.text.cols", c("signal", "genes")))

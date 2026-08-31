@@ -26,7 +26,6 @@
 #' @importFrom methods is
 #' @importFrom GenomicRanges seqinfo mcols
 #' @importFrom Seqinfo seqnames
-#' @importFrom shinyWidgets pickerInput
 #' @import VizModules
 #'
 #' @export
@@ -92,18 +91,11 @@ cnSegmentPlotInputsUI <- function(id, seg, defaults = NULL,
             placement = "top", options = list(container = "body")
         ),
         tipify(
-            pickerInput(ns("to.plot"), "Chromosomes to Plot",
+            viz_select_input(ns("to.plot"), "Chromosomes to Plot",
                 choices = seq.choices,
                 selected = get_default(defaults, "to.plot", character(0)),
                 multiple = TRUE,
-                options = list(
-                    `live-search` = TRUE,
-                    `actions-box` = TRUE,
-                    # Render the menu on <body> so its search box and
-                    # select/deselect header are not clipped by a scrolling
-                    # sidebar/container.
-                    container = "body"
-                )
+                showSelectAll = TRUE
             ), "Chromosomes to include. Leave empty to auto-select chromosomes representing at least 1% of the genome.",
             placement = "top", options = list(container = "body")
         ),
