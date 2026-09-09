@@ -15,9 +15,10 @@ cnSegmentPlotServer(
 \arguments{
 \item{id}{The ID for the Shiny module.}
 
-\item{data}{A \code{reactive} returning a single \code{CNSegment} object (as returned
-by \code{\link[sesame:cnSegmentation]{sesame::cnSegmentation()}}). Gene labels are taken from
-\code{seg$genomeInfo$genes} and chromosome tick/guide positions from
+\item{data}{A \code{reactive} returning a \code{CNSegment} object (as returned by
+\code{\link[sesame:cnSegmentation]{sesame::cnSegmentation()}}), or a named list of them to compare several
+samples stacked vertically over a shared genomic x-axis. Gene labels are
+taken from \code{seg$genomeInfo$genes} and chromosome tick/guide positions from
 \code{seg$genomeInfo$cytoBand}; genes overlapping each bin are read from the
 \code{bin.coords$genes} metadata column when present.}
 

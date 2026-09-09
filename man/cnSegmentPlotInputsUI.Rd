@@ -15,9 +15,9 @@ cnSegmentPlotInputsUI(
 \arguments{
 \item{id}{The ID for the Shiny module.}
 
-\item{seg}{A \code{CNSegment} object used to populate the chromosome choices. Gene
-label controls are populated from its \code{genomeInfo$genes} annotation when
-present.}
+\item{seg}{A \code{CNSegment} object, or a named list of them, used to populate
+the sample and chromosome choices. Gene label controls are populated from
+the first sample carrying a \code{genomeInfo$genes} annotation.}
 
 \item{defaults}{A named list of default values for the inputs.}
 
@@ -40,6 +40,10 @@ number scatter/segment plot from a \code{CNSegment} object (as returned by
 \code{\link[sesame:cnSegmentation]{sesame::cnSegmentation()}}). When the object carries a \code{genomeInfo$genes}
 \code{GRanges}, users can enter gene identifiers separated by commas or whitespace
 and choose the metadata column used to match and display those labels.
+
+Passing a named list of \code{CNSegment} objects populates the "Samples to Plot"
+control, which stacks the selected samples vertically over a shared genomic
+x-axis (in the order they are selected). See \code{\link[=cnSegmentPlot]{cnSegmentPlot()}}.
 }
 \examples{
 library(sciVizModules)

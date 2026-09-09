@@ -11,10 +11,14 @@
 #' `GRanges`, users can enter gene identifiers separated by commas or whitespace
 #' and choose the metadata column used to match and display those labels.
 #'
+#' Passing a named list of `CNSegment` objects populates the "Samples to Plot"
+#' control, which stacks the selected samples vertically over a shared genomic
+#' x-axis (in the order they are selected). See [cnSegmentPlot()].
+#'
 #' @param id The ID for the Shiny module.
-#' @param seg A `CNSegment` object used to populate the chromosome choices. Gene
-#'   label controls are populated from its `genomeInfo$genes` annotation when
-#'   present.
+#' @param seg A `CNSegment` object, or a named list of them, used to populate
+#'   the sample and chromosome choices. Gene label controls are populated from
+#'   the first sample carrying a `genomeInfo$genes` annotation.
 #' @param defaults A named list of default values for the inputs.
 #' @param title An optional title for the UI grid.
 #' @param columns Number of columns for the UI grid.
@@ -43,21 +47,10 @@
 cnSegmentPlotInputsUI <- function(id, seg, defaults = NULL,
                                   title = "CN Segment Settings", columns = 2) {
     ns <- NS(id)
-    stopifnot(is(seg, "CNSegment"))
-    genes <- seg$genomeInfo$genes
+    seg.list <- .cn_seg_as_list(seg)
+    genes <- .cn_seg_genes(seg.list)
 
-    base_defaults <- list(
-            label.genes = "TP53, EGFR, MYC, TERT, PTCH1, MGMT, CCNE1, KRAS, CDK4, CDK6, CCND1, CCND2, FGFR1, PDGFRA, RB1, MYCN, MDM4, GLI2, MYB, CDKN2A, PTEN, MDM2, NF1, PPM1D, NF2, SMARCB1",
-            label.size = 10,
-            show.grid.x = FALSE,
-            show.grid.y = FALSE,
-            margin.top = 70,
-            hline.intercepts = "0",
-            hline.colors = "#adadad",
-            hline.widths = "1",
-            hline.linetypes = "solid",
-            axis.tickangle.x = -45
-        )
+    base_defaults <- .cn_seg_base_defaults()
 
     if (!is.null(defaults)) {
         defaults <- modifyList(base_defaults, defaults)
@@ -65,9 +58,9 @@ cnSegmentPlotInputsUI <- function(id, seg, defaults = NULL,
         defaults <- base_defaults
     }
 
-    seq.choices <- as.character(seqnames(seqinfo(seg$bin.coords)))
-    seq.choices <- seq.choices[seq.choices %in% c(paste0("chr", seq_len(22)), "chrX", "chrY")]
-    hover.choices <- union(names(mcols(seg$bin.coords)), "signal")
+    sample.choices <- names(seg.list)
+    seq.choices <- .cn_seg_seq_choices(seg.list)
+    hover.choices <- .cn_seg_hover_choices(seg.list)
 
     id.col.choices <- if (!is.null(genes) && length(genes) > 0) names(mcols(genes)) else character(0)
     default.id.col <- get_default(
@@ -88,6 +81,19 @@ cnSegmentPlotInputsUI <- function(id, seg, defaults = NULL,
             textInput(ns("main"), "Plot Title",
                 value = get_default(defaults, "main", "")
             ), "Title displayed above the plot. Leave empty for no title.",
+            placement = "top", options = list(container = "body")
+        ),
+        tipify(
+            viz_select_input(ns("samples"), "Samples to Plot",
+                choices = sample.choices,
+                selected = get_default(defaults, "samples", sample.choices),
+                multiple = TRUE,
+                showSelectAll = TRUE
+            ),
+            paste(
+                "Samples to stack vertically over a shared genomic x-axis, in the order",
+                "selected. Leave empty to plot every sample."
+            ),
             placement = "top", options = list(container = "body")
         ),
         tipify(
@@ -239,6 +245,31 @@ cnSegmentPlotInputsUI <- function(id, seg, defaults = NULL,
                 placement = "top", options = list(container = "body")
             ),
             tipify(
+                colourInput(ns("gene.line.color"), "Gene Guide Line Colour",
+                    value = get_default(defaults, "gene.line.color", "#666666")
+                ),
+                paste(
+                    "Colour of the vertical gene guide lines drawn through every panel when",
+                    "multiple samples are stacked."
+                ),
+                placement = "top", options = list(container = "body")
+            ),
+            tipify(
+                numericInput(ns("gene.line.width"), "Gene Guide Line Width",
+                    value = get_default(defaults, "gene.line.width", 0.3), min = 0, step = 0.1
+                ),
+                "Width of the gene guide lines. Set to 0 to hide them.",
+                placement = "top", options = list(container = "body")
+            ),
+            tipify(
+                selectInput(ns("gene.line.linetype"), "Gene Guide Line Type",
+                    choices = c("solid", "dashed", "dotted", "dotdash", "longdash", "twodash"),
+                    selected = get_default(defaults, "gene.line.linetype", "dotted"), selectize = FALSE
+                ),
+                "Line type of the gene guide lines.",
+                placement = "top", options = list(container = "body")
+            ),
+            tipify(
                 numericInput(ns("label.size"), "Gene Label Size",
                     value = get_default(defaults, "label.size", 8), min = 0, step = 1
                 ),
@@ -267,6 +298,16 @@ cnSegmentPlotInputsUI <- function(id, seg, defaults = NULL,
                         value = get_default(defaults, "y.max", NA), step = 0.1
                     ),
                     "Upper limit for the y-axis. Values above this are squished to the limit. Leave blank for automatic.",
+                    placement = "top", options = list(container = "body")
+                ),
+                tipify(
+                    checkboxInput(ns("free.y"), "Free Y-Axis Per Sample",
+                        value = get_default(defaults, "free.y", FALSE)
+                    ),
+                    paste(
+                        "Scale each stacked sample's y-axis independently instead of sharing one",
+                        "across the stack. Overrides Y-Axis Min/Max. No effect with a single sample."
+                    ),
                     placement = "top", options = list(container = "body")
                 )
             ),
@@ -299,6 +340,10 @@ cnSegmentPlotInputsUI <- function(id, seg, defaults = NULL,
 #' @param id The ID for the Shiny module.
 #' @param resizable Logical; when \code{TRUE} (the default) the plot output is
 #'   wrapped in [shinyjqui::jqui_resizable()] so it can be resized by dragging.
+#' @param height Height of the plot container, as a valid CSS unit. Stacked
+#'   multi-sample plots need more room than the `"400px"` default; allow roughly
+#'   200px per sample. The figure autosizes to the container, so it can still be
+#'   resized by dragging when `resizable` is `TRUE`.
 #'
 #' @return A Shiny plotlyOutput for the copy number segment plot.
 #'
@@ -309,11 +354,13 @@ cnSegmentPlotInputsUI <- function(id, seg, defaults = NULL,
 #'
 #' @examples
 #' cnSegmentPlotOutputUI("plot")
+#' # Room for a stack of four samples:
+#' cnSegmentPlotOutputUI("plot", height = "800px")
 #' @export
 #' @author Jared Andrews
-cnSegmentPlotOutputUI <- function(id, resizable = TRUE) {
+cnSegmentPlotOutputUI <- function(id, resizable = TRUE, height = "400px") {
     ns <- NS(id)
-    plot_output <- plotlyOutput(ns("cnSegmentPlot"))
+    plot_output <- plotlyOutput(ns("cnSegmentPlot"), height = height)
     if (isTRUE(resizable)) {
         plot_output <- jqui_resizable(plot_output)
     }

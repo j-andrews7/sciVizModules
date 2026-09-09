@@ -175,6 +175,167 @@ test_that("cnSegmentPlot exposes centromere and chromosome-border line styling",
     expect_true(cent[[1]]$line$width > border[[1]]$line$width)
 })
 
+test_that(".cn_seg_as_list normalizes and names samples", {
+    data(example_cn_segment, package = "sciVizModules")
+
+    # A bare CNSegment becomes a stack of one.
+    single <- .cn_seg_as_list(example_cn_segment)
+    expect_length(single, 1)
+    expect_s3_class(single[[1]], "CNSegment")
+
+    # Supplied names win; the `seg.signals$ID` column is the fallback.
+    named <- .cn_seg_as_list(list(Tumor = example_cn_segment, Normal = example_cn_segment))
+    expect_identical(names(named), c("Tumor", "Normal"))
+    expect_identical(
+        names(.cn_seg_as_list(list(example_cn_segment))),
+        unique(as.character(example_cn_segment$seg.signals$ID))
+    )
+
+    # Positional fallback when no ID is available, and names are made unique.
+    no.id <- example_cn_segment
+    no.id$seg.signals$ID <- NA_character_
+    expect_identical(names(.cn_seg_as_list(list(no.id, no.id))), c("Sample 1", "Sample 2"))
+    expect_identical(names(.cn_seg_as_list(list(A = no.id, A = no.id))), c("A", "A.1"))
+
+    expect_error(.cn_seg_as_list(list(example_cn_segment, 1)), "element\\(s\\) 2 are not")
+    expect_error(.cn_seg_as_list(list()), "non-empty list")
+})
+
+test_that(".cn_seg_shared_seqlengths rejects mismatched genome builds", {
+    data(example_cn_segment, package = "sciVizModules")
+
+    seg.list <- .cn_seg_as_list(list(A = example_cn_segment, B = example_cn_segment))
+    expect_identical(
+        .cn_seg_shared_seqlengths(seg.list),
+        GenomeInfoDb::seqlengths(GenomeInfoDb::seqinfo(example_cn_segment$bin.coords))
+    )
+
+    other <- example_cn_segment
+    lens <- GenomeInfoDb::seqlengths(other$bin.coords)
+    lens["chr1"] <- lens[["chr1"]] + 1000L
+    GenomeInfoDb::seqlengths(other$bin.coords) <- lens
+
+    expect_error(
+        .cn_seg_shared_seqlengths(.cn_seg_as_list(list(A = example_cn_segment, B = other))),
+        "share a genome build"
+    )
+})
+
+test_that("cnSegmentPlot stacks samples over a single shared x-axis", {
+    data(example_cn_segment, package = "sciVizModules")
+    shifted <- example_cn_segment
+    shifted$bin.signals <- shifted$bin.signals + 0.25
+
+    built <- plotly::plotly_build(cnSegmentPlot(
+        list(Tumor = example_cn_segment, Normal = shifted),
+        to.plot = c("chr1", "chr2")
+    ))
+    layout.names <- names(built$x$layout)
+
+    # One panel per sample, but a single x-axis shared by the whole stack, so
+    # chromosome labels are drawn once and loci line up vertically.
+    expect_setequal(grep("^yaxis", layout.names, value = TRUE), c("yaxis", "yaxis2"))
+    expect_identical(grep("^xaxis", layout.names, value = TRUE), "xaxis")
+    expect_equal(built$x$layout$xaxis$domain, c(0, 1))
+
+    # The first sample is on top.
+    expect_gt(built$x$layout$yaxis$domain[1], built$x$layout$yaxis2$domain[1])
+
+    # Sample names label the panels.
+    strips <- vapply(built$x$layout$annotations, `[[`, character(1), "text")
+    expect_true(all(c("Tumor", "Normal") %in% strips))
+
+    # Every panel gets the colorscale, but the colorbar is drawn once.
+    color_traces <- Filter(function(trace) !is.null(trace$marker$colorscale), built$x$data)
+    expect_length(color_traces, 2)
+    expect_equal(sum(vapply(color_traces, function(trace) isTRUE(trace$marker$showscale), logical(1))), 1)
+    expect_true(all(vapply(color_traces, function(trace) identical(trace$marker$cmid, 0), logical(1))))
+})
+
+test_that("cnSegmentPlot shares gene labels across a stack", {
+    data(example_cn_segment, package = "sciVizModules")
+    genes <- example_cn_segment$genomeInfo$genes
+    selected <- genes[GenomicRanges::mcols(genes)$gene_name %in% c("TP53", "EGFR")]
+    shifted <- example_cn_segment
+    shifted$bin.signals <- shifted$bin.signals + 0.25
+
+    built <- plotly::plotly_build(cnSegmentPlot(
+        list(Tumor = example_cn_segment, Normal = shifted),
+        genes = selected, id.col = "gene_name",
+        gene.line.linetype = "dotted"
+    ))
+
+    # Each gene is labeled once for the whole stack, above the top panel:
+    # anchored to the shared data x-axis but to the paper in y.
+    gene.labels <- Filter(
+        function(ann) identical(ann$xref, "x") && identical(ann$yref, "paper"),
+        built$x$layout$annotations
+    )
+    expect_setequal(vapply(gene.labels, `[[`, character(1), "text"), c("TP53", "EGFR"))
+    expect_true(all(vapply(gene.labels, function(ann) identical(ann$y, 1), logical(1))))
+    expect_true(all(vapply(gene.labels, function(ann) ann$textangle == -90, logical(1))))
+
+    # A guide line per gene runs through every panel, so one trace per panel
+    # carrying both x positions.
+    guides <- Filter(function(trace) identical(trace$line$dash, "dot"), built$x$data)
+    expect_length(guides, 2)
+    expect_equal(length(unique(stats::na.omit(guides[[1]]$x))), 2)
+
+    # Suppressing the guide lines leaves the labels in place.
+    no.guides <- plotly::plotly_build(cnSegmentPlot(
+        list(Tumor = example_cn_segment, Normal = shifted),
+        genes = selected, id.col = "gene_name", gene.line.width = 0
+    ))
+    expect_length(Filter(function(trace) identical(trace$line$dash, "dot"), no.guides$x$data), 0)
+})
+
+test_that("cnSegmentPlot free.y scales stacked panels independently", {
+    data(example_cn_segment, package = "sciVizModules")
+    shifted <- example_cn_segment
+    shifted$bin.signals <- shifted$bin.signals + 0.5
+    seg.list <- list(Tumor = example_cn_segment, Normal = shifted)
+
+    shared <- plotly::plotly_build(cnSegmentPlot(seg.list, to.plot = "chr1"))
+    expect_equal(shared$x$layout$yaxis$range, shared$x$layout$yaxis2$range)
+
+    free <- plotly::plotly_build(cnSegmentPlot(seg.list, to.plot = "chr1", free.y = TRUE))
+    expect_false(isTRUE(all.equal(free$x$layout$yaxis$range, free$x$layout$yaxis2$range)))
+
+    # y.min/y.max are ignored when each panel scales itself.
+    limited <- plotly::plotly_build(cnSegmentPlot(
+        seg.list, to.plot = "chr1", free.y = TRUE, y.min = -0.1, y.max = 0.1
+    ))
+    expect_gt(diff(limited$x$layout$yaxis$range), 0.2)
+})
+
+test_that("cnSegmentPlotOutputUI takes a height for stacked plots", {
+    expect_match(htmltools::renderTags(cnSegmentPlotOutputUI("p"))$html, "400px", fixed = TRUE)
+    expect_match(
+        htmltools::renderTags(cnSegmentPlotOutputUI("p", height = "800px"))$html,
+        "800px",
+        fixed = TRUE
+    )
+})
+
+test_that("cnSegmentPlotInputsUI exposes the multi-sample controls", {
+    data(example_cn_segment, package = "sciVizModules")
+
+    ui <- cnSegmentPlotInputsUI(
+        "test", list(Tumor = example_cn_segment, Normal = example_cn_segment)
+    )
+    html <- htmltools::renderTags(ui)$html
+
+    for (input.id in c(
+        "test-samples", "test-free.y",
+        "test-gene.line.color", "test-gene.line.width", "test-gene.line.linetype"
+    )) {
+        expect_match(html, input.id, fixed = TRUE)
+    }
+    # Both samples are offered, and selected by default.
+    expect_match(html, "Tumor", fixed = TRUE)
+    expect_match(html, "Normal", fixed = TRUE)
+})
+
 test_that("cnSegmentPlotInputsUI includes free-text gene selection", {
     data(example_cn_segment, package = "sciVizModules")
 

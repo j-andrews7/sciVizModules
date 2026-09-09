@@ -25,18 +25,26 @@ cnSegmentPlot(
   border.color = "grey80",
   border.width = 0.3,
   border.linetype = "solid",
+  gene.line.color = "grey40",
+  gene.line.width = 0.3,
+  gene.line.linetype = "dotted",
   label.size = 10,
+  free.y = FALSE,
   y.min = NULL,
   y.max = NULL,
   main = NULL
 )
 }
 \arguments{
-\item{seg}{A \code{CNSegment} object, as returned by \code{\link[sesame:cnSegmentation]{sesame::cnSegmentation()}}.}
+\item{seg}{A \code{CNSegment} object, as returned by \code{\link[sesame:cnSegmentation]{sesame::cnSegmentation()}},
+or a named list of them to stack several samples vertically over a shared
+genomic x-axis. See the "Multiple samples" section.}
 
 \item{genes}{An optional \code{GRanges} of gene coordinates. Each gene is matched
 to the plotted bin it overlaps most; its identifier is added to that bin's
-hover text and shown in an arrowed annotation.}
+hover text and labeled on the plot -- with an arrow pointing at the bin for
+a single sample, or once above the stack for several (see the "Multiple
+samples" section).}
 
 \item{id.col}{Name of the metadata column in \code{genes} holding the label to
 display (e.g. a gene symbol column). If \code{NULL}, \code{names(genes)} is used.}
@@ -101,8 +109,23 @@ to \code{0.3}.}
 \item{border.linetype}{Line type of the chromosome boundary lines. Defaults
 to \code{"solid"}.}
 
+\item{gene.line.color}{Color of the vertical gene guide lines drawn through
+every panel when several samples are stacked. Defaults to \code{"grey40"}.
+Unused with a single sample, which anchors its labels with arrows instead.}
+
+\item{gene.line.width}{Line width of the gene guide lines. Defaults to \code{0.3};
+use \code{0} to suppress them.}
+
+\item{gene.line.linetype}{Line type of the gene guide lines. Defaults to
+\code{"dotted"}.}
+
 \item{label.size}{Plotly font size of gene labels (only used when \code{genes} is
 supplied). Defaults to \code{10}.}
+
+\item{free.y}{Logical; when \code{TRUE}, each stacked sample gets its own
+automatically scaled y-axis instead of a single shared one, and \code{y.min} /
+\code{y.max} are ignored. Has no effect with a single sample. Defaults to
+\code{FALSE}.}
 
 \item{y.min}{Optional lower limit for the y-axis (log2 signal ratio).
 Values below this limit are squished to the limit rather than dropped.
@@ -125,7 +148,9 @@ Draws a genome-wide copy number scatter/segment plot from the output of
 the genome and colored by signal, with the called segment means overlaid as
 horizontal line segments. Genes overlapping each bin (\code{bin.coords$genes}) are
 surfaced in the point hover text, and selected genes can additionally be
-labeled with draggable Plotly annotations.
+labeled with draggable Plotly annotations. Several samples can be compared at
+once by passing a list of \code{CNSegment} objects, which are stacked vertically
+over a single shared genomic x-axis.
 }
 \details{
 \code{seg} must be a \code{CNSegment} object as returned by
@@ -139,21 +164,52 @@ Chromosome tick and dashed-guide positions are derived from
 \code{seg$genomeInfo$cytoBand} (see \code{centromere}), and gene labels from
 \code{seg$genomeInfo$genes} (see \code{genes}). Genes overlapping each plotted bin are
 read from the \code{bin.coords$genes} metadata column when present.
+}
+\section{Multiple samples}{
+ A \code{CNSegment} object holds a single sample. To
+compare several, pass a (preferably named) list of them; each becomes one
+panel, stacked vertically in the order supplied with the first sample on
+top. Panel names are taken from \code{names(seg)}, falling back to the
+\code{seg.signals$ID} column and then to \code{"Sample <i>"}.
 
-Both the color scale and the y-axis support explicit limits
+All panels share one genomic x-axis, built from the union of the samples'
+\code{seqinfo}, so a locus lines up vertically across the whole stack: chromosome
+tick labels are drawn once beneath the bottom panel, and the chromosome
+boundary and centromere guide lines run through every panel. Samples must
+agree on their chromosome lengths (i.e. share a genome build); an error is
+raised otherwise.
+
+Gene labels are shared too. Rather than one arrowed annotation per panel,
+each requested gene is labeled once above the top panel, with a vertical
+guide line (see \code{gene.line.color} and friends) descending through the stack
+at that gene's position. With a single sample the labels stay anchored to
+their bin with an arrow, as before.
+
+By default every panel shares one y-axis so peak heights are directly
+comparable; set \code{free.y = TRUE} to let each sample scale independently.
+}
+
+\section{Limits}{
+ Both the color scale and the y-axis support explicit limits
 (\code{color.limits} and \code{y.min}/\code{y.max}, respectively). In both cases,
 out-of-bound values are squished to the nearest limit (via
 \code{\link[scales:squish]{scales::squish()}}) rather than dropped, so points beyond the requested
 limits remain visible (clamped to the edge of the plot/color scale) instead
-of disappearing. The signal colorbar is shown, and \code{color.zero} is always
-mapped to signal 0, including when \code{color.limits} are asymmetric.
+of disappearing. The signal colorbar is shown once, and \code{color.zero} is
+always mapped to signal 0, including when \code{color.limits} are asymmetric.
 }
+
 \examples{
 library(sciVizModules)
 data(example_cn_segment)
 # Gene labels are drawn from the object's own gene annotation:
 cnSegmentPlot(example_cn_segment,
     genes = example_cn_segment$genomeInfo$genes, id.col = "gene_name")
+
+# Several samples are stacked over a shared genomic x-axis:
+noisy <- example_cn_segment
+noisy$bin.signals <- noisy$bin.signals + 0.2
+cnSegmentPlot(list(Tumor = example_cn_segment, Reference = noisy))
 }
 \seealso{
 \code{\link[sesame:cnSegmentation]{sesame::cnSegmentation()}}, \code{\link[=cnSegmentPlotInputsUI]{cnSegmentPlotInputsUI()}},

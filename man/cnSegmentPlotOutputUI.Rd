@@ -4,13 +4,18 @@
 \alias{cnSegmentPlotOutputUI}
 \title{Output UI components for the cnSegmentPlot module}
 \usage{
-cnSegmentPlotOutputUI(id, resizable = TRUE)
+cnSegmentPlotOutputUI(id, resizable = TRUE, height = "400px")
 }
 \arguments{
 \item{id}{The ID for the Shiny module.}
 
 \item{resizable}{Logical; when \code{TRUE} (the default) the plot output is
 wrapped in \code{\link[shinyjqui:jqui_resizable]{shinyjqui::jqui_resizable()}} so it can be resized by dragging.}
+
+\item{height}{Height of the plot container, as a valid CSS unit. Stacked
+multi-sample plots need more room than the \code{"400px"} default; allow roughly
+200px per sample. The figure autosizes to the container, so it can still be
+resized by dragging when \code{resizable} is \code{TRUE}.}
 }
 \value{
 A Shiny plotlyOutput for the copy number segment plot.
@@ -20,6 +25,8 @@ This should be placed in the UI where the plot should be shown.
 }
 \examples{
 cnSegmentPlotOutputUI("plot")
+# Room for a stack of four samples:
+cnSegmentPlotOutputUI("plot", height = "800px")
 }
 \author{
 Jared Andrews

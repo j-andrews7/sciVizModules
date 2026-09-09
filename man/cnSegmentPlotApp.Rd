@@ -11,8 +11,9 @@ cnSegmentPlotApp(
 )
 }
 \arguments{
-\item{seg}{A \code{CNSegment} object, as returned by \code{\link[sesame:cnSegmentation]{sesame::cnSegmentation()}}.
-Defaults to the bundled \link{example_cn_segment}.}
+\item{seg}{A \code{CNSegment} object, as returned by \code{\link[sesame:cnSegmentation]{sesame::cnSegmentation()}},
+or a named list of them to compare several samples. Defaults to the bundled
+\link{example_cn_segment}.}
 
 \item{defaults}{An optional named list of default input values.}
 
@@ -32,6 +33,11 @@ takes the \code{CNSegment} object directly rather than a single data frame. Gene
 labels and centromere positions are derived from the object's \code{genomeInfo}
 (\code{genomeInfo$genes} and \code{genomeInfo$cytoBand}, respectively).
 
+Passing a named list of \code{CNSegment} objects, e.g.
+\code{list(Tumor = seg1, Normal = seg2)}, stacks the samples vertically over a
+shared genomic x-axis; the plot container is sized to fit them, and the
+"Samples to Plot" control chooses which ones are shown.
+
 When called with no arguments, the app launches with the bundled
 \link{example_cn_segment} object; a curated set of cancer genes is labeled
 initially.
@@ -40,6 +46,13 @@ initially.
 library(sciVizModules)
 # Launch with the bundled example data:
 app <- cnSegmentPlotApp()
+if (interactive()) shiny::runApp(app)
+
+# Compare several samples, stacked over a shared genomic x-axis:
+data(example_cn_segment)
+shifted <- example_cn_segment
+shifted$bin.signals <- shifted$bin.signals + 0.2
+app <- cnSegmentPlotApp(list(Tumor = example_cn_segment, Normal = shifted))
 if (interactive()) shiny::runApp(app)
 }
 \seealso{

@@ -6,9 +6,10 @@
 #' and adds user-selected genes as draggable Plotly annotations.
 #'
 #' @param id The ID for the Shiny module.
-#' @param data A `reactive` returning a single `CNSegment` object (as returned
-#'   by [sesame::cnSegmentation()]). Gene labels are taken from
-#'   `seg$genomeInfo$genes` and chromosome tick/guide positions from
+#' @param data A `reactive` returning a `CNSegment` object (as returned by
+#'   [sesame::cnSegmentation()]), or a named list of them to compare several
+#'   samples stacked vertically over a shared genomic x-axis. Gene labels are
+#'   taken from `seg$genomeInfo$genes` and chromosome tick/guide positions from
 #'   `seg$genomeInfo$cytoBand`; genes overlapping each bin are read from the
 #'   `bin.coords$genes` metadata column when present.
 #' @param hide.inputs A character vector of input IDs to hide.
@@ -24,7 +25,8 @@
 #' @import plotly
 #' @importFrom methods is
 #' @importFrom colourpicker updateColourInput
-#' @importFrom GenomicRanges seqinfo seqnames mcols
+#' @importFrom GenomicRanges mcols
+#' @importFrom stats complete.cases
 #' @import VizModules
 #'
 #' @seealso [sciVizModules::cnSegmentPlot()],
@@ -41,18 +43,7 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
     stopifnot(is.reactive(data))
     data_reactive <- data
 
-    base_defaults <- list(
-            label.genes = "TP53, EGFR, MYC, TERT, PTCH1, MGMT, CCNE1, KRAS, CDK4, CDK6, CCND1, CCND2, FGFR1, PDGFRA, RB1, MYCN, MDM4, GLI2, MYB, CDKN2A, PTEN, MDM2, NF1, PPM1D, NF2, SMARCB1",
-            label.size = 10,
-            show.grid.x = FALSE,
-            show.grid.y = FALSE,
-            margin.top = 70,
-            hline.intercepts = "0",
-            hline.colors = "#adadad",
-            hline.widths = "1",
-            hline.linetypes = "solid",
-            axis.tickangle.x = -45
-        )
+    base_defaults <- .cn_seg_base_defaults()
 
     if (!is.null(defaults)) {
         defaults <- modifyList(base_defaults, defaults)
@@ -72,21 +63,24 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             for (tab.name in hide.tabs) hideTab(inputId = "cnSegmentPlotTabsetPanel", target = tab.name)
         }
 
-        # The module consumes a single CNSegment object. Gene labels come from
-        # its `genomeInfo$genes` annotation; centromeres are derived internally
-        # from `genomeInfo$cytoBand` by cnSegmentPlot().
-        seg_obj <- reactive(data_reactive())
-        genes_obj <- reactive(seg_obj()$genomeInfo$genes)
+        # The module consumes one CNSegment object per sample, normalized to a
+        # named list so single- and multi-sample data take the same path. Gene
+        # labels come from a `genomeInfo$genes` annotation; centromeres are
+        # derived internally from `genomeInfo$cytoBand` by cnSegmentPlot().
+        seg_obj <- reactive(.cn_seg_as_list(data_reactive()))
+        genes_obj <- reactive(.cn_seg_genes(seg_obj()))
 
         observeEvent(input$reset, {
-            seg <- seg_obj()
-            req(seg)
+            seg.list <- seg_obj()
+            req(seg.list)
 
-            seq.choices <- as.character(seqnames(seqinfo(seg$bin.coords)))
-            seq.choices <- seq.choices[seq.choices %in% c(paste0("chr", seq_len(22)), "chrX", "chrY")]
-            hover.choices <- union(names(mcols(seg$bin.coords)), "signal")
+            sample.choices <- names(seg.list)
+            seq.choices <- .cn_seg_seq_choices(seg.list)
+            hover.choices <- .cn_seg_hover_choices(seg.list)
 
             updateTextInput(session, "main", value = get_default(defaults, "main", ""))
+            update_viz_select(session, "samples",
+                choices = sample.choices, selected = get_default(defaults, "samples", sample.choices))
             update_viz_select(session, "to.plot",
                 choices = seq.choices, selected = get_default(defaults, "to.plot", character(0)))
             updateSelectInput(session, "hover.text.cols",
@@ -130,9 +124,16 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 value = get_default(defaults, "border.width", 0.3))
             updateSelectInput(session, "border.linetype",
                 selected = get_default(defaults, "border.linetype", "solid"))
+            updateColourInput(session, "gene.line.color",
+                value = get_default(defaults, "gene.line.color", "#666666"))
+            updateNumericInput(session, "gene.line.width",
+                value = get_default(defaults, "gene.line.width", 0.3))
+            updateSelectInput(session, "gene.line.linetype",
+                selected = get_default(defaults, "gene.line.linetype", "dotted"))
             updateNumericInput(session, "label.size", value = get_default(defaults, "label.size", 10))
             updateNumericInput(session, "y.min", value = get_default(defaults, "y.min", NA))
             updateNumericInput(session, "y.max", value = get_default(defaults, "y.max", NA))
+            updateCheckboxInput(session, "free.y", value = get_default(defaults, "free.y", FALSE))
 
             reset_axes_inputs(session, defaults)
             reset_plotly_inputs(session, defaults)
@@ -142,8 +143,16 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
         generate_cnSegmentPlot <- reactive({
             isolate_fn <- setup_auto_update_logic(input, params)
 
-            seg <- seg_obj()
-            req(seg)
+            seg.list <- seg_obj()
+            req(seg.list)
+
+            # Panels follow the order the samples were selected in; an empty or
+            # absent selection plots every sample supplied.
+            selected <- intersect(isolate_fn(input$samples), names(seg.list))
+            if (length(selected) > 0) {
+                seg.list <- seg.list[selected]
+            }
+            multi <- length(seg.list) > 1L
 
             to.plot <- isolate_fn(input$to.plot)
             hover.text.cols <- isolate_fn(input$hover.text.cols)
@@ -170,7 +179,7 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             if (is.na(y.max)) y.max <- NULL
 
             fig <- cnSegmentPlot(
-                seg = seg,
+                seg = seg.list,
                 genes = genes.to.label,
                 id.col = id.col,
                 to.plot = to.plot,
@@ -189,7 +198,11 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 border.color = isolate_fn(input$border.color),
                 border.width = isolate_fn(input$border.width),
                 border.linetype = isolate_fn(input$border.linetype),
+                gene.line.color = isolate_fn(input$gene.line.color),
+                gene.line.width = isolate_fn(input$gene.line.width),
+                gene.line.linetype = isolate_fn(input$gene.line.linetype),
                 label.size = isolate_fn(input$label.size),
+                free.y = isTRUE(isolate_fn(input$free.y)),
                 y.min = y.min,
                 y.max = y.max,
                 main = isolate_fn(input$main)
@@ -234,18 +247,34 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
 
             config_list <- add_plot_config(
                 download.format = isolate_fn(input$download.format),
-                include.modebar.buttons = TRUE, facet.by = NULL
+                include.modebar.buttons = TRUE,
+                facet.by = if (multi) "sample" else NULL
             )
 
             fig <- do.call(config, c(list(p = fig), config_list))
-            fig <- axis_titles_as_annotations(fig)
+
+            # A stacked plot is multi-panel, so ggplotly already renders its
+            # shared axis titles as annotations (which axis_titles_as_annotations()
+            # deliberately leaves alone); style those instead.
+            fig <- if (multi) {
+                apply_axis_title_to_annotations(fig, input, isolate_fn)
+            } else {
+                axis_titles_as_annotations(fig)
+            }
             fig
         })
 
         output$cnSegmentPlot <- renderPlotly({
-            req(seg_obj())
+            # seg_obj() validates the supplied data, so it is inside the
+            # tryCatch: a malformed `data` reactive should surface as the
+            # module's message plot rather than a raw Shiny error. req()'s own
+            # silent error is re-raised so it still cancels the render.
             tryCatch(
-                apply_render_margins(generate_cnSegmentPlot(), input),
+                {
+                    req(seg_obj())
+                    apply_render_margins(generate_cnSegmentPlot(), input)
+                },
+                shiny.silent.error = function(e) stop(e),
                 error = function(e) {
                     empty_plot(text = conditionMessage(e), plotly = TRUE)
                 }
@@ -257,10 +286,26 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
         })
 
         plot_source_reactive <- reactive({
-            collect_source_data(
+            source_data <- collect_source_data(
                 plot_reactive = generate_cnSegmentPlot,
                 inputs_reactive = AllInputs()
             )
+
+            # collect_source_data() narrows the frame to the plotted aesthetics,
+            # which drops the facet variable. Without it a stacked download is
+            # just pooled bins with no way to tell the samples apart, so put the
+            # column back, matching that function's own row filtering.
+            full_data <- as.data.frame(plotly_data(source_data$plot))
+            if (!is.null(full_data$sample) && is.null(source_data$plot_data$sample)) {
+                keep_rows <- stats::complete.cases(
+                    full_data[, names(source_data$plot_data), drop = FALSE]
+                )
+                source_data$plot_data <- cbind(
+                    sample = full_data$sample[keep_rows], source_data$plot_data
+                )
+            }
+
+            source_data
         })
 
         output$download.source <- create_source_download_handler(
