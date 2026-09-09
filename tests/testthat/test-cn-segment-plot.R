@@ -289,6 +289,56 @@ test_that("cnSegmentPlot shares gene labels across a stack", {
     expect_length(Filter(function(trace) identical(trace$line$dash, "dot"), no.guides$x$data), 0)
 })
 
+test_that("cnSegmentPlot boxes every stacked panel", {
+    data(example_cn_segment, package = "sciVizModules")
+    shifted <- example_cn_segment
+    shifted$bin.signals <- shifted$bin.signals + 0.25
+    seg.list <- list(Tumor = example_cn_segment, Normal = shifted, Extra = shifted)
+
+    panel_boxes <- function(fig) {
+        shapes <- plotly::plotly_build(fig)$x$layout$shapes
+        Filter(
+            function(shape) {
+                identical(shape$type, "rect") && identical(shape$xref, "paper") &&
+                    !is.null(shape$line$color) && !is.na(shape$line$color)
+            },
+            shapes
+        )
+    }
+
+    boxes <- panel_boxes(cnSegmentPlot(seg.list, to.plot = "chr1"))
+
+    # One full-width rectangle per panel, so no panel is left open at the top or
+    # bottom the way the shared x-axis line alone would leave it.
+    expect_length(boxes, 3)
+    expect_true(all(vapply(boxes, function(b) b$x0 == 0 && b$x1 == 1, logical(1))))
+    expect_true(all(vapply(boxes, function(b) identical(b$line$color, "black"), logical(1))))
+
+    # The boxes tile the panels top to bottom without overlapping.
+    tops <- sort(vapply(boxes, function(b) b$y1, numeric(1)), decreasing = TRUE)
+    bottoms <- sort(vapply(boxes, function(b) b$y0, numeric(1)), decreasing = TRUE)
+    expect_equal(tops[1], 1)
+    expect_equal(bottoms[3], 0)
+    expect_true(all(tops > bottoms))
+
+    # Styling and suppression.
+    styled <- panel_boxes(cnSegmentPlot(
+        seg.list, to.plot = "chr1", panel.border.color = "#FF0000", panel.border.width = 2
+    ))
+    expect_true(all(vapply(styled, function(b) identical(b$line$color, "#FF0000"), logical(1))))
+    expect_true(all(vapply(styled, function(b) b$line$width == 2, logical(1))))
+    expect_length(panel_boxes(cnSegmentPlot(seg.list, to.plot = "chr1", panel.border.width = 0)), 0)
+
+    # Without mirroring, only the left and bottom edges are drawn.
+    unmirrored <- plotly::plotly_build(
+        cnSegmentPlot(seg.list, to.plot = "chr1", panel.border.mirror = FALSE)
+    )$x$layout$shapes
+    expect_length(Filter(function(s) identical(s$type, "line"), unmirrored), 6)
+
+    # A single sample is boxed by its own axis lines, so it gains no shapes.
+    expect_length(panel_boxes(cnSegmentPlot(example_cn_segment, to.plot = "chr1")), 0)
+})
+
 test_that("cnSegmentPlot free.y scales stacked panels independently", {
     data(example_cn_segment, package = "sciVizModules")
     shifted <- example_cn_segment

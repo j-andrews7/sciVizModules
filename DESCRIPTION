@@ -58,9 +58,6 @@ VignetteBuilder: knitr
 Config/testthat/edition: 3
 URL: https://github.com/j-andrews7/sciVizModules
 BugReports: https://github.com/j-andrews7/sciVizModules/issues
-Config/roxygen2/version: 8.0.0
+Config/roxygen2/version: 8.1.0
 biocViews: Visualization, ShinyApps, GUI, DifferentialExpression,
     GeneExpression, SingleCell, GeneSetEnrichment, Pathways, GO, Survival
-
-
-

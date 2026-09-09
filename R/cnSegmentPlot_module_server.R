@@ -201,6 +201,16 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 gene.line.color = isolate_fn(input$gene.line.color),
                 gene.line.width = isolate_fn(input$gene.line.width),
                 gene.line.linetype = isolate_fn(input$gene.line.linetype),
+                # Per-panel borders follow the Axes tab's axis border controls,
+                # so a stacked plot boxes its panels the same way a single-panel
+                # one boxes its axes -- one source of truth, no double-drawing.
+                panel.border.color = isolate_fn(input$axis.linecolor),
+                panel.border.width = if (isTRUE(isolate_fn(input$axis.showline))) {
+                    isolate_fn(input$axis.linewidth)
+                } else {
+                    0
+                },
+                panel.border.mirror = isTRUE(isolate_fn(input$axis.mirror)),
                 label.size = isolate_fn(input$label.size),
                 free.y = isTRUE(isolate_fn(input$free.y)),
                 y.min = y.min,

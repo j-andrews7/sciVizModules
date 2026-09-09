@@ -111,6 +111,13 @@
 #'   use `0` to suppress them.
 #' @param gene.line.linetype Line type of the gene guide lines. Defaults to
 #'   `"dotted"`.
+#' @param panel.border.color Color of the border drawn around each panel when
+#'   several samples are stacked. Defaults to `"black"`.
+#' @param panel.border.width Width of the per-panel border. Defaults to `0.5`;
+#'   use `0` to suppress it.
+#' @param panel.border.mirror Logical; when `TRUE` (the default) each panel gets
+#'   a complete rectangle. When `FALSE`, only its left and bottom edges are
+#'   drawn.
 #' @param label.size Plotly font size of gene labels (only used when `genes` is
 #'   supplied). Defaults to `10`.
 #' @param free.y Logical; when `TRUE`, each stacked sample gets its own
@@ -178,6 +185,9 @@ cnSegmentPlot <- function(seg,
                           gene.line.color = "grey40",
                           gene.line.width = 0.3,
                           gene.line.linetype = "dotted",
+                          panel.border.color = "black",
+                          panel.border.width = 0.5,
+                          panel.border.mirror = TRUE,
                           label.size = 10,
                           free.y = FALSE,
                           y.min = NULL,
@@ -444,6 +454,23 @@ cnSegmentPlot <- function(seg,
 
     if (multi) {
         fig <- .cn_seg_tag_axis_title(fig, "Log2 Signal Ratio")
+
+        # ggplotly anchors the single shared x-axis to the bottom panel, so axis
+        # lines alone box only that panel and leave the ones above it open at the
+        # top and bottom. Draw an explicit rectangle per panel instead, appending
+        # to the shapes ggplotly already uses for the facet strip backgrounds.
+        if (isTRUE(panel.border.width > 0)) {
+            fig$x$layout$shapes <- c(
+                fig$x$layout$shapes,
+                build_facet_panel_borders(
+                    fig,
+                    n_facets = length(seg.list),
+                    showline = TRUE, mirror = isTRUE(panel.border.mirror),
+                    linecolor = panel.border.color, linewidth = panel.border.width,
+                    ncol = 1, nrow = length(seg.list)
+                )
+            )
+        }
     }
 
     fig <- config(fig, edits = list(

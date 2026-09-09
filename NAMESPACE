@@ -69,73 +69,97 @@ import(ggplot2, except = last_plot)
 
 import(plotly)
 import(shiny)
-importFrom(DT,DTOutput)
-importFrom(DT,renderDT)
-importFrom(GenomicRanges,GRanges)
-importFrom(GenomicRanges,end)
-importFrom(GenomicRanges,findOverlaps)
-importFrom(GenomicRanges,mcols)
-importFrom(GenomicRanges,seqinfo)
-importFrom(GenomicRanges,seqnames)
-importFrom(GenomicRanges,start)
-importFrom(GenomicRanges,width)
-importFrom(IRanges,IRanges)
-importFrom(IRanges,pintersect)
-importFrom(S4Vectors,queryHits)
-importFrom(S4Vectors,subjectHits)
-importFrom(Seqinfo,seqinfo)
-importFrom(Seqinfo,seqlengths)
-importFrom(Seqinfo,seqnames)
+importFrom(DT,
+  DTOutput,
+  renderDT
+)
+importFrom(GenomicRanges,
+  GRanges,
+  end,
+  findOverlaps,
+  mcols,
+  seqinfo,
+  seqnames,
+  start,
+  width
+)
+importFrom(IRanges,
+  IRanges,
+  pintersect
+)
+importFrom(S4Vectors,
+  queryHits,
+  subjectHits
+)
+importFrom(Seqinfo,
+  seqinfo,
+  seqlengths,
+  seqnames
+)
 importFrom(SummarizedExperiment,colData)
-importFrom(VizModules,createModuleApp)
-importFrom(VizModules,dittoViz_scatterPlotInputsUI)
-importFrom(VizModules,dittoViz_scatterPlotOutputUI)
-importFrom(VizModules,dittoViz_scatterPlotServer)
-importFrom(VizModules,plotthis_DotPlotInputsUI)
-importFrom(VizModules,plotthis_DotPlotOutputUI)
-importFrom(VizModules,plotthis_DotPlotServer)
-importFrom(VizModules,register_model_backend)
-importFrom(colourpicker,colourInput)
-importFrom(colourpicker,updateColourInput)
-importFrom(dittoSeq,dittoBarPlot)
-importFrom(dittoSeq,dittoDimHex)
-importFrom(dittoSeq,dittoDimPlot)
-importFrom(dittoSeq,dittoFreqPlot)
-importFrom(dittoSeq,dittoPlot)
-importFrom(dittoSeq,dittoRidgeJitter)
-importFrom(dittoSeq,dittoScatterPlot)
-importFrom(ggplot2,.data)
-importFrom(ggplot2,aes)
-importFrom(ggplot2,element_blank)
-importFrom(ggplot2,element_text)
-importFrom(ggplot2,facet_grid)
-importFrom(ggplot2,geom_point)
-importFrom(ggplot2,geom_segment)
-importFrom(ggplot2,geom_vline)
-importFrom(ggplot2,ggplot)
-importFrom(ggplot2,ggtitle)
-importFrom(ggplot2,scale_colour_gradient2)
-importFrom(ggplot2,scale_x_continuous)
-importFrom(ggplot2,scale_y_continuous)
-importFrom(ggplot2,theme)
-importFrom(ggplot2,theme_minimal)
-importFrom(ggplot2,vars)
-importFrom(ggplot2,xlab)
-importFrom(ggplot2,ylab)
+importFrom(VizModules,
+  createModuleApp,
+  dittoViz_scatterPlotInputsUI,
+  dittoViz_scatterPlotOutputUI,
+  dittoViz_scatterPlotServer,
+  plotthis_DotPlotInputsUI,
+  plotthis_DotPlotOutputUI,
+  plotthis_DotPlotServer,
+  register_model_backend
+)
+importFrom(colourpicker,
+  colourInput,
+  updateColourInput
+)
+importFrom(dittoSeq,
+  dittoBarPlot,
+  dittoDimHex,
+  dittoDimPlot,
+  dittoFreqPlot,
+  dittoPlot,
+  dittoRidgeJitter,
+  dittoScatterPlot
+)
+importFrom(ggplot2,
+  .data,
+  aes,
+  element_blank,
+  element_text,
+  facet_grid,
+  geom_point,
+  geom_segment,
+  geom_vline,
+  ggplot,
+  ggtitle,
+  scale_colour_gradient2,
+  scale_x_continuous,
+  scale_y_continuous,
+  theme,
+  theme_minimal,
+  vars,
+  xlab,
+  ylab
+)
 importFrom(methods,is)
-importFrom(plotly,add_annotations)
-importFrom(plotly,config)
-importFrom(plotly,ggplotly)
-importFrom(plotly,plotlyOutput)
+importFrom(plotly,
+  add_annotations,
+  config,
+  ggplotly,
+  plotlyOutput
+)
 importFrom(readxl,read_excel)
 importFrom(scales,squish)
 importFrom(shiny,NS)
 importFrom(shinyBS,tipify)
-importFrom(shinyWidgets,materialSwitch)
-importFrom(shinyWidgets,updateMaterialSwitch)
+importFrom(shinyWidgets,
+  materialSwitch,
+  updateMaterialSwitch
+)
 importFrom(shinyjqui,jqui_resizable)
 importFrom(shinyjs,useShinyjs)
-importFrom(stats,as.formula)
-importFrom(stats,complete.cases)
-importFrom(stats,setNames)
+importFrom(stats,
+  as.formula,
+  complete.cases,
+  setNames
+)
 importFrom(survival,Surv)

@@ -28,6 +28,9 @@ cnSegmentPlot(
   gene.line.color = "grey40",
   gene.line.width = 0.3,
   gene.line.linetype = "dotted",
+  panel.border.color = "black",
+  panel.border.width = 0.5,
+  panel.border.mirror = TRUE,
   label.size = 10,
   free.y = FALSE,
   y.min = NULL,
@@ -118,6 +121,16 @@ use \code{0} to suppress them.}
 
 \item{gene.line.linetype}{Line type of the gene guide lines. Defaults to
 \code{"dotted"}.}
+
+\item{panel.border.color}{Color of the border drawn around each panel when
+several samples are stacked. Defaults to \code{"black"}.}
+
+\item{panel.border.width}{Width of the per-panel border. Defaults to \code{0.5};
+use \code{0} to suppress it.}
+
+\item{panel.border.mirror}{Logical; when \code{TRUE} (the default) each panel gets
+a complete rectangle. When \code{FALSE}, only its left and bottom edges are
+drawn.}
 
 \item{label.size}{Plotly font size of gene labels (only used when \code{genes} is
 supplied). Defaults to \code{10}.}
