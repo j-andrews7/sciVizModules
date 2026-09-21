@@ -28,7 +28,7 @@ A dataset containing differential expression results from comparing treated vs u
 samples in the airway dataset using edgeR (quasi-likelihood).
 }
 \examples{
-library(VizModules)
+data(airway_edger)
 head(airway_edger)
 
 }

@@ -56,10 +56,13 @@
 #' @examples
 #' library(sciVizModules)
 #' data(survival_lung)
-#' fig <- survivalCurve(survival_lung,
-#'     time = "time", status = "status", group.by = "sex"
-#' )
-#' if (interactive()) fig
+#' # survminer is a Suggests, and this function needs it.
+#' if (requireNamespace("survminer", quietly = TRUE)) {
+#'     fig <- survivalCurve(survival_lung,
+#'         time = "time", status = "status", group.by = "sex"
+#'     )
+#'     if (interactive()) fig
+#' }
 survivalCurve <- function(data,
                           time,
                           status,

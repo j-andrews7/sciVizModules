@@ -61,17 +61,31 @@ test_that("every entry's dataset is in the bundled catalogue", {
     }
 })
 
-test_that("registry defaults name columns present in their dataset", {
+test_that("registry defaults are keys the modules actually read", {
     data_list <- .sci_figure_builder_data()
+    # `get_default()` falls back silently on an unknown key, so a typo here is
+    # a no-op rather than an error. Column-naming keys are checkable; the rest
+    # at least have to be scalars the module can seed a control with.
+    column_keys <- c("x.by", "y.by", "time", "status", "group.by")
+    checked <- 0
 
     for (mod in sci_figure_builder_registry()) {
         if (is.null(mod$defaults)) next
         df <- data_list[[mod$dataset]]
-        for (key in intersect(names(mod$defaults), c("x.by", "y.by", "time", "status", "group.by"))) {
-            expect_true(mod$defaults[[key]] %in% names(df),
-                info = paste(mod$label, key, mod$defaults[[key]]))
+        for (key in names(mod$defaults)) {
+            value <- mod$defaults[[key]]
+            expect_false(is.null(value), info = paste(mod$label, key))
+            if (key %in% column_keys) {
+                expect_true(value %in% names(df),
+                    info = paste(mod$label, key, value))
+            }
+            checked <- checked + 1
         }
     }
+
+    # Guards against this test quietly becoming empty if the defaults are
+    # dropped from every entry.
+    expect_gt(checked, 0)
 })
 
 test_that("sciFigureBuilderApp() builds without launching", {

@@ -5,9 +5,9 @@
 \title{Create a standalone Shiny app for the michaelisMenten module}
 \usage{
 michaelisMentenApp(
-  data = mm_kinetics,
-  model = mm_kinetics_line,
-  stats = mm_kinetics_fit,
+  data = .sci_example_data("mm_kinetics"),
+  model = .sci_example_data("mm_kinetics_line"),
+  stats = .sci_example_data("mm_kinetics_fit"),
   defaults = NULL,
   title = "Modular Michaelis-Menten Plot"
 )
@@ -52,6 +52,7 @@ app <- michaelisMentenApp()
 if (interactive()) shiny::runApp(app)
 
 # Launch with custom data:
+data(mm_kinetics)
 if (requireNamespace("drc", quietly = TRUE)) {
     library(drc)
     mm_model <- drm(v ~ S, data = mm_kinetics, fct = MM.2())

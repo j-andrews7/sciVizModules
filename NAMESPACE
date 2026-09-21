@@ -170,4 +170,7 @@ importFrom(stats,
   setNames
 )
 importFrom(survival,Surv)
-importFrom(utils,data)
+importFrom(utils,
+  data,
+  modifyList
+)

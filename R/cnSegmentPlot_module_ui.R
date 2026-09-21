@@ -31,6 +31,7 @@
 #' @importFrom GenomicRanges seqinfo mcols
 #' @importFrom Seqinfo seqnames
 #' @import VizModules
+#' @importFrom utils modifyList
 #'
 #' @export
 #'

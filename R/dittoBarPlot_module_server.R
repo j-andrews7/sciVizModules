@@ -93,15 +93,15 @@ dittoBarPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, d
             req(obj)
             disc <- .ditto_discrete_metas(obj)
             update_viz_select(session, "var",
-                selected = .ditto_default(defaults, "var", if (length(disc)) disc[1] else ""))
-            update_viz_select(session, "group.by", selected = .ditto_default(defaults, "group.by",
+                selected = get_default(defaults, "var", if (length(disc)) disc[1] else ""))
+            update_viz_select(session, "group.by", selected = get_default(defaults, "group.by",
                 if (length(disc) >= 2) disc[2] else if (length(disc)) disc[1] else ""))
-            update_viz_select(session, "scale", selected = .ditto_default(defaults, "scale", "percent"))
-            update_viz_select(session, "split.by", selected = .ditto_default(defaults, "split.by", ""))
-            updateNumericInput(session, "split.nrow", value = .ditto_default(defaults, "split.nrow", NA))
-            updateNumericInput(session, "split.ncol", value = .ditto_default(defaults, "split.ncol", NA))
-            updateMaterialSwitch(session, "x.labels.rotate", value = .ditto_default(defaults, "x.labels.rotate", TRUE))
-            updateMaterialSwitch(session, "retain.factor.levels", value = .ditto_default(defaults, "retain.factor.levels", FALSE))
+            update_viz_select(session, "scale", selected = get_default(defaults, "scale", "percent"))
+            update_viz_select(session, "split.by", selected = get_default(defaults, "split.by", ""))
+            updateNumericInput(session, "split.nrow", value = get_default(defaults, "split.nrow", NA))
+            updateNumericInput(session, "split.ncol", value = get_default(defaults, "split.ncol", NA))
+            updateMaterialSwitch(session, "x.labels.rotate", value = get_default(defaults, "x.labels.rotate", TRUE))
+            updateMaterialSwitch(session, "retain.factor.levels", value = get_default(defaults, "retain.factor.levels", FALSE))
             .ditto_reset_uniform(session, defaults)
         })
 

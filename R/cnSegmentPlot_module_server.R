@@ -28,6 +28,7 @@
 #' @importFrom GenomicRanges mcols
 #' @importFrom stats complete.cases
 #' @import VizModules
+#' @importFrom utils modifyList
 #'
 #' @seealso [sciVizModules::cnSegmentPlot()],
 #' [sciVizModules::cnSegmentPlotInputsUI()],
