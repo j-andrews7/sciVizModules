@@ -55,6 +55,8 @@ export(michaelisMentenInputsUI)
 export(michaelisMentenOutputUI)
 export(michaelisMentenPlot)
 export(michaelisMentenServer)
+export(sciFigureBuilderApp)
+export(sci_figure_builder_registry)
 export(survivalCurve)
 export(survivalCurveApp)
 export(survivalCurveInputsUI)
@@ -102,6 +104,7 @@ importFrom(VizModules,
   dittoViz_scatterPlotInputsUI,
   dittoViz_scatterPlotOutputUI,
   dittoViz_scatterPlotServer,
+  figureBuilderApp,
   plotthis_DotPlotInputsUI,
   plotthis_DotPlotOutputUI,
   plotthis_DotPlotServer,
@@ -140,6 +143,10 @@ importFrom(ggplot2,
   xlab,
   ylab
 )
+importFrom(grDevices,
+  col2rgb,
+  rgb
+)
 importFrom(methods,is)
 importFrom(plotly,
   add_annotations,
@@ -163,3 +170,4 @@ importFrom(stats,
   setNames
 )
 importFrom(survival,Surv)
+importFrom(utils,data)

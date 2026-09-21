@@ -1,0 +1,131 @@
+url: https://j-andrews7.github.io/sciVizModules/
+
+template:
+  bootstrap: 5
+
+development:
+  mode: auto
+
+reference:
+- title: Differential expression
+  desc: >
+    Volcano and MA plots over a differential-expression results table. Both
+    wrap the VizModules scatter plot module, adding threshold controls and an
+    auto-generated Up/Down/n.s. grouping.
+  contents:
+  - volcanoPlotInputsUI
+  - volcanoPlotOutputUI
+  - volcanoPlotServer
+  - volcanoPlotApp
+  - maPlotInputsUI
+  - maPlotOutputUI
+  - maPlotServer
+  - maPlotApp
+
+- title: Functional enrichment
+  desc: >
+    Dot plot and GO sunburst ("fan") plot over over-representation or GSEA
+    results.
+  contents:
+  - enrichmentDotPlotInputsUI
+  - enrichmentDotPlotOutputUI
+  - enrichmentDotPlotServer
+  - enrichmentDotPlotApp
+  - goFanPlot
+  - goFanPlotInputsUI
+  - goFanPlotOutputUI
+  - goFanPlotServer
+  - goFanPlotApp
+
+- title: Survival analysis
+  desc: Kaplan-Meier curves with confidence bands, censor marks and risk table.
+  contents:
+  - survivalCurve
+  - survivalCurveInputsUI
+  - survivalCurveOutputUI
+  - survivalCurveServer
+  - survivalCurveApp
+
+- title: Pharmacology and kinetics
+  desc: Dose-response curves and Michaelis-Menten enzyme kinetics.
+  contents:
+  - doseResponseInputsUI
+  - doseResponseOutputUI
+  - doseResponseServer
+  - doseResponseApp
+  - michaelisMentenPlot
+  - michaelisMentenInputsUI
+  - michaelisMentenOutputUI
+  - michaelisMentenServer
+  - michaelisMentenApp
+
+- title: Copy number
+  desc: >
+    Stacked genome-wide copy-number segment plots over `CNSegment` objects, as
+    returned by `sesame::cnSegmentation()`.
+  contents:
+  - cnSegmentPlot
+  - cnSegmentPlotInputsUI
+  - cnSegmentPlotOutputUI
+  - cnSegmentPlotServer
+  - cnSegmentPlotApp
+
+- title: Single-cell and RNA-seq (dittoSeq)
+  desc: >
+    Wrappers around the dittoSeq plotting functions. Each takes a
+    `SingleCellExperiment`, `Seurat` or `SummarizedExperiment` object rather
+    than a data frame, and so takes `object_list` in its `*App()`.
+  contents:
+  - dittoDimPlotInputsUI
+  - dittoDimPlotOutputUI
+  - dittoDimPlotServer
+  - dittoDimPlotApp
+  - dittoDimHexInputsUI
+  - dittoDimHexOutputUI
+  - dittoDimHexServer
+  - dittoDimHexApp
+  - dittoScatterPlotInputsUI
+  - dittoScatterPlotOutputUI
+  - dittoScatterPlotServer
+  - dittoScatterPlotApp
+  - dittoPlotInputsUI
+  - dittoPlotOutputUI
+  - dittoPlotServer
+  - dittoPlotApp
+  - dittoRidgeJitterInputsUI
+  - dittoRidgeJitterOutputUI
+  - dittoRidgeJitterServer
+  - dittoRidgeJitterApp
+  - dittoBarPlotInputsUI
+  - dittoBarPlotOutputUI
+  - dittoBarPlotServer
+  - dittoBarPlotApp
+  - dittoFreqPlotInputsUI
+  - dittoFreqPlotOutputUI
+  - dittoFreqPlotServer
+  - dittoFreqPlotApp
+
+- title: Figure Builder
+  desc: >
+    Arrange several of these modules into one multi-panel figure using the
+    VizModules Figure Builder.
+  contents:
+  - sci_figure_builder_registry
+  - sciFigureBuilderApp
+
+- title: Example data
+  desc: >
+    Bundled datasets used by the example apps, the vignette and the tests.
+    This package sets no `LazyData`, so load them with `data()`.
+  contents:
+  - airway_deseq2
+  - airway_edger
+  - airway_voom
+  - dose_response
+  - example_cn_segment
+  - example_enrichment
+  - example_sce
+  - mm_kinetics
+  - mm_kinetics_line
+  - mm_kinetics_fit
+  - survival_lung

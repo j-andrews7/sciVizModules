@@ -12,6 +12,7 @@ library(sciVizModules)
 ##               SingleCellExperiment; no data-table filter applies.
 ##   * "mm"    - the Michaelis-Menten module, which needs a bundle of
 ##               observed points, a fitted line, and a stats object.
+##   * "cn"    - the copy-number module, bound to a CNSegment object.
 ## ---------------------------------------------------------------------------
 
 ## ---- Package metadata (for the About tab / navbar) ------------------------
@@ -29,6 +30,7 @@ data("example_sce",        package = "sciVizModules", envir = environment())
 data("mm_kinetics",        package = "sciVizModules", envir = environment())
 data("mm_kinetics_line",   package = "sciVizModules", envir = environment())
 data("mm_kinetics_fit",    package = "sciVizModules", envir = environment())
+data("example_cn_segment", package = "sciVizModules", envir = environment())
 
 ## Michaelis-Menten needs three pieces bundled together.
 mm_bundle <- list(
@@ -75,6 +77,11 @@ module_registry <- list(
         inputs_ui = michaelisMentenInputsUI, output_ui = michaelisMentenOutputUI,
         server_fn = michaelisMentenServer, data = mm_kinetics,
         bundle = mm_bundle, defaults = NULL
+    ),
+    list(
+        label = "Copy Number", id = "cnseg", type = "cn",
+        inputs_ui = cnSegmentPlotInputsUI, output_ui = cnSegmentPlotOutputUI,
+        server_fn = cnSegmentPlotServer, data = example_cn_segment, defaults = NULL
     ),
     list(
         label = "DimPlot", id = "dimplot", type = "sce",
@@ -130,6 +137,13 @@ build_tab <- function(mod) {
             hr(),
             p("This module is bound to the bundled 'example_sce' ",
                 "SingleCellExperiment.",
+                style = "color: grey; font-size: 12px;")
+        )
+    } else if (identical(mod$type, "cn")) {
+        tagList(
+            hr(),
+            p("This module is bound to the bundled 'example_cn_segment' ",
+                "CNSegment object.",
                 style = "color: grey; font-size: 12px;")
         )
     } else {
@@ -201,13 +215,17 @@ ui <- do.call(navbarPage, c(
         position = "static-top",
         header   = tagList(
             shinyjs::useShinyjs(),
+            ## Every rule is anchored on .scivizmodules-gallery, a class this
+            ## app invents. Bare `.navbar` / `.navbar-nav` are Bootstrap's own,
+            ## so they would restyle any navbar on the page -- see the CSS
+            ## containment notes in AGENTS.md.
             tags$head(tags$style(HTML(paste(
-                ".navbar { margin-bottom: 0; }",
-                ".navbar-nav > li > a {",
+                ".scivizmodules-gallery .navbar { margin-bottom: 0; }",
+                ".scivizmodules-gallery .navbar-nav > li > a {",
                 "  padding-left: 9px; padding-right: 9px; font-size: 13px;",
                 "}",
-                ".navbar .navbar-collapse { flex-wrap: nowrap; }",
-                ".navbar-nav { white-space: nowrap; }",
+                ".scivizmodules-gallery .navbar .navbar-collapse { flex-wrap: nowrap; }",
+                ".scivizmodules-gallery .navbar-nav { white-space: nowrap; }",
                 sep = "\n"
             ))))
         )
@@ -215,6 +233,11 @@ ui <- do.call(navbarPage, c(
     list(about_tab),
     lapply(module_registry, build_tab)
 ))
+
+## The stylesheet above is scoped to this class, so the whole page carries it.
+## navbarPage() returns a tagList rather than a single tag, so wrap rather than
+## trying to append an attribute to it.
+ui <- tags$div(class = "scivizmodules-gallery", ui)
 
 ## ---- Server ---------------------------------------------------------------
 server <- function(input, output, session) {
@@ -239,6 +262,15 @@ server <- function(input, output, session) {
                     title = h3(paste(m$label, "Settings")))
             })
             m$server_fn(m$id, data = sce_data)
+
+        } else if (identical(m$type, "cn")) {
+            ## CNSegment object bound directly (no data table).
+            seg_data <- reactive(m$data)
+            output[[paste0(m$id, "_inputs_ui")]] <- renderUI({
+                m$inputs_ui(m$id, seg_data(), defaults = m$defaults,
+                    title = h3(paste(m$label, "Settings")))
+            })
+            m$server_fn(m$id, data = seg_data)
 
         } else {
             ## Michaelis-Menten: bundle of data + model + stats.

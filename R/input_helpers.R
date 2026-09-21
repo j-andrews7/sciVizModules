@@ -25,8 +25,6 @@
 #'
 #' @return A [shiny::reactive()] yielding the input's debounced value.
 #'
-#' @importFrom shiny debounce reactive
-#'
 #' @author Jared Andrews
 #' @rdname INTERNAL_sci_debounced_input
 #' @keywords internal
