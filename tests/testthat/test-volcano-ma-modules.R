@@ -1,10 +1,11 @@
-# Regression tests for the volcano and MA modules' wiring into the VizModules
-# scatter plot module.
+# Tests for the volcano and MA modules' wiring into the VizModules scatter plot
+# module.
 #
-# VizModules 0.4.0 removed `manual.colors` from `dittoViz_scatterPlotServer()`.
-# Both modules still passed it, so either server failed with an unused-argument
-# error the moment it ran. The group colours now travel as a named `color.panel`
-# vector in the `defaults` handed to the wrapped module.
+# Both are thin wrappers: they add threshold controls and an auto-generated
+# Up/Down/n.s. grouping, then hand everything else to
+# `dittoViz_scatterPlotServer()`. The group colours travel to it as a named
+# `color.panel` vector in `defaults`, which is what keeps them editable on its
+# Colors tab and covered by its Reset.
 
 de_modules <- c("volcanoPlot", "maPlot")
 
@@ -17,12 +18,11 @@ test_that("all volcano and MA module functions are exported", {
     }
 })
 
-test_that("the wrapped scatter server no longer takes manual.colors", {
-    # The reason these modules changed. If it ever comes back, the defaults
-    # route below is redundant rather than wrong, but this should be revisited.
-    expect_false(
-        "manual.colors" %in% names(formals(VizModules::dittoViz_scatterPlotServer))
-    )
+test_that("every argument these modules pass is in the wrapped server's signature", {
+    args <- names(formals(VizModules::dittoViz_scatterPlotServer))
+    expect_true(all(c("id", "data", "hide.inputs", "hide.tabs", "defaults") %in% args))
+    # Colours reach it through `defaults`; there is no colour argument of its own.
+    expect_false("manual.colors" %in% args)
 })
 
 test_that("DE defaults carry a color.panel mapping for the wrapped module", {
@@ -50,7 +50,7 @@ test_that("a caller-supplied color.panel wins over the scalar colour keys", {
     expect_identical(unname(d2$color.panel[["Up"]]), "#123456")
 })
 
-test_that("InputsUI no longer renders a module-local group colour picker", {
+test_that("InputsUI leaves group colours to the wrapped module's picker", {
     data(airway_deseq2, package = "sciVizModules")
 
     ui <- volcanoPlotInputsUI("de", airway_deseq2)
@@ -74,10 +74,10 @@ test_that("OutputUI accepts resizable, as the Figure Builder requires", {
     }
 })
 
-test_that("the servers reach the wrapped module without an unused argument", {
-    # The specific regression: `manual.colors = ` reaching a server that no
-    # longer accepts it. testServer cannot drive the plotly output, so other
-    # errors are possible here and are not what this asserts.
+test_that("the servers reach the wrapped module with arguments it accepts", {
+    # testServer cannot drive the plotly output, so other errors are possible
+    # here; this asserts only that nothing is passed that the wrapped server
+    # does not take.
     skip_if_not_installed("dittoViz")
     data(airway_deseq2, package = "sciVizModules")
 

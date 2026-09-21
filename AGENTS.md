@@ -255,4 +255,4 @@ Bioconductor packages appear throughout; some example data depends on `sesame`/`
 - When changing a shared plotting function, keep existing single-input behavior byte-identical unless the change is the point; the existing tests are the regression guard and should stay green untouched.
 - Prefer verifying plotly output structurally (`plotly::plotly_build()`, then inspect `x$data` / `x$layout`) over eyeballing; reserve interactive checks for layout and legibility questions that structure cannot answer.
 
-These instructions are a starting point, not an authority. Verify against the code before relying on any specific claim here, and correct this file when you find it stale - much of it had drifted a full VizModules minor version before anyone noticed.
+These instructions are a starting point, not an authority. Verify against the code before relying on any specific claim here, and correct this file when you find it stale.

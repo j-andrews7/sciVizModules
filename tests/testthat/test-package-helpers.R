@@ -1,6 +1,5 @@
-# Unit tests for the package-wide helpers added alongside the VizModules 0.5.0
-# sync: the example-data loader, the group-colour validator, and the debounced
-# free-text reader.
+# Unit tests for the package-wide helpers: the example-data loader, the
+# group-colour validator, and the debounced free-text reader.
 
 test_that(".sci_example_data loads a bundled dataset without attaching it", {
     df <- .sci_example_data("airway_deseq2")

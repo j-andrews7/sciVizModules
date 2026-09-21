@@ -1,15 +1,13 @@
-# Guard for the viz_select_input() migration.
+# Guard for the select inputs the modules build.
 #
-# VizModules replaced its own module selects with `viz_select_input()`, built on
-# a virtualised dropdown, so a select fed by a high-cardinality column (every
-# gene in a SingleCellExperiment, say) stays responsive. Two VizModules 0.5.0
-# fixes also land only there: the length-zero guards for an input that has not
-# reported yet, and multi-selects no longer dropping a deselection made from a
-# value tag's x.
-#
-# Module UI and server functions must therefore use it rather than
-# `shiny::selectInput()` / `updateSelectInput()`. The demo-app dataset pickers
-# are deliberately exempt -- they are app chrome over a handful of names.
+# Every module select is a `VizModules::viz_select_input()`, built on a
+# virtualised dropdown: it renders only the visible slice of the choice list, so
+# a select fed by a high-cardinality column (every gene in a
+# SingleCellExperiment, say) stays responsive, and it carries the length-zero
+# guards an input that has not reported yet needs. `shiny::selectInput()` and
+# `updateSelectInput()` have neither property and must not appear in a module UI
+# or server. The demo-app dataset pickers are deliberately exempt -- they are app
+# chrome over a handful of names.
 
 module_prefixes <- c(
     "cnSegmentPlot", "dittoBarPlot", "dittoDimHex", "dittoDimPlot",
