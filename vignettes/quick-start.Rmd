@@ -8,15 +8,18 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
+# Every chunk below either launches a Shiny app or needs a Bioconductor
+# dependency that is only Suggested, so none of them run at build time.
 knitr::opts_chunk$set(
     collapse = TRUE,
-    comment = "#>"
+    comment = "#>",
+    eval = FALSE
 )
 ```
 
 ## Overview
 
-**sciVizModules** extends [VizModules](https://cran.r-project.org/package=VizModules)
+**sciVizModules** extends [VizModules](https://github.com/j-andrews7/VizModules)
 with a curated set of domain-specific Shiny modules for the biological, chemical,
 and physical sciences. Each module wraps a plotting function with scientifically
 meaningful defaults, axis conventions, and annotation layers, while preserving
@@ -35,6 +38,36 @@ someModuleServer(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL
 ```
 
 Each module also ships a standalone `*App()` convenience function.
+
+Note that this package sets no `LazyData`, so the bundled example datasets need
+a `data()` call before you can use them by name:
+
+```{r load-data}
+library(sciVizModules)
+data(airway_deseq2)
+data(example_sce)
+data(survival_lung)
+```
+
+## Working with an AI coding agent
+
+sciVizModules builds on VizModules, which ships three agent skills describing
+its APIs. Install them into your project once and any compatible agent (Claude
+Code, GitHub Copilot, OpenAI Codex) will discover them:
+
+```{r skills}
+VizModules::use_vizmodules_skills(".", client = "claude")  # or "agents" / "copilot"
+```
+
+- `vizmodules-app` covers wiring modules into an app, and carries a generated
+  inventory of every VizModules module's column-mapping keys, colour key and tab
+  names.
+- `vizmodules-custom-module` covers wrapping and extending a base module, which
+  is what most of sciVizModules does.
+- `vizmodules-new-module` covers authoring a module inside VizModules itself.
+
+`AGENTS.md` in the sciVizModules repository covers the conventions specific to
+this package on top of those.
 
 ## The module gallery
 
@@ -81,9 +114,10 @@ shinyApp(ui, server)
 The fastest way to explore a module is its `*App()` function:
 
 ```{r apps}
-if (interactive()) volcanoPlotApp()   # differential expression, airway_deseq2
-if (interactive()) dittoDimPlotApp()  # single-cell reduction, example_sce
-if (interactive()) doseResponseApp()  # pharmacology, dose_response
+if (interactive()) volcanoPlotApp()     # differential expression, airway_deseq2
+if (interactive()) dittoDimPlotApp()    # single-cell reduction, example_sce
+if (interactive()) doseResponseApp()    # pharmacology, dose_response
+if (interactive()) cnSegmentPlotApp()   # copy number, example_cn_segment
 ```
 
 ## Set defaults and hide controls
@@ -95,14 +129,34 @@ the plot, so the module stays fully configured.
 ```{r defaults}
 volcanoPlotServer(
     "de",
-    data      = reactive(airway_deseq2),
-    defaults  = list(sig.thresh = 0.01, fc.thresh = 1),
-    hide.tabs = c("Legend/Scale")
+    data        = reactive(airway_deseq2),
+    defaults    = list(sig.thresh = 0.01, fc.thresh = 1),
+    hide.inputs = c("shape.by"),
+    hide.tabs   = c("Legend")
 )
 ```
 
 Hidden inputs and tabs still feed their values into the plot, so the module
 stays fully configured while exposing only what your users need.
+
+The tab names come from the module being wrapped, so check its help page before
+naming one: a `hide.tabs` entry that matches nothing is silently ignored. For
+the volcano and MA modules the tabs are those of
+`VizModules::dittoViz_scatterPlotInputsUI()` -- Data, Adjustments, Points,
+Colors, Facet, Annotations, Legend, Trajectory, Lines, Axes, Plotly, Extras.
+
+Group colours are a `defaults` entry too. The volcano and MA modules assemble
+`color.up` / `color.down` / `color.ns` into the wrapped module's `color.panel`
+mapping, so the colours open where you asked and stay editable on its Colors
+tab:
+
+```{r de-colors}
+volcanoPlotServer(
+    "de",
+    data     = reactive(airway_deseq2),
+    defaults = list(color.up = "#D55E00", color.down = "#0072B2")
+)
+```
 
 ## App factory with `createModuleApp()`
 
@@ -114,7 +168,7 @@ filterable data table, and dataset switching for any module:
 ```{r create-module-app}
 library(sciVizModules)
 
-app <- createModuleApp(
+app <- VizModules::createModuleApp(
     inputs_ui_fn = volcanoPlotInputsUI,
     output_ui_fn = volcanoPlotOutputUI,
     server_fn    = volcanoPlotServer,
@@ -206,6 +260,21 @@ head(dose_response)
 #> dose_uM, rep1_response_pct, ..., mean_response_pct, sd_response_pct
 ```
 
+### Copy number
+
+| Module | Server function | Data type | Expected data | Example data |
+|---|---|---|---|---|
+| Copy-number segments | `cnSegmentPlotServer()` | `CNSegment`, or a named list of them | A `CNSegment` object as returned by `sesame::cnSegmentation()`: bin-level log2 signal ratios in `bin.signals`, their coordinates in `bin.coords`, and a `genomeInfo` carrying `cytoBand` (for chromosome ticks and centromere guides) and optionally `genes` (for labels) | `example_cn_segment` |
+
+Passing a named list plots one panel per sample, stacked over a shared genomic
+x-axis. This is the one module that does not take a data frame, so it is also
+the one that cannot go in the Figure Builder.
+
+```{r cn-format}
+data(example_cn_segment)
+example_cn_segment
+```
+
 ### Single-cell / RNA-seq (dittoSeq wrappers)
 
 These modules wrap `dittoSeq` plotting functions. They all accept a
@@ -231,6 +300,48 @@ or `SummarizedExperiment` object.
 data(example_sce)
 example_sce
 ```
+
+## Multi-panel figures
+
+The data-frame modules are registered with the VizModules Figure Builder, so
+several panels can be dragged, sized and exported as one figure:
+
+```{r figure-builder}
+sciFigureBuilderApp()
+```
+
+`sci_figure_builder_registry()` returns the registry itself, in the shape
+`VizModules::figureBuilderServer()` documents, so you can extend it with your
+own modules:
+
+```{r figure-builder-registry}
+registry <- sci_figure_builder_registry()
+names(registry)
+str(registry$volcano, max.level = 1)
+```
+
+The dittoSeq modules, `cnSegmentPlot` and `michaelisMenten` are not registered:
+the builder's dataset catalogue holds data frames, and those take a
+`SingleCellExperiment`, a `CNSegment` object, and a bundle carrying a model fit
+respectively.
+
+## Export the source data
+
+Every module's control panel ends in a **Source Data** button. It downloads a
+ZIP holding a self-contained interactive HTML of the plot, an SVG and a PNG of
+it as drawn on screen, a CSV of the data actually plotted, a CSV of the UI input
+values, and a statistics table where the module computes one. The Figure Builder
+writes one such set per panel, named after the panel label.
+
+This is plumbed by `VizModules::collect_source_data()` and
+`VizModules::create_source_download_handler()`, which every module here already
+wires up, so nothing is needed on your side. Two notes:
+
+- The SVG and PNG are photographed in the browser off the graph you are looking
+  at, so they carry anything applied after the figure was built. The button
+  therefore pauses briefly before the archive arrives.
+- The interactive HTML needs pandoc (via `htmlwidgets::saveWidget()`). Without
+  it the archive still downloads, with a warning and no HTML.
 
 ## Which plot parameters are exposed?
 

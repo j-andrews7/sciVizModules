@@ -2,6 +2,7 @@
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/j-andrews7/sciVizModules/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/j-andrews7/sciVizModules/actions/workflows/R-CMD-check.yaml)
+[![pkgdown](https://github.com/j-andrews7/sciVizModules/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/j-andrews7/sciVizModules/actions/workflows/pkgdown.yaml)
 <!-- badges: end -->
 
 sciVizModules extends [VizModules](https://github.com/j-andrews7/VizModules) with a curated
@@ -19,11 +20,14 @@ Developed by [Jared Andrews](https://github.com/j-andrews7) and [Jacob Martin](h
 
 Note that this package is in development and may break at any time.
 
-VizModules must be installed first:
+VizModules 0.5.0 or newer must be installed first:
 
 ```r
 install.packages("VizModules")
-devtools::install_github("j-andrews7/sciVizModules")
+# ... or, for the development version:
+# remotes::install_github("j-andrews7/VizModules")
+
+remotes::install_github("j-andrews7/sciVizModules")
 ```
 
 ## Module Gallery
@@ -60,10 +64,22 @@ holds the logic. Every module also ships a standalone `*App()` you can run to se
   data frame (a numeric follow-up `time` column, an event `status` column, and an optional
   grouping column) and renders an interactive plotly curve with optional confidence intervals,
   censoring marks, log-rank p-value, median-survival lines, and a number-at-risk table.
-- **`michaelisMentenPlot`** - Michaelis Menten plot to analyse enzyme-substate kinetics. This module is 
-  built uppon the outputs of the [drc](https://cran.r-project.org/web/packages/drc/index.html) package.
-  The module expects a data, model, and stats inputs generated from the **drc** michaelis-menten
-  workflow. 
+- **`maPlot`** — differential-expression MA plot: mean abundance on the x-axis (log10 for
+  DESeq2's `baseMean`, identity for the already-logged edgeR/limma columns) against log fold
+  change, with the same interactive significance and fold-change thresholding as the volcano
+  plot (wraps `VizModules::dittoViz_scatterPlot`).
+- **`michaelisMenten`** — Michaelis-Menten plot for enzyme-substrate kinetics, built on the
+  outputs of the [drc](https://cran.r-project.org/package=drc) package. The module takes a
+  `data` (observed points), `model` (fitted line) and optional `stats` (an `nls` fit, or named
+  `K` / `Vmax` coefficients) bundle produced by the **drc** Michaelis-Menten workflow.
+- **`doseResponse`** — dose-response curve with the dose on a log10 axis and a log-logistic
+  curve fitted with **drc**. The `drm` model backend is registered with VizModules at load, so
+  the curve is one of the fit options on the wrapped scatter plot
+  (wraps `VizModules::dittoViz_scatterPlot`).
+- **`cnSegmentPlot`** — genome-wide array copy-number segment plot over a `CNSegment` object as
+  returned by [`sesame::cnSegmentation()`](https://bioconductor.org/packages/sesame/). Bin-level
+  log2 signal ratios are drawn across the genome with chromosome guides, centromere marks and
+  optional gene labels; several samples stack vertically over a shared genomic x-axis.
 
 ### RNA-seq / single-cell modules (dittoSeq)
 
@@ -103,4 +119,45 @@ survivalCurve(survival_lung, time = "time", status = "status", group.by = "sex")
 # Launch an RNA-seq module app with the bundled example SingleCellExperiment:
 dittoDimPlotApp()
 ```
+
+Note that this package sets no `LazyData`, so the bundled datasets need a
+`data()` call before you can use them by name.
+
+## Multi-panel Figures
+
+The data-frame modules are registered with the [VizModules Figure
+Builder](https://j-andrews7.github.io/VizModules/), so several panels can be dragged, sized
+and exported as one figure, with a source-data archive per panel:
+
+```r
+library(sciVizModules)
+sciFigureBuilderApp()
+```
+
+`sci_figure_builder_registry()` returns the registry itself, so you can combine it with your
+own modules (or with the VizModules ones) and pass the result to
+`VizModules::figureBuilderApp()`.
+
+The single-cell modules, `cnSegmentPlot` and `michaelisMenten` are not registered: the
+builder's dataset catalogue holds data frames, and those three take a
+`SingleCellExperiment`, a `CNSegment` object, and a bundle carrying a model fit respectively.
+Run their `*App()` functions instead.
+
+## Working with an AI Coding Agent
+
+This package builds on VizModules, which ships three agent skills describing its APIs. Install
+them into your project once and any compatible agent (Claude Code, GitHub Copilot, OpenAI
+Codex) will pick them up:
+
+```r
+VizModules::use_vizmodules_skills(".", client = "claude")  # or "agents" / "copilot"
+```
+
+- `vizmodules-app` — wiring modules into an app, with a generated inventory of every module's
+  column-mapping keys, colour key and tab names.
+- `vizmodules-custom-module` — building wrapper modules on top of a base module, which is what
+  most of sciVizModules does.
+- `vizmodules-new-module` — authoring a module inside VizModules itself.
+
+`AGENTS.md` in this repository covers the sciVizModules-specific conventions on top of those.
 

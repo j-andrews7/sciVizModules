@@ -6,6 +6,17 @@ stop acceptance outright; **required** items will be flagged as ERROR/WARNING by
 `R CMD check` / `BiocCheck`; **recommended** items are NOTES or reviewer
 expectations.
 
+> **Status.** Most of §0-§2 is done; those items are marked RESOLVED below and
+> kept for the record rather than deleted. What is genuinely still open:
+>
+> - `inst/CITATION` does not exist (§2).
+> - `biocViews` omits the `Software` trunk term (§0.2).
+> - The `@return` / `\value` audit across the `.Rd` files (§6).
+> - Screenshot compression and the `data/` size question (§3).
+> - `shinytest2` tests (§4) — note it is **not** in `Suggests:`, contrary to
+>   what §4 claimed; adding it is part of that work.
+> - Verifying the source tarball builds under 10 MB (§7).
+
 ---
 
 ## 0. Critical blockers (must fix before submission)
@@ -23,7 +34,7 @@ on CRAN or Bioconductor. Verified availability:
 The `Remotes:` field has been removed from `DESCRIPTION`. No dependency blocker
 remains.
 
-### 0.2 `biocViews` field is missing — REQUIRED, blocks build
+### 0.2 `biocViews` field is missing — PARTLY RESOLVED
 `biocViews` is mandatory and must list **at least two** leaf terms from the same
 trunk (Software). Suggested terms for this package:
 
@@ -34,32 +45,41 @@ biocViews: Software, Visualization, ShinyApps, GeneExpression,
 
 Verify each term exists in the current devel biocViews tree before committing.
 
-### 0.3 `Description` field is malformed — REQUIRED
-Words are run together across line breaks ("modulestailored", "foundationsof",
+**Status:** `biocViews` is now present in `DESCRIPTION`, reading
+`Visualization, ShinyApps, GUI, DifferentialExpression, GeneExpression,
+SingleCell, GeneSetEnrichment, Pathways, GO, Survival`. **Still open:** the
+`Software` trunk term is absent, and the guide requires trunk membership.
+
+### 0.3 `Description` field is malformed — RESOLVED
+Words were run together across line breaks ("modulestailored", "foundationsof",
 "inscientific", "packagewhile", "layersrelevant", "publication-ready,interactive",
-"dataand"). Rewrite as clean, ≥3-sentence prose with proper spacing and
+"dataand").
+
+**Status:** rewritten as clean multi-sentence prose with proper spacing and
 continuation-line indentation.
 
 ---
 
-## 1. DESCRIPTION file — required cleanups
+## 1. DESCRIPTION file — cleanups (RESOLVED)
 
-- **Remove `LazyData: true`.** Bioconductor recommends against it (slows loading);
-  the guide asks for justification if kept. With ~2.7 MB of `.rda` data, drop it.
-- **Trailing comma in `Imports:`** — `dittoSeq,` ends the block with a dangling
-  comma. Remove it.
-- **Trim `Depends:`.** Seven packages are in `Depends:` (`shiny`, `plotthis`,
-  `dittoViz`, `plotly`, `shinyBS`, `VizModules`, plus `R`). The guide says it is
-  unusual to have more than ~3. Move everything that is only used inside your
-  namespace to `Imports:`; keep `Depends:` minimal (likely just `R (>= 4.x)` and
-  possibly `shiny`).
-- **Add `BugReports:`** — `https://github.com/j-andrews7/sciVizModules/issues`.
-- **Bump R version.** `R (>= 3.5)` is very old; current Bioc devel expects a
-  recent R (4.5/4.6). Set to match the devel Bioconductor you build against.
-- **Version** — the submitted version must be exactly `0.99.0` (currently
-  `0.99.0.9000`; drop the `.9000` dev suffix for submission).
+- **Remove `LazyData: true`.** — DONE. Note the consequence: the datasets in
+  `data/` are no longer promises in the namespace, so package code must reach
+  them through `.sci_example_data()` and examples/tests must call `data()`
+  first. A bare reference fails with "object not found".
+- **Trailing comma in `Imports:`** — DONE.
+- **Trim `Depends:`.** — DONE. `Depends:` is now `R (>= 4.6.0)`, `shiny`,
+  `VizModules (>= 0.5.0)`.
+- **Add `BugReports:`** — DONE.
+- **Bump R version.** — DONE; `R (>= 4.6.0)`.
+- **Version** — DONE; exactly `0.99.0`.
 - **Confirm every `Imports:` package is actually used**, and every package used
-  is declared (see `drc` above). `BiocCheck` flags both directions.
+  is declared. `BiocCheck` flags both directions. — DONE: `colourpicker`, `DT`,
+  `ggplot2`, `grDevices`, `plotly`, `shinyBS`, `shinyjs`, `stats` and `survival`
+  were imported in `NAMESPACE` but undeclared (they resolved only transitively
+  through VizModules' own `Depends:`); `htmltools`, `htmlwidgets` and `jsonlite`
+  were declared but unused. Both directions are now reconciled, and `survminer`
+  has been added to `Suggests:`. **Keep checking this** — it drifts whenever a
+  roxygen `@importFrom` is added.
 - **License** — `MIT + file LICENSE` is acceptable. Ensure the `LICENSE` file
   contains the standard MIT text with year + copyright holder (no restrictive
   clauses).
@@ -68,16 +88,17 @@ continuation-line indentation.
 
 ## 2. Required package infrastructure (currently missing)
 
-- **NEWS file** — add a top-level `NEWS.md` (or `inst/NEWS.Rd`). Even a single
-  `# sciVizModules 0.99.0` section with "Initial Bioconductor submission" is
-  expected.
+- **NEWS file** — DONE. `NEWS.md` carries the single `# sciVizModules 0.99.0`
+  section. It stays that way until there is a released version to describe
+  changes *from*.
 - **CITATION file** — add `inst/CITATION`. Recommended for all packages.
 - **INSTALL file** — only if you keep any `SystemRequirements` (e.g. if `drc`
   or GOfan pull in external system libs). Document Linux/Windows/Mac install.
-- **Confirm `R CMD check` passes with the current vignette.** You just added
-  `vignettes/quick-start.Rmd`; make sure it builds. Note it currently sets
-  `eval = FALSE` for all chunks — acceptable for a Shiny package, but the
-  reviewer will look for at least a screenshot or a runnable non-Shiny example.
+- **Confirm `R CMD check` passes with the current vignette.** The vignette now
+  sets `eval = FALSE` for all chunks — it previously did not, so
+  `runApp(system.file(...))` and `shinyApp(ui, server)` executed at build time.
+  `eval = FALSE` is acceptable for a Shiny package, but the reviewer will look
+  for at least a screenshot or a runnable non-Shiny example.
 
 ---
 
@@ -115,8 +136,10 @@ appears in executable package code. Remaining items:
 - **Graceful error handling** — reviewers want errors/warnings surfaced to the
   user (e.g. `shinytoastr` / `showNotification`), not silent failures or
   crashes. Audit `stopifnot()`/`stop()` paths in the servers.
-- **shinytest2** is already in `Suggests:` — add at least one `shinytest2` test
-  per module family; reviewers explicitly look for this.
+- **shinytest2** is **not** in `Suggests:` (this line was wrong). Add it, then
+  add at least one `shinytest2` test per module family; reviewers explicitly
+  look for this. The testthat suite currently covers helpers, UI construction
+  and module wiring, but drives no browser.
 
 ---
 
@@ -144,7 +167,8 @@ Clean these before submission to minimize review friction:
 
 - **README** already has content and an install section — update the install
   instructions once the `Remotes` situation is resolved (it currently tells
-  users to `install_github`, which won't apply post-acceptance).
+  users to `install_github`, which won't apply post-acceptance). It now also
+  documents every exported module, the Figure Builder, and the agent skills.
 - Ensure **every exported function has a `@return` (`\value`) section** —
   `BiocCheck` errors on missing value sections. With 112 Rd files this is worth
   an automated pass.
@@ -169,13 +193,12 @@ Address every ERROR and WARNING; justify any remaining NOTE.
 
 ## Suggested order of work
 
-1. **Resolve dependencies** (§0.1) — decide the fate of VizModules, GOfan, drc.
-   Nothing else matters until this path is clear.
-2. Fix `DESCRIPTION`: `biocViews`, `Description`, remove `Remotes`/`LazyData`,
-   trailing comma, `Depends`→`Imports`, `BugReports`, version → `0.99.0` (§0.2–1).
-3. Delete junk files, compress screenshots (§3).
-4. Add `NEWS.md` and `inst/CITATION` (§2).
-5. Audit exports vs internals and `@return` sections (§4, §6).
-6. Add `shinytest2` tests (§4).
-7. Style/lint pass (§5).
-8. Run the full build/check/BiocCheck loop (§7) until clean.
+Steps 1, 2 and the `NEWS.md` half of step 4 are done. What remains:
+
+1. Add the `Software` biocViews trunk term (§0.2).
+2. Delete any remaining junk files and compress the screenshots (§3).
+3. Add `inst/CITATION` (§2).
+4. Audit exports vs internals and `@return` sections (§4, §6).
+5. Add `shinytest2` to `Suggests:` and write the browser tests (§4).
+6. Style/lint pass (§5).
+7. Run the full build/check/BiocCheck loop (§7) until clean.

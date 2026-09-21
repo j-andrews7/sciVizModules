@@ -1,5 +1,17 @@
 # Potential Scientific Plots to consider:
 
+> **Already implemented**, and so no longer candidates: the **dose-response
+> curve** (`doseResponse`), the **Michaelis-Menten curve** (`michaelisMenten`),
+> the **survival curve** (`survivalCurve`), and **UMAP / PCA**, which the
+> `dittoDimPlot` and `dittoDimHex` modules cover for any reduction stored on a
+> `SingleCellExperiment` / `Seurat` object. The IC50 curve is largely covered by
+> `doseResponse`, which fits a log-logistic curve with **drc**; a dedicated
+> module would mostly be about reporting the IC50 itself.
+>
+> Genuinely open: the kinetic order plots, chromatogram, 1D NMR, PK curve, and
+> the Lineweaver-Burk plot. Their entries are kept below with the reference
+> screenshots.
+
 ## Biochemistry: 
 
 Kinetic Plots:
@@ -43,17 +55,17 @@ Visualise how drug conc in plasma changes over time after dosing. C_max T_max an
 
 
 
-IC50 Curve:
+IC50 Curve: *(largely covered by `doseResponse`)*
 
 ![](man/PlotScreenShots/IC50.png)
 
 
-Dose Response Curve:
+Dose Response Curve: **implemented as `doseResponse`**
 
 ![](man/PlotScreenShots/DoseResponseCurve.png)
 
 
-Michaelis Menten Curve:
+Michaelis Menten Curve: **implemented as `michaelisMenten`**
 
 Biological kinetics of reactions. Substrate and protein interaction curve. 
 
@@ -62,7 +74,7 @@ Biological kinetics of reactions. Substrate and protein interaction curve.
 
 ## Biology: 
 
-Survival Curve: 
+Survival Curve: **implemented as `survivalCurve`**
 
 Shows the survival of a population over time. 
 
@@ -70,11 +82,11 @@ Shows the survival of a population over time.
 ![](man/PlotScreenShots/Survival_Curve.png)
 
 
-UMAP: 
+UMAP: **covered by `dittoDimPlot` / `dittoDimHex`**
 
 ![](man/PlotScreenShots/UMAP.png)
 
-PCA: 
+PCA: **covered by `dittoDimPlot`**
 
 ![](man/PlotScreenShots/PCA.png)
 
