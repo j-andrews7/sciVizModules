@@ -71,16 +71,16 @@ michaelisMentenServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL
             num.choices <- names(df)[vapply(df, is.numeric, logical(1))]
             if (length(num.choices) == 0) num.choices <- col.choices
 
-            updateSelectInput(session, "x",
+            update_viz_select(session, "x",
                 selected = get_default(defaults, "x", if ("S" %in% col.choices) "S" else num.choices[1]))
-            updateSelectInput(session, "y",
+            update_viz_select(session, "y",
                 selected = get_default(defaults, "y", if ("v" %in% col.choices) "v" else num.choices[min(2, length(num.choices))]))
             updateMaterialSwitch(session, "jitter", value = get_default(defaults, "jitter", TRUE))
             updateNumericInput(session, "jitter_size", value = get_default(defaults, "jitter_size", 1.5))
             colourpicker::updateColourInput(session, "jitter_color", value = get_default(defaults, "jitter_color", "#000000"))
             updateSliderInput(session, "jitter_alpha", value = get_default(defaults, "jitter_alpha", 1.0))
             colourpicker::updateColourInput(session, "line_color", value = get_default(defaults, "line_color", "#FF0000"))
-            updateSelectInput(session, "linetype", selected = get_default(defaults, "linetype", "solid"))
+            update_viz_select(session, "linetype", selected = get_default(defaults, "linetype", "solid"))
             updateMaterialSwitch(session, "show_stats", value = get_default(defaults, "show_stats", TRUE))
             reset_plotly_inputs(session, defaults)
             reset_axes_inputs(session, defaults)

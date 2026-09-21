@@ -75,23 +75,20 @@ survivalCurveInputsUI <- function(id, data, defaults = NULL, title = "Survival C
 
     inputs <- list(
         "Data" = tagList(
-            tipify(selectInput(ns("time"), "Time",
+            tipify(viz_select_input(ns("time"), "Time",
                 choices = num.choices,
-                selected = .sv_default(defaults, "time", if (length(num.choices)) num.choices[1] else NULL),
-                selectize = FALSE
+                selected = .sv_default(defaults, "time", if (length(num.choices)) num.choices[1] else NULL)
             ), "Numeric follow-up time column.", placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("status"), "Status (Event)",
+            tipify(viz_select_input(ns("status"), "Status (Event)",
                 choices = names(data),
-                selected = .sv_default(defaults, "status", NULL),
-                selectize = FALSE
+                selected = .sv_default(defaults, "status", NULL)
             ), paste(
                 "Event indicator column. Accepts 0/1 (1 = event), 1/2 (2 = event),",
                 "logical, or a two-level factor/character."
             ), placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("group.by"), "Group By",
+            tipify(viz_select_input(ns("group.by"), "Group By",
                 choices = group.choices,
-                selected = .sv_default(defaults, "group.by", ""),
-                selectize = FALSE
+                selected = .sv_default(defaults, "group.by", "")
             ), "Optional categorical column to stratify the curves by.",
                 placement = "top", options = list(container = "body"))
         ),
@@ -108,21 +105,21 @@ survivalCurveInputsUI <- function(id, data, defaults = NULL, title = "Survival C
                 value = .sv_default(defaults, "censor", TRUE), status = "success"),
                 "Draw marks where observations were censored.",
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("surv.median.line"), "Median Survival Line",
+            tipify(viz_select_input(ns("surv.median.line"), "Median Survival Line",
                 choices = c("none", "hv", "h", "v"),
-                selected = .sv_default(defaults, "surv.median.line", "none"), selectize = FALSE
+                selected = .sv_default(defaults, "surv.median.line", "none")
             ), "Draw reference lines at the median survival time.",
                 placement = "top", options = list(container = "body"))
         ),
         "Aesthetics" = tagList(
-            tipify(selectInput(ns("fun"), "Curve Type",
+            tipify(viz_select_input(ns("fun"), "Curve Type",
                 choices = c(
                     "Survival probability" = "survival",
                     "Survival percentage" = "pct",
                     "Cumulative events" = "event",
                     "Cumulative hazard" = "cumhaz"
                 ),
-                selected = .sv_default(defaults, "fun", "survival"), selectize = FALSE
+                selected = .sv_default(defaults, "fun", "survival")
             ), "Transformation applied to the survival curve.",
                 placement = "top", options = list(container = "body")),
             uiOutput(ns("palette.selection")),

@@ -50,12 +50,12 @@ goFanPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defa
             num.choices <- names(df)[vapply(df, is.numeric, logical(1))]
             if (is.null(detected.fill)) detected.fill <- if (length(num.choices)) num.choices[1] else ""
 
-            updateSelectInput(session, "term.id", selected = get_default(defaults, "term.id", detected.id))
-            updateSelectInput(session, "onto", selected = get_default(defaults, "onto", .gofan_onto(df)))
-            updateSelectInput(session, "org", selected = get_default(defaults, "org", "org.Hs.eg.db"))
-            updateSelectInput(session, "fill", selected = get_default(defaults, "fill", detected.fill))
-            updateSelectInput(session, "palette", selected = get_default(defaults, "palette", "Viridis"))
-            updateSelectInput(session, "sub_rect", selected = get_default(defaults, "sub_rect", ""))
+            update_viz_select(session, "term.id", selected = get_default(defaults, "term.id", detected.id))
+            update_viz_select(session, "onto", selected = get_default(defaults, "onto", .gofan_onto(df)))
+            update_viz_select(session, "org", selected = get_default(defaults, "org", "org.Hs.eg.db"))
+            update_viz_select(session, "fill", selected = get_default(defaults, "fill", detected.fill))
+            update_viz_select(session, "palette", selected = get_default(defaults, "palette", "Viridis"))
+            update_viz_select(session, "sub_rect", selected = get_default(defaults, "sub_rect", ""))
             updateNumericInput(session, "go.annotation.level.cutoff",
                 value = get_default(defaults, "go.annotation.level.cutoff", 4))
             updateNumericInput(session, "filter.nodes.by.edge.number",

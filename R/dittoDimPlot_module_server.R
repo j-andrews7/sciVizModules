@@ -75,13 +75,13 @@ dittoDimPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, d
         observeEvent(input$reset, {
             obj <- data_reactive()
             req(obj)
-            updateSelectInput(session, "reduction.use",
+            update_viz_select(session, "reduction.use",
                 selected = get_default(defaults, "reduction.use", get_default_reduction(obj)))
             updateNumericInput(session, "dim.1", value = get_default(defaults, "dim.1", 1))
             updateNumericInput(session, "dim.2", value = get_default(defaults, "dim.2", 2))
-            updateSelectInput(session, "shape.by", selected = get_default(defaults, "shape.by", ""))
-            updateSelectInput(session, "split.by", selected = get_default(defaults, "split.by", ""))
-            updateSelectInput(session, "order", selected = get_default(defaults, "order", "unordered"))
+            update_viz_select(session, "shape.by", selected = get_default(defaults, "shape.by", ""))
+            update_viz_select(session, "split.by", selected = get_default(defaults, "split.by", ""))
+            update_viz_select(session, "order", selected = get_default(defaults, "order", "unordered"))
             updateNumericInput(session, "size", value = get_default(defaults, "size", 1))
             updateNumericInput(session, "opacity", value = get_default(defaults, "opacity", 1))
             updateMaterialSwitch(session, "do.label", value = get_default(defaults, "do.label", FALSE))

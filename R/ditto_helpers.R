@@ -184,7 +184,7 @@ get_default_reduction <- function(object) {
 #'
 #' @param object A dittoSeq-compatible object.
 #' @param include.blank Whether to prepend an empty choice.
-#' @return A named character vector suitable for `selectInput()` choices.
+#' @return A named character vector suitable for `VizModules::viz_select_input()` choices.
 #'
 #' @author Jacob Martin, Jared Andrews
 #' @rdname INTERNAL_ditto_var_choices
@@ -205,7 +205,7 @@ get_default_reduction <- function(object) {
 #'
 #' @param object A dittoSeq-compatible object.
 #' @param include.blank Whether to prepend an empty choice.
-#' @return A named character vector suitable for `selectInput()` choices.
+#' @return A named character vector suitable for `VizModules::viz_select_input()` choices.
 #'
 #' @author Jacob Martin, Jared Andrews
 #' @rdname INTERNAL_ditto_continuous_choices

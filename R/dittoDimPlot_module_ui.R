@@ -90,14 +90,14 @@ dittoDimPlotInputsUI <- function(id, data, defaults = NULL, title = "DimPlot Set
 
     inputs <- list(
         "Data" = tagList(
-            tipify(selectInput(ns("var"), "Color By (gene / metadata)",
+            tipify(viz_select_input(ns("var"), "Color By (gene / metadata)",
                 choices = var.choices,
-                selected = default.var, selectize = FALSE
+                selected = default.var
             ), documentParameters$var,
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("reduction.use"), "Reduction",
+            tipify(viz_select_input(ns("reduction.use"), "Reduction",
                 choices = red.choices,
-                selected = default.red, selectize = FALSE
+                selected = default.red
             ), documentParameters$reduction.use,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("dim.1"), "X Dimension",
@@ -108,14 +108,14 @@ dittoDimPlotInputsUI <- function(id, data, defaults = NULL, title = "DimPlot Set
                 value = get_default(defaults, "dim.2", 2), min = 1, step = 1),
                 documentParameters$dim.2,
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("shape.by"), "Shape By",
+            tipify(viz_select_input(ns("shape.by"), "Shape By",
                 choices = disc.choices,
-                selected = get_default(defaults, "shape.by", ""), selectize = FALSE
+                selected = get_default(defaults, "shape.by", "")
             ), documentParameters$shape.by,
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("split.by"), "Split By (facet)",
+            tipify(viz_select_input(ns("split.by"), "Split By (facet)",
                 choices = disc.choices,
-                selected = get_default(defaults, "split.by", ""), selectize = FALSE
+                selected = get_default(defaults, "split.by", "")
             ), documentParameters$split.by,
                 placement = "top", options = list(container = "body"))
         ),
@@ -129,9 +129,9 @@ dittoDimPlotInputsUI <- function(id, data, defaults = NULL, title = "DimPlot Set
                 value = get_default(defaults, "max.color", "#0072B2")),
                 documentParameters$max.color,
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("order"), "Point Order",
+            tipify(viz_select_input(ns("order"), "Point Order",
                 choices = c("unordered", "increasing", "decreasing", "randomize"),
-                selected = get_default(defaults, "order", "unordered"), selectize = FALSE
+                selected = get_default(defaults, "order", "unordered")
             ), documentParameters$order,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("size"), "Point Size",

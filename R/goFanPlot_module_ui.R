@@ -90,33 +90,33 @@ goFanPlotInputsUI <- function(id, data, defaults = NULL, title = "GO Sunburst Se
 
     inputs <- list(
         "Data" = tagList(
-            tipify(selectInput(ns("term.id"), "GO ID Column",
-                choices = id.choices, selected = default.id, selectize = FALSE
+            tipify(viz_select_input(ns("term.id"), "GO ID Column",
+                choices = id.choices, selected = default.id
             ), "Column holding the GO identifiers (e.g. GO:0006955).",
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("onto"), "Ontology",
+            tipify(viz_select_input(ns("onto"), "Ontology",
                 choices = c("Biological Process" = "BP", "Cellular Component" = "CC",
                     "Molecular Function" = "MF"),
-                selected = default.onto, selectize = FALSE
+                selected = default.onto
             ), "GO ontology category of the supplied IDs.",
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("org"), "Organism",
-                choices = org.choices, selected = default.org, selectize = FALSE
+            tipify(viz_select_input(ns("org"), "Organism",
+                choices = org.choices, selected = default.org
             ), paste(
                 "Organism annotation package used to resolve the GO hierarchy.",
                 "The corresponding OrgDb package must be installed."
             ), placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("fill"), "Colour By",
-                choices = num.choices, selected = default.fill, selectize = FALSE
+            tipify(viz_select_input(ns("fill"), "Colour By",
+                choices = num.choices, selected = default.fill
             ), "Numeric column mapped onto the segment fill colour (e.g. qvalue).",
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("palette"), "Palette",
+            tipify(viz_select_input(ns("palette"), "Palette",
                 choices = .gofan_palettes,
-                selected = get_default(defaults, "palette", "Viridis"), selectize = FALSE
+                selected = get_default(defaults, "palette", "Viridis")
             ), "Colour palette used to map the 'Colour By' column onto the segments.",
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("sub_rect"), "Sub-rectangle (area)",
-                choices = subrect.choices, selected = default.subrect, selectize = FALSE
+            tipify(viz_select_input(ns("sub_rect"), "Sub-rectangle (area)",
+                choices = subrect.choices, selected = default.subrect
             ), paste(
                 "Optional numeric column drawn as a proportional sub-rectangle",
                 "inside each segment (a count is converted to a proportion)."

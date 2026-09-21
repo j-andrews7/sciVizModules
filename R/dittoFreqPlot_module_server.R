@@ -75,14 +75,14 @@ dittoFreqPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             obj <- data_reactive()
             req(obj)
             disc <- .ditto_discrete_metas(obj)
-            updateSelectInput(session, "var",
+            update_viz_select(session, "var",
                 selected = get_default(defaults, "var", if (length(disc)) disc[1] else ""))
-            updateSelectInput(session, "sample.by", selected = get_default(defaults, "sample.by", ""))
-            updateSelectInput(session, "group.by", selected = get_default(defaults, "group.by",
+            update_viz_select(session, "sample.by", selected = get_default(defaults, "sample.by", ""))
+            update_viz_select(session, "group.by", selected = get_default(defaults, "group.by",
                 if (length(disc) >= 2) disc[2] else if (length(disc)) disc[1] else ""))
-            updateSelectInput(session, "color.by", selected = get_default(defaults, "color.by", ""))
-            updateSelectInput(session, "scale", selected = get_default(defaults, "scale", "percent"))
-            updateSelectInput(session, "plots",
+            update_viz_select(session, "color.by", selected = get_default(defaults, "color.by", ""))
+            update_viz_select(session, "scale", selected = get_default(defaults, "scale", "percent"))
+            update_viz_select(session, "plots",
                 selected = get_default(defaults, "plots", c("boxplot", "jitter")))
             updateMaterialSwitch(session, "max.normalize", value = get_default(defaults, "max.normalize", FALSE))
             updateNumericInput(session, "jitter.size", value = get_default(defaults, "jitter.size", 1))

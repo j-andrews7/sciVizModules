@@ -78,7 +78,7 @@ maPlotInputsUI <- function(id, data, defaults = NULL, title = "MA Settings", col
     sig.choices <- names(data)[vapply(data, is.numeric, logical(1))]
 
     extras <- tagList(
-        tipify(selectInput(ns("sig.by"), "Significance Column:",
+        tipify(viz_select_input(ns("sig.by"), "Significance Column:",
             choices = sig.choices,
             selected = defaults[["sig.by"]]
         ), "Column used to determine significance for Up/Down/n.s. grouping.",

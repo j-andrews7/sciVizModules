@@ -41,14 +41,14 @@ dittoDimHexServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, de
         observeEvent(input$reset, {
             obj <- data_reactive()
             req(obj)
-            updateSelectInput(session, "color.var", selected = get_default(defaults, "color.var", ""))
-            updateSelectInput(session, "reduction.use",
+            update_viz_select(session, "color.var", selected = get_default(defaults, "color.var", ""))
+            update_viz_select(session, "reduction.use",
                 selected = get_default(defaults, "reduction.use", get_default_reduction(obj)))
             updateNumericInput(session, "dim.1", value = get_default(defaults, "dim.1", 1))
             updateNumericInput(session, "dim.2", value = get_default(defaults, "dim.2", 2))
             updateNumericInput(session, "bins", value = get_default(defaults, "bins", 30))
             updateTextInput(session, "color.method", value = get_default(defaults, "color.method", ""))
-            updateSelectInput(session, "split.by", selected = get_default(defaults, "split.by", ""))
+            update_viz_select(session, "split.by", selected = get_default(defaults, "split.by", ""))
             updateNumericInput(session, "min.opacity", value = get_default(defaults, "min.opacity", 0.2))
             updateNumericInput(session, "max.opacity", value = get_default(defaults, "max.opacity", 1))
             updateMaterialSwitch(session, "do.contour", value = get_default(defaults, "do.contour", FALSE))

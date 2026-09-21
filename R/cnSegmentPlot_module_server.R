@@ -83,7 +83,7 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 choices = sample.choices, selected = get_default(defaults, "samples", sample.choices))
             update_viz_select(session, "to.plot",
                 choices = seq.choices, selected = get_default(defaults, "to.plot", character(0)))
-            updateSelectInput(session, "hover.text.cols",
+            update_viz_select(session, "hover.text.cols",
                 choices = hover.choices, selected = get_default(defaults, "hover.text.cols", c("signal", "genes")))
 
             genes <- genes_obj()
@@ -97,7 +97,7 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                     } else {
                         id.col.choices[1]
                     })
-                updateSelectInput(session, "id.col", choices = id.col.choices, selected = default.id.col)
+                update_viz_select(session, "id.col", choices = id.col.choices, selected = default.id.col)
                 updateTextInput(session, "label.genes", value = get_default(defaults, "label.genes", ""))
             }
 
@@ -116,19 +116,19 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 value = get_default(defaults, "centromere.color", "#B3B3B3"))
             updateNumericInput(session, "centromere.width",
                 value = get_default(defaults, "centromere.width", 0.3))
-            updateSelectInput(session, "centromere.linetype",
+            update_viz_select(session, "centromere.linetype",
                 selected = get_default(defaults, "centromere.linetype", "dashed"))
             updateColourInput(session, "border.color",
                 value = get_default(defaults, "border.color", "#000000"))
             updateNumericInput(session, "border.width",
                 value = get_default(defaults, "border.width", 0.3))
-            updateSelectInput(session, "border.linetype",
+            update_viz_select(session, "border.linetype",
                 selected = get_default(defaults, "border.linetype", "solid"))
             updateColourInput(session, "gene.line.color",
                 value = get_default(defaults, "gene.line.color", "#666666"))
             updateNumericInput(session, "gene.line.width",
                 value = get_default(defaults, "gene.line.width", 0.3))
-            updateSelectInput(session, "gene.line.linetype",
+            update_viz_select(session, "gene.line.linetype",
                 selected = get_default(defaults, "gene.line.linetype", "dotted"))
             updateNumericInput(session, "label.size", value = get_default(defaults, "label.size", 10))
             updateNumericInput(session, "y.min", value = get_default(defaults, "y.min", NA))

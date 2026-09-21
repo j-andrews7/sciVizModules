@@ -90,7 +90,7 @@ maPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = c("Trajectory
         # ma_defaults, passed below); this handles the controls it does not know
         # about.
         observeEvent(input$reset, {
-            updateSelectInput(session, "sig.by",
+            update_viz_select(session, "sig.by",
                 selected = VizModules::get_default(ma_defaults, "sig.by", ma_defaults$sig.by))
             updateNumericInput(session, "sig.thresh",
                 value = VizModules::get_default(ma_defaults, "sig.thresh", 0.05))

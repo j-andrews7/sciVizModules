@@ -78,14 +78,14 @@ dittoDimHexInputsUI <- function(id, data, defaults = NULL, title = "DimHex Setti
 
     inputs <- list(
         "Data" = tagList(
-            tipify(selectInput(ns("color.var"), "Color By (gene / metadata)",
+            tipify(viz_select_input(ns("color.var"), "Color By (gene / metadata)",
                 choices = var.choices,
-                selected = get_default(defaults, "color.var", ""), selectize = FALSE
+                selected = get_default(defaults, "color.var", "")
             ), documentParameters$color.var,
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("reduction.use"), "Reduction",
+            tipify(viz_select_input(ns("reduction.use"), "Reduction",
                 choices = red.choices,
-                selected = default.red, selectize = FALSE
+                selected = default.red
             ), documentParameters$reduction.use,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("dim.1"), "X Dimension",
@@ -104,9 +104,9 @@ dittoDimHexInputsUI <- function(id, data, defaults = NULL, title = "DimHex Setti
                 value = get_default(defaults, "color.method", "")),
                 documentParameters$color.method,
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("split.by"), "Split By (facet)",
+            tipify(viz_select_input(ns("split.by"), "Split By (facet)",
                 choices = disc.choices,
-                selected = get_default(defaults, "split.by", ""), selectize = FALSE
+                selected = get_default(defaults, "split.by", "")
             ), documentParameters$split.by,
                 placement = "top", options = list(container = "body"))
         ),
