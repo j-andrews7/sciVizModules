@@ -30,6 +30,10 @@ dittoPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defa
     data_reactive <- data
 
     moduleServer(id, function(input, output, session) {
+        # Resolve any reactive() entries in `defaults` server-side, so a parent
+        # app driving a parameter costs one render rather than a client round-trip.
+        params <- setup_reactive_defaults(defaults, input, session)
+
         ns <- session$ns
 
         hide_input(session, hide.inputs)
@@ -53,12 +57,29 @@ dittoPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defa
             .ditto_group_levels(obj, col)
         })
 
+        # The group-to-colour mapping the plot draws with. The picker is rebuilt
+        # by renderUI() whenever the group set changes, and the value it then
+        # reports is exactly what the server seeded it with -- reading the raw
+        # input would rebuild the plot for that echo, on load and again the first
+        # time the user opens the tab the picker lives on. See
+        # VizModules::setup_group_colors().
+        palette_store <- setup_group_colors(
+            input, "palette.colours", palette_groups,
+            default_palette_values, defaults, params
+        )
+
         output$palette.selection <- renderUI({
             groups <- palette_groups()
             if (length(groups) == 0) {
                 return(NULL)
             }
-            initial_colors <- isolate(resolve_palette(groups, input$palette.colours, default_palette_values))
+            initial_colors <- isolate(resolve_palette(
+                groups, input$palette.colours, default_palette_values,
+                .sci_group_colors(defaults)
+            ))
+            # Seed the store with what the picker is built from, so its first
+            # report back is a no-op rather than a change.
+            palette_store(initial_colors)
             multiColorPicker(
                 ns("palette.colours"),
                 label = "Group Colors",
@@ -93,7 +114,7 @@ dittoPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defa
         })
 
         generate_dittoPlot <- reactive({
-            isolate_fn <- setup_auto_update_logic(input)
+            isolate_fn <- setup_auto_update_logic(input, params)
 
             obj <- data_reactive()
             req(obj)
@@ -113,7 +134,10 @@ dittoPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defa
             groups <- isolate_fn(palette_groups())
             color.panel <- default_palette_values
             if (length(groups) > 0) {
-                palette_values <- resolve_palette(groups, isolate_fn(input$palette.colours), default_palette_values)
+                palette_values <- resolve_palette(
+                    groups, isolate_fn(palette_store()), default_palette_values,
+                    .sci_group_colors(defaults)
+                )
                 color.panel <- unname(palette_values[groups])
             }
 

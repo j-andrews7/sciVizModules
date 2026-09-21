@@ -34,6 +34,10 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
     data_reactive <- data
 
     moduleServer(id, function(input, output, session) {
+        # Resolve any reactive() entries in `defaults` server-side, so a parent
+        # app driving a parameter costs one render rather than a client round-trip.
+        params <- setup_reactive_defaults(defaults, input, session)
+
         # Hide individual inputs if requested.
         hide_input(session, hide.inputs)
 
@@ -55,10 +59,27 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             if (length(grp) == 0) "All" else grp
         })
 
+        # The group-to-colour mapping the plot draws with. The picker is rebuilt
+        # by renderUI() whenever the group set changes, and the value it then
+        # reports is exactly what the server seeded it with -- reading the raw
+        # input would rebuild the plot for that echo, on load and again the first
+        # time the user opens the tab the picker lives on. See
+        # VizModules::setup_group_colors().
+        palette_store <- setup_group_colors(
+            input, "palette.colours", palette_groups,
+            default_palette_values, defaults, params
+        )
+
         output$palette.selection <- renderUI({
             ns <- session$ns
             groups <- palette_groups()
-            initial_colors <- isolate(resolve_palette(groups, input$palette.colours, default_palette_values))
+            initial_colors <- isolate(resolve_palette(
+                groups, input$palette.colours, default_palette_values,
+                .sci_group_colors(defaults)
+            ))
+            # Seed the store with what the picker is built from, so its first
+            # report back is a no-op rather than a change.
+            palette_store(initial_colors)
             multiColorPicker(
                 ns("palette.colours"),
                 label = "Curve Colors",
@@ -95,7 +116,7 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
 
         # Build the plot (shared by the output and the source download).
         generate_survivalCurve <- reactive({
-            isolate_fn <- setup_auto_update_logic(input)
+            isolate_fn <- setup_auto_update_logic(input, params)
 
             d <- data_reactive()
             req(d)
@@ -112,7 +133,10 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             fun <- if (is.null(fun_choice) || fun_choice == "survival") NULL else fun_choice
 
             groups <- isolate_fn(palette_groups())
-            palette_values <- resolve_palette(groups, isolate_fn(input$palette.colours), default_palette_values)
+            palette_values <- resolve_palette(
+                groups, isolate_fn(palette_store()), default_palette_values,
+                .sci_group_colors(defaults)
+            )
 
             break.time.by <- isolate_fn(input$break.time.by)
             if (length(break.time.by) != 1 || is.na(break.time.by)) break.time.by <- NULL

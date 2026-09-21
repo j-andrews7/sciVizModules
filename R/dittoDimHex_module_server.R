@@ -31,12 +31,21 @@ dittoDimHexServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, de
     data_reactive <- data
 
     moduleServer(id, function(input, output, session) {
+        # Resolve any reactive() entries in `defaults` server-side, so a parent
+        # app driving a parameter costs one render rather than a client round-trip.
+        params <- setup_reactive_defaults(defaults, input, session)
+
         hide_input(session, hide.inputs)
         if (!is.null(hide.tabs)) {
             for (tab.name in hide.tabs) hideTab(inputId = "dittoDimHexTabsetPanel", target = tab.name)
         }
 
         default_palette_values <- default_palettes()[["choices"]][["Defaults"]][["dittoColors"]]
+
+        # "Color Method" is free text naming a summary function, so it reports on
+        # every keystroke; without this the plot rebinds and redraws the hexes
+        # once per character. See .sci_debounced_input().
+        color_method_text <- .sci_debounced_input(input, "color.method", params)
 
         observeEvent(input$reset, {
             obj <- data_reactive()
@@ -59,7 +68,7 @@ dittoDimHexServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, de
         })
 
         generate_dittoDimHex <- reactive({
-            isolate_fn <- setup_auto_update_logic(input)
+            isolate_fn <- setup_auto_update_logic(input, params)
 
             obj <- data_reactive()
             req(obj)
@@ -70,7 +79,7 @@ dittoDimHexServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, de
             color.var <- isolate_fn(input$color.var)
             if (is.null(color.var) || !nzchar(color.var)) color.var <- NULL
 
-            color.method <- isolate_fn(input$color.method)
+            color.method <- isolate_fn(color_method_text())
             if (is.null(color.method) || !nzchar(color.method)) color.method <- NULL
 
             split.by <- isolate_fn(input$split.by)

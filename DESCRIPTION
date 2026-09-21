@@ -33,6 +33,7 @@ Imports:
     DT,
     GenomicRanges,
     ggplot2,
+    grDevices,
     IRanges,
     methods,
     plotly,
