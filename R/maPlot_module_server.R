@@ -7,10 +7,15 @@
 #' @param data A `reactive` containing the data frame to plot.
 #'   Must contain a mean abundance (e.g., baseMean, logCPM, AveExpr), effect size
 #'   (e.g., log2FoldChange, logFC), and significance (e.g., padj, FDR) columns.
-#' @param hide.inputs A character vector of input IDs to hide.
-#' @param hide.tabs A character vector of tab names to hide. Default hides: "Trajectory", "Facet", "Colors", "Legend/Scale".
+#' @param hide.inputs A character vector of input IDs to hide. The continuous
+#'   colour-scale and contour controls are always hidden, since an MA plot
+#'   colours by the discrete `group` column.
+#' @param hide.tabs A character vector of tab names to hide. Default hides:
+#'   "Trajectory" and "Facet".
 #' @param defaults A named list of default values. Merged over the module's
 #'   MA defaults (user values win) and used to restore state on reset.
+#'   Group colours are set with `color.up` / `color.down` / `color.ns`, or
+#'   directly with a named `color.panel` vector.
 #' @return The `moduleServer` function for the maPlot module.
 #'
 #' @import shiny
@@ -26,7 +31,7 @@
 #' if (interactive()) maPlotApp()
 #' @export
 #' @author Jared Andrews
-maPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = c("Trajectory", "Facet", "Colors", "Legend/Scale"), defaults = NULL) {
+maPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = c("Trajectory", "Facet"), defaults = NULL) {
     # MA defaults, shared with maPlotInputsUI so the initial state and the reset
     # state match. Computed once from a snapshot of the data.
     ma_defaults <- .ma_defaults(
@@ -34,12 +39,12 @@ maPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = c("Trajectory
         defaults
     )
 
-    # The wrapped scatter server validates its reset defaults as scalars, so
-    # only hand it the scalar scatter inputs it knows about. MA-only keys
-    # (sig.by, thresholds, group colours) and multi-length keys (hover.data)
-    # are reset separately in the observer below.
+    # Hand the wrapped scatter server only the keys it knows about, so its own
+    # reset restores them. MA-only keys (sig.by, the thresholds) and multi-length
+    # keys it does not read (hover.data) are reset separately in the observer
+    # below. `color.panel` is the one non-scalar it does read.
     scatter_default_keys <- c(
-        "x.by", "y.by", "color.by", "x.adj.fxn", "show.others"
+        "x.by", "y.by", "color.by", "x.adj.fxn", "show.others", "color.panel"
     )
     scatter_defaults <- ma_defaults[intersect(scatter_default_keys, names(ma_defaults))]
 
@@ -80,17 +85,6 @@ maPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = c("Trajectory
             dat
         })
 
-        # Use multiColorPicker input for manual colors - reactive so it updates immediately
-        color_reac <- reactive({
-            isolate_fn <- setup_auto_update_logic(input)
-            colors <- isolate_fn(input$ma.colors)
-            if (is.null(colors)) {
-                # Fallback defaults if input not yet initialized
-                colors <- c("Up" = "red", "Down" = "blue", "n.s." = "lightgray")
-            }
-            colors
-        })
-
         # Restore the MA-specific extra inputs when the module's reset button is
         # pressed. The wrapped scatter server resets its own inputs (using
         # ma_defaults, passed below); this handles the controls it does not know
@@ -102,19 +96,26 @@ maPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = c("Trajectory
                 value = VizModules::get_default(ma_defaults, "sig.thresh", 0.05))
             updateNumericInput(session, "fc.thresh",
                 value = VizModules::get_default(ma_defaults, "fc.thresh", 0))
-            VizModules::updateMultiColorPicker(session, "ma.colors",
-                colors = .de_group_colors(ma_defaults))
         })
 
-        list(data = data_reac, colors = color_reac)
+        data_reac
     })
 
-    # Hide the standard color panel since we're using custom controls
-    if (is.null(hide.inputs)) {
-        hide.inputs <- c("color.panel")
-    } else {
-        hide.inputs <- c(hide.inputs, "color.panel")
-    }
+    # The group colours are the wrapped module's own "Color palette" picker,
+    # seeded from scatter_defaults$color.panel, so they stay editable and reset
+    # with everything else. The rest of its Colors tab describes a continuous
+    # scale and contour lines, neither of which an MA plot uses.
+    hide.inputs <- c(
+        hide.inputs,
+        "custom.models", "custom.model.enable",
+        "min.color", "max.color", "contour.color", "contour.linetype"
+    )
 
-    dittoViz_scatterPlotServer(id = id, data = res$data, hide.inputs = c(hide.inputs, "custom.models", "custom.model.enable"), hide.tabs = hide.tabs, manual.colors = res$colors, defaults = scatter_defaults)
+    dittoViz_scatterPlotServer(
+        id = id,
+        data = res,
+        hide.inputs = hide.inputs,
+        hide.tabs = hide.tabs,
+        defaults = scatter_defaults
+    )
 }

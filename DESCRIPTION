@@ -26,23 +26,28 @@ License: MIT + file LICENSE
 Depends:
     R (>= 4.6.0),
     shiny,
-    VizModules (>= 0.4.0)
+    VizModules (>= 0.5.0)
 Imports:
+    colourpicker,
     dittoSeq,
+    DT,
     GenomicRanges,
-    htmltools,
-    htmlwidgets,
+    ggplot2,
     IRanges,
-    jsonlite,
     methods,
+    plotly,
     readxl,
     S4Vectors,
     scales,
     Seqinfo,
+    shinyBS,
     shinyjqui,
+    shinyjs,
     shinyWidgets,
     SingleCellExperiment,
-    SummarizedExperiment
+    stats,
+    SummarizedExperiment,
+    survival
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Suggests:
@@ -53,6 +58,7 @@ Suggests:
     rmarkdown,
     sesame,
     sesameData,
+    survminer,
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3

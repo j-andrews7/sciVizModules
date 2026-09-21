@@ -4,7 +4,7 @@
 
 **sciVizModules** extends VizModules with interactivity-first Shiny modules for scientific analyses and plots. Prefer composition and extension of VizModules over parallel reimplementations of general plotting-module behavior.
 
-**Stack**: R (>= 4.6.0), Shiny, VizModules (>= 0.4.0), plotly, roxygen2 | **Version**: 0.99.0 | **License**: MIT + file LICENSE
+**Stack**: R (>= 4.6.0), Shiny, VizModules (>= 0.5.0), plotly, roxygen2 | **Version**: 0.99.0 | **License**: MIT + file LICENSE
 
 The package targets Bioconductor (see `biocViews` in DESCRIPTION and `BIOCONDUCTOR_SUBMISSION_PLAN.md`), so keep R CMD check clean and follow Bioconductor packaging conventions.
 
@@ -73,7 +73,7 @@ R CMD check --no-build-vignettes sciVizModules_*.tar.gz      # Quick check
 
 ### VizModules Foundation
 
-VizModules is a hard dependency (`Depends: VizModules (>= 0.4.0)`) and the primary foundation for generic interactive plotting, UI organization, downloads, annotations, and module infrastructure.
+VizModules is a hard dependency (`Depends: VizModules (>= 0.5.0)`) and the primary foundation for generic interactive plotting, UI organization, downloads, annotations, and module infrastructure.
 
 - Before building or changing a module, first check whether an existing VizModules module, helper, or wrapper pattern covers the general behavior. Extend it with science-specific defaults, controls, data preparation, annotations, or validation instead of recreating it.
 - Every VizModules plot module follows the shared `*InputsUI(id, ...)`, `*OutputUI(id)`, and `*Server(id, data = reactive(...), ...)` contract. Preserve this contract when wrapping or composing a base module.
@@ -132,7 +132,7 @@ In UI: Use `NS(id)` for wrapper's inputs, pass bare `id` to base module UI funct
 
 ### Dependencies
 
-**Depends**: R (>= 4.6.0), shiny, VizModules (>= 0.4.0)
+**Depends**: R (>= 4.6.0), shiny, VizModules (>= 0.5.0)
 
 **Imports**: dittoSeq, GenomicRanges, htmltools, htmlwidgets, IRanges, jsonlite, methods, readxl, S4Vectors, scales, Seqinfo, shinyjqui, shinyWidgets, SingleCellExperiment, SummarizedExperiment
 
