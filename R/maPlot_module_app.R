@@ -39,7 +39,7 @@
 maPlotApp <- function(data_list = NULL) {
     # Use default example data when none is provided
     if (is.null(data_list)) {
-        data_list <- list("airway_deseq2" = airway_deseq2)
+        data_list <- list("airway_deseq2" = .sci_example_data("airway_deseq2"))
     }
 
     # Validate input

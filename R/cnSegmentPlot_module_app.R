@@ -47,7 +47,7 @@
 #' shifted$bin.signals <- shifted$bin.signals + 0.2
 #' app <- cnSegmentPlotApp(list(Tumor = example_cn_segment, Normal = shifted))
 #' if (interactive()) shiny::runApp(app)
-cnSegmentPlotApp <- function(seg = example_cn_segment,
+cnSegmentPlotApp <- function(seg = .sci_example_data("example_cn_segment"),
                              defaults = NULL,
                              title = "Array Copy Number Segments") {
     seg.list <- .cn_seg_as_list(seg)

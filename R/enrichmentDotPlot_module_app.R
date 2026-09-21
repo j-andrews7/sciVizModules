@@ -39,7 +39,7 @@
 #' if (interactive()) shiny::runApp(app2)
 enrichmentDotPlotApp <- function(data_list = NULL) {
     if (is.null(data_list)) {
-        data_list <- list("example_enrichment" = example_enrichment)
+        data_list <- list("example_enrichment" = .sci_example_data("example_enrichment"))
     }
 
     stopifnot(is.list(data_list), length(data_list) >= 1)

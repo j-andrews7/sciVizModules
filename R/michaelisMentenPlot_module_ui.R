@@ -30,6 +30,7 @@
 #' [sciVizModules::michaelisMentenServer()], [sciVizModules::michaelisMentenApp()]
 #' @examples
 #' library(sciVizModules)
+#' data(mm_kinetics)
 #' michaelisMentenInputsUI("mm", mm_kinetics)
 michaelisMentenInputsUI <- function(id, data, defaults = NULL,
                                     title = "Michaelis-Menten Settings", columns = 2) {

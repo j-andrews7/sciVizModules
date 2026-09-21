@@ -29,7 +29,7 @@
 #' if (interactive()) shiny::runApp(app)
 doseResponseApp <- function(data_list = NULL, defaults = NULL) {
     if (is.null(data_list)) {
-        data_list <- list("dose_response" = dose_response)
+        data_list <- list("dose_response" = .sci_example_data("dose_response"))
     }
 
     stopifnot(is.list(data_list), length(data_list) >= 1)

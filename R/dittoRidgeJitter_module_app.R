@@ -25,7 +25,7 @@
 #' if (interactive()) shiny::runApp(app)
 dittoRidgeJitterApp <- function(object_list = NULL) {
     if (is.null(object_list)) {
-        object_list <- list("example_sce" = example_sce)
+        object_list <- list("example_sce" = .sci_example_data("example_sce"))
     }
     .ditto_module_app(
         inputs_ui_fn = dittoRidgeJitterInputsUI,

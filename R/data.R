@@ -19,7 +19,7 @@
 #' The contrast compares dexamethasone treatment ("trt") vs untreated ("untrt").
 #'
 #' @examples
-#' library(VizModules)
+#' data(airway_deseq2)
 #' head(airway_deseq2)
 #'
 #' @author Jacob Martin
@@ -46,7 +46,7 @@
 #' The contrast compares dexamethasone treatment ("trt") vs untreated ("untrt").
 #'
 #' @examples
-#' library(VizModules)
+#' data(airway_edger)
 #' head(airway_edger)
 #'
 #' @author Jacob Martin
@@ -74,7 +74,7 @@
 #' The contrast compares dexamethasone treatment ("trt") vs untreated ("untrt").
 #'
 #' @examples
-#' library(VizModules)
+#' data(airway_voom)
 #' head(airway_voom)
 #'
 #' @author Jacob Martin
@@ -102,7 +102,7 @@
 #' Cancer Treatment Group).
 #'
 #' @examples
-#' library(sciVizModules)
+#' data(survival_lung)
 #' head(survival_lung)
 #'
 #' @author Jacob Martin
