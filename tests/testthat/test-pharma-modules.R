@@ -77,3 +77,24 @@ test_that("*App() factories return a shiny app object", {
     app2 <- michaelisMentenApp()
     expect_s3_class(app2, "shiny.appobj")
 })
+
+test_that("michaelisMenten applies the Plotly tab's shape styling", {
+    data(mm_kinetics, package = "sciVizModules")
+    data(mm_kinetics_line, package = "sciVizModules")
+
+    shiny::testServer(
+        michaelisMentenServer,
+        args = list(data = shiny::reactive(list(data = mm_kinetics, model = mm_kinetics_line))),
+        expr = {
+            do.call(session$setInputs, c(
+                list(auto.update = TRUE, x = "S", y = "v", download.format = "png"),
+                test_axes_inputs(), test_shape_inputs()
+            ))
+            newshape <- plotly::plotly_build(generate_michaelisMentenPlot())$x$layout$newshape
+            expect_identical(newshape$fillcolor, "#FF0000")
+            expect_identical(newshape$line$color, "#00FF00")
+            expect_identical(newshape$line$dash, "dash")
+            expect_identical(newshape$opacity, 0.5)
+        }
+    )
+})

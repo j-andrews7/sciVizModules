@@ -187,6 +187,7 @@ michaelisMentenServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL
                 include.modebar.buttons = TRUE, facet.by = NULL
             )
             fig <- do.call(config, c(list(p = fig), config_list))
+            fig <- apply_plotly_newshape(fig, input, isolate_fn)
             fig <- axis_titles_as_annotations(fig)
             fig
         })

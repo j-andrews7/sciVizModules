@@ -138,7 +138,8 @@ goFanPlotInputsUI <- function(id, data, defaults = NULL, title = "GO Sunburst Se
                 "Replace missing values in the colour column with 0.",
                 placement = "top", options = list(container = "body"))
         ),
-        "Plotly" = uniform_plotly_inputs_ui(ns, defaults)
+        # A sunburst has no cartesian axes, which plotly's drawing tools need.
+        "Plotly" = uniform_plotly_inputs_ui(ns, defaults, include.shapes = FALSE)
     )
 
     organize_inputs(

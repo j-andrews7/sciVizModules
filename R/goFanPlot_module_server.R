@@ -93,11 +93,12 @@ goFanPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defa
 
             # Apply the generic (non-cartesian) plotly styling: title and export
             # config. Axis/legend/reference-line controls do not apply to a
-            # radial sunburst layout and are intentionally omitted.
+            # radial sunburst layout and are intentionally omitted, as are the
+            # shape-drawing modebar buttons, which need cartesian axes.
             fig <- VizModules::apply_title_layout(fig, input, isolate_fn, title_y = 0.95, title_x = 0.5)
             config_list <- add_plot_config(
                 download.format = isolate_fn(input$download.format),
-                include.modebar.buttons = TRUE, facet.by = NULL
+                include.modebar.buttons = FALSE, facet.by = NULL
             )
             fig <- do.call(config, c(list(p = fig), config_list))
             fig

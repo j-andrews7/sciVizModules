@@ -285,6 +285,7 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             )
 
             fig <- do.call(config, c(list(p = fig), config_list))
+            fig <- apply_plotly_newshape(fig, input, isolate_fn)
 
             # A stacked plot is multi-panel, so ggplotly already renders its
             # shared axis titles as annotations (which axis_titles_as_annotations()

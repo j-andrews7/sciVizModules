@@ -51,3 +51,28 @@ test_that("example_sce has the expected structure", {
     expect_true(all(c("clustering", "condition", "sample", "nCount") %in% colnames(cd)))
     expect_true(length(SingleCellExperiment::reducedDimNames(example_sce)) >= 1)
 })
+
+test_that("every Legend tab control reaches the figure", {
+    data(example_sce, package = "sciVizModules")
+    for (m in ditto_modules) {
+        html <- as.character(get(paste0(m, "InputsUI"))("test", example_sce))
+        for (key in names(test_legend_inputs())) {
+            expect_true(grepl(paste0("test-", key), html, fixed = TRUE), info = paste(m, key))
+        }
+    }
+
+    gg <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg, colour = factor(cyl))) +
+        ggplot2::geom_point()
+    input <- c(test_axes_inputs(), test_legend_inputs(), list(download.format = "svg"))
+    built <- plotly::plotly_build(.ditto_finalize_plotly(plotly::ggplotly(gg), input, identity))
+
+    expect_false(built$x$layout$showlegend)
+    expect_identical(built$x$layout$legend$font$family, "Courier New")
+    expect_identical(built$x$layout$legend$font$color, "#123456")
+    expect_identical(built$x$layout$legend$font$size, 11)
+    expect_identical(built$x$layout$legend$xanchor, "left")
+
+    input$legend.show <- TRUE
+    built <- plotly::plotly_build(.ditto_finalize_plotly(plotly::ggplotly(gg), input, identity))
+    expect_true(built$x$layout$showlegend)
+})

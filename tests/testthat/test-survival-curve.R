@@ -95,3 +95,24 @@ test_that("survivalCurve() builds a plotly figure", {
     fig <- survivalCurve(survival_lung, time = "time", status = "status", group.by = "sex")
     expect_s3_class(fig, "plotly")
 })
+
+test_that("the server applies every Legend tab control", {
+    skip_if_not_installed("survminer")
+    data(survival_lung, package = "sciVizModules")
+
+    shiny::testServer(
+        survivalCurveServer,
+        args = list(data = shiny::reactive(survival_lung)),
+        expr = {
+            do.call(session$setInputs, c(
+                list(auto.update = TRUE, time = "time", status = "status", group.by = "sex",
+                     download.format = "png"),
+                test_axes_inputs(), test_legend_inputs()
+            ))
+            built <- plotly::plotly_build(generate_survivalCurve())
+            expect_false(built$x$layout$showlegend)
+            expect_identical(built$x$layout$legend$font$family, "Courier New")
+            expect_identical(built$x$layout$legend$font$color, "#123456")
+        }
+    )
+})

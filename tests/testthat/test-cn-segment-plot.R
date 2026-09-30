@@ -207,13 +207,13 @@ test_that(".cn_seg_shared_seqlengths rejects mismatched genome builds", {
     seg.list <- .cn_seg_as_list(list(A = example_cn_segment, B = example_cn_segment))
     expect_identical(
         .cn_seg_shared_seqlengths(seg.list),
-        GenomeInfoDb::seqlengths(GenomeInfoDb::seqinfo(example_cn_segment$bin.coords))
+        Seqinfo::seqlengths(Seqinfo::seqinfo(example_cn_segment$bin.coords))
     )
 
     other <- example_cn_segment
-    lens <- GenomeInfoDb::seqlengths(other$bin.coords)
+    lens <- Seqinfo::seqlengths(other$bin.coords)
     lens["chr1"] <- lens[["chr1"]] + 1000L
-    GenomeInfoDb::seqlengths(other$bin.coords) <- lens
+    Seqinfo::seqlengths(other$bin.coords) <- lens
 
     expect_error(
         .cn_seg_shared_seqlengths(.cn_seg_as_list(list(A = example_cn_segment, B = other))),

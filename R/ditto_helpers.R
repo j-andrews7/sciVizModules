@@ -332,7 +332,10 @@ get_default_reduction <- function(object) {
         fig,
         title.size = isolate_fn(input$legend.title.size),
         text.size = isolate_fn(input$legend.text.size),
-        position = c(1.02, "left", "v")
+        position = c(1.02, "left"),
+        font.family = isolate_fn(input$legend.font.family),
+        font.color = isolate_fn(input$legend.font.color),
+        show = isolate_fn(input$legend.show)
     )
     fig <- axis_titles_as_annotations(fig)
     fig
