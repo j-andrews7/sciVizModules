@@ -280,13 +280,17 @@ get_default_reduction <- function(object) {
 #' @param input The Shiny module `input` object.
 #' @param isolate_fn The isolation helper returned by
 #'   [VizModules::setup_auto_update_logic()].
+#' @param faceted Logical, whether the figure is split into panels (`split.by`
+#'   is set, or the plot always facets). A faceted figure titles each panel, so
+#'   its main title is not editable in place, and its shared axis titles and
+#'   panel titles are annotations styled from the Axes tab.
 #' @return The styled `plotly` figure.
 #'
 #' @import plotly
 #' @author Jacob Martin, Jared Andrews
 #' @rdname INTERNAL_ditto_finalize_plotly
 #' @keywords internal
-.ditto_finalize_plotly <- function(fig, input, isolate_fn) {
+.ditto_finalize_plotly <- function(fig, input, isolate_fn, faceted = FALSE) {
     fig <- VizModules::apply_title_layout(
         fig, input, isolate_fn,
         title_y = 0.95,
@@ -301,6 +305,9 @@ get_default_reduction <- function(object) {
         axis_side = "y", isolate_fn = isolate_fn, ggplot.axis.styling = FALSE
     )
     fig <- VizModules::apply_subplot_axis_styling(fig, xaxis_style, yaxis_style)
+    if (isTRUE(faceted)) {
+        fig <- apply_axis_title_to_annotations(fig, input, isolate_fn)
+    }
 
     fig <- VizModules::add_reference_lines(fig,
         hline.intercepts = isolate_fn(input$hline.intercepts),
@@ -323,7 +330,7 @@ get_default_reduction <- function(object) {
 
     config_list <- add_plot_config(
         download.format = isolate_fn(input$download.format),
-        include.modebar.buttons = TRUE, facet.by = NULL
+        include.modebar.buttons = TRUE, facet.by = isTRUE(faceted)
     )
     fig <- do.call(config, c(list(p = fig), config_list))
     fig <- apply_plotly_newshape(fig, input, isolate_fn)
@@ -340,6 +347,37 @@ get_default_reduction <- function(object) {
     fig <- axis_titles_as_annotations(fig)
     fig
 }
+
+#' Match the title inputs to whether a dittoSeq plot is faceted
+#'
+#' A faceted plot titles each panel and has no editable main title, so the
+#' facet title inputs are shown and the main title inputs hidden. An unfaceted
+#' plot is the reverse. Mirrors how the VizModules faceting modules (e.g.
+#' [VizModules::dittoViz_scatterPlotServer()]) respond to `split.by`.
+#'
+#' @param session The Shiny module session.
+#' @param faceted Logical, whether the plot is currently faceted.
+#' @param hidden Input IDs the app hid via `hide.inputs`, which are never shown
+#'   again here.
+#' @return Invisibly `NULL`. Called for its side effect.
+#'
+#' @author Jared Andrews
+#' @rdname INTERNAL_ditto_toggle_facet_titles
+#' @keywords internal
+.ditto_toggle_facet_titles <- function(session, faceted, hidden = NULL) {
+    facet_ids <- c("facet.title.font.size", "facet.title.font.color", "facet.title.font.family")
+    main_ids <- .ditto_main_title_input_ids
+
+    shown <- if (isTRUE(faceted)) facet_ids else main_ids
+    hide_input(session, if (isTRUE(faceted)) main_ids else facet_ids)
+    show_input(session, setdiff(shown, hidden))
+    invisible(NULL)
+}
+
+# Inputs styling the main plot title, which a faceted plot does not draw.
+.ditto_main_title_input_ids <- c(
+    "title.font.family", "title.font.color", "title.font.size", "axis.title.horizontal.position"
+)
 
 #' Build the module reset handler shared by dittoSeq modules
 #'

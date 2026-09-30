@@ -37,7 +37,8 @@ dittoFreqPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
 
         ns <- session$ns
 
-        hide_input(session, hide.inputs)
+        # dittoFreqPlot always facets by var level, so there is no main title to style.
+        hide_input(session, c(hide.inputs, .ditto_main_title_input_ids))
         if (!is.null(hide.tabs)) {
             for (tab.name in hide.tabs) hideTab(inputId = "dittoFreqPlotTabsetPanel", target = tab.name)
         }
@@ -169,7 +170,7 @@ dittoFreqPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             )
 
             fig <- plotly::ggplotly(gg)
-            .ditto_finalize_plotly(fig, input, isolate_fn)
+            .ditto_finalize_plotly(fig, input, isolate_fn, faceted = TRUE)
         })
 
         output$dittoFreqPlot <- renderPlotly({

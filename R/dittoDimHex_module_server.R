@@ -67,6 +67,11 @@ dittoDimHexServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, de
             .ditto_reset_uniform(session, defaults)
         })
 
+        observeEvent(input$split.by, {
+            split.set <- !is.null(input$split.by) && any(nzchar(input$split.by))
+            .ditto_toggle_facet_titles(session, split.set, hidden = hide.inputs)
+        }, ignoreNULL = FALSE)
+
         generate_dittoDimHex <- reactive({
             isolate_fn <- setup_auto_update_logic(input, params)
 
@@ -116,7 +121,7 @@ dittoDimHexServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, de
             )
 
             fig <- plotly::ggplotly(gg)
-            .ditto_finalize_plotly(fig, input, isolate_fn)
+            .ditto_finalize_plotly(fig, input, isolate_fn, faceted = !is.null(split.by))
         })
 
         output$dittoDimHex <- renderPlotly({

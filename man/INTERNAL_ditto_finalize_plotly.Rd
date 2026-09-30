@@ -4,7 +4,7 @@
 \alias{.ditto_finalize_plotly}
 \title{Apply the shared VizModules plotly styling stack to a dittoSeq figure}
 \usage{
-.ditto_finalize_plotly(fig, input, isolate_fn)
+.ditto_finalize_plotly(fig, input, isolate_fn, faceted = FALSE)
 }
 \arguments{
 \item{fig}{A \code{plotly} figure (typically from \code{\link[plotly:ggplotly]{plotly::ggplotly()}}).}
@@ -13,6 +13,11 @@
 
 \item{isolate_fn}{The isolation helper returned by
 \code{\link[VizModules:setup_auto_update_logic]{VizModules::setup_auto_update_logic()}}.}
+
+\item{faceted}{Logical, whether the figure is split into panels (\code{split.by}
+is set, or the plot always facets). A faceted figure titles each panel, so
+its main title is not editable in place, and its shared axis titles and
+panel titles are annotations styled from the Axes tab.}
 }
 \value{
 The styled \code{plotly} figure.

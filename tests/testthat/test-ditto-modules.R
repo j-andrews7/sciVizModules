@@ -76,3 +76,98 @@ test_that("every Legend tab control reaches the figure", {
     built <- plotly::plotly_build(.ditto_finalize_plotly(plotly::ggplotly(gg), input, identity))
     expect_true(built$x$layout$showlegend)
 })
+
+test_that("a faceted figure styles its panel and axis titles and drops the editable main title", {
+    gg <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg)) +
+        ggplot2::geom_point() +
+        ggplot2::facet_wrap(~cyl)
+    input <- c(
+        test_axes_inputs(), test_legend_inputs(),
+        list(
+            download.format = "svg", facet.title.font.size = 21,
+            facet.title.font.color = "#654321", facet.title.font.family = "Courier New"
+        )
+    )
+
+    built <- plotly::plotly_build(.ditto_finalize_plotly(plotly::ggplotly(gg), input, identity, faceted = TRUE))
+    expect_false(built$x$config$edits$titleText)
+    annos <- built$x$layout$annotations
+    is_axis <- vapply(annos, function(a) identical(a$annotationType, "axis"), logical(1))
+    is_panel <- vapply(annos, function(a) is.null(a$annotationType) && identical(a$xanchor, "center"), logical(1))
+    expect_true(any(is_axis))
+    expect_true(any(is_panel))
+    for (a in annos[is_axis]) expect_identical(a$font$size, 14)
+    for (a in annos[is_panel]) {
+        expect_identical(a$font$size, 21)
+        expect_identical(a$font$color, "#654321")
+        expect_identical(a$font$family, "Courier New")
+    }
+
+    built <- plotly::plotly_build(.ditto_finalize_plotly(plotly::ggplotly(gg), input, identity))
+    expect_true(built$x$config$edits$titleText)
+})
+
+test_that("the title inputs follow whether the plot is faceted", {
+    calls <- list()
+    local_mocked_bindings(
+        hide_input = function(session, ids) calls$hidden <<- ids,
+        show_input = function(session, ids) calls$shown <<- ids
+    )
+    facet_ids <- c("facet.title.font.size", "facet.title.font.color", "facet.title.font.family")
+
+    .ditto_toggle_facet_titles(NULL, TRUE, hidden = "facet.title.font.color")
+    expect_identical(calls$hidden, .ditto_main_title_input_ids)
+    expect_identical(calls$shown, setdiff(facet_ids, "facet.title.font.color"))
+
+    .ditto_toggle_facet_titles(NULL, FALSE, hidden = "title.font.size")
+    expect_identical(calls$hidden, facet_ids)
+    expect_identical(calls$shown, setdiff(.ditto_main_title_input_ids, "title.font.size"))
+})
+
+test_that("split.by makes a dittoSeq module figure faceted", {
+    skip_if_not_installed("dittoSeq")
+    data(example_sce, package = "sciVizModules")
+
+    shiny::testServer(
+        dittoDimPlotServer,
+        args = list(data = shiny::reactive(example_sce)),
+        expr = {
+            do.call(session$setInputs, c(
+                list(
+                    auto.update = TRUE, var = "clustering", download.format = "png",
+                    reduction.use = SingleCellExperiment::reducedDimNames(example_sce)[1],
+                    dim.1 = 1, dim.2 = 2, size = 1, opacity = 1, order = "unordered",
+                    do.label = FALSE, do.ellipse = FALSE, do.contour = FALSE, labels.size = 5,
+                    min.color = "#F0E442", max.color = "#0072B2", split.by = ""
+                ),
+                test_axes_inputs(), test_legend_inputs()
+            ))
+            expect_true(plotly::plotly_build(generate_dittoDimPlot())$x$config$edits$titleText)
+
+            session$setInputs(split.by = "condition")
+            expect_false(plotly::plotly_build(generate_dittoDimPlot())$x$config$edits$titleText)
+        }
+    )
+})
+
+test_that("dittoFreqPlot, which always facets by var level, finishes as a faceted figure", {
+    skip_if_not_installed("dittoSeq")
+    data(example_sce, package = "sciVizModules")
+
+    shiny::testServer(
+        dittoFreqPlotServer,
+        args = list(data = shiny::reactive(example_sce)),
+        expr = {
+            do.call(session$setInputs, c(
+                list(
+                    auto.update = TRUE, var = "clustering", group.by = "condition", sample.by = "sample",
+                    color.by = "", plots = c("boxplot", "jitter"), scale = "percent", max.normalize = FALSE,
+                    jitter.size = 1, jitter.width = 0.2, jitter.color = "black", boxplot.width = 0.4,
+                    vlnplot.width = 1, download.format = "png"
+                ),
+                test_axes_inputs(), test_legend_inputs()
+            ))
+            expect_false(plotly::plotly_build(generate_dittoFreqPlot())$x$config$edits$titleText)
+        }
+    )
+})
