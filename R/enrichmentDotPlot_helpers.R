@@ -165,7 +165,7 @@
 #' @param mapping The mapping list produced by [.prepare_enrichment()].
 #' @return A named list of defaults keyed by DotPlot UI input IDs.
 #'
-#' @author Jacob Martin
+#' @author Jacob Martin, Jared Andrews
 #' @rdname INTERNAL_enrich_defaults
 #' @keywords internal
 .enrich_defaults <- function(defaults, mapping) {
