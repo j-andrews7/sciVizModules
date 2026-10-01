@@ -76,7 +76,7 @@ dittoRidgeJitterServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
             }
             initial_colors <- isolate(resolve_palette(
                 groups, input$palette.colours, default_palette_values,
-                .sci_group_colors(defaults)
+                VizModules::default_group_colors(defaults, "palette.colours")
             ))
             # Seed the store with what the picker is built from, so its first
             # report back is a no-op rather than a change.
@@ -111,7 +111,7 @@ dittoRidgeJitterServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
 
         observeEvent(input$split.by, {
             split.set <- !is.null(input$split.by) && any(nzchar(input$split.by))
-            .ditto_toggle_facet_titles(session, split.set, hidden = hide.inputs)
+            VizModules::toggle_facet_title_inputs(session, split.set, hidden = hide.inputs)
         }, ignoreNULL = FALSE)
 
         generate_dittoRidgeJitter <- reactive({
@@ -134,7 +134,7 @@ dittoRidgeJitterServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
             if (length(groups) > 0) {
                 palette_values <- resolve_palette(
                     groups, isolate_fn(palette_store()), default_palette_values,
-                    .sci_group_colors(defaults)
+                    VizModules::default_group_colors(defaults, "palette.colours")
                 )
                 color.panel <- unname(palette_values[groups])
             }

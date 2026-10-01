@@ -75,7 +75,7 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             groups <- palette_groups()
             initial_colors <- isolate(resolve_palette(
                 groups, input$palette.colours, default_palette_values,
-                .sci_group_colors(defaults)
+                VizModules::default_group_colors(defaults, "palette.colours")
             ))
             # Seed the store with what the picker is built from, so its first
             # report back is a no-op rather than a change.
@@ -135,7 +135,7 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             groups <- isolate_fn(palette_groups())
             palette_values <- resolve_palette(
                 groups, isolate_fn(palette_store()), default_palette_values,
-                .sci_group_colors(defaults)
+                VizModules::default_group_colors(defaults, "palette.colours")
             )
 
             break.time.by <- isolate_fn(input$break.time.by)

@@ -20,7 +20,7 @@ Developed by [Jared Andrews](https://github.com/j-andrews7) and [Jacob Martin](h
 
 Note that this package is in development and may break at any time.
 
-VizModules 0.5.0 or newer must be installed first:
+VizModules 0.6.0 or newer must be installed first:
 
 ```r
 install.packages("VizModules")

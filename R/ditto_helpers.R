@@ -348,37 +348,6 @@ get_default_reduction <- function(object) {
     fig
 }
 
-#' Match the title inputs to whether a dittoSeq plot is faceted
-#'
-#' A faceted plot titles each panel and has no editable main title, so the
-#' facet title inputs are shown and the main title inputs hidden. An unfaceted
-#' plot is the reverse. Mirrors how the VizModules faceting modules (e.g.
-#' [VizModules::dittoViz_scatterPlotServer()]) respond to `split.by`.
-#'
-#' @param session The Shiny module session.
-#' @param faceted Logical, whether the plot is currently faceted.
-#' @param hidden Input IDs the app hid via `hide.inputs`, which are never shown
-#'   again here.
-#' @return Invisibly `NULL`. Called for its side effect.
-#'
-#' @author Jared Andrews
-#' @rdname INTERNAL_ditto_toggle_facet_titles
-#' @keywords internal
-.ditto_toggle_facet_titles <- function(session, faceted, hidden = NULL) {
-    facet_ids <- c("facet.title.font.size", "facet.title.font.color", "facet.title.font.family")
-    main_ids <- .ditto_main_title_input_ids
-
-    shown <- if (isTRUE(faceted)) facet_ids else main_ids
-    hide_input(session, if (isTRUE(faceted)) main_ids else facet_ids)
-    show_input(session, setdiff(shown, hidden))
-    invisible(NULL)
-}
-
-# Inputs styling the main plot title, which a faceted plot does not draw.
-.ditto_main_title_input_ids <- c(
-    "title.font.family", "title.font.color", "title.font.size", "axis.title.horizontal.position"
-)
-
 #' Build the module reset handler shared by dittoSeq modules
 #'
 #' Resets the uniform Plotly/Axes/Legend/Lines tabs to their defaults. Individual

@@ -107,23 +107,6 @@ test_that("a faceted figure styles its panel and axis titles and drops the edita
     expect_true(built$x$config$edits$titleText)
 })
 
-test_that("the title inputs follow whether the plot is faceted", {
-    calls <- list()
-    local_mocked_bindings(
-        hide_input = function(session, ids) calls$hidden <<- ids,
-        show_input = function(session, ids) calls$shown <<- ids
-    )
-    facet_ids <- c("facet.title.font.size", "facet.title.font.color", "facet.title.font.family")
-
-    .ditto_toggle_facet_titles(NULL, TRUE, hidden = "facet.title.font.color")
-    expect_identical(calls$hidden, .ditto_main_title_input_ids)
-    expect_identical(calls$shown, setdiff(facet_ids, "facet.title.font.color"))
-
-    .ditto_toggle_facet_titles(NULL, FALSE, hidden = "title.font.size")
-    expect_identical(calls$hidden, facet_ids)
-    expect_identical(calls$shown, setdiff(.ditto_main_title_input_ids, "title.font.size"))
-})
-
 test_that("split.by makes a dittoSeq module figure faceted", {
     skip_if_not_installed("dittoSeq")
     data(example_sce, package = "sciVizModules")

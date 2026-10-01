@@ -69,7 +69,7 @@ dittoDimHexServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, de
 
         observeEvent(input$split.by, {
             split.set <- !is.null(input$split.by) && any(nzchar(input$split.by))
-            .ditto_toggle_facet_titles(session, split.set, hidden = hide.inputs)
+            VizModules::toggle_facet_title_inputs(session, split.set, hidden = hide.inputs)
         }, ignoreNULL = FALSE)
 
         generate_dittoDimHex <- reactive({

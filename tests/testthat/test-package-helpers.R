@@ -27,33 +27,6 @@ test_that("every *App() default dataset resolves", {
     }
 })
 
-test_that(".sci_group_colors accepts only a named character mapping", {
-    expect_null(.sci_group_colors(NULL))
-    expect_null(.sci_group_colors(list()))
-    # Unnamed, non-character, and partially named vectors are all rejected.
-    expect_null(.sci_group_colors(list(palette.colours = c("red", "blue"))))
-    expect_null(.sci_group_colors(list(palette.colours = c(A = 1, B = 2))))
-    expect_null(.sci_group_colors(list(palette.colours = c(A = "red", "blue"))))
-})
-
-test_that(".sci_group_colors normalizes colour names to hex", {
-    out <- .sci_group_colors(list(palette.colours = c(Up = "red", Down = "#0000FF")))
-    expect_identical(names(out), c("Up", "Down"))
-    expect_identical(unname(out[["Up"]]), "#FF0000")
-    expect_identical(unname(out[["Down"]]), "#0000FF")
-})
-
-test_that(".sci_group_colors reads the requested key and drops unusable entries", {
-    defaults <- list(
-        palette.colours = c(A = "black"),
-        volcano = c(Up = "not-a-colour", Down = "green")
-    )
-    expect_identical(unname(.sci_group_colors(defaults)[["A"]]), "#000000")
-
-    out <- .sci_group_colors(defaults, "volcano")
-    expect_identical(names(out), "Down")
-})
-
 test_that(".sci_debounced_input defaults to a 700ms delay", {
     # 700ms matches what VizModules uses for the ComplexHeatmap filter inputs.
     args <- formals(.sci_debounced_input)

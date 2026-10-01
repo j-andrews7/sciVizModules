@@ -77,7 +77,7 @@ dittoFreqPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             }
             initial_colors <- isolate(resolve_palette(
                 groups, input$palette.colours, default_palette_values,
-                .sci_group_colors(defaults)
+                VizModules::default_group_colors(defaults, "palette.colours")
             ))
             # Seed the store with what the picker is built from, so its first
             # report back is a no-op rather than a change.
@@ -137,7 +137,7 @@ dittoFreqPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             if (length(groups) > 0) {
                 palette_values <- resolve_palette(
                     groups, isolate_fn(palette_store()), default_palette_values,
-                    .sci_group_colors(defaults)
+                    VizModules::default_group_colors(defaults, "palette.colours")
                 )
                 color.panel <- unname(palette_values[groups])
             }

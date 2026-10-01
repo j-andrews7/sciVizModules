@@ -4,13 +4,13 @@
 
 **sciVizModules** extends VizModules with interactivity-first Shiny modules for scientific analyses and plots. Prefer composition and extension of VizModules over parallel reimplementations of general plotting-module behavior.
 
-**Stack**: R (>= 4.6.0), Shiny, VizModules (>= 0.5.0), plotly, roxygen2 | **Version**: 0.99.0 | **License**: MIT + file LICENSE
+**Stack**: R (>= 4.6.0), Shiny, VizModules (>= 0.6.0), plotly, roxygen2 | **Version**: 0.99.0 | **License**: MIT + file LICENSE
 
 The package targets Bioconductor (see `biocViews` in DESCRIPTION and `BIOCONDUCTOR_SUBMISSION_PLAN.md`), so keep R CMD check clean and follow Bioconductor packaging conventions.
 
 ## Repository Structure
 
-- **R/** - source files: `*_module_ui.R` (UI), `*_module_server.R` (logic), `*_module_app.R` (examples), plus `*_helpers.R` and standalone plot functions. Package-wide helpers live in `example_data.R`, `input_helpers.R`, `palette_helpers.R` and `figure_builder_registry.R`
+- **R/** - source files: `*_module_ui.R` (UI), `*_module_server.R` (logic), `*_module_app.R` (examples), plus `*_helpers.R` and standalone plot functions. Package-wide helpers live in `example_data.R`, `input_helpers.R` and `figure_builder_registry.R`
 - **man/** - Auto-generated roxygen2 docs
 - **data/** - example datasets used by tests, examples, and vignettes. `DESCRIPTION` sets no `LazyData`, so package code reaches them through `.sci_example_data()`, never by bare name
 - **data-raw/** - scripts that build the example datasets
@@ -76,7 +76,7 @@ R CMD check --no-build-vignettes sciVizModules_*.tar.gz      # Quick check
 
 ### VizModules Foundation
 
-VizModules is a hard dependency (`Depends: VizModules (>= 0.5.0)`) and the primary foundation for generic interactive plotting, UI organization, downloads, annotations, and module infrastructure.
+VizModules is a hard dependency (`Depends: VizModules (>= 0.6.0)`) and the primary foundation for generic interactive plotting, UI organization, downloads, annotations, and module infrastructure.
 
 - Before building or changing a module, first check whether an existing VizModules module, helper, or wrapper pattern covers the general behavior. Extend it with science-specific defaults, controls, data preparation, annotations, or validation instead of recreating it.
 - Every VizModules plot module follows the shared `*InputsUI(id, ...)`, `*OutputUI(id)`, and `*Server(id, data = reactive(...), ...)` contract. Preserve this contract when wrapping or composing a base module.
@@ -84,7 +84,7 @@ VizModules is a hard dependency (`Depends: VizModules (>= 0.5.0)`) and the prima
 - Prefer documented VizModules arguments and helpers over local replacements. Commonly useful ones, grouped by what they do:
   - **Inputs and layout**: `organize_inputs()`, `module_tack_ui()`, `hide_input()` / `show_input()` / `toggle_input_cell()`, `viz_select_input()` / `update_viz_select()`, `multiColorPicker()` / `updateMultiColorPicker()`, `multiDynamicInput()` / `updateMultiDynamicInput()`, and the uniform input blocks (`uniform_axes_inputs_ui()`, `uniform_legend_inputs_ui()`, `uniform_lines_inputs_ui()`, `uniform_plotly_inputs_ui()`, `uniform_annotation_inputs_ui()`) with their reset counterparts (`reset_axes_inputs()`, `reset_legend_inputs()`, `reset_lines_inputs()`, `reset_plotly_inputs()`, `reset_annotation_inputs()`).
   - **Defaults and server-side stores**: `get_default()`, `setup_reactive_defaults()`, `setup_auto_update_logic()`, `setup_group_colors()`, `setup_axis_range()`, `resolve_palette()`, `setup_manual_edits()` / `finalize_manual_edits()`. See "Avoiding Double Renders" below.
-  - **Plot finishing**: `apply_title_layout()`, `create_axis_styles()`, `apply_subplot_axis_styling()`, `axis_titles_as_annotations()`, `apply_axis_title_to_annotations()`, `reset_axis_title_text()`, `add_reference_lines()`, `add_plot_config()`, `apply_plotly_newshape()`, `apply_render_margins()`, `apply_legend_styling()` / `apply_legend_inputs()`, `empty_plot()`. A module that renders `uniform_legend_inputs_ui()` must apply all of it (`legend.show`, `legend.font.family`, `legend.font.color` and the two sizes), and one that renders the shape controls of `uniform_plotly_inputs_ui()` must call `apply_plotly_newshape()`; a plot without cartesian axes passes `include.shapes = FALSE` and `include.modebar.buttons = FALSE` instead. A figure split into panels (e.g. by `split.by`) passes `facet.by` to `add_plot_config()`, which drops the editable main title, styles its shared axis and panel titles with `apply_axis_title_to_annotations()`, and swaps the main title inputs for the `facet.title.*` ones as the split changes (`.ditto_toggle_facet_titles()`).
+  - **Plot finishing**: `apply_title_layout()`, `create_axis_styles()`, `apply_subplot_axis_styling()`, `axis_titles_as_annotations()`, `apply_axis_title_to_annotations()`, `reset_axis_title_text()`, `add_reference_lines()`, `add_plot_config()`, `apply_plotly_newshape()`, `apply_render_margins()`, `apply_legend_styling()` / `apply_legend_inputs()`, `empty_plot()`. A module that renders `uniform_legend_inputs_ui()` must apply all of it (`legend.show`, `legend.font.family`, `legend.font.color` and the two sizes), and one that renders the shape controls of `uniform_plotly_inputs_ui()` must call `apply_plotly_newshape()`; a plot without cartesian axes passes `include.shapes = FALSE` and `include.modebar.buttons = FALSE` instead. A figure split into panels (e.g. by `split.by`) passes `facet.by` to `add_plot_config()`, which drops the editable main title, styles its shared axis and panel titles with `apply_axis_title_to_annotations()`, and swaps the main title inputs for the `facet.title.*` ones as the split changes (`VizModules::toggle_facet_title_inputs()`).
   - **Statistics**: `compute_pairwise_stats()`, `create_stat_annotations()`, `apply_stat_annotations()`, `stat_bracket_y_max()`, `generate_pair_strings()` / `parse_pair_strings()`.
   - **Export**: `collect_source_data()`, `create_source_download_handler()`, `draw_to_svg()` / `draw_to_png()`.
   - **Data tables and expressions**: `dataFilterUI()` / `dataFilterServer()`, `resolve_column_targets()`, `safe_eval_filter()` / `validate_expression()`.
@@ -139,8 +139,8 @@ rebuilds twice per change - cheap on a toy dataset, painful on a real one.
    `setup_axis_range()` for y-limit controls (seed it beside **every**
    `update*Input()` that sets them).
 
-`.sci_group_colors()` in `R/palette_helpers.R` validates a caller-supplied
-mapping before it reaches `resolve_palette()`'s `manual_colors` argument.
+`VizModules::default_group_colors()` validates a caller-supplied mapping before
+it reaches `resolve_palette()`'s `manual_colors` argument.
 
 ### Debouncing Free Text
 
@@ -209,7 +209,7 @@ In UI: Use `NS(id)` for wrapper's inputs, pass bare `id` to base module UI funct
 
 ### Dependencies
 
-**Depends**: R (>= 4.6.0), shiny, VizModules (>= 0.5.0)
+**Depends**: R (>= 4.6.0), shiny, VizModules (>= 0.6.0)
 
 **Imports**: colourpicker, dittoSeq, DT, GenomicRanges, ggplot2, grDevices, IRanges, methods, plotly, readxl, S4Vectors, scales, Seqinfo, shinyBS, shinyjqui, shinyjs, shinyWidgets, SingleCellExperiment, stats, SummarizedExperiment, survival
 
