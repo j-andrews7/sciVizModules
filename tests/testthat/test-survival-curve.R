@@ -13,12 +13,6 @@ test_that("all survivalCurve functions are exported", {
     }
 })
 
-test_that(".sv_default returns the stored value or the fallback", {
-    expect_identical(.sv_default(list(time = "days"), "time", "x"), "days")
-    expect_identical(.sv_default(list(), "time", "x"), "x")
-    expect_null(.sv_default(NULL, "time"))
-})
-
 test_that(".detect_time_col prefers an exact 'time' match", {
     df <- data.frame(age = 1, time = 2, surv_months = 3)
     num <- names(df)

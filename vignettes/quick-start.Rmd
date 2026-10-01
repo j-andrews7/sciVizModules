@@ -59,15 +59,27 @@ Code, GitHub Copilot, OpenAI Codex) will discover them:
 VizModules::use_vizmodules_skills(".", client = "claude")  # or "agents" / "copilot"
 ```
 
-- `vizmodules-app` covers wiring modules into an app, and carries a generated
-  inventory of every VizModules module's column-mapping keys, colour key and tab
-  names.
-- `vizmodules-custom-module` covers wrapping and extending a base module, which
-  is what most of sciVizModules does.
-- `vizmodules-new-module` covers authoring a module inside VizModules itself.
+Point your agent at the one that matches the job:
 
-`AGENTS.md` in the sciVizModules repository covers the conventions specific to
-this package on top of those.
+- **Putting sciVizModules modules into an app** (`defaults`, `hide.inputs` /
+  `hide.tabs`, `createModuleApp()`, the data filter, the Figure Builder,
+  source-data export): `vizmodules-app`. It also carries a generated inventory
+  of every VizModules module's column-mapping keys, colour key and tab names,
+  which the wrapper modules here inherit.
+- **Building your own module on top of one of these, or of a VizModules base
+  module** (adding inputs, transforming the data before it is plotted, driving
+  the wrapped module's parameters): `vizmodules-custom-module`. Most of
+  sciVizModules is built exactly this way, so its modules are good worked
+  examples.
+- **Writing a module from scratch around your own plotting function**:
+  `vizmodules-custom-module` for the Shiny wiring, plus `vizmodules-new-module`
+  for the full `*InputsUI()` / `*OutputUI()` / `*Server()` / `*App()` layout,
+  documentation and tests. The latter is written for contributions to
+  VizModules itself, but the structure carries over.
+
+The skills are copied from your installed VizModules, so re-run the call with
+`overwrite = TRUE` after upgrading it. `AGENTS.md` in the sciVizModules
+repository covers the conventions specific to this package on top of those.
 
 ## The module gallery
 
@@ -118,6 +130,12 @@ if (interactive()) volcanoPlotApp()     # differential expression, airway_deseq2
 if (interactive()) dittoDimPlotApp()    # single-cell reduction, example_sce
 if (interactive()) doseResponseApp()    # pharmacology, dose_response
 if (interactive()) cnSegmentPlotApp()   # copy number, example_cn_segment
+if (interactive()) forestPlotApp()      # Cox / logistic / linear model, survival_lung
+if (interactive()) pcaBiplotApp()       # PCAtools pca object, example_pca
+if (interactive()) alphafoldConfidenceApp() # AlphaFold DB prediction for p53
+if (interactive()) manhattanPlotApp()   # GWAS summary statistics, example_gwas
+if (interactive()) gseaEnrichmentPlotApp() # fgsea example ranks and pathways
+if (interactive()) crisprScreenRankApp() # simulated MAGeCK gene summary
 ```
 
 ## Set defaults and hide controls
@@ -144,6 +162,8 @@ naming one: a `hide.tabs` entry that matches nothing is silently ignored. For
 the volcano and MA modules the tabs are those of
 `VizModules::dittoViz_scatterPlotInputsUI()` -- Data, Adjustments, Points,
 Colors, Facet, Annotations, Legend, Trajectory, Lines, Axes, Plotly, Extras.
+The `vizmodules-app` agent skill (see above) lists the tab names and `defaults`
+keys of every VizModules base module in its module inventory.
 
 Group colours are a `defaults` entry too. The volcano and MA modules assemble
 `color.up` / `color.down` / `color.ns` into the wrapped module's `color.panel`
@@ -177,6 +197,9 @@ app <- VizModules::createModuleApp(
 )
 if (interactive()) runApp(app)
 ```
+
+The `vizmodules-app` agent skill covers `createModuleApp()` and its data filter
+in more depth.
 
 The data-frame modules take a `data_list`; the dittoSeq single-cell modules take
 an `object_list` of `SingleCellExperiment` / `Seurat` / `SummarizedExperiment`
@@ -237,6 +260,19 @@ head(survival_lung)
 #> time, status, age, sex, ph.ecog
 ```
 
+### Clinical models
+
+| Module | Server function | Data type | Expected data | Example data |
+|---|---|---|---|---|
+| Forest plot | `forestPlotServer()` | `data.frame` | Raw data: for a Cox model a time and an event column (as for the survival curve); for a logistic model a binary outcome; for a linear model a numeric outcome; plus any numeric or categorical covariates. The module fits the model | `survival_lung` |
+
+```{r forest-format}
+forestPlot(survival_lung,
+    model = "cox", time = "time", status = "status",
+    covariates = c("age", "sex", "ph.ecog")
+)
+```
+
 ### Biochemical kinetics and pharmacology
 
 | Module | Server function | Data type | Expected data | Example data |
@@ -267,13 +303,78 @@ head(dose_response)
 | Copy-number segments | `cnSegmentPlotServer()` | `CNSegment`, or a named list of them | A `CNSegment` object as returned by `sesame::cnSegmentation()`: bin-level log2 signal ratios in `bin.signals`, their coordinates in `bin.coords`, and a `genomeInfo` carrying `cytoBand` (for chromosome ticks and centromere guides) and optionally `genes` (for labels) | `example_cn_segment` |
 
 Passing a named list plots one panel per sample, stacked over a shared genomic
-x-axis. This is the one module that does not take a data frame, so it is also
-the one that cannot go in the Figure Builder.
+x-axis. Like the PCAtools and AlphaFold modules, it does not take a data frame,
+so it cannot go in the Figure Builder.
 
 ```{r cn-format}
 data(example_cn_segment)
 example_cn_segment
 ```
+
+### Genetics (GWAS)
+
+| Module | Server function | Data type | Expected data | Example data |
+|---|---|---|---|---|
+| Manhattan plot | `manhattanPlotServer()` | `data.frame` | Summary statistics with chromosome, position and p-value columns (and optionally a variant id), named in any common style (`CHR`/`BP`/`P`, `chromosome`/`base_pair_location`/`p_value`, ...) | `example_gwas` |
+| GWAS QQ plot | `gwasQQPlotServer()` | `data.frame` | Summary statistics with a p-value column | `example_gwas` |
+
+### Gene set enrichment (GSEA)
+
+| Module | Server function | Data type | Expected data | Example data |
+|---|---|---|---|---|
+| GSEA enrichment plot | `gseaEnrichmentPlotServer()` | fgsea bundle or `gseaResult` | `list(stats = <named numeric>, pathways = <named list>, results = <fgsea table, optional>)`, or a clusterProfiler `gseaResult` | `example_gsea` |
+
+### Functional genomics screens
+
+| Module | Server function | Data type | Expected data | Example data |
+|---|---|---|---|---|
+| CRISPR screen rank | `crisprScreenRankServer()` | `data.frame` | A MAGeCK RRA `gene_summary.txt`, read with `read_mageck()` | simulated, in `inst/extdata` |
+
+```{r crispr-format}
+screen <- read_mageck(system.file("extdata", "example_mageck.gene_summary.txt.gz",
+    package = "sciVizModules"))
+head(screen)
+```
+
+### Principal component analysis (PCAtools)
+
+| Module | Server function | Data type | Expected data | Example data |
+|---|---|---|---|---|
+| Biplot | `pcaBiplotServer()` | PCAtools `pca` | The object `PCAtools::pca()` returns: sample scores (`rotated`), variable `loadings`, `variance` explained, and sample `metadata` | `example_pca` |
+| Scree plot | `pcaScreePlotServer()` | PCAtools `pca` | As above | `example_pca` |
+| Loadings plot | `pcaLoadingsPlotServer()` | PCAtools `pca` | As above | `example_pca` |
+| Pairs plot | `pcaPairsPlotServer()` | PCAtools `pca` | As above | `example_pca` |
+| PC-metadata correlation | `pcaEigencorPlotServer()` | PCAtools `pca` | As above; needs sample `metadata` | `example_pca` |
+
+Their `*App()` functions take a named `pca_list`. A `pca` object is a plain
+list, so the modules read it without PCAtools installed; PCAtools is needed
+only to make one, and to mark the elbow on the scree plot.
+
+```{r pca-format}
+data(example_pca)
+round(example_pca$variance, 1)
+head(example_pca$metadata)
+```
+
+### Structural biology
+
+| Module | Server function | Data type | Expected data | Example data |
+|---|---|---|---|---|
+| AlphaFold confidence | `alphafoldConfidenceServer()` | `read_alphafold()` result | AlphaFold DB `*-predicted_aligned_error_v*.json` and `*-confidence_v*.json`, a ColabFold `*_scores_*.json`, or a predicted model (`.pdb` / `.cif`) whose B-factors hold the pLDDT; files may be gzipped | AlphaFold DB prediction for p53 (P04637), in `inst/extdata` |
+
+```{r af-format}
+af <- read_alphafold(
+    pae = system.file("extdata", "AF-P04637-F1-predicted_aligned_error_v6.json.gz",
+        package = "sciVizModules"),
+    confidence = system.file("extdata", "AF-P04637-F1-confidence_v6.json.gz",
+        package = "sciVizModules")
+)
+af
+alphafoldConfidence(af)
+```
+
+AlphaFold DB data is available under CC-BY 4.0; cite Jumper et al. (2021) and
+Varadi et al. (2024) when you use it.
 
 ### Single-cell / RNA-seq (dittoSeq wrappers)
 
@@ -320,10 +421,13 @@ names(registry)
 str(registry$volcano, max.level = 1)
 ```
 
-The dittoSeq modules, `cnSegmentPlot` and `michaelisMenten` are not registered:
-the builder's dataset catalogue holds data frames, and those take a
-`SingleCellExperiment`, a `CNSegment` object, and a bundle carrying a model fit
-respectively.
+The `vizmodules-app` agent skill covers embedding the Figure Builder in your own
+app, and `vizmodules-custom-module` covers building a module to register in it.
+
+The dittoSeq modules, `cnSegmentPlot`, `michaelisMenten`, the PCAtools modules,
+`gseaEnrichmentPlot` and `alphafoldConfidence` are not registered: the
+builder's dataset catalogue holds data frames, and those take other objects.
+`forestPlot`, the GWAS modules and `crisprScreenRank` are not registered yet.
 
 ## Export the source data
 

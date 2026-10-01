@@ -38,7 +38,7 @@ dittoFreqPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
         ns <- session$ns
 
         # dittoFreqPlot always facets by var level, so there is no main title to style.
-        hide_input(session, c(hide.inputs, .ditto_main_title_input_ids))
+        hide_input(session, c(hide.inputs, main_title_input_ids))
         if (!is.null(hide.tabs)) {
             for (tab.name in hide.tabs) hideTab(inputId = "dittoFreqPlotTabsetPanel", target = tab.name)
         }
@@ -51,9 +51,8 @@ dittoFreqPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             if (is.null(obj)) {
                 return(character(0))
             }
-            col <- input$color.by
-            if (is.null(col) || !nzchar(col)) col <- input$group.by
-            if (is.null(col) || !nzchar(col)) {
+            col <- blank_to_null(input$color.by) %||% blank_to_null(input$group.by)
+            if (is.null(col)) {
                 return(character(0))
             }
             .ditto_group_levels(obj, col)
@@ -77,7 +76,7 @@ dittoFreqPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             }
             initial_colors <- isolate(resolve_palette(
                 groups, input$palette.colours, default_palette_values,
-                .sci_group_colors(defaults)
+                default_group_colors(defaults, "palette.colours")
             ))
             # Seed the store with what the picker is built from, so its first
             # report back is a no-op rather than a change.
@@ -111,6 +110,7 @@ dittoFreqPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             updateNumericInput(session, "jitter.width", value = get_default(defaults, "jitter.width", 0.2))
             updateNumericInput(session, "boxplot.width", value = get_default(defaults, "boxplot.width", 0.4))
             updateNumericInput(session, "vlnplot.width", value = get_default(defaults, "vlnplot.width", 1))
+            reset_group_colors(session, "palette.colours", defaults, palette_groups(), default_palette_values)
             .ditto_reset_uniform(session, defaults)
         })
 
@@ -122,22 +122,22 @@ dittoFreqPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
 
             var <- isolate_fn(input$var)
             group.by <- isolate_fn(input$group.by)
-            req(var, nzchar(var), group.by, nzchar(group.by))
+            req(nz_value(var), nz_value(group.by))
 
             plots <- isolate_fn(input$plots)
             req(length(plots) > 0)
 
             sample.by <- isolate_fn(input$sample.by)
-            if (is.null(sample.by) || !nzchar(sample.by)) sample.by <- NULL
+            sample.by <- blank_to_null(sample.by)
             color.by <- isolate_fn(input$color.by)
-            if (is.null(color.by) || !nzchar(color.by)) color.by <- group.by
+            color.by <- blank_to_null(color.by) %||% group.by
 
             groups <- isolate_fn(palette_groups())
             color.panel <- default_palette_values
             if (length(groups) > 0) {
                 palette_values <- resolve_palette(
                     groups, isolate_fn(palette_store()), default_palette_values,
-                    .sci_group_colors(defaults)
+                    default_group_colors(defaults, "palette.colours")
                 )
                 color.panel <- unname(palette_values[groups])
             }
@@ -151,7 +151,9 @@ dittoFreqPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 strip.background = element_blank()
             )
 
-            gg <- dittoSeq::dittoFreqPlot(
+            # ggplot2 draws a jitter layer's seed when the layer is created, so build under
+            # a fixed one or the points jump to new positions on every rebuild.
+            gg <- with_stable_seed(dittoSeq::dittoFreqPlot(
                 object = obj,
                 var = var,
                 sample.by = sample.by,
@@ -167,10 +169,10 @@ dittoFreqPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 vlnplot.width = isolate_fn(input$vlnplot.width),
                 color.panel = color.panel, 
                 theme = theme_style
-            )
+            ))
 
             fig <- plotly::ggplotly(gg)
-            .ditto_finalize_plotly(fig, input, isolate_fn, faceted = TRUE)
+            .sci_finalize_plotly(fig, input, isolate_fn, faceted = TRUE)
         })
 
         output$dittoFreqPlot <- renderPlotly({

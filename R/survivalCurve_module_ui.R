@@ -77,37 +77,37 @@ survivalCurveInputsUI <- function(id, data, defaults = NULL, title = "Survival C
         "Data" = tagList(
             tipify(viz_select_input(ns("time"), "Time",
                 choices = num.choices,
-                selected = .sv_default(defaults, "time", if (length(num.choices)) num.choices[1] else NULL)
+                selected = get_default(defaults, "time", if (length(num.choices)) num.choices[1] else NULL)
             ), "Numeric follow-up time column.", placement = "top", options = list(container = "body")),
             tipify(viz_select_input(ns("status"), "Status (Event)",
                 choices = names(data),
-                selected = .sv_default(defaults, "status", NULL)
+                selected = get_default(defaults, "status", NULL)
             ), paste(
                 "Event indicator column. Accepts 0/1 (1 = event), 1/2 (2 = event),",
                 "logical, or a two-level factor/character."
             ), placement = "top", options = list(container = "body")),
             tipify(viz_select_input(ns("group.by"), "Group By",
                 choices = group.choices,
-                selected = .sv_default(defaults, "group.by", "")
+                selected = get_default(defaults, "group.by", "")
             ), "Optional categorical column to stratify the curves by.",
                 placement = "top", options = list(container = "body"))
         ),
         "Statistics" = tagList(
             tipify(materialSwitch(ns("pval"), "Log-rank p-value",
-                value = .sv_default(defaults, "pval", TRUE), status = "success"),
+                value = get_default(defaults, "pval", TRUE), status = "success"),
                 "Show the log-rank test p-value (only shown when stratified by a group).",
                 placement = "top", options = list(container = "body")),
             tipify(materialSwitch(ns("risk.table"), "Risk Table",
-                value = .sv_default(defaults, "risk.table", FALSE), status = "success"),
+                value = get_default(defaults, "risk.table", FALSE), status = "success"),
                 "Append a 'number at risk' table beneath the curve.",
                 placement = "top", options = list(container = "body")),
             tipify(materialSwitch(ns("censor"), "Censoring Marks",
-                value = .sv_default(defaults, "censor", TRUE), status = "success"),
+                value = get_default(defaults, "censor", TRUE), status = "success"),
                 "Draw marks where observations were censored.",
                 placement = "top", options = list(container = "body")),
             tipify(viz_select_input(ns("surv.median.line"), "Median Survival Line",
                 choices = c("none", "hv", "h", "v"),
-                selected = .sv_default(defaults, "surv.median.line", "none")
+                selected = get_default(defaults, "surv.median.line", "none")
             ), "Draw reference lines at the median survival time.",
                 placement = "top", options = list(container = "body"))
         ),
@@ -119,12 +119,12 @@ survivalCurveInputsUI <- function(id, data, defaults = NULL, title = "Survival C
                     "Cumulative events" = "event",
                     "Cumulative hazard" = "cumhaz"
                 ),
-                selected = .sv_default(defaults, "fun", "survival")
+                selected = get_default(defaults, "fun", "survival")
             ), "Transformation applied to the survival curve.",
                 placement = "top", options = list(container = "body")),
             uiOutput(ns("palette.selection")),
             tipify(numericInput(ns("line.size"), "Line Width",
-                value = .sv_default(defaults, "line.size", 1), min = 0.1, step = 0.1),
+                value = get_default(defaults, "line.size", 1), min = 0.1, step = 0.1),
                 "Width of the survival curve lines.",
                 placement = "top", options = list(container = "body"))
         ),

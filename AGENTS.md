@@ -4,7 +4,7 @@
 
 **sciVizModules** extends VizModules with interactivity-first Shiny modules for scientific analyses and plots. Prefer composition and extension of VizModules over parallel reimplementations of general plotting-module behavior.
 
-**Stack**: R (>= 4.6.0), Shiny, VizModules (>= 0.5.0), plotly, roxygen2 | **Version**: 0.99.0 | **License**: MIT + file LICENSE
+**Stack**: R (>= 4.6.0), Shiny, VizModules (>= 0.6.0), plotly, roxygen2 | **Version**: 0.99.0 | **License**: MIT + file LICENSE
 
 The package targets Bioconductor (see `biocViews` in DESCRIPTION and `BIOCONDUCTOR_SUBMISSION_PLAN.md`), so keep R CMD check clean and follow Bioconductor packaging conventions.
 
@@ -26,11 +26,13 @@ The package targets Bioconductor (see `biocViews` in DESCRIPTION and `BIOCONDUCT
 
 ## Modules In This Package
 
-`cnSegmentPlot`, `dittoBarPlot`, `dittoDimHex`, `dittoDimPlot`, `dittoFreqPlot`, `dittoPlot`, `dittoRidgeJitter`, `dittoScatterPlot`, `doseResponse`, `enrichmentDotPlot`, `goFanPlot`, `maPlot`, `michaelisMenten`, `survivalCurve`, `volcanoPlot`.
+`alphafoldConfidence`, `cnSegmentPlot`, `dittoBarPlot`, `dittoDimHex`, `dittoDimPlot`, `dittoFreqPlot`, `dittoPlot`, `dittoRidgeJitter`, `dittoScatterPlot`, `crisprScreenRank`, `doseResponse`, `enrichmentDotPlot`, `forestPlot`, `goFanPlot`, `gseaEnrichmentPlot`, `gwasQQPlot`, `maPlot`, `manhattanPlot`, `michaelisMenten`, `pcaBiplot`, `pcaEigencorPlot`, `pcaLoadingsPlot`, `pcaPairsPlot`, `pcaScreePlot`, `survivalCurve`, `volcanoPlot`.
+
+The modules that take a non-data-frame object and build their own plotly figure (the PCAtools family except `pcaBiplot`, and `alphafoldConfidence`) share their server, input layout and app scaffolding through `.sci_plot_server()`, `.sci_plot_inputs_ui()` and `.sci_object_app()` in `R/module_helpers.R`; a new module of that kind should too. `.sci_finalize_plotly()` (`R/plotly_helpers.R`) applies the uniform Axes/Legend/Lines/Plotly finishing to a figure a module builds itself. Readers for non-R tool outputs are exported `read_*()` functions (`read_alphafold()`, `read_mageck()`). Wrappers of the VizModules scatter module add layers through its `fig.fn` hook via a testable internal `.<module>_layers(fig, ..., input, isolate_fn)` function (see `.pca_biplot_layers()`, `.manhattan_layers()`).
 
 Each exposes the `*InputsUI()` / `*OutputUI()` / `*Server()` / `*App()` set. Run the `*App()` to inspect one interactively, or `runApp(system.file("apps/module-gallery", package = "sciVizModules"))` to see them all.
 
-The data-frame modules are also registered with the VizModules Figure Builder via `sci_figure_builder_registry()`, so they can be arranged into a multi-panel figure with `sciFigureBuilderApp()`. The dittoSeq modules (`SingleCellExperiment` input), `cnSegmentPlot` (`CNSegment`) and `michaelisMenten` (a bundle carrying a model fit) cannot be registered - the builder's dataset catalogue holds data frames.
+The data-frame modules are also registered with the VizModules Figure Builder via `sci_figure_builder_registry()`, so they can be arranged into a multi-panel figure with `sciFigureBuilderApp()`. The dittoSeq modules (`SingleCellExperiment` input), `cnSegmentPlot` (`CNSegment`) and `michaelisMenten` (a bundle carrying a model fit), the PCAtools modules (a `pca` object) and `alphafoldConfidence` (a `read_alphafold()` result) cannot be registered - the builder's dataset catalogue holds data frames. `forestPlot` takes a data frame but is not registered yet.
 
 ## Build and Validation
 
@@ -76,21 +78,35 @@ R CMD check --no-build-vignettes sciVizModules_*.tar.gz      # Quick check
 
 ### VizModules Foundation
 
-VizModules is a hard dependency (`Depends: VizModules (>= 0.5.0)`) and the primary foundation for generic interactive plotting, UI organization, downloads, annotations, and module infrastructure.
+VizModules is a hard dependency (`Depends: VizModules (>= 0.6.0)`) and the primary foundation for generic interactive plotting, UI organization, downloads, annotations, and module infrastructure.
 
 - Before building or changing a module, first check whether an existing VizModules module, helper, or wrapper pattern covers the general behavior. Extend it with science-specific defaults, controls, data preparation, annotations, or validation instead of recreating it.
 - Every VizModules plot module follows the shared `*InputsUI(id, ...)`, `*OutputUI(id)`, and `*Server(id, data = reactive(...), ...)` contract. Preserve this contract when wrapping or composing a base module.
 - Use `defaults` to set scientific defaults. Use `hide.inputs` and `hide.tabs` to enforce fixed values without exposing the corresponding generic controls.
 - Prefer documented VizModules arguments and helpers over local replacements. Commonly useful ones, grouped by what they do:
-  - **Inputs and layout**: `organize_inputs()`, `module_tack_ui()`, `hide_input()` / `show_input()` / `toggle_input_cell()`, `viz_select_input()` / `update_viz_select()`, `multiColorPicker()` / `updateMultiColorPicker()`, `multiDynamicInput()` / `updateMultiDynamicInput()`, and the uniform input blocks (`uniform_axes_inputs_ui()`, `uniform_legend_inputs_ui()`, `uniform_lines_inputs_ui()`, `uniform_plotly_inputs_ui()`, `uniform_annotation_inputs_ui()`) with their reset counterparts (`reset_axes_inputs()`, `reset_legend_inputs()`, `reset_lines_inputs()`, `reset_plotly_inputs()`, `reset_annotation_inputs()`).
-  - **Defaults and server-side stores**: `get_default()`, `setup_reactive_defaults()`, `setup_auto_update_logic()`, `setup_group_colors()`, `setup_axis_range()`, `resolve_palette()`, `setup_manual_edits()` / `finalize_manual_edits()`. See "Avoiding Double Renders" below.
-  - **Plot finishing**: `apply_title_layout()`, `create_axis_styles()`, `apply_subplot_axis_styling()`, `axis_titles_as_annotations()`, `apply_axis_title_to_annotations()`, `reset_axis_title_text()`, `add_reference_lines()`, `add_plot_config()`, `apply_plotly_newshape()`, `apply_render_margins()`, `apply_legend_styling()` / `apply_legend_inputs()`, `empty_plot()`. A module that renders `uniform_legend_inputs_ui()` must apply all of it (`legend.show`, `legend.font.family`, `legend.font.color` and the two sizes), and one that renders the shape controls of `uniform_plotly_inputs_ui()` must call `apply_plotly_newshape()`; a plot without cartesian axes passes `include.shapes = FALSE` and `include.modebar.buttons = FALSE` instead. A figure split into panels (e.g. by `split.by`) passes `facet.by` to `add_plot_config()`, which drops the editable main title, styles its shared axis and panel titles with `apply_axis_title_to_annotations()`, and swaps the main title inputs for the `facet.title.*` ones as the split changes (`.ditto_toggle_facet_titles()`).
-  - **Statistics**: `compute_pairwise_stats()`, `create_stat_annotations()`, `apply_stat_annotations()`, `stat_bracket_y_max()`, `generate_pair_strings()` / `parse_pair_strings()`.
+  - **Inputs and layout**: `organize_inputs()`, `module_tack_ui()`, `hide_input()` / `show_input()` / `toggle_input_cell()`, `viz_select_input()` / `update_viz_select()`, `multiColorPicker()` / `updateMultiColorPicker()`, `multiDynamicInput()` / `updateMultiDynamicInput()`, and the uniform input blocks (`uniform_axes_inputs_ui()`, `uniform_legend_inputs_ui()`, `uniform_lines_inputs_ui()`, `uniform_plotly_inputs_ui()`, `uniform_annotation_inputs_ui()`) with their reset counterparts (`reset_axes_inputs()`, `reset_legend_inputs()`, `reset_lines_inputs()`, `reset_plotly_inputs()`, `reset_annotation_inputs()`), plus `uniform_subplot_spacing_inputs_ui()` / `subplot_spacing_defaults()` for a Facet tab's spacing controls.
+  - **Defaults and server-side stores**: `get_default()`, `setup_reactive_defaults()`, `setup_auto_update_logic()`, `setup_group_colors()`, `setup_axis_range()`, `resolve_palette()`, `setup_manual_edits()` / `finalize_manual_edits()` / `reset_manual_edits()`, and for a group colour picker `default_group_colors()` (validates and hex-normalises a mapping in `defaults`) with `reset_group_colors()` (restores the picker on Reset). See "Avoiding Double Renders" below.
+  - **Server boilerplate**: `require_data_frame()` wraps a data-frame module's `data` reactive; `blank_to_null()` turns a select's `""` (or `NA`, or a missing input) into `NULL`, and `nz_value()` tests for a usable string without erroring on `NULL`; `with_stable_seed()` builds a jittered plot under a fixed seed so the points stay put across rebuilds; `facet_check()`, `flatten_palette_options()`, and `as_plotted()` / `adjusted_values()` / `adjustment_fn()` for anything drawn over an adjusted axis.
+  - **Plot finishing**: `apply_title_layout()`, `create_axis_styles()`, `apply_subplot_axis_styling()`, `axis_titles_as_annotations()`, `apply_axis_title_to_annotations()`, `reset_axis_title_text()`, `add_reference_lines()`, `add_plot_config()`, `apply_plotly_newshape()`, `apply_render_margins()`, `apply_legend_styling()` / `apply_legend_inputs()`, `empty_plot()`. A module that renders `uniform_legend_inputs_ui()` must apply all of it (`legend.show`, `legend.font.family`, `legend.font.color` and the two sizes), and one that renders the shape controls of `uniform_plotly_inputs_ui()` must call `apply_plotly_newshape()`; a plot without cartesian axes passes `include.shapes = FALSE` and `include.modebar.buttons = FALSE` instead. A figure split into panels (e.g. by `split.by`) passes `facet.by` to `add_plot_config()`, which drops the editable main title, styles its shared axis and panel titles with `apply_axis_title_to_annotations()`, and swaps the main title inputs for the `facet.title.*` ones as the split changes (`toggle_facet_title_inputs()`; a plot that always facets hides `main_title_input_ids` instead).
+  - **Statistics**: `uniform_stats_inputs_ui()` / `reset_stats_inputs()`, `compute_pairwise_stats()`, `create_stat_annotations()`, `apply_stat_annotations()`, `stat_bracket_y_max()` / `stat_bracket_headroom()`, `note_brackets_skipped()`, `generate_pair_strings()` / `parse_pair_strings()` / `default_stat_pairs()`.
+  - **Point highlighting and labels**: `parse_highlight_values()`, `apply_highlight_styling()`, `create_highlight_annotations()`, `create_selected_annotations()`, `merge_annotation_sets()`.
   - **Export**: `collect_source_data()`, `create_source_download_handler()`, `draw_to_svg()` / `draw_to_png()`.
   - **Data tables and expressions**: `dataFilterUI()` / `dataFilterServer()`, `resolve_column_targets()`, `safe_eval_filter()` / `validate_expression()`.
 - For faceted / multi-panel figures, reuse the facet toolkit rather than hand-rolling layout maths: `resolve_facet_sharing()`, `resolve_facet_layout()`, `apply_facet_subplot_spacing()`, `build_facet_annotations()`, and `build_facet_panel_borders()`.
 - For a new scientific module, create bespoke plotting or module code only when VizModules does not provide an appropriate base. Reuse its input organization, layout, download, and plotly conventions where applicable.
-- All plots must remain plotly-based. Do not assume that every argument of an underlying `dittoViz`, `dittoSeq`, or `plotthis` function is exposed through a VizModules module; verify its documented signature first.
+- Build plots with plotly wherever plotly can do the job - the VizModules helpers this package leans on assume it (see Critical Rule 6 for when a non-plotly widget is acceptable). Do not assume that every argument of an underlying `dittoViz`, `dittoSeq`, or `plotthis` function is exposed through a VizModules module; verify its documented signature first.
+
+### Use the VizModules Skills for Module Work
+
+Before adding a module, wrapping a base module, or wiring modules into an app, load the matching VizModules agent skill and follow it. They encode the conventions this file only summarizes (reactive defaults, double-render avoidance, manual-edit persistence, the uniform input helpers, CSS containment), and they are kept in step with each VizModules release. If they are not already in `.claude/skills/` (or `.agents/skills/`, `.github/skills/`), install them first with `VizModules::use_vizmodules_skills(".", client = "claude")`, which copies them from the installed VizModules (`overwrite = TRUE` refreshes them after a VizModules upgrade).
+
+| Task in this package | Skill |
+|---|---|
+| A new module that wraps a VizModules base module (as `volcanoPlot`, `maPlot`, `doseResponse`, `enrichmentDotPlot` do), or changes to one | `vizmodules-custom-module` |
+| A new standalone module with its own plotting function (as `cnSegmentPlot`, `survivalCurve`, `goFanPlot` and the dittoSeq modules are) | `vizmodules-custom-module` for the module wiring, plus `vizmodules-new-module` for the InputsUI/OutputUI/Server/App quartet, its roxygen sections, uniform helpers, gallery registration and tests. That skill is written for the VizModules source tree, so map its file and registry steps onto this repo (`inst/apps/module-gallery`, `sci_figure_builder_registry()`, `_pkgdown.yml`) |
+| `*App()` functions, the module gallery, `sciFigureBuilderApp()`, `defaults` / `hide.inputs` / `hide.tabs` usage in examples and vignettes | `vizmodules-app` |
+
+Where a skill and this file disagree, this file wins on sciVizModules-specific conventions (no `LazyData`, `.sci_debounced_input()`, Bioconductor packaging); the skill wins on how VizModules itself behaves.
 
 ### VizModules Reference Sources
 
@@ -139,8 +155,9 @@ rebuilds twice per change - cheap on a toy dataset, painful on a real one.
    `setup_axis_range()` for y-limit controls (seed it beside **every**
    `update*Input()` that sets them).
 
-`.sci_group_colors()` in `R/palette_helpers.R` validates a caller-supplied
-mapping before it reaches `resolve_palette()`'s `manual_colors` argument.
+`default_group_colors(defaults, key)` validates a caller-supplied mapping before
+it reaches `resolve_palette()`'s `manual_colors` argument, and
+`reset_group_colors()` puts the picker back to it on Reset.
 
 ### Debouncing Free Text
 
@@ -209,15 +226,15 @@ In UI: Use `NS(id)` for wrapper's inputs, pass bare `id` to base module UI funct
 
 ### Dependencies
 
-**Depends**: R (>= 4.6.0), shiny, VizModules (>= 0.5.0)
+**Depends**: R (>= 4.6.0), shiny, VizModules (>= 0.6.0)
 
-**Imports**: colourpicker, dittoSeq, DT, GenomicRanges, ggplot2, grDevices, IRanges, methods, plotly, readxl, S4Vectors, scales, Seqinfo, shinyBS, shinyjqui, shinyjs, shinyWidgets, SingleCellExperiment, stats, SummarizedExperiment, survival
+**Imports**: colourpicker, dittoSeq, DT, GenomicRanges, ggplot2, IRanges, jsonlite, methods, plotly, readxl, S4Vectors, scales, Seqinfo, shinyBS, shinyjqui, shinyjs, shinyWidgets, SingleCellExperiment, stats, SummarizedExperiment, survival
 
-**Suggests**: drc, GOfan, knitr, org.Hs.eg.db, rmarkdown, sesame, sesameData, survminer, testthat (>= 3.0.0)
+**Suggests**: drc, fgsea, GOfan, knitr, org.Hs.eg.db, PCAtools, rmarkdown, sesame, sesameData, survminer, testthat (>= 3.0.0)
 
 Keep `Imports:` and `NAMESPACE` in step in **both** directions - `R CMD check` and `BiocCheck` flag an undeclared import and an unused declaration alike. Several packages resolve at runtime only because VizModules `Depends:` on them; that is not a declaration.
 
-Bioconductor packages appear throughout; some example data depends on `sesame`/`sesameData`, and `survivalCurve` needs `survminer`, `goFanPlot` needs `GOfan` plus an `OrgDb`, and `doseResponse` needs `drc`. All are Suggests and must be reached through `requireNamespace()` and guarded in examples and tests.
+Bioconductor packages appear throughout; some example data depends on `sesame`/`sesameData`, and `survivalCurve` needs `survminer`, `goFanPlot` needs `GOfan` plus an `OrgDb`, and `doseResponse` needs `drc`. `PCAtools` is needed only to build a `pca` object and for the scree plot's elbow marker. All are Suggests and must be reached through `requireNamespace()` and guarded in examples and tests.
 
 ## Common Issues
 
@@ -242,12 +259,13 @@ Bioconductor packages appear throughout; some example data depends on `sesame`/`
 3. **ALWAYS run `devtools::document()`** after changing roxygen2 comments or signatures
 4. **Run `devtools::test()`** after changes to verify the testthat test suite passes; also test modules interactively via example apps
 5. **Follow namespace pattern strictly** for wrapper modules (see Coding Conventions)
-6. **All plots must use plotly** - this is a plotly-based package. VizModules' `ComplexHeatmap_Heatmap` is the one exception on its side, and a non-plotly module there has to supply `vector_svg` / `raster_png` renderers (built with `draw_to_svg()` / `draw_to_png()`) or it contributes no artwork to the Figure Builder export and no images to its source archive
+6. **Strongly prefer plotly** - the shared finishing helpers, manual-edit persistence, the Figure Builder and the source-data images all assume a plotly figure, so a module built from scratch should be plotly unless plotly has no reasonable equivalent. A non-plotly htmlwidget with Shiny bindings is acceptable in that case (e.g. a 3D molecular viewer via NGLVieweR or r3dmol; VizModules' own `ComplexHeatmap_Heatmap` is another). Such a module must say so in its docs, and supply its own image export. To appear in the Figure Builder export and source archive it needs `vector_svg` / `raster_png` renderers (built with `draw_to_svg()` / `draw_to_png()`); without them it contributes no artwork there
 7. **Document missing features** - clearly note functionality unavailable in plotly
 8. **Use `VizModules::organize_inputs()`** helper for consistent UI layouts
 9. **Keep changes scoped** - do not let generated-file churn (NAMESPACE reformatting, roxygen version bumps) ride along with a behavioral change
 10. **Every module select is a `viz_select_input()`** - never `shiny::selectInput()`. A column of gene names is unusable otherwise, and two VizModules 0.5.0 fixes land only on the virtual select. `tests/testthat/test-select-inputs.R` enforces this
 11. **Scope every CSS selector** on a class this package invents (see "CSS Containment")
+12. **Load the matching VizModules skill before module work** - adding, wrapping or wiring a module starts from `vizmodules-custom-module`, `vizmodules-new-module` or `vizmodules-app` (see "Use the VizModules Skills for Module Work")
 
 ## Best Practices
 

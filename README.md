@@ -20,7 +20,7 @@ Developed by [Jared Andrews](https://github.com/j-andrews7) and [Jacob Martin](h
 
 Note that this package is in development and may break at any time.
 
-VizModules 0.5.0 or newer must be installed first:
+VizModules 0.6.0 or newer must be installed first:
 
 ```r
 install.packages("VizModules")
@@ -80,6 +80,42 @@ holds the logic. Every module also ships a standalone `*App()` you can run to se
   returned by [`sesame::cnSegmentation()`](https://bioconductor.org/packages/sesame/). Bin-level
   log2 signal ratios are drawn across the genome with chromosome guides, centromere marks and
   optional gene labels; several samples stack vertically over a shared genomic x-axis.
+- **`forestPlot`** — forest plot of hazard ratios (Cox), odds ratios (logistic) or
+  coefficients (linear regression), fitted from the raw data inside the module. Choose the
+  outcome and covariates interactively, and switch between one adjusted (multivariable) model
+  and one model per covariate; factors show a row per level against their reference level.
+- **`manhattanPlot`** / **`gwasQQPlot`** — GWAS summary statistics as a Manhattan plot
+  (chromosomes end to end, genome-wide and suggestive lines) and a QQ plot (confidence band,
+  lambda GC). Columns are detected from the usual names (qqman, PLINK, REGENIE, GWAS Catalog),
+  and large files are thinned to keep the plot responsive (both wrap
+  `VizModules::dittoViz_scatterPlot`).
+- **`gseaEnrichmentPlot`** — the GSEA running enrichment score for one or more gene sets, with
+  hit ticks and the ranked statistic, from fgsea output or a clusterProfiler `gseaResult`.
+- **`crisprScreenRank`** — gene rank plot of a pooled CRISPR screen from a MAGeCK RRA gene
+  summary (`read_mageck()`), with FDR hits coloured and the top genes labelled (wraps
+  `VizModules::dittoViz_scatterPlot`).
+- **`alphafoldConfidence`** — AlphaFold prediction confidence: the per-residue pLDDT over the
+  AlphaFold DB confidence bands, above the predicted aligned error (PAE) heatmap on the same
+  residue axis, with chain boundaries for multimers. `read_alphafold()` reads AlphaFold DB
+  PAE/confidence JSON, ColabFold score files, or the pLDDT stored in a model's PDB/mmCIF
+  B-factors.
+
+### Principal component analysis (PCAtools)
+
+One module per [PCAtools](https://bioconductor.org/packages/PCAtools/) view, each taking a
+PCAtools `pca` object (from `PCAtools::pca()`), so any data matrix with sample metadata works.
+The bundled `example_pca` (airway RNA-seq) is the default in every `*App()`.
+
+- **`pcaBiplot`** — sample scores with % variance in the axis titles and optional loading
+  arrows (wraps `VizModules::dittoViz_scatterPlot`, so colour, shape, ellipses and point
+  annotations all apply).
+- **`pcaScreePlot`** — variance explained per component, the cumulative line, and markers for
+  the elbow and any components you name.
+- **`pcaLoadingsPlot`** — the variables loading most strongly on each component (PCAtools'
+  `rangeRetain` rule).
+- **`pcaPairsPlot`** — a lower-triangle grid of score scatters for every pair of components.
+- **`pcaEigencorPlot`** — correlation of each component with each sample metadata variable,
+  with significance.
 
 ### RNA-seq / single-cell modules (dittoSeq)
 
@@ -138,10 +174,11 @@ sciFigureBuilderApp()
 own modules (or with the VizModules ones) and pass the result to
 `VizModules::figureBuilderApp()`.
 
-The single-cell modules, `cnSegmentPlot` and `michaelisMenten` are not registered: the
-builder's dataset catalogue holds data frames, and those three take a
-`SingleCellExperiment`, a `CNSegment` object, and a bundle carrying a model fit respectively.
-Run their `*App()` functions instead.
+The single-cell modules, `cnSegmentPlot`, `michaelisMenten`, the PCAtools modules and
+`alphafoldConfidence` are not registered: the builder's dataset catalogue holds data frames,
+and those take a `SingleCellExperiment`, a `CNSegment` object, a bundle carrying a model fit,
+a PCAtools `pca` object and a `read_alphafold()` result respectively. `forestPlot` is not
+registered yet. Run their `*App()` functions instead.
 
 ## Working with an AI Coding Agent
 

@@ -26,15 +26,15 @@ License: MIT + file LICENSE
 Depends:
     R (>= 4.6.0),
     shiny,
-    VizModules (>= 0.5.0)
+    VizModules (>= 0.6.0)
 Imports:
     colourpicker,
     dittoSeq,
     DT,
     GenomicRanges,
     ggplot2,
-    grDevices,
     IRanges,
+    jsonlite,
     methods,
     plotly,
     readxl,
@@ -53,9 +53,11 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Suggests:
     drc,
+    fgsea,
     GOfan,
     knitr,
     org.Hs.eg.db,
+    PCAtools,
     rmarkdown,
     sesame,
     sesameData,

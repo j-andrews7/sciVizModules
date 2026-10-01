@@ -1,19 +1,3 @@
-#' Fetch a default value for a survivalCurve input
-#'
-#' @param defaults A named list of defaults (may be `NULL`).
-#' @param key The default name to look up.
-#' @param fallback The value to return when `key` is absent.
-#' @return The stored default or `fallback`.
-#'
-#' @author Jacob Martin
-#' @rdname INTERNAL_sv_default
-#' @keywords internal
-.sv_default <- function(defaults, key, fallback = NULL) {
-    if (!is.null(defaults) && key %in% names(defaults)) {
-        return(defaults[[key]])
-    }
-    fallback
-}
 #' Auto-detect a follow-up time column
 #'
 #' @param data A data frame.

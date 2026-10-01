@@ -68,8 +68,8 @@ dittoDimHexServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, de
         })
 
         observeEvent(input$split.by, {
-            split.set <- !is.null(input$split.by) && any(nzchar(input$split.by))
-            .ditto_toggle_facet_titles(session, split.set, hidden = hide.inputs)
+            split.set <- nz_value(input$split.by)
+            toggle_facet_title_inputs(session, split.set, hidden = hide.inputs)
         }, ignoreNULL = FALSE)
 
         generate_dittoDimHex <- reactive({
@@ -79,16 +79,16 @@ dittoDimHexServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, de
             req(obj)
 
             reduction.use <- isolate_fn(input$reduction.use)
-            req(reduction.use, nzchar(reduction.use))
+            req(nz_value(reduction.use))
 
             color.var <- isolate_fn(input$color.var)
-            if (is.null(color.var) || !nzchar(color.var)) color.var <- NULL
+            color.var <- blank_to_null(color.var)
 
             color.method <- isolate_fn(color_method_text())
-            if (is.null(color.method) || !nzchar(color.method)) color.method <- NULL
+            color.method <- blank_to_null(color.method)
 
             split.by <- isolate_fn(input$split.by)
-            if (is.null(split.by) || !nzchar(split.by)) split.by <- NULL
+            split.by <- blank_to_null(split.by)
 
             # Making theme arguments for uniform aesthetic
             additional_theme <- create_ggplot_axis_style(input, isolate_fn = isolate_fn)
@@ -121,7 +121,7 @@ dittoDimHexServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, de
             )
 
             fig <- plotly::ggplotly(gg)
-            .ditto_finalize_plotly(fig, input, isolate_fn, faceted = !is.null(split.by))
+            .sci_finalize_plotly(fig, input, isolate_fn, faceted = !is.null(split.by))
         })
 
         output$dittoDimHex <- renderPlotly({

@@ -64,7 +64,7 @@ test_that("every Legend tab control reaches the figure", {
     gg <- ggplot2::ggplot(mtcars, ggplot2::aes(wt, mpg, colour = factor(cyl))) +
         ggplot2::geom_point()
     input <- c(test_axes_inputs(), test_legend_inputs(), list(download.format = "svg"))
-    built <- plotly::plotly_build(.ditto_finalize_plotly(plotly::ggplotly(gg), input, identity))
+    built <- plotly::plotly_build(.sci_finalize_plotly(plotly::ggplotly(gg), input, identity))
 
     expect_false(built$x$layout$showlegend)
     expect_identical(built$x$layout$legend$font$family, "Courier New")
@@ -73,7 +73,7 @@ test_that("every Legend tab control reaches the figure", {
     expect_identical(built$x$layout$legend$xanchor, "left")
 
     input$legend.show <- TRUE
-    built <- plotly::plotly_build(.ditto_finalize_plotly(plotly::ggplotly(gg), input, identity))
+    built <- plotly::plotly_build(.sci_finalize_plotly(plotly::ggplotly(gg), input, identity))
     expect_true(built$x$layout$showlegend)
 })
 
@@ -89,7 +89,7 @@ test_that("a faceted figure styles its panel and axis titles and drops the edita
         )
     )
 
-    built <- plotly::plotly_build(.ditto_finalize_plotly(plotly::ggplotly(gg), input, identity, faceted = TRUE))
+    built <- plotly::plotly_build(.sci_finalize_plotly(plotly::ggplotly(gg), input, identity, faceted = TRUE))
     expect_false(built$x$config$edits$titleText)
     annos <- built$x$layout$annotations
     is_axis <- vapply(annos, function(a) identical(a$annotationType, "axis"), logical(1))
@@ -103,25 +103,32 @@ test_that("a faceted figure styles its panel and axis titles and drops the edita
         expect_identical(a$font$family, "Courier New")
     }
 
-    built <- plotly::plotly_build(.ditto_finalize_plotly(plotly::ggplotly(gg), input, identity))
+    built <- plotly::plotly_build(.sci_finalize_plotly(plotly::ggplotly(gg), input, identity))
     expect_true(built$x$config$edits$titleText)
 })
 
-test_that("the title inputs follow whether the plot is faceted", {
+test_that("the title inputs follow whether split.by facets the plot", {
+    skip_if_not_installed("dittoSeq")
+    data(example_sce, package = "sciVizModules")
+
     calls <- list()
     local_mocked_bindings(
-        hide_input = function(session, ids) calls$hidden <<- ids,
-        show_input = function(session, ids) calls$shown <<- ids
+        toggle_facet_title_inputs = function(session, faceted, extra = NULL, hidden = NULL) {
+            calls[[length(calls) + 1]] <<- list(faceted = faceted, hidden = hidden)
+        }
     )
-    facet_ids <- c("facet.title.font.size", "facet.title.font.color", "facet.title.font.family")
 
-    .ditto_toggle_facet_titles(NULL, TRUE, hidden = "facet.title.font.color")
-    expect_identical(calls$hidden, .ditto_main_title_input_ids)
-    expect_identical(calls$shown, setdiff(facet_ids, "facet.title.font.color"))
+    shiny::testServer(
+        dittoDimPlotServer,
+        args = list(data = shiny::reactive(example_sce), hide.inputs = "title.font.size"),
+        expr = {
+            session$setInputs(split.by = "")
+            session$setInputs(split.by = "condition")
+        }
+    )
 
-    .ditto_toggle_facet_titles(NULL, FALSE, hidden = "title.font.size")
-    expect_identical(calls$hidden, facet_ids)
-    expect_identical(calls$shown, setdiff(.ditto_main_title_input_ids, "title.font.size"))
+    expect_identical(vapply(calls, function(x) x$faceted, logical(1)), c(FALSE, TRUE))
+    expect_identical(calls[[2]]$hidden, "title.font.size")
 })
 
 test_that("split.by makes a dittoSeq module figure faceted", {
@@ -168,6 +175,38 @@ test_that("dittoFreqPlot, which always facets by var level, finishes as a facete
                 test_axes_inputs(), test_legend_inputs()
             ))
             expect_false(plotly::plotly_build(generate_dittoFreqPlot())$x$config$edits$titleText)
+        }
+    )
+})
+
+test_that("jittered points keep their positions when the plot rebuilds", {
+    skip_if_not_installed("dittoSeq")
+    data(example_sce, package = "sciVizModules")
+
+    point_x <- function(fig) {
+        traces <- Filter(function(tr) identical(tr$mode, "markers"), fig$x$data)
+        unlist(lapply(traces, function(tr) tr$x))
+    }
+
+    shiny::testServer(
+        dittoFreqPlotServer,
+        args = list(data = shiny::reactive(example_sce)),
+        expr = {
+            do.call(session$setInputs, c(
+                list(
+                    auto.update = TRUE, var = "clustering", group.by = "condition", sample.by = "sample",
+                    color.by = "", plots = c("boxplot", "jitter"), scale = "percent", max.normalize = FALSE,
+                    jitter.size = 1, jitter.width = 0.2, jitter.color = "black", boxplot.width = 0.4,
+                    vlnplot.width = 1, download.format = "png"
+                ),
+                test_axes_inputs(), test_legend_inputs()
+            ))
+            first <- point_x(generate_dittoFreqPlot())
+
+            # Any change rebuilds the figure, which draws the jitter afresh.
+            session$setInputs(jitter.size = 2)
+            expect_true(length(first) > 0)
+            expect_identical(point_x(generate_dittoFreqPlot()), first)
         }
     )
 })

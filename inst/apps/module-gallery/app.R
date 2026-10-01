@@ -4,7 +4,7 @@ library(sciVizModules)
 ## sciVizModules Gallery
 ##
 ## Showcases every sciVizModules module using the bundled example datasets.
-## Modules fall into three families, each wired to a different data source:
+## Modules fall into families, each wired to a different data source:
 ##
 ##   * "df"    - data.frame modules. Get a VizModules dataFilter data table
 ##               so users can filter/edit the data feeding the plot.
@@ -13,6 +13,9 @@ library(sciVizModules)
 ##   * "mm"    - the Michaelis-Menten module, which needs a bundle of
 ##               observed points, a fitted line, and a stats object.
 ##   * "cn"    - the copy-number module, bound to a CNSegment object.
+##   * "pca"   - the PCAtools modules, bound to a PCAtools `pca` object.
+##   * "af"    - the AlphaFold module, bound to a read_alphafold() object.
+##   * "gsea"  - the GSEA module, bound to an fgsea input bundle.
 ## ---------------------------------------------------------------------------
 
 ## ---- Package metadata (for the About tab / navbar) ------------------------
@@ -31,6 +34,20 @@ data("mm_kinetics",        package = "sciVizModules", envir = environment())
 data("mm_kinetics_line",   package = "sciVizModules", envir = environment())
 data("mm_kinetics_fit",    package = "sciVizModules", envir = environment())
 data("example_cn_segment", package = "sciVizModules", envir = environment())
+data("example_pca",        package = "sciVizModules", envir = environment())
+data("example_gwas",       package = "sciVizModules", envir = environment())
+data("example_gsea",       package = "sciVizModules", envir = environment())
+
+## A simulated MAGeCK RRA gene summary, shipped as the file MAGeCK writes.
+example_mageck <- read_mageck(
+    system.file("extdata", "example_mageck.gene_summary.txt.gz", package = "sciVizModules")
+)
+
+## The AlphaFold DB prediction for human p53 (CC-BY 4.0), shipped as files.
+example_alphafold <- read_alphafold(
+    pae = system.file("extdata", "AF-P04637-F1-predicted_aligned_error_v6.json.gz", package = "sciVizModules"),
+    confidence = system.file("extdata", "AF-P04637-F1-confidence_v6.json.gz", package = "sciVizModules")
+)
 
 ## Michaelis-Menten needs three pieces bundled together.
 mm_bundle <- list(
@@ -63,6 +80,26 @@ module_registry <- list(
         server_fn = goFanPlotServer, data = example_enrichment, defaults = NULL
     ),
     list(
+        label = "GSEA", id = "gsea", type = "gsea",
+        inputs_ui = gseaEnrichmentPlotInputsUI, output_ui = gseaEnrichmentPlotOutputUI,
+        server_fn = gseaEnrichmentPlotServer, data = example_gsea, defaults = NULL
+    ),
+    list(
+        label = "Manhattan", id = "manhattan", type = "df",
+        inputs_ui = manhattanPlotInputsUI, output_ui = manhattanPlotOutputUI,
+        server_fn = manhattanPlotServer, data = example_gwas, defaults = NULL
+    ),
+    list(
+        label = "GWAS QQ", id = "gwasqq", type = "df",
+        inputs_ui = gwasQQPlotInputsUI, output_ui = gwasQQPlotOutputUI,
+        server_fn = gwasQQPlotServer, data = example_gwas, defaults = NULL
+    ),
+    list(
+        label = "CRISPR Screen", id = "crispr", type = "df",
+        inputs_ui = crisprScreenRankInputsUI, output_ui = crisprScreenRankOutputUI,
+        server_fn = crisprScreenRankServer, data = example_mageck, defaults = NULL
+    ),
+    list(
         label = "Dose-Response", id = "dose", type = "df",
         inputs_ui = doseResponseInputsUI, output_ui = doseResponseOutputUI,
         server_fn = doseResponseServer, data = dose_response, defaults = NULL
@@ -79,9 +116,44 @@ module_registry <- list(
         bundle = mm_bundle, defaults = NULL
     ),
     list(
+        label = "Forest", id = "forest", type = "df",
+        inputs_ui = forestPlotInputsUI, output_ui = forestPlotOutputUI,
+        server_fn = forestPlotServer, data = survival_lung, defaults = NULL
+    ),
+    list(
         label = "Copy Number", id = "cnseg", type = "cn",
         inputs_ui = cnSegmentPlotInputsUI, output_ui = cnSegmentPlotOutputUI,
         server_fn = cnSegmentPlotServer, data = example_cn_segment, defaults = NULL
+    ),
+    list(
+        label = "PCA Biplot", id = "pcabiplot", type = "pca",
+        inputs_ui = pcaBiplotInputsUI, output_ui = pcaBiplotOutputUI,
+        server_fn = pcaBiplotServer, data = example_pca, defaults = NULL
+    ),
+    list(
+        label = "PCA Scree", id = "pcascree", type = "pca",
+        inputs_ui = pcaScreePlotInputsUI, output_ui = pcaScreePlotOutputUI,
+        server_fn = pcaScreePlotServer, data = example_pca, defaults = NULL
+    ),
+    list(
+        label = "PCA Loadings", id = "pcaloadings", type = "pca",
+        inputs_ui = pcaLoadingsPlotInputsUI, output_ui = pcaLoadingsPlotOutputUI,
+        server_fn = pcaLoadingsPlotServer, data = example_pca, defaults = NULL
+    ),
+    list(
+        label = "PCA Pairs", id = "pcapairs", type = "pca",
+        inputs_ui = pcaPairsPlotInputsUI, output_ui = pcaPairsPlotOutputUI,
+        server_fn = pcaPairsPlotServer, data = example_pca, defaults = NULL
+    ),
+    list(
+        label = "PC Correlation", id = "pcaeigencor", type = "pca",
+        inputs_ui = pcaEigencorPlotInputsUI, output_ui = pcaEigencorPlotOutputUI,
+        server_fn = pcaEigencorPlotServer, data = example_pca, defaults = NULL
+    ),
+    list(
+        label = "AlphaFold", id = "alphafold", type = "af",
+        inputs_ui = alphafoldConfidenceInputsUI, output_ui = alphafoldConfidenceOutputUI,
+        server_fn = alphafoldConfidenceServer, data = example_alphafold, defaults = NULL
     ),
     list(
         label = "DimPlot", id = "dimplot", type = "sce",
@@ -132,27 +204,22 @@ build_tab <- function(mod) {
                 style = "color: grey; font-size: 12px;"),
             VizModules::dataFilterUI(paste0(mod$id, "_filter"))
         )
-    } else if (identical(mod$type, "sce")) {
-        tagList(
-            hr(),
-            p("This module is bound to the bundled 'example_sce' ",
-                "SingleCellExperiment.",
-                style = "color: grey; font-size: 12px;")
-        )
-    } else if (identical(mod$type, "cn")) {
-        tagList(
-            hr(),
-            p("This module is bound to the bundled 'example_cn_segment' ",
-                "CNSegment object.",
-                style = "color: grey; font-size: 12px;")
-        )
     } else {
-        tagList(
-            hr(),
-            p("This module uses the bundled Michaelis-Menten kinetics data ",
-                "(observed points, fitted line, and nls fit).",
-                style = "color: grey; font-size: 12px;")
+        note <- switch(mod$type,
+            sce = "This module is bound to the bundled 'example_sce' SingleCellExperiment.",
+            cn = "This module is bound to the bundled 'example_cn_segment' CNSegment object.",
+            pca = "This module is bound to the bundled 'example_pca' PCAtools object (airway RNA-seq).",
+            gsea = "This module is bound to the bundled 'example_gsea' input (fgsea's example ranks and pathways).",
+            af = paste(
+                "This module is bound to the bundled AlphaFold DB prediction for human p53",
+                "(P04637; AlphaFold DB, CC-BY 4.0)."
+            ),
+            paste(
+                "This module uses the bundled Michaelis-Menten kinetics data",
+                "(observed points, fitted line, and nls fit)."
+            )
         )
+        tagList(hr(), p(note, style = "color: grey; font-size: 12px;"))
     }
 
     tabPanel(
@@ -186,10 +253,11 @@ about_tab <- tabPanel(
                     "This gallery showcases sciVizModules' interactive Shiny",
                     "modules using bundled example datasets so you can preview",
                     "each scientific plot type and its configurable inputs.",
-                    "Differential-expression, enrichment, survival, and",
-                    "pharmacology modules are driven by editable data tables;",
-                    "the single-cell (dittoSeq) modules are bound to the",
-                    "bundled example SingleCellExperiment."
+                    "Differential-expression, enrichment, survival, forest, GWAS,",
+                    "CRISPR screen and pharmacology modules are driven by editable",
+                    "data tables; the single-cell (dittoSeq), copy number, PCA",
+                    "(PCAtools), GSEA and AlphaFold modules are bound to bundled",
+                    "example objects."
                 ),
                 tags$p(
                     tags$strong("Repository: "),
@@ -254,23 +322,15 @@ server <- function(input, output, session) {
             })
             m$server_fn(m$id, data = filtered_data)
 
-        } else if (identical(m$type, "sce")) {
-            ## SingleCellExperiment bound directly (no data table).
-            sce_data <- reactive(m$data)
+        } else if (m$type %in% c("sce", "cn", "pca", "af", "gsea")) {
+            ## An object bound directly (no data table): SingleCellExperiment,
+            ## CNSegment, PCAtools pca, or read_alphafold() result.
+            obj_data <- reactive(m$data)
             output[[paste0(m$id, "_inputs_ui")]] <- renderUI({
-                m$inputs_ui(m$id, sce_data(), defaults = m$defaults,
+                m$inputs_ui(m$id, obj_data(), defaults = m$defaults,
                     title = h3(paste(m$label, "Settings")))
             })
-            m$server_fn(m$id, data = sce_data)
-
-        } else if (identical(m$type, "cn")) {
-            ## CNSegment object bound directly (no data table).
-            seg_data <- reactive(m$data)
-            output[[paste0(m$id, "_inputs_ui")]] <- renderUI({
-                m$inputs_ui(m$id, seg_data(), defaults = m$defaults,
-                    title = h3(paste(m$label, "Settings")))
-            })
-            m$server_fn(m$id, data = seg_data)
+            m$server_fn(m$id, data = obj_data)
 
         } else {
             ## Michaelis-Menten: bundle of data + model + stats.

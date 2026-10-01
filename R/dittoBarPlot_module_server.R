@@ -48,7 +48,7 @@ dittoBarPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, d
         palette_groups <- reactive({
             obj <- data_reactive()
             var <- input$var
-            if (is.null(obj) || is.null(var) || !nzchar(var)) {
+            if (is.null(obj) || !nz_value(var)) {
                 return(character(0))
             }
             .ditto_group_levels(obj, var)
@@ -72,7 +72,7 @@ dittoBarPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, d
             }
             initial_colors <- isolate(resolve_palette(
                 groups, input$palette.colours, default_palette_values,
-                .sci_group_colors(defaults)
+                default_group_colors(defaults, "palette.colours")
             ))
             # Seed the store with what the picker is built from, so its first
             # report back is a no-op rather than a change.
@@ -102,12 +102,13 @@ dittoBarPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, d
             updateNumericInput(session, "split.ncol", value = get_default(defaults, "split.ncol", NA))
             updateMaterialSwitch(session, "x.labels.rotate", value = get_default(defaults, "x.labels.rotate", TRUE))
             updateMaterialSwitch(session, "retain.factor.levels", value = get_default(defaults, "retain.factor.levels", FALSE))
+            reset_group_colors(session, "palette.colours", defaults, palette_groups(), default_palette_values)
             .ditto_reset_uniform(session, defaults)
         })
 
         observeEvent(input$split.by, {
-            split.set <- !is.null(input$split.by) && any(nzchar(input$split.by))
-            .ditto_toggle_facet_titles(session, split.set, hidden = hide.inputs)
+            split.set <- nz_value(input$split.by)
+            toggle_facet_title_inputs(session, split.set, hidden = hide.inputs)
         }, ignoreNULL = FALSE)
 
         generate_dittoBarPlot <- reactive({
@@ -118,10 +119,10 @@ dittoBarPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, d
 
             var <- isolate_fn(input$var)
             group.by <- isolate_fn(input$group.by)
-            req(var, nzchar(var), group.by, nzchar(group.by))
+            req(nz_value(var), nz_value(group.by))
 
             split.by <- isolate_fn(input$split.by)
-            if (is.null(split.by) || !nzchar(split.by)) split.by <- NULL
+            split.by <- blank_to_null(split.by)
 
             split.nrow <- isolate_fn(input$split.nrow)
             if (is.null(split.nrow) || is.na(split.nrow)) split.nrow <- NULL
@@ -133,7 +134,7 @@ dittoBarPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, d
             if (length(groups) > 0) {
                 palette_values <- resolve_palette(
                     groups, isolate_fn(palette_store()), default_palette_values,
-                    .sci_group_colors(defaults)
+                    default_group_colors(defaults, "palette.colours")
                 )
                 color.panel <- unname(palette_values[groups])
             }
@@ -162,7 +163,7 @@ dittoBarPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, d
             )
 
             fig <- plotly::ggplotly(gg)
-            .ditto_finalize_plotly(fig, input, isolate_fn, faceted = !is.null(split.by))
+            .sci_finalize_plotly(fig, input, isolate_fn, faceted = !is.null(split.by))
         })
 
         output$dittoBarPlot <- renderPlotly({

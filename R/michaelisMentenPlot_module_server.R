@@ -96,7 +96,7 @@ michaelisMentenServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL
 
             x <- isolate_fn(input$x)
             y <- isolate_fn(input$y)
-            req(x, nzchar(x), y, nzchar(y))
+            req(nz_value(x), nz_value(y))
             req(x %in% names(df), y %in% names(df))
             req(x %in% names(mml), y %in% names(mml))
 
@@ -108,7 +108,9 @@ michaelisMentenServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL
                 axis.ticks = additional_theme$axis.ticks,
                 strip.background = element_blank()
             )
-            gg <- michaelisMentenPlot(
+            # ggplot2 draws a jitter layer's seed when the layer is created, so build under
+            # a fixed one or the points jump to new positions on every rebuild.
+            gg <- with_stable_seed(michaelisMentenPlot(
                 data = df,
                 model = mml,
                 x = x,
@@ -120,7 +122,7 @@ michaelisMentenServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL
                 jitter_alpha = isolate_fn(input$jitter_alpha),
                 line_color = isolate_fn(input$line_color),
                 linetype = isolate_fn(input$linetype)
-            )
+            ))
 
             fig <- plotly::ggplotly(gg)
 

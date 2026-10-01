@@ -180,7 +180,7 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             if (is.null(hover.text.cols) || length(hover.text.cols) == 0) hover.text.cols <- "signal"
 
             id.col <- if (!is.null(input$id.col)) isolate_fn(input$id.col) else NULL
-            if (!is.null(id.col) && !nzchar(id.col)) id.col <- NULL
+            id.col <- blank_to_null(id.col)
 
             genes <- genes_obj()
             label.genes <- isolate_fn(label_genes_text())

@@ -6,7 +6,9 @@
 #'
 #' @param id The ID for the Shiny module.
 #' @param data A `reactive` returning the enrichment results data frame. Must
-#'   contain a column of GO identifiers and a numeric column to colour by.
+#'   contain a column of GO identifiers and a numeric column to colour by. Values that
+#'   are not data frames are coerced with [as.data.frame()]; a `NULL` value is
+#'   treated as "not ready yet" and the module waits for data.
 #' @param hide.inputs A character vector of input IDs to hide. These will still
 #'   be initialized and their values passed to the plot function, but the user
 #'   will not be able to see/adjust them in the UI.
@@ -31,7 +33,9 @@
 #' @author Jacob Martin, Jared Andrews
 goFanPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL) {
     stopifnot(is.reactive(data))
-    data_reactive <- data
+    # A NULL (a parent app switching datasets) becomes a silent wait, and anything
+    # coercible, such as a DataFrame, is converted before the module reads it.
+    data_reactive <- require_data_frame(data)
 
     moduleServer(id, function(input, output, session) {
         hide_input(session, hide.inputs)
@@ -72,11 +76,11 @@ goFanPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defa
 
             term.id <- isolate_fn(input$term.id)
             fill <- isolate_fn(input$fill)
-            req(term.id, nzchar(term.id), fill, nzchar(fill))
+            req(nz_value(term.id), nz_value(fill))
             req(term.id %in% names(df), fill %in% names(df))
 
             sub_rect <- isolate_fn(input$sub_rect)
-            if (is.null(sub_rect) || !nzchar(sub_rect)) sub_rect <- NULL
+            sub_rect <- blank_to_null(sub_rect)
 
             fig <- goFanPlot(
                 data = df,

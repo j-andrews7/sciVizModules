@@ -6,7 +6,9 @@
 #'
 #' @param id The ID for the Shiny module.
 #' @param data A `reactive` containing the data frame to plot. Must contain a
-#'   numeric follow-up time column and an event/status column.
+#'   numeric follow-up time column and an event/status column. Values that are not
+#'   data frames are coerced with [as.data.frame()]; a `NULL` value is treated as
+#'   "not ready yet" and the module waits for data.
 #' @param hide.inputs A character vector of input IDs to hide. These will still be
 #'   initialized and their values passed to the plot function, but the user will
 #'   not be able to see/adjust them in the UI.
@@ -31,7 +33,9 @@
 #' @author Jacob Martin
 survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL) {
     stopifnot(is.reactive(data))
-    data_reactive <- data
+    # A NULL (a parent app switching datasets) becomes a silent wait, and anything
+    # coercible, such as a DataFrame, is converted before the module reads it.
+    data_reactive <- require_data_frame(data)
 
     moduleServer(id, function(input, output, session) {
         # Resolve any reactive() entries in `defaults` server-side, so a parent
@@ -52,7 +56,7 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
         palette_groups <- reactive({
             df <- data_reactive()
             group_col <- input$group.by
-            if (is.null(df) || is.null(group_col) || !nzchar(group_col) || !group_col %in% names(df)) {
+            if (is.null(df) || !nz_value(group_col) || !group_col %in% names(df)) {
                 return("All")
             }
             grp <- unique(stats::na.omit(as.character(df[[group_col]])))
@@ -75,7 +79,7 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             groups <- palette_groups()
             initial_colors <- isolate(resolve_palette(
                 groups, input$palette.colours, default_palette_values,
-                .sci_group_colors(defaults)
+                default_group_colors(defaults, "palette.colours")
             ))
             # Seed the store with what the picker is built from, so its first
             # report back is a no-op rather than a change.
@@ -97,21 +101,22 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             req(df)
             num.choices <- names(df)[vapply(df, is.numeric, logical(1))]
 
-            update_viz_select(session, "time", selected = .sv_default(defaults, "time", .detect_time_col(df, num.choices)))
-            update_viz_select(session, "status", selected = .sv_default(defaults, "status", .detect_status_col(df, num.choices)))
-            update_viz_select(session, "group.by", selected = .sv_default(defaults, "group.by", ""))
-            updateMaterialSwitch(session, "pval", value = .sv_default(defaults, "pval", TRUE))
-            updateMaterialSwitch(session, "risk.table", value = .sv_default(defaults, "risk.table", FALSE))
-            updateMaterialSwitch(session, "censor", value = .sv_default(defaults, "censor", TRUE))
-            update_viz_select(session, "surv.median.line", selected = .sv_default(defaults, "surv.median.line", "none"))
-            update_viz_select(session, "fun", selected = .sv_default(defaults, "fun", "survival"))
-            updateNumericInput(session, "line.size", value = .sv_default(defaults, "line.size", 1))
-            updateNumericInput(session, "break.time.by", value = .sv_default(defaults, "break.time.by", NA))
-            updateTextInput(session, "legend.title", value = .sv_default(defaults, "legend.title", ""))
+            update_viz_select(session, "time", selected = get_default(defaults, "time", .detect_time_col(df, num.choices)))
+            update_viz_select(session, "status", selected = get_default(defaults, "status", .detect_status_col(df, num.choices)))
+            update_viz_select(session, "group.by", selected = get_default(defaults, "group.by", ""))
+            updateMaterialSwitch(session, "pval", value = get_default(defaults, "pval", TRUE))
+            updateMaterialSwitch(session, "risk.table", value = get_default(defaults, "risk.table", FALSE))
+            updateMaterialSwitch(session, "censor", value = get_default(defaults, "censor", TRUE))
+            update_viz_select(session, "surv.median.line", selected = get_default(defaults, "surv.median.line", "none"))
+            update_viz_select(session, "fun", selected = get_default(defaults, "fun", "survival"))
+            updateNumericInput(session, "line.size", value = get_default(defaults, "line.size", 1))
+            updateNumericInput(session, "break.time.by", value = get_default(defaults, "break.time.by", NA))
+            updateTextInput(session, "legend.title", value = get_default(defaults, "legend.title", ""))
             reset_lines_inputs(session, defaults = defaults)
             reset_axes_inputs(session, defaults)
             reset_plotly_inputs(session, defaults)
             reset_legend_inputs(session, defaults)
+            reset_group_colors(session, "palette.colours", defaults, palette_groups(), default_palette_values)
         })
 
         # Build the plot (shared by the output and the source download).
@@ -127,7 +132,7 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             req(time_col %in% names(d), status_col %in% names(d))
 
             group.by <- isolate_fn(input$group.by)
-            if (is.null(group.by) || !nzchar(group.by)) group.by <- NULL
+            group.by <- blank_to_null(group.by)
 
             fun_choice <- isolate_fn(input$fun)
             fun <- if (is.null(fun_choice) || fun_choice == "survival") NULL else fun_choice
@@ -135,14 +140,14 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             groups <- isolate_fn(palette_groups())
             palette_values <- resolve_palette(
                 groups, isolate_fn(palette_store()), default_palette_values,
-                .sci_group_colors(defaults)
+                default_group_colors(defaults, "palette.colours")
             )
 
             break.time.by <- isolate_fn(input$break.time.by)
             if (length(break.time.by) != 1 || is.na(break.time.by)) break.time.by <- NULL
 
             legend.title <- isolate_fn(input$legend.title)
-            if (is.null(legend.title) || !nzchar(legend.title)) legend.title <- NULL
+            legend.title <- blank_to_null(legend.title)
           
           
             fig <- survivalCurve(

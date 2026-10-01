@@ -50,7 +50,7 @@ dittoDimPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, d
         palette_groups <- reactive({
             obj <- data_reactive()
             var <- input$var
-            if (is.null(obj) || is.null(var) || !nzchar(var)) {
+            if (is.null(obj) || !nz_value(var)) {
                 return(character(0))
             }
             if (!var %in% .ditto_discrete_metas(obj)) {
@@ -77,7 +77,7 @@ dittoDimPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, d
             }
             initial_colors <- isolate(resolve_palette(
                 groups, input$palette.colours, default_palette_values,
-                .sci_group_colors(defaults)
+                default_group_colors(defaults, "palette.colours")
             ))
             # Seed the store with what the picker is built from, so its first
             # report back is a no-op rather than a change.
@@ -109,12 +109,13 @@ dittoDimPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, d
             updateMaterialSwitch(session, "do.ellipse", value = get_default(defaults, "do.ellipse", FALSE))
             updateMaterialSwitch(session, "do.contour", value = get_default(defaults, "do.contour", FALSE))
             updateNumericInput(session, "labels.size", value = get_default(defaults, "labels.size", 5))
+            reset_group_colors(session, "palette.colours", defaults, palette_groups(), default_palette_values)
             .ditto_reset_uniform(session, defaults)
         })
 
         observeEvent(input$split.by, {
-            split.set <- !is.null(input$split.by) && any(nzchar(input$split.by))
-            .ditto_toggle_facet_titles(session, split.set, hidden = hide.inputs)
+            split.set <- nz_value(input$split.by)
+            toggle_facet_title_inputs(session, split.set, hidden = hide.inputs)
         }, ignoreNULL = FALSE)
 
         generate_dittoDimPlot <- reactive({
@@ -124,21 +125,21 @@ dittoDimPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, d
             req(obj)
 
             var <- isolate_fn(input$var)
-            req(var, nzchar(var))
+            req(nz_value(var))
             reduction.use <- isolate_fn(input$reduction.use)
-            req(reduction.use, nzchar(reduction.use))
+            req(nz_value(reduction.use))
 
             shape.by <- isolate_fn(input$shape.by)
-            if (is.null(shape.by) || !nzchar(shape.by)) shape.by <- NULL
+            shape.by <- blank_to_null(shape.by)
             split.by <- isolate_fn(input$split.by)
-            if (is.null(split.by) || !nzchar(split.by)) split.by <- NULL
+            split.by <- blank_to_null(split.by)
 
             groups <- isolate_fn(palette_groups())
             color.panel <- default_palette_values
             if (length(groups) > 0) {
                 palette_values <- resolve_palette(
                     groups, isolate_fn(palette_store()), default_palette_values,
-                    .sci_group_colors(defaults)
+                    default_group_colors(defaults, "palette.colours")
                 )
                 color.panel <- unname(palette_values[groups])
             }
@@ -174,7 +175,7 @@ dittoDimPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, d
             )
 
             fig <- plotly::ggplotly(gg)
-            .ditto_finalize_plotly(fig, input, isolate_fn, faceted = !is.null(split.by))
+            .sci_finalize_plotly(fig, input, isolate_fn, faceted = !is.null(split.by))
         })
 
         output$dittoDimPlot <- renderPlotly({
