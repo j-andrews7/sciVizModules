@@ -78,3 +78,13 @@ test_that("InputsUI builds UI from example_enrichment", {
     ui <- goFanPlotInputsUI("test", example_enrichment)
     expect_true(inherits(ui, c("shiny.tag", "shiny.tag.list")))
 })
+
+test_that("InputsUI offers no shape-drawing controls for the sunburst", {
+    # plotly's drawing tools need cartesian axes, so a sunburst has no use for them.
+    data(example_enrichment, package = "sciVizModules")
+    html <- as.character(goFanPlotInputsUI("test", example_enrichment))
+    expect_true(grepl("test-download.format", html, fixed = TRUE))
+    for (key in names(test_shape_inputs())) {
+        expect_false(grepl(paste0("test-", key), html, fixed = TRUE), info = key)
+    }
+})

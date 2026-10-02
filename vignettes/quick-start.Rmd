@@ -8,15 +8,18 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
+# Every chunk below either launches a Shiny app or needs a Bioconductor
+# dependency that is only Suggested, so none of them run at build time.
 knitr::opts_chunk$set(
     collapse = TRUE,
-    comment = "#>"
+    comment = "#>",
+    eval = FALSE
 )
 ```
 
 ## Overview
 
-**sciVizModules** extends [VizModules](https://cran.r-project.org/package=VizModules)
+**sciVizModules** extends [VizModules](https://github.com/j-andrews7/VizModules)
 with a curated set of domain-specific Shiny modules for the biological, chemical,
 and physical sciences. Each module wraps a plotting function with scientifically
 meaningful defaults, axis conventions, and annotation layers, while preserving
@@ -35,6 +38,48 @@ someModuleServer(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL
 ```
 
 Each module also ships a standalone `*App()` convenience function.
+
+Note that this package sets no `LazyData`, so the bundled example datasets need
+a `data()` call before you can use them by name:
+
+```{r load-data}
+library(sciVizModules)
+data(airway_deseq2)
+data(example_sce)
+data(survival_lung)
+```
+
+## Working with an AI coding agent
+
+sciVizModules builds on VizModules, which ships three agent skills describing
+its APIs. Install them into your project once and any compatible agent (Claude
+Code, GitHub Copilot, OpenAI Codex) will discover them:
+
+```{r skills}
+VizModules::use_vizmodules_skills(".", client = "claude")  # or "agents" / "copilot"
+```
+
+Point your agent at the one that matches the job:
+
+- **Putting sciVizModules modules into an app** (`defaults`, `hide.inputs` /
+  `hide.tabs`, `createModuleApp()`, the data filter, the Figure Builder,
+  source-data export): `vizmodules-app`. It also carries a generated inventory
+  of every VizModules module's column-mapping keys, colour key and tab names,
+  which the wrapper modules here inherit.
+- **Building your own module on top of one of these, or of a VizModules base
+  module** (adding inputs, transforming the data before it is plotted, driving
+  the wrapped module's parameters): `vizmodules-custom-module`. Most of
+  sciVizModules is built exactly this way, so its modules are good worked
+  examples.
+- **Writing a module from scratch around your own plotting function**:
+  `vizmodules-custom-module` for the Shiny wiring, plus `vizmodules-new-module`
+  for the full `*InputsUI()` / `*OutputUI()` / `*Server()` / `*App()` layout,
+  documentation and tests. The latter is written for contributions to
+  VizModules itself, but the structure carries over.
+
+The skills are copied from your installed VizModules, so re-run the call with
+`overwrite = TRUE` after upgrading it. `AGENTS.md` in the sciVizModules
+repository covers the conventions specific to this package on top of those.
 
 ## The module gallery
 
@@ -81,9 +126,21 @@ shinyApp(ui, server)
 The fastest way to explore a module is its `*App()` function:
 
 ```{r apps}
-if (interactive()) volcanoPlotApp()   # differential expression, airway_deseq2
-if (interactive()) dittoDimPlotApp()  # single-cell reduction, example_sce
-if (interactive()) doseResponseApp()  # pharmacology, dose_response
+if (interactive()) volcanoPlotApp()     # differential expression, airway_deseq2
+if (interactive()) dittoDimPlotApp()    # single-cell reduction, example_sce
+if (interactive()) doseResponseApp()    # pharmacology, dose_response
+if (interactive()) cnSegmentPlotApp()   # copy number, example_cn_segment
+if (interactive()) forestPlotApp()      # Cox / logistic / linear model, survival_lung
+if (interactive()) pcaBiplotApp()       # PCAtools pca object, example_pca
+if (interactive()) alphafoldConfidenceApp() # AlphaFold DB prediction for p53
+if (interactive()) manhattanPlotApp()   # GWAS summary statistics, example_gwas
+if (interactive()) gseaEnrichmentPlotApp() # fgsea example ranks and pathways
+if (interactive()) crisprScreenRankApp() # simulated MAGeCK gene summary
+if (interactive()) rocCurveApp()        # diagnostic markers, example_biomarkers
+if (interactive()) pkConcentrationTimeApp() # oral theophylline, datasets::Theoph
+if (interactive()) plateHeatmapApp()    # two 384-well plates, example_plate
+if (interactive()) structureViewerApp() # 3D AlphaFold model of p53
+if (interactive()) mdTrajectoryMetricsApp() # simulated GROMACS RMSD, Rg and RMSF
 ```
 
 ## Set defaults and hide controls
@@ -95,14 +152,36 @@ the plot, so the module stays fully configured.
 ```{r defaults}
 volcanoPlotServer(
     "de",
-    data      = reactive(airway_deseq2),
-    defaults  = list(sig.thresh = 0.01, fc.thresh = 1),
-    hide.tabs = c("Legend/Scale")
+    data        = reactive(airway_deseq2),
+    defaults    = list(sig.thresh = 0.01, fc.thresh = 1),
+    hide.inputs = c("shape.by"),
+    hide.tabs   = c("Legend")
 )
 ```
 
 Hidden inputs and tabs still feed their values into the plot, so the module
 stays fully configured while exposing only what your users need.
+
+The tab names come from the module being wrapped, so check its help page before
+naming one: a `hide.tabs` entry that matches nothing is silently ignored. For
+the volcano and MA modules the tabs are those of
+`VizModules::dittoViz_scatterPlotInputsUI()` -- Data, Adjustments, Points,
+Colors, Facet, Annotations, Legend, Trajectory, Lines, Axes, Plotly, Extras.
+The `vizmodules-app` agent skill (see above) lists the tab names and `defaults`
+keys of every VizModules base module in its module inventory.
+
+Group colours are a `defaults` entry too. The volcano and MA modules assemble
+`color.up` / `color.down` / `color.ns` into the wrapped module's `color.panel`
+mapping, so the colours open where you asked and stay editable on its Colors
+tab:
+
+```{r de-colors}
+volcanoPlotServer(
+    "de",
+    data     = reactive(airway_deseq2),
+    defaults = list(color.up = "#D55E00", color.down = "#0072B2")
+)
+```
 
 ## App factory with `createModuleApp()`
 
@@ -114,7 +193,7 @@ filterable data table, and dataset switching for any module:
 ```{r create-module-app}
 library(sciVizModules)
 
-app <- createModuleApp(
+app <- VizModules::createModuleApp(
     inputs_ui_fn = volcanoPlotInputsUI,
     output_ui_fn = volcanoPlotOutputUI,
     server_fn    = volcanoPlotServer,
@@ -123,6 +202,9 @@ app <- createModuleApp(
 )
 if (interactive()) runApp(app)
 ```
+
+The `vizmodules-app` agent skill covers `createModuleApp()` and its data filter
+in more depth.
 
 The data-frame modules take a `data_list`; the dittoSeq single-cell modules take
 an `object_list` of `SingleCellExperiment` / `Seurat` / `SummarizedExperiment`
@@ -183,12 +265,34 @@ head(survival_lung)
 #> time, status, age, sex, ph.ecog
 ```
 
+### Clinical models
+
+| Module | Server function | Data type | Expected data | Example data |
+|---|---|---|---|---|
+| Forest plot | `forestPlotServer()` | `data.frame` | Raw data: for a Cox model a time and an event column (as for the survival curve); for a logistic model a binary outcome; for a linear model a numeric outcome; plus any numeric or categorical covariates. The module fits the model | `survival_lung` |
+| ROC curve | `rocCurveServer()` | `data.frame` | One row per subject: a binary outcome column and one or more numeric predictor columns | `example_biomarkers` |
+
+```{r forest-format}
+forestPlot(survival_lung,
+    model = "cox", time = "time", status = "status",
+    covariates = c("age", "sex", "ph.ecog")
+)
+```
+
+```{r roc-format}
+data(example_biomarkers)
+roc <- rocCurve(example_biomarkers, response = "disease",
+    predictors = c("marker_strong", "marker_moderate", "marker_weak"))
+attr(roc, "table")  # AUC, CI and Youden cut-off per predictor
+```
+
 ### Biochemical kinetics and pharmacology
 
 | Module | Server function | Data type | Expected data | Example data |
 |---|---|---|---|---|
 | Michaelis-Menten | `michaelisMentenServer()` | reactive `list` | A list with `data` (observed-points `data.frame`), `model` (fitted-line `data.frame`), and optional `stats` (an `nls` fit or named `K` / `Vmax` coefficients for annotation) | `mm_kinetics`, `mm_kinetics_line`, `mm_kinetics_fit` |
 | Dose-response | `doseResponseServer()` | `data.frame` | A dose column (plotted on a log10 scale) and a response column; the module fits a log-logistic curve with **drc** | `dose_response` |
+| PK concentration-time | `pkConcentrationTimeServer()` | `data.frame` | One row per sample: subject, time and concentration columns, optionally a dose and a treatment group (`Subject`/`ID`, `Time`/`TAD`, `conc`/`DV`, `Dose`/`AMT` are detected) | `datasets::Theoph` |
 
 The Michaelis-Menten module consumes pre-computed pieces rather than a single
 data frame:
@@ -204,6 +308,134 @@ str(list(
 ```{r dr-format}
 head(dose_response)
 #> dose_uM, rep1_response_pct, ..., mean_response_pct, sd_response_pct
+```
+
+The PK module computes each subject's non-compartmental parameters the way
+PKNCA does by default (linear-up / log-down AUC, best-fit terminal slope):
+
+```{r pk-format}
+pk <- pkConcentrationTime(datasets::Theoph, time = "Time", conc = "conc",
+    subject = "Subject", dose = "Dose", log.y = TRUE, show.lambda = TRUE)
+head(attr(pk, "table"))  # Cmax, Tmax, AUClast, half-life, AUCinf, CL/F, Vz/F
+```
+
+### Screening and plate assays
+
+| Module | Server function | Data type | Expected data | Example data |
+|---|---|---|---|---|
+| Plate heatmap | `plateHeatmapServer()` | `data.frame` | One row per well: a well identifier (`A01`, `B7`, `AF48`), a numeric readout, and optionally a plate column and a column labelling the positive and negative control wells | `example_plate` |
+
+```{r plate-format}
+data(example_plate)
+head(example_plate)
+plateHeatmap(example_plate, well = "well", value = "signal", plate = "plate",
+    control = "type", positive = "positive", negative = "negative",
+    normalise = "bscore", marginals = TRUE)
+```
+
+### Copy number
+
+| Module | Server function | Data type | Expected data | Example data |
+|---|---|---|---|---|
+| Copy-number segments | `cnSegmentPlotServer()` | `CNSegment`, or a named list of them | A `CNSegment` object as returned by `sesame::cnSegmentation()`: bin-level log2 signal ratios in `bin.signals`, their coordinates in `bin.coords`, and a `genomeInfo` carrying `cytoBand` (for chromosome ticks and centromere guides) and optionally `genes` (for labels) | `example_cn_segment` |
+
+Passing a named list plots one panel per sample, stacked over a shared genomic
+x-axis. Like the PCAtools and AlphaFold modules, it does not take a data frame,
+so it cannot go in the Figure Builder.
+
+```{r cn-format}
+data(example_cn_segment)
+example_cn_segment
+```
+
+### Genetics (GWAS)
+
+| Module | Server function | Data type | Expected data | Example data |
+|---|---|---|---|---|
+| Manhattan plot | `manhattanPlotServer()` | `data.frame` | Summary statistics with chromosome, position and p-value columns (and optionally a variant id), named in any common style (`CHR`/`BP`/`P`, `chromosome`/`base_pair_location`/`p_value`, ...) | `example_gwas` |
+| GWAS QQ plot | `gwasQQPlotServer()` | `data.frame` | Summary statistics with a p-value column | `example_gwas` |
+
+### Gene set enrichment (GSEA)
+
+| Module | Server function | Data type | Expected data | Example data |
+|---|---|---|---|---|
+| GSEA enrichment plot | `gseaEnrichmentPlotServer()` | fgsea bundle or `gseaResult` | `list(stats = <named numeric>, pathways = <named list>, results = <fgsea table, optional>)`, or a clusterProfiler `gseaResult` | `example_gsea` |
+
+### Functional genomics screens
+
+| Module | Server function | Data type | Expected data | Example data |
+|---|---|---|---|---|
+| CRISPR screen rank | `crisprScreenRankServer()` | `data.frame` | A MAGeCK RRA `gene_summary.txt`, read with `read_mageck()` | simulated, in `inst/extdata` |
+
+```{r crispr-format}
+screen <- read_mageck(system.file("extdata", "example_mageck.gene_summary.txt.gz",
+    package = "sciVizModules"))
+head(screen)
+```
+
+### Principal component analysis (PCAtools)
+
+| Module | Server function | Data type | Expected data | Example data |
+|---|---|---|---|---|
+| Biplot | `pcaBiplotServer()` | PCAtools `pca` | The object `PCAtools::pca()` returns: sample scores (`rotated`), variable `loadings`, `variance` explained, and sample `metadata` | `example_pca` |
+| Scree plot | `pcaScreePlotServer()` | PCAtools `pca` | As above | `example_pca` |
+| Loadings plot | `pcaLoadingsPlotServer()` | PCAtools `pca` | As above | `example_pca` |
+| Pairs plot | `pcaPairsPlotServer()` | PCAtools `pca` | As above | `example_pca` |
+| PC-metadata correlation | `pcaEigencorPlotServer()` | PCAtools `pca` | As above; needs sample `metadata` | `example_pca` |
+
+Their `*App()` functions take a named `pca_list`. A `pca` object is a plain
+list, so the modules read it without PCAtools installed; PCAtools is needed
+only to make one, and to mark the elbow on the scree plot.
+
+```{r pca-format}
+data(example_pca)
+round(example_pca$variance, 1)
+head(example_pca$metadata)
+```
+
+### Structural biology
+
+| Module | Server function | Data type | Expected data | Example data |
+|---|---|---|---|---|
+| AlphaFold confidence | `alphafoldConfidenceServer()` | `read_alphafold()` result | AlphaFold DB `*-predicted_aligned_error_v*.json` and `*-confidence_v*.json`, a ColabFold `*_scores_*.json`, or a predicted model (`.pdb` / `.cif`) whose B-factors hold the pLDDT; files may be gzipped | AlphaFold DB prediction for p53 (P04637), in `inst/extdata` |
+
+```{r af-format}
+af <- read_alphafold(
+    pae = system.file("extdata", "AF-P04637-F1-predicted_aligned_error_v6.json.gz",
+        package = "sciVizModules"),
+    confidence = system.file("extdata", "AF-P04637-F1-confidence_v6.json.gz",
+        package = "sciVizModules")
+)
+af
+alphafoldConfidence(af)
+```
+
+AlphaFold DB data is available under CC-BY 4.0; cite Jumper et al. (2021) and
+Varadi et al. (2024) when you use it.
+
+| Module | Server function | Data type | Expected data | Example data |
+|---|---|---|---|---|
+| 3D structure viewer | `structureViewerServer()` | `read_structure()` result | A PDB or mmCIF file (from the PDB, AlphaFold DB, ColabFold, ...), optionally gzipped | AlphaFold DB model of p53 (P04637), in `inst/extdata` |
+| MD trajectory metrics | `mdTrajectoryMetricsServer()` | `data.frame` | `read_xvg()` output from GROMACS `.xvg` files (`gmx rms`, `gmx gyrate`, `gmx rmsf`, ...), several files combined with `rbind()`: columns `x`, `value`, `series` and `metric` | simulated, in `inst/extdata` |
+
+`structureViewer` is the one module that is not a plotly figure. It is an NGL
+3D widget, so it has its own PNG snapshot button instead of the Source Data
+download, and it is not available to the Figure Builder.
+
+```{r structure-format}
+p53 <- read_structure(system.file("extdata", "AF-P04637-F1-model_v6.pdb.gz",
+    package = "sciVizModules"))
+p53
+structureViewer(p53, color.by = "plddt", highlight = "175, 248, 273")
+```
+
+```{r xvg-format}
+ext <- function(f) system.file("extdata", f, package = "sciVizModules")
+md <- rbind(
+    read_xvg(ext("example_rmsd_rep1.xvg.gz"), series = "replica 1"),
+    read_xvg(ext("example_rmsd_rep2.xvg.gz"), series = "replica 2")
+)
+mdTrajectoryMetrics(md, smooth.window = 25, time.unit = "ps to ns")
 ```
 
 ### Single-cell / RNA-seq (dittoSeq wrappers)
@@ -231,6 +463,53 @@ or `SummarizedExperiment` object.
 data(example_sce)
 example_sce
 ```
+
+## Multi-panel figures
+
+The data-frame modules are registered with the VizModules Figure Builder, so
+several panels can be dragged, sized and exported as one figure:
+
+```{r figure-builder}
+sciFigureBuilderApp()
+```
+
+`sci_figure_builder_registry()` returns the registry itself, in the shape
+`VizModules::figureBuilderServer()` documents, so you can extend it with your
+own modules:
+
+```{r figure-builder-registry}
+registry <- sci_figure_builder_registry()
+names(registry)
+str(registry$volcano, max.level = 1)
+```
+
+The `vizmodules-app` agent skill covers embedding the Figure Builder in your own
+app, and `vizmodules-custom-module` covers building a module to register in it.
+
+The dittoSeq modules, `cnSegmentPlot`, `michaelisMenten`, the PCAtools modules,
+`gseaEnrichmentPlot` and `alphafoldConfidence` are not registered: the
+builder's dataset catalogue holds data frames, and those take other objects.
+`structureViewer` is a 3D widget rather than a plotly figure. `forestPlot`, the
+GWAS modules, `crisprScreenRank`, `rocCurve`, `pkConcentrationTime`,
+`plateHeatmap` and `mdTrajectoryMetrics` are not registered yet.
+
+## Export the source data
+
+Every module's control panel ends in a **Source Data** button. It downloads a
+ZIP holding a self-contained interactive HTML of the plot, an SVG and a PNG of
+it as drawn on screen, a CSV of the data actually plotted, a CSV of the UI input
+values, and a statistics table where the module computes one. The Figure Builder
+writes one such set per panel, named after the panel label.
+
+This is plumbed by `VizModules::collect_source_data()` and
+`VizModules::create_source_download_handler()`, which every module here already
+wires up, so nothing is needed on your side. Two notes:
+
+- The SVG and PNG are photographed in the browser off the graph you are looking
+  at, so they carry anything applied after the figure was built. The button
+  therefore pauses briefly before the archive arrives.
+- The interactive HTML needs pandoc (via `htmlwidgets::saveWidget()`). Without
+  it the archive still downloads, with a warning and no HTML.
 
 ## Which plot parameters are exposed?
 

@@ -12,7 +12,7 @@
 \item{include.blank}{Whether to prepend an empty choice.}
 }
 \value{
-A named character vector suitable for \code{selectInput()} choices.
+A named character vector suitable for \code{VizModules::viz_select_input()} choices.
 }
 \description{
 Build the choices for a continuous selector (numeric metadata + genes)

@@ -35,7 +35,7 @@
 #' if (interactive()) shiny::runApp(app2)
 survivalCurveApp <- function(data_list = NULL) {
     if (is.null(data_list)) {
-        data_list <- list("survival_lung" = survival_lung)
+        data_list <- list("survival_lung" = .sci_example_data("survival_lung"))
     }
 
     stopifnot(is.list(data_list), length(data_list) >= 1)

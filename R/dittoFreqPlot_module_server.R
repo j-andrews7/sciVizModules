@@ -31,9 +31,14 @@ dittoFreqPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
     data_reactive <- data
 
     moduleServer(id, function(input, output, session) {
+        # Resolve any reactive() entries in `defaults` server-side, so a parent
+        # app driving a parameter costs one render rather than a client round-trip.
+        params <- setup_reactive_defaults(defaults, input, session)
+
         ns <- session$ns
 
-        hide_input(session, hide.inputs)
+        # dittoFreqPlot always facets by var level, so there is no main title to style.
+        hide_input(session, c(hide.inputs, main_title_input_ids))
         if (!is.null(hide.tabs)) {
             for (tab.name in hide.tabs) hideTab(inputId = "dittoFreqPlotTabsetPanel", target = tab.name)
         }
@@ -46,20 +51,36 @@ dittoFreqPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             if (is.null(obj)) {
                 return(character(0))
             }
-            col <- input$color.by
-            if (is.null(col) || !nzchar(col)) col <- input$group.by
-            if (is.null(col) || !nzchar(col)) {
+            col <- blank_to_null(input$color.by) %||% blank_to_null(input$group.by)
+            if (is.null(col)) {
                 return(character(0))
             }
             .ditto_group_levels(obj, col)
         })
+
+        # The group-to-colour mapping the plot draws with. The picker is rebuilt
+        # by renderUI() whenever the group set changes, and the value it then
+        # reports is exactly what the server seeded it with -- reading the raw
+        # input would rebuild the plot for that echo, on load and again the first
+        # time the user opens the tab the picker lives on. See
+        # VizModules::setup_group_colors().
+        palette_store <- setup_group_colors(
+            input, "palette.colours", palette_groups,
+            default_palette_values, defaults, params
+        )
 
         output$palette.selection <- renderUI({
             groups <- palette_groups()
             if (length(groups) == 0) {
                 return(NULL)
             }
-            initial_colors <- isolate(resolve_palette(groups, input$palette.colours, default_palette_values))
+            initial_colors <- isolate(resolve_palette(
+                groups, input$palette.colours, default_palette_values,
+                default_group_colors(defaults, "palette.colours")
+            ))
+            # Seed the store with what the picker is built from, so its first
+            # report back is a no-op rather than a change.
+            palette_store(initial_colors)
             multiColorPicker(
                 ns("palette.colours"),
                 label = "Group Colors",
@@ -75,45 +96,49 @@ dittoFreqPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             obj <- data_reactive()
             req(obj)
             disc <- .ditto_discrete_metas(obj)
-            updateSelectInput(session, "var",
+            update_viz_select(session, "var",
                 selected = get_default(defaults, "var", if (length(disc)) disc[1] else ""))
-            updateSelectInput(session, "sample.by", selected = get_default(defaults, "sample.by", ""))
-            updateSelectInput(session, "group.by", selected = get_default(defaults, "group.by",
+            update_viz_select(session, "sample.by", selected = get_default(defaults, "sample.by", ""))
+            update_viz_select(session, "group.by", selected = get_default(defaults, "group.by",
                 if (length(disc) >= 2) disc[2] else if (length(disc)) disc[1] else ""))
-            updateSelectInput(session, "color.by", selected = get_default(defaults, "color.by", ""))
-            updateSelectInput(session, "scale", selected = get_default(defaults, "scale", "percent"))
-            updateSelectInput(session, "plots",
+            update_viz_select(session, "color.by", selected = get_default(defaults, "color.by", ""))
+            update_viz_select(session, "scale", selected = get_default(defaults, "scale", "percent"))
+            update_viz_select(session, "plots",
                 selected = get_default(defaults, "plots", c("boxplot", "jitter")))
             updateMaterialSwitch(session, "max.normalize", value = get_default(defaults, "max.normalize", FALSE))
             updateNumericInput(session, "jitter.size", value = get_default(defaults, "jitter.size", 1))
             updateNumericInput(session, "jitter.width", value = get_default(defaults, "jitter.width", 0.2))
             updateNumericInput(session, "boxplot.width", value = get_default(defaults, "boxplot.width", 0.4))
             updateNumericInput(session, "vlnplot.width", value = get_default(defaults, "vlnplot.width", 1))
+            reset_group_colors(session, "palette.colours", defaults, palette_groups(), default_palette_values)
             .ditto_reset_uniform(session, defaults)
         })
 
         generate_dittoFreqPlot <- reactive({
-            isolate_fn <- setup_auto_update_logic(input)
+            isolate_fn <- setup_auto_update_logic(input, params)
 
             obj <- data_reactive()
             req(obj)
 
             var <- isolate_fn(input$var)
             group.by <- isolate_fn(input$group.by)
-            req(var, nzchar(var), group.by, nzchar(group.by))
+            req(nz_value(var), nz_value(group.by))
 
             plots <- isolate_fn(input$plots)
             req(length(plots) > 0)
 
             sample.by <- isolate_fn(input$sample.by)
-            if (is.null(sample.by) || !nzchar(sample.by)) sample.by <- NULL
+            sample.by <- blank_to_null(sample.by)
             color.by <- isolate_fn(input$color.by)
-            if (is.null(color.by) || !nzchar(color.by)) color.by <- group.by
+            color.by <- blank_to_null(color.by) %||% group.by
 
             groups <- isolate_fn(palette_groups())
             color.panel <- default_palette_values
             if (length(groups) > 0) {
-                palette_values <- resolve_palette(groups, isolate_fn(input$palette.colours), default_palette_values)
+                palette_values <- resolve_palette(
+                    groups, isolate_fn(palette_store()), default_palette_values,
+                    default_group_colors(defaults, "palette.colours")
+                )
                 color.panel <- unname(palette_values[groups])
             }
 
@@ -126,7 +151,9 @@ dittoFreqPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 strip.background = element_blank()
             )
 
-            gg <- dittoSeq::dittoFreqPlot(
+            # ggplot2 draws a jitter layer's seed when the layer is created, so build under
+            # a fixed one or the points jump to new positions on every rebuild.
+            gg <- with_stable_seed(dittoSeq::dittoFreqPlot(
                 object = obj,
                 var = var,
                 sample.by = sample.by,
@@ -142,10 +169,10 @@ dittoFreqPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 vlnplot.width = isolate_fn(input$vlnplot.width),
                 color.panel = color.panel, 
                 theme = theme_style
-            )
+            ))
 
             fig <- plotly::ggplotly(gg)
-            .ditto_finalize_plotly(fig, input, isolate_fn)
+            .sci_finalize_plotly(fig, input, isolate_fn, faceted = TRUE)
         })
 
         output$dittoFreqPlot <- renderPlotly({

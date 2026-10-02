@@ -16,7 +16,9 @@ survivalCurveServer(
 \item{id}{The ID for the Shiny module.}
 
 \item{data}{A \code{reactive} containing the data frame to plot. Must contain a
-numeric follow-up time column and an event/status column.}
+numeric follow-up time column and an event/status column. Values that are not
+data frames are coerced with \code{\link[=as.data.frame]{as.data.frame()}}; a \code{NULL} value is treated as
+"not ready yet" and the module waits for data.}
 
 \item{hide.inputs}{A character vector of input IDs to hide. These will still be
 initialized and their values passed to the plot function, but the user will

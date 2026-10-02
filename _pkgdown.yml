@@ -1,0 +1,260 @@
+url: https://j-andrews7.github.io/sciVizModules/
+
+template:
+  bootstrap: 5
+
+development:
+  mode: auto
+
+reference:
+- title: Differential expression
+  desc: >
+    Volcano and MA plots over a differential-expression results table. Both
+    wrap the VizModules scatter plot module, adding threshold controls and an
+    auto-generated Up/Down/n.s. grouping.
+  contents:
+  - volcanoPlotInputsUI
+  - volcanoPlotOutputUI
+  - volcanoPlotServer
+  - volcanoPlotApp
+  - maPlotInputsUI
+  - maPlotOutputUI
+  - maPlotServer
+  - maPlotApp
+
+- title: Functional enrichment
+  desc: >
+    Dot plot and GO sunburst ("fan") plot over over-representation or GSEA
+    results, and the GSEA running enrichment score plot.
+  contents:
+  - enrichmentDotPlotInputsUI
+  - enrichmentDotPlotOutputUI
+  - enrichmentDotPlotServer
+  - enrichmentDotPlotApp
+  - goFanPlot
+  - goFanPlotInputsUI
+  - goFanPlotOutputUI
+  - goFanPlotServer
+  - goFanPlotApp
+  - gseaEnrichmentPlot
+  - gseaEnrichmentPlotInputsUI
+  - gseaEnrichmentPlotOutputUI
+  - gseaEnrichmentPlotServer
+  - gseaEnrichmentPlotApp
+
+- title: Genetics (GWAS)
+  desc: >
+    Manhattan and QQ plots of GWAS summary statistics. Both wrap the VizModules
+    scatter plot module; columns are detected from the common naming styles.
+  contents:
+  - manhattanPlotInputsUI
+  - manhattanPlotOutputUI
+  - manhattanPlotServer
+  - manhattanPlotApp
+  - gwasQQPlotInputsUI
+  - gwasQQPlotOutputUI
+  - gwasQQPlotServer
+  - gwasQQPlotApp
+
+- title: Functional genomics screens
+  desc: >
+    Pooled CRISPR screens summarised by MAGeCK: the gene rank plot, and the
+    reader for MAGeCK gene summaries.
+  contents:
+  - read_mageck
+  - crisprScreenRankInputsUI
+  - crisprScreenRankOutputUI
+  - crisprScreenRankServer
+  - crisprScreenRankApp
+
+- title: Survival analysis
+  desc: Kaplan-Meier curves with confidence bands, censor marks and risk table.
+  contents:
+  - survivalCurve
+  - survivalCurveInputsUI
+  - survivalCurveOutputUI
+  - survivalCurveServer
+  - survivalCurveApp
+
+- title: Clinical models
+  desc: >
+    Forest plots of hazard ratios, odds ratios or coefficients, fitted from the
+    raw data inside the module (Cox, logistic or linear regression), and ROC
+    curves with AUCs and optimal cut-offs for diagnostic markers.
+  contents:
+  - forestPlot
+  - forestPlotInputsUI
+  - forestPlotOutputUI
+  - forestPlotServer
+  - forestPlotApp
+  - rocCurve
+  - rocCurveInputsUI
+  - rocCurveOutputUI
+  - rocCurveServer
+  - rocCurveApp
+
+- title: Principal component analysis (PCAtools)
+  desc: >
+    One module per PCAtools view, each taking a PCAtools `pca` object: the
+    biplot (wrapping the VizModules scatter module, with loading arrows), the
+    scree, loadings and pairs plots, and the PC-metadata correlation heatmap.
+  contents:
+  - pcaBiplotInputsUI
+  - pcaBiplotOutputUI
+  - pcaBiplotServer
+  - pcaBiplotApp
+  - pcaScreePlot
+  - pcaScreePlotInputsUI
+  - pcaScreePlotOutputUI
+  - pcaScreePlotServer
+  - pcaScreePlotApp
+  - pcaLoadingsPlot
+  - pcaLoadingsPlotInputsUI
+  - pcaLoadingsPlotOutputUI
+  - pcaLoadingsPlotServer
+  - pcaLoadingsPlotApp
+  - pcaPairsPlot
+  - pcaPairsPlotInputsUI
+  - pcaPairsPlotOutputUI
+  - pcaPairsPlotServer
+  - pcaPairsPlotApp
+  - pcaEigencorPlot
+  - pcaEigencorPlotInputsUI
+  - pcaEigencorPlotOutputUI
+  - pcaEigencorPlotServer
+  - pcaEigencorPlotApp
+
+- title: Structural biology
+  desc: >
+    AlphaFold prediction confidence (per-residue pLDDT and the predicted
+    aligned error), an interactive 3D structure viewer for PDB / mmCIF files,
+    and molecular dynamics trajectory metrics from GROMACS `.xvg` output.
+    `structureViewer` is the one module here that is not a plotly figure: it
+    is an NGL widget with its own PNG snapshot.
+  contents:
+  - read_alphafold
+  - alphafoldConfidence
+  - alphafoldConfidenceInputsUI
+  - alphafoldConfidenceOutputUI
+  - alphafoldConfidenceServer
+  - alphafoldConfidenceApp
+  - read_structure
+  - structureViewer
+  - structureViewerInputsUI
+  - structureViewerOutputUI
+  - structureViewerServer
+  - structureViewerApp
+  - read_xvg
+  - mdTrajectoryMetrics
+  - mdTrajectoryMetricsInputsUI
+  - mdTrajectoryMetricsOutputUI
+  - mdTrajectoryMetricsServer
+  - mdTrajectoryMetricsApp
+
+- title: Pharmacology and kinetics
+  desc: >
+    Dose-response curves, Michaelis-Menten enzyme kinetics, and
+    pharmacokinetic concentration-time profiles with non-compartmental
+    parameters.
+  contents:
+  - doseResponseInputsUI
+  - doseResponseOutputUI
+  - doseResponseServer
+  - doseResponseApp
+  - michaelisMentenPlot
+  - michaelisMentenInputsUI
+  - michaelisMentenOutputUI
+  - michaelisMentenServer
+  - michaelisMentenApp
+  - pkConcentrationTime
+  - pkConcentrationTimeInputsUI
+  - pkConcentrationTimeOutputUI
+  - pkConcentrationTimeServer
+  - pkConcentrationTimeApp
+
+- title: Screening and plate assays
+  desc: >
+    Assay plate heatmaps in physical layout, raw or normalised per plate, with
+    control wells, Z'-factors and edge-effect margins.
+  contents:
+  - plateHeatmap
+  - plateHeatmapInputsUI
+  - plateHeatmapOutputUI
+  - plateHeatmapServer
+  - plateHeatmapApp
+
+- title: Copy number
+  desc: >
+    Stacked genome-wide copy-number segment plots over `CNSegment` objects, as
+    returned by `sesame::cnSegmentation()`.
+  contents:
+  - cnSegmentPlot
+  - cnSegmentPlotInputsUI
+  - cnSegmentPlotOutputUI
+  - cnSegmentPlotServer
+  - cnSegmentPlotApp
+
+- title: Single-cell and RNA-seq (dittoSeq)
+  desc: >
+    Wrappers around the dittoSeq plotting functions. Each takes a
+    `SingleCellExperiment`, `Seurat` or `SummarizedExperiment` object rather
+    than a data frame, and so takes `object_list` in its `*App()`.
+  contents:
+  - dittoDimPlotInputsUI
+  - dittoDimPlotOutputUI
+  - dittoDimPlotServer
+  - dittoDimPlotApp
+  - dittoDimHexInputsUI
+  - dittoDimHexOutputUI
+  - dittoDimHexServer
+  - dittoDimHexApp
+  - dittoScatterPlotInputsUI
+  - dittoScatterPlotOutputUI
+  - dittoScatterPlotServer
+  - dittoScatterPlotApp
+  - dittoPlotInputsUI
+  - dittoPlotOutputUI
+  - dittoPlotServer
+  - dittoPlotApp
+  - dittoRidgeJitterInputsUI
+  - dittoRidgeJitterOutputUI
+  - dittoRidgeJitterServer
+  - dittoRidgeJitterApp
+  - dittoBarPlotInputsUI
+  - dittoBarPlotOutputUI
+  - dittoBarPlotServer
+  - dittoBarPlotApp
+  - dittoFreqPlotInputsUI
+  - dittoFreqPlotOutputUI
+  - dittoFreqPlotServer
+  - dittoFreqPlotApp
+
+- title: Figure Builder
+  desc: >
+    Arrange several of these modules into one multi-panel figure using the
+    VizModules Figure Builder.
+  contents:
+  - sci_figure_builder_registry
+  - sciFigureBuilderApp
+
+- title: Example data
+  desc: >
+    Bundled datasets used by the example apps, the vignette and the tests.
+    This package sets no `LazyData`, so load them with `data()`.
+  contents:
+  - airway_deseq2
+  - airway_edger
+  - airway_voom
+  - dose_response
+  - example_biomarkers
+  - example_cn_segment
+  - example_enrichment
+  - example_gsea
+  - example_gwas
+  - example_pca
+  - example_plate
+  - example_sce
+  - mm_kinetics
+  - mm_kinetics_line
+  - mm_kinetics_fit
+  - survival_lung

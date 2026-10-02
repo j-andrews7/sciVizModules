@@ -54,6 +54,11 @@
     if (!"color.down" %in% names(defaults)) defaults$color.down <- "blue"
     if (!"color.ns" %in% names(defaults)) defaults$color.ns <- "lightgray"
 
+    # The group colours reach the wrapped scatter module through its own
+    # `color.panel` key, which seeds its colour picker and its reset. A caller
+    # that sets `color.panel` directly wins over the three scalar keys above.
+    if (!"color.panel" %in% names(defaults)) defaults$color.panel <- .de_group_colors(defaults)
+
     defaults
 }
 

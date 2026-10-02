@@ -77,24 +77,24 @@ dittoRidgeJitterInputsUI <- function(id, data, defaults = NULL, title = "RidgeJi
 
     inputs <- list(
         "Data" = tagList(
-            tipify(selectInput(ns("var"), "Variable (gene / metadata)",
+            tipify(viz_select_input(ns("var"), "Variable (gene / metadata)",
                 choices = cont.choices,
-                selected = default.var, selectize = FALSE
+                selected = default.var
             ), documentParameters$var,
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("group.by"), "Group By",
+            tipify(viz_select_input(ns("group.by"), "Group By",
                 choices = group.choices,
-                selected = default.group, selectize = FALSE
+                selected = default.group
             ), documentParameters$group.by,
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("color.by"), "Color By",
+            tipify(viz_select_input(ns("color.by"), "Color By",
                 choices = color.choices,
-                selected = get_default(defaults, "color.by", ""), selectize = FALSE
+                selected = get_default(defaults, "color.by", "")
             ), documentParameters$color.by,
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("split.by"), "Split By (facet)",
+            tipify(viz_select_input(ns("split.by"), "Split By (facet)",
                 choices = color.choices,
-                selected = get_default(defaults, "split.by", ""), selectize = FALSE
+                selected = get_default(defaults, "split.by", "")
             ), documentParameters$split.by,
                 placement = "top", options = list(container = "body"))
         ),
@@ -108,9 +108,9 @@ dittoRidgeJitterInputsUI <- function(id, data, defaults = NULL, title = "RidgeJi
                 value = get_default(defaults, "ridgeplot.lineweight", 1), min = 0, step = 0.1),
                 documentParameters$ridgeplot.lineweight,
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("ridgeplot.shape"), "Ridge Shape",
+            tipify(viz_select_input(ns("ridgeplot.shape"), "Ridge Shape",
                 choices = c("Smooth" = "smooth", "Histogram" = "hist"),
-                selected = get_default(defaults, "ridgeplot.shape", "smooth"), selectize = FALSE
+                selected = get_default(defaults, "ridgeplot.shape", "smooth")
             ), documentParameters$ridgeplot.shape,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("ridgeplot.bins"), "Ridge Bins",

@@ -26,37 +26,49 @@ License: MIT + file LICENSE
 Depends:
     R (>= 4.6.0),
     shiny,
-    VizModules (>= 0.4.0)
+    VizModules (>= 0.6.0)
 Imports:
+    colourpicker,
     dittoSeq,
+    DT,
     GenomicRanges,
-    htmltools,
-    htmlwidgets,
+    ggplot2,
     IRanges,
     jsonlite,
     methods,
+    NGLVieweR,
+    plotly,
     readxl,
     S4Vectors,
     scales,
     Seqinfo,
+    shinyBS,
     shinyjqui,
+    shinyjs,
     shinyWidgets,
     SingleCellExperiment,
-    SummarizedExperiment
+    stats,
+    SummarizedExperiment,
+    survival
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Suggests:
     drc,
+    fgsea,
     GOfan,
     knitr,
     org.Hs.eg.db,
+    PCAtools,
+    PKNCA,
+    pROC,
     rmarkdown,
     sesame,
     sesameData,
+    survminer,
     testthat (>= 3.0.0)
 VignetteBuilder: knitr
 Config/testthat/edition: 3
-URL: https://github.com/j-andrews7/sciVizModules
+URL: https://github.com/j-andrews7/sciVizModules, https://j-andrews7.github.io/sciVizModules/
 BugReports: https://github.com/j-andrews7/sciVizModules/issues
 Config/roxygen2/version: 8.1.0
 biocViews: Visualization, ShinyApps, GUI, DifferentialExpression,

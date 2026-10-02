@@ -31,6 +31,10 @@ dittoBarPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, d
     data_reactive <- data
 
     moduleServer(id, function(input, output, session) {
+        # Resolve any reactive() entries in `defaults` server-side, so a parent
+        # app driving a parameter costs one render rather than a client round-trip.
+        params <- setup_reactive_defaults(defaults, input, session)
+
         ns <- session$ns
 
         hide_input(session, hide.inputs)
@@ -44,18 +48,35 @@ dittoBarPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, d
         palette_groups <- reactive({
             obj <- data_reactive()
             var <- input$var
-            if (is.null(obj) || is.null(var) || !nzchar(var)) {
+            if (is.null(obj) || !nz_value(var)) {
                 return(character(0))
             }
             .ditto_group_levels(obj, var)
         })
+
+        # The group-to-colour mapping the plot draws with. The picker is rebuilt
+        # by renderUI() whenever the group set changes, and the value it then
+        # reports is exactly what the server seeded it with -- reading the raw
+        # input would rebuild the plot for that echo, on load and again the first
+        # time the user opens the tab the picker lives on. See
+        # VizModules::setup_group_colors().
+        palette_store <- setup_group_colors(
+            input, "palette.colours", palette_groups,
+            default_palette_values, defaults, params
+        )
 
         output$palette.selection <- renderUI({
             groups <- palette_groups()
             if (length(groups) == 0) {
                 return(NULL)
             }
-            initial_colors <- isolate(resolve_palette(groups, input$palette.colours, default_palette_values))
+            initial_colors <- isolate(resolve_palette(
+                groups, input$palette.colours, default_palette_values,
+                default_group_colors(defaults, "palette.colours")
+            ))
+            # Seed the store with what the picker is built from, so its first
+            # report back is a no-op rather than a change.
+            palette_store(initial_colors)
             multiColorPicker(
                 ns("palette.colours"),
                 label = "Bar Colors",
@@ -71,31 +92,37 @@ dittoBarPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, d
             obj <- data_reactive()
             req(obj)
             disc <- .ditto_discrete_metas(obj)
-            updateSelectInput(session, "var",
-                selected = .ditto_default(defaults, "var", if (length(disc)) disc[1] else ""))
-            updateSelectInput(session, "group.by", selected = .ditto_default(defaults, "group.by",
+            update_viz_select(session, "var",
+                selected = get_default(defaults, "var", if (length(disc)) disc[1] else ""))
+            update_viz_select(session, "group.by", selected = get_default(defaults, "group.by",
                 if (length(disc) >= 2) disc[2] else if (length(disc)) disc[1] else ""))
-            updateSelectInput(session, "scale", selected = .ditto_default(defaults, "scale", "percent"))
-            updateSelectInput(session, "split.by", selected = .ditto_default(defaults, "split.by", ""))
-            updateNumericInput(session, "split.nrow", value = .ditto_default(defaults, "split.nrow", NA))
-            updateNumericInput(session, "split.ncol", value = .ditto_default(defaults, "split.ncol", NA))
-            updateMaterialSwitch(session, "x.labels.rotate", value = .ditto_default(defaults, "x.labels.rotate", TRUE))
-            updateMaterialSwitch(session, "retain.factor.levels", value = .ditto_default(defaults, "retain.factor.levels", FALSE))
+            update_viz_select(session, "scale", selected = get_default(defaults, "scale", "percent"))
+            update_viz_select(session, "split.by", selected = get_default(defaults, "split.by", ""))
+            updateNumericInput(session, "split.nrow", value = get_default(defaults, "split.nrow", NA))
+            updateNumericInput(session, "split.ncol", value = get_default(defaults, "split.ncol", NA))
+            updateMaterialSwitch(session, "x.labels.rotate", value = get_default(defaults, "x.labels.rotate", TRUE))
+            updateMaterialSwitch(session, "retain.factor.levels", value = get_default(defaults, "retain.factor.levels", FALSE))
+            reset_group_colors(session, "palette.colours", defaults, palette_groups(), default_palette_values)
             .ditto_reset_uniform(session, defaults)
         })
 
+        observeEvent(input$split.by, {
+            split.set <- nz_value(input$split.by)
+            toggle_facet_title_inputs(session, split.set, hidden = hide.inputs)
+        }, ignoreNULL = FALSE)
+
         generate_dittoBarPlot <- reactive({
-            isolate_fn <- setup_auto_update_logic(input)
+            isolate_fn <- setup_auto_update_logic(input, params)
 
             obj <- data_reactive()
             req(obj)
 
             var <- isolate_fn(input$var)
             group.by <- isolate_fn(input$group.by)
-            req(var, nzchar(var), group.by, nzchar(group.by))
+            req(nz_value(var), nz_value(group.by))
 
             split.by <- isolate_fn(input$split.by)
-            if (is.null(split.by) || !nzchar(split.by)) split.by <- NULL
+            split.by <- blank_to_null(split.by)
 
             split.nrow <- isolate_fn(input$split.nrow)
             if (is.null(split.nrow) || is.na(split.nrow)) split.nrow <- NULL
@@ -105,7 +132,10 @@ dittoBarPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, d
             groups <- isolate_fn(palette_groups())
             color.panel <- default_palette_values
             if (length(groups) > 0) {
-                palette_values <- resolve_palette(groups, isolate_fn(input$palette.colours), default_palette_values)
+                palette_values <- resolve_palette(
+                    groups, isolate_fn(palette_store()), default_palette_values,
+                    default_group_colors(defaults, "palette.colours")
+                )
                 color.panel <- unname(palette_values[groups])
             }
 
@@ -133,7 +163,7 @@ dittoBarPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, d
             )
 
             fig <- plotly::ggplotly(gg)
-            .ditto_finalize_plotly(fig, input, isolate_fn)
+            .sci_finalize_plotly(fig, input, isolate_fn, faceted = !is.null(split.by))
         })
 
         output$dittoBarPlot <- renderPlotly({

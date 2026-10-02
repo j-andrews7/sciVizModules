@@ -20,8 +20,10 @@
 #' - `sig.by`: Significance column used for grouping (auto-detected: padj, FDR, adj.P.Val, ...)
 #' - `sig.thresh`: Significance threshold (default 0.05)
 #' - `fc.thresh`: Log2 fold change threshold (default 0)
-#' - `ma.colors`: A multiColorPicker for Up/Down/n.s. group colors
-#'   (defaults: Up="red", Down="blue", n.s.="lightgray")
+#'
+#' Group colors are the wrapped module's own "Color palette" picker on its
+#' **Colors** tab, seeded from `color.up` / `color.down` / `color.ns` (defaults:
+#' red / blue / lightgray) and therefore fully editable and covered by Reset.
 #'
 #' @section Plot parameters and defaults:
 #' The following parameters can be accessed via UI inputs and/or the `defaults` argument:
@@ -40,7 +42,9 @@
 #' The following parameters implementing MA-specific features are also available:
 #'
 #' - `sig.by` - Significance column used for grouping (UI: "Significance Column")
-#' - `ma.colors` - Named color vector for Up/Down/n.s. groups (UI: "Group Colors" multiColorPicker)
+#' - `color.up`, `color.down`, `color.ns` - Colors for the three significance
+#'   groups, assembled into the wrapped module's `color.panel` mapping. A named
+#'   `color.panel` vector may be given instead and takes precedence.
 #' - `group` - Auto-generated grouping column based on sig.thresh and fc.thresh
 #'
 #' @param id The ID for the Shiny module.
@@ -71,13 +75,10 @@ maPlotInputsUI <- function(id, data, defaults = NULL, title = "MA Settings", col
     # the reset state stay in sync).
     defaults <- .ma_defaults(data, defaults)
 
-    # Build initial colors from defaults or use standard MA colors
-    initial_colors <- .de_group_colors(defaults)
-
     sig.choices <- names(data)[vapply(data, is.numeric, logical(1))]
 
     extras <- tagList(
-        tipify(selectInput(ns("sig.by"), "Significance Column:",
+        tipify(viz_select_input(ns("sig.by"), "Significance Column:",
             choices = sig.choices,
             selected = defaults[["sig.by"]]
         ), "Column used to determine significance for Up/Down/n.s. grouping.",
@@ -94,15 +95,6 @@ maPlotInputsUI <- function(id, data, defaults = NULL, title = "MA Settings", col
             min = 0,
             step = 0.25
         ), "Log2 fold change threshold for grouping genes as Up/Down/n.s.",
-            placement = "top", options = list(container = "body")),
-        tipify(multiColorPicker(
-            inputId = ns("ma.colors"),
-            label = "Group Colors",
-            groups = c("Up", "Down", "n.s."),
-            colors = initial_colors,
-            palette_options = default_palettes()[["choices"]],
-            compact = TRUE
-        ), "Select colors for each significance group (Up-regulated, Down-regulated, and non-significant)",
             placement = "top", options = list(container = "body"))
     )
 
@@ -125,6 +117,9 @@ maPlotInputsUI <- function(id, data, defaults = NULL, title = "MA Settings", col
 #' This should be placed in the UI where the plot should be shown.
 #'
 #' @param id The ID for the Shiny module.
+#' @param resizable Logical, whether to wrap the output in a resizable
+#'   container. Set `FALSE` when the output already sits in something that
+#'   provides its own resize handle, such as a Figure Builder panel.
 #'
 #' @return A Shiny plotlyOutput for the MA plot
 #'
@@ -135,6 +130,6 @@ maPlotInputsUI <- function(id, data, defaults = NULL, title = "MA Settings", col
 #' maPlotOutputUI("plot")
 #' @export
 #' @author Jared Andrews
-maPlotOutputUI <- function(id) {
-    dittoViz_scatterPlotOutputUI(id)
+maPlotOutputUI <- function(id, resizable = TRUE) {
+    dittoViz_scatterPlotOutputUI(id, resizable = resizable)
 }
