@@ -16,6 +16,8 @@ library(sciVizModules)
 ##   * "pca"   - the PCAtools modules, bound to a PCAtools `pca` object.
 ##   * "af"    - the AlphaFold module, bound to a read_alphafold() object.
 ##   * "gsea"  - the GSEA module, bound to an fgsea input bundle.
+##   * "structure" - the 3D structure viewer, bound to a read_structure()
+##               object. Its output is an NGL widget, not a plotly figure.
 ## ---------------------------------------------------------------------------
 
 ## ---- Package metadata (for the About tab / navbar) ------------------------
@@ -37,6 +39,12 @@ data("example_cn_segment", package = "sciVizModules", envir = environment())
 data("example_pca",        package = "sciVizModules", envir = environment())
 data("example_gwas",       package = "sciVizModules", envir = environment())
 data("example_gsea",       package = "sciVizModules", envir = environment())
+data("example_biomarkers", package = "sciVizModules", envir = environment())
+data("example_plate",      package = "sciVizModules", envir = environment())
+
+## Oral theophylline in 12 subjects, from base R.
+theoph <- as.data.frame(datasets::Theoph)
+theoph$Subject <- as.character(theoph$Subject)
 
 ## A simulated MAGeCK RRA gene summary, shipped as the file MAGeCK writes.
 example_mageck <- read_mageck(
@@ -48,6 +56,19 @@ example_alphafold <- read_alphafold(
     pae = system.file("extdata", "AF-P04637-F1-predicted_aligned_error_v6.json.gz", package = "sciVizModules"),
     confidence = system.file("extdata", "AF-P04637-F1-confidence_v6.json.gz", package = "sciVizModules")
 )
+
+## The same p53 model as a 3D structure.
+example_structure <- read_structure(
+    system.file("extdata", "AF-P04637-F1-model_v6.pdb.gz", package = "sciVizModules")
+)
+
+## Simulated GROMACS backbone RMSD for three replicas, shipped as .xvg files.
+example_md <- do.call(rbind, lapply(1:3, function(i) {
+    read_xvg(
+        system.file("extdata", sprintf("example_rmsd_rep%d.xvg.gz", i), package = "sciVizModules"),
+        series = paste("replica", i)
+    )
+}))
 
 ## Michaelis-Menten needs three pieces bundled together.
 mm_bundle <- list(
@@ -116,9 +137,24 @@ module_registry <- list(
         bundle = mm_bundle, defaults = NULL
     ),
     list(
+        label = "PK Profiles", id = "pk", type = "df",
+        inputs_ui = pkConcentrationTimeInputsUI, output_ui = pkConcentrationTimeOutputUI,
+        server_fn = pkConcentrationTimeServer, data = theoph, defaults = NULL
+    ),
+    list(
+        label = "Plate", id = "plate", type = "df",
+        inputs_ui = plateHeatmapInputsUI, output_ui = plateHeatmapOutputUI,
+        server_fn = plateHeatmapServer, data = example_plate, defaults = NULL
+    ),
+    list(
         label = "Forest", id = "forest", type = "df",
         inputs_ui = forestPlotInputsUI, output_ui = forestPlotOutputUI,
         server_fn = forestPlotServer, data = survival_lung, defaults = NULL
+    ),
+    list(
+        label = "ROC", id = "roc", type = "df",
+        inputs_ui = rocCurveInputsUI, output_ui = rocCurveOutputUI,
+        server_fn = rocCurveServer, data = example_biomarkers, defaults = NULL
     ),
     list(
         label = "Copy Number", id = "cnseg", type = "cn",
@@ -154,6 +190,16 @@ module_registry <- list(
         label = "AlphaFold", id = "alphafold", type = "af",
         inputs_ui = alphafoldConfidenceInputsUI, output_ui = alphafoldConfidenceOutputUI,
         server_fn = alphafoldConfidenceServer, data = example_alphafold, defaults = NULL
+    ),
+    list(
+        label = "Structure", id = "structure", type = "structure",
+        inputs_ui = structureViewerInputsUI, output_ui = structureViewerOutputUI,
+        server_fn = structureViewerServer, data = example_structure, defaults = NULL
+    ),
+    list(
+        label = "MD Trajectory", id = "md", type = "df",
+        inputs_ui = mdTrajectoryMetricsInputsUI, output_ui = mdTrajectoryMetricsOutputUI,
+        server_fn = mdTrajectoryMetricsServer, data = example_md, defaults = NULL
     ),
     list(
         label = "DimPlot", id = "dimplot", type = "sce",
@@ -214,6 +260,11 @@ build_tab <- function(mod) {
                 "This module is bound to the bundled AlphaFold DB prediction for human p53",
                 "(P04637; AlphaFold DB, CC-BY 4.0)."
             ),
+            structure = paste(
+                "This module shows the bundled AlphaFold DB model of human p53 (P04637; CC-BY 4.0).",
+                "It is an NGL 3D widget rather than a plotly figure: drag to rotate, scroll to zoom,",
+                "and use Snapshot for a PNG."
+            ),
             paste(
                 "This module uses the bundled Michaelis-Menten kinetics data",
                 "(observed points, fitted line, and nls fit)."
@@ -253,11 +304,11 @@ about_tab <- tabPanel(
                     "This gallery showcases sciVizModules' interactive Shiny",
                     "modules using bundled example datasets so you can preview",
                     "each scientific plot type and its configurable inputs.",
-                    "Differential-expression, enrichment, survival, forest, GWAS,",
-                    "CRISPR screen and pharmacology modules are driven by editable",
-                    "data tables; the single-cell (dittoSeq), copy number, PCA",
-                    "(PCAtools), GSEA and AlphaFold modules are bound to bundled",
-                    "example objects."
+                    "Differential-expression, enrichment, survival, forest, ROC, GWAS,",
+                    "CRISPR screen, pharmacology, plate and MD trajectory modules are",
+                    "driven by editable data tables; the single-cell (dittoSeq), copy",
+                    "number, PCA (PCAtools), GSEA, AlphaFold and 3D structure modules",
+                    "are bound to bundled example objects."
                 ),
                 tags$p(
                     tags$strong("Repository: "),
@@ -322,9 +373,9 @@ server <- function(input, output, session) {
             })
             m$server_fn(m$id, data = filtered_data)
 
-        } else if (m$type %in% c("sce", "cn", "pca", "af", "gsea")) {
+        } else if (m$type %in% c("sce", "cn", "pca", "af", "gsea", "structure")) {
             ## An object bound directly (no data table): SingleCellExperiment,
-            ## CNSegment, PCAtools pca, or read_alphafold() result.
+            ## CNSegment, PCAtools pca, read_alphafold() or read_structure() result.
             obj_data <- reactive(m$data)
             output[[paste0(m$id, "_inputs_ui")]] <- renderUI({
                 m$inputs_ui(m$id, obj_data(), defaults = m$defaults,

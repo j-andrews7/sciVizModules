@@ -136,6 +136,11 @@ if (interactive()) alphafoldConfidenceApp() # AlphaFold DB prediction for p53
 if (interactive()) manhattanPlotApp()   # GWAS summary statistics, example_gwas
 if (interactive()) gseaEnrichmentPlotApp() # fgsea example ranks and pathways
 if (interactive()) crisprScreenRankApp() # simulated MAGeCK gene summary
+if (interactive()) rocCurveApp()        # diagnostic markers, example_biomarkers
+if (interactive()) pkConcentrationTimeApp() # oral theophylline, datasets::Theoph
+if (interactive()) plateHeatmapApp()    # two 384-well plates, example_plate
+if (interactive()) structureViewerApp() # 3D AlphaFold model of p53
+if (interactive()) mdTrajectoryMetricsApp() # simulated GROMACS RMSD, Rg and RMSF
 ```
 
 ## Set defaults and hide controls
@@ -265,6 +270,7 @@ head(survival_lung)
 | Module | Server function | Data type | Expected data | Example data |
 |---|---|---|---|---|
 | Forest plot | `forestPlotServer()` | `data.frame` | Raw data: for a Cox model a time and an event column (as for the survival curve); for a logistic model a binary outcome; for a linear model a numeric outcome; plus any numeric or categorical covariates. The module fits the model | `survival_lung` |
+| ROC curve | `rocCurveServer()` | `data.frame` | One row per subject: a binary outcome column and one or more numeric predictor columns | `example_biomarkers` |
 
 ```{r forest-format}
 forestPlot(survival_lung,
@@ -273,12 +279,20 @@ forestPlot(survival_lung,
 )
 ```
 
+```{r roc-format}
+data(example_biomarkers)
+roc <- rocCurve(example_biomarkers, response = "disease",
+    predictors = c("marker_strong", "marker_moderate", "marker_weak"))
+attr(roc, "table")  # AUC, CI and Youden cut-off per predictor
+```
+
 ### Biochemical kinetics and pharmacology
 
 | Module | Server function | Data type | Expected data | Example data |
 |---|---|---|---|---|
 | Michaelis-Menten | `michaelisMentenServer()` | reactive `list` | A list with `data` (observed-points `data.frame`), `model` (fitted-line `data.frame`), and optional `stats` (an `nls` fit or named `K` / `Vmax` coefficients for annotation) | `mm_kinetics`, `mm_kinetics_line`, `mm_kinetics_fit` |
 | Dose-response | `doseResponseServer()` | `data.frame` | A dose column (plotted on a log10 scale) and a response column; the module fits a log-logistic curve with **drc** | `dose_response` |
+| PK concentration-time | `pkConcentrationTimeServer()` | `data.frame` | One row per sample: subject, time and concentration columns, optionally a dose and a treatment group (`Subject`/`ID`, `Time`/`TAD`, `conc`/`DV`, `Dose`/`AMT` are detected) | `datasets::Theoph` |
 
 The Michaelis-Menten module consumes pre-computed pieces rather than a single
 data frame:
@@ -294,6 +308,29 @@ str(list(
 ```{r dr-format}
 head(dose_response)
 #> dose_uM, rep1_response_pct, ..., mean_response_pct, sd_response_pct
+```
+
+The PK module computes each subject's non-compartmental parameters the way
+PKNCA does by default (linear-up / log-down AUC, best-fit terminal slope):
+
+```{r pk-format}
+pk <- pkConcentrationTime(datasets::Theoph, time = "Time", conc = "conc",
+    subject = "Subject", dose = "Dose", log.y = TRUE, show.lambda = TRUE)
+head(attr(pk, "table"))  # Cmax, Tmax, AUClast, half-life, AUCinf, CL/F, Vz/F
+```
+
+### Screening and plate assays
+
+| Module | Server function | Data type | Expected data | Example data |
+|---|---|---|---|---|
+| Plate heatmap | `plateHeatmapServer()` | `data.frame` | One row per well: a well identifier (`A01`, `B7`, `AF48`), a numeric readout, and optionally a plate column and a column labelling the positive and negative control wells | `example_plate` |
+
+```{r plate-format}
+data(example_plate)
+head(example_plate)
+plateHeatmap(example_plate, well = "well", value = "signal", plate = "plate",
+    control = "type", positive = "positive", negative = "negative",
+    normalise = "bscore", marginals = TRUE)
 ```
 
 ### Copy number
@@ -376,6 +413,31 @@ alphafoldConfidence(af)
 AlphaFold DB data is available under CC-BY 4.0; cite Jumper et al. (2021) and
 Varadi et al. (2024) when you use it.
 
+| Module | Server function | Data type | Expected data | Example data |
+|---|---|---|---|---|
+| 3D structure viewer | `structureViewerServer()` | `read_structure()` result | A PDB or mmCIF file (from the PDB, AlphaFold DB, ColabFold, ...), optionally gzipped | AlphaFold DB model of p53 (P04637), in `inst/extdata` |
+| MD trajectory metrics | `mdTrajectoryMetricsServer()` | `data.frame` | `read_xvg()` output from GROMACS `.xvg` files (`gmx rms`, `gmx gyrate`, `gmx rmsf`, ...), several files combined with `rbind()`: columns `x`, `value`, `series` and `metric` | simulated, in `inst/extdata` |
+
+`structureViewer` is the one module that is not a plotly figure. It is an NGL
+3D widget, so it has its own PNG snapshot button instead of the Source Data
+download, and it is not available to the Figure Builder.
+
+```{r structure-format}
+p53 <- read_structure(system.file("extdata", "AF-P04637-F1-model_v6.pdb.gz",
+    package = "sciVizModules"))
+p53
+structureViewer(p53, color.by = "plddt", highlight = "175, 248, 273")
+```
+
+```{r xvg-format}
+ext <- function(f) system.file("extdata", f, package = "sciVizModules")
+md <- rbind(
+    read_xvg(ext("example_rmsd_rep1.xvg.gz"), series = "replica 1"),
+    read_xvg(ext("example_rmsd_rep2.xvg.gz"), series = "replica 2")
+)
+mdTrajectoryMetrics(md, smooth.window = 25, time.unit = "ps to ns")
+```
+
 ### Single-cell / RNA-seq (dittoSeq wrappers)
 
 These modules wrap `dittoSeq` plotting functions. They all accept a
@@ -427,7 +489,9 @@ app, and `vizmodules-custom-module` covers building a module to register in it.
 The dittoSeq modules, `cnSegmentPlot`, `michaelisMenten`, the PCAtools modules,
 `gseaEnrichmentPlot` and `alphafoldConfidence` are not registered: the
 builder's dataset catalogue holds data frames, and those take other objects.
-`forestPlot`, the GWAS modules and `crisprScreenRank` are not registered yet.
+`structureViewer` is a 3D widget rather than a plotly figure. `forestPlot`, the
+GWAS modules, `crisprScreenRank`, `rocCurve`, `pkConcentrationTime`,
+`plateHeatmap` and `mdTrajectoryMetrics` are not registered yet.
 
 ## Export the source data
 

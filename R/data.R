@@ -406,3 +406,57 @@
 #' @author Jared Andrews
 #' @keywords datasets
 "example_gsea"
+
+#' Example diagnostic biomarker data (simulated)
+#'
+#' A simulated diagnostic study for the [rocCurveServer()] module: 300 patients
+#' with a binary disease outcome and three serum markers that separate the
+#' groups strongly, moderately and weakly. No real patients are involved.
+#'
+#' @format A data frame with 300 rows and 7 columns:
+#' \describe{
+#'   \item{id}{Patient identifier}
+#'   \item{disease}{Outcome, a factor: "Healthy" or "Disease"}
+#'   \item{marker_strong}{Marker with strong discrimination (AUC about 0.93)}
+#'   \item{marker_moderate}{Marker with moderate discrimination (AUC about 0.75)}
+#'   \item{marker_weak}{Marker with weak discrimination (AUC about 0.62)}
+#'   \item{age}{Age in years}
+#'   \item{sex}{Sex, a factor}
+#' }
+#'
+#' @source Simulated in `data-raw/generate_example_biomarkers.R`.
+#'
+#' @examples
+#' data(example_biomarkers)
+#' head(example_biomarkers)
+#'
+#' @author Jared Andrews
+#' @keywords datasets
+"example_biomarkers"
+
+#' Example assay plates
+#'
+#' A simulated luminescence screen on two 384-well plates, for the
+#' [plateHeatmap()] module. Column 2 holds 16 negative (DMSO) control wells and
+#' column 23 holds 16 positive (fully inhibited) control wells on each plate.
+#' The first plate carries a strong evaporation edge effect, which the B-score
+#' normalisation removes, and the second a mild one; each holds a few hits.
+#'
+#' @format A data frame with 768 rows and 5 columns:
+#' \describe{
+#'   \item{plate}{Plate identifier, `"Plate_01"` or `"Plate_02"`}
+#'   \item{well}{Well identifier, `"A01"` to `"P24"`}
+#'   \item{type}{`"sample"`, `"negative"` or `"positive"`}
+#'   \item{compound}{Compound identifier (simulated)}
+#'   \item{signal}{Luminescence readout}
+#' }
+#'
+#' @source Simulated in `data-raw/generate_example_plate.R`.
+#'
+#' @examples
+#' data(example_plate)
+#' head(example_plate)
+#'
+#' @author Jared Andrews
+#' @keywords datasets
+"example_plate"

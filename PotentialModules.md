@@ -10,6 +10,11 @@ is a candidate, not a commitment.
 Also implemented: `manhattanPlot` and `gwasQQPlot` (#11, #12; wrappers on the VizModules scatter module using its `fig.fn` hook for chromosome ticks, significance lines, the QQ band and lambda GC; simulated `example_gwas`).
 Also implemented: `gseaEnrichmentPlot` (#22; native, from an fgsea bundle or a clusterProfiler `gseaResult`; running score computed in-package and tested equal to fgsea's; `example_gsea` from fgsea's MIT-licensed example data).
 Also implemented: `crisprScreenRank` (#29, with `read_mageck()`, which also reads `mageck mle` summaries ready for `crisprBetaScatter`; simulated MAGeCK example, since no MAGeCK output carries a licence to redistribute).
+Also implemented: `structureViewer` (#71, with `read_structure()`; the package's one non-plotly widget, built on NGLVieweR, restyling in place through its proxy, colouring by AlphaFold pLDDT bands, B-factor, chain, rainbow, secondary structure or hydrophobicity; `ramachandranPlot` and `contactMap` could reuse `read_structure()`).
+Also implemented: `mdTrajectoryMetrics` (#74, with `read_xvg()` for GROMACS output; replicas and metrics combine with `rbind()`; running-mean smoothing and ps/ns, nm/Angstrom conversion; simulated example files).
+Also implemented: `rocCurve` (#79; native; curves, AUCs and Youden cut-offs computed in-package and tested equal to pROC's, DeLong CI via pROC when installed; simulated `example_biomarkers`).
+Also implemented: `pkConcentrationTime` (#83; native; per-subject or mean +/- SD profiles, linear or log, with terminal fits; NCA parameters computed in-package and tested equal to PKNCA's on `Theoph`).
+Also implemented: `plateHeatmap` (#89; native; plates in physical layout from any 6- to 1536-well format, raw, percent-of-control, percent-inhibition, z, robust-z or B-score per plate, outlined controls, Z' per plate, row/column means for edge effects; simulated `example_plate`).
 Their rows are marked **Done**.
 
 **How candidates were chosen.** Popular packages with a standard input structure (a MAF
@@ -131,25 +136,25 @@ in `sci_figure_builder_registry()`; **N** for S4 inputs (MAF, SE, phyloseq, ...)
 | 68 | `antibiogram` | % susceptible per organism x antibiotic; S/I/R proportions | AMR | AST df | VM base: `ComplexHeatmap_Heatmap`, `plotthis_BarPlot` | 1.7k/mo | AMR | Y | 2 |
 | 69 | `pangenomePresence` | Core/accessory partition, gene frequency, presence matrix | Panaroo, Roary (non-R) | `gene_presence_absence.Rtab` | VM base: `piePlot`, `plotthis_Histogram`, `ComplexHeatmap_Heatmap` | Panaroo 375, Roary 380 GitHub stars | none (reader) | Y | 2 |
 | 70 | `alphafoldConfidence` | Per-residue pLDDT and PAE heatmap | AlphaFold, ColabFold (non-R) | PAE / scores JSON + PDB/mmCIF | VM base: `linePlot`; native PAE heatmap | AlphaFold GitHub 14.9k stars, ColabFold 2.9k | jsonlite | N | Done |
-| 71 | `structureViewer` | Interactive 3D cartoon coloured by pLDDT, B-factor or chain | NGLVieweR, r3dmol | PDB / mmCIF | Widget (non-plotly exception) | NGLVieweR 373/mo, r3dmol 537/mo | NGLVieweR | N | 2 |
+| 71 | `structureViewer` | Interactive 3D cartoon coloured by pLDDT, B-factor or chain | NGLVieweR, r3dmol | PDB / mmCIF | Widget (non-plotly exception) | NGLVieweR 373/mo, r3dmol 537/mo | NGLVieweR | N | Done |
 | 72 | `ramachandranPlot` | Backbone phi/psi with allowed regions | bio3d | PDB | VM base: `dittoViz_scatterPlot` | 2.7k/mo | bio3d | N | 2 |
 | 73 | `contactMap` | Residue distance / contact map | bio3d | PDB / trajectory | Native | 2.7k/mo | bio3d | N | 3 |
-| 74 | `mdTrajectoryMetrics` | RMSD, RMSF, radius of gyration, H-bonds over time | GROMACS, MDAnalysis, mdtraj (non-R); bio3d | `.xvg` / CSV | VM base: `linePlot` | gromacs 965, MDAnalysis 1.7k GitHub stars | none (reader) | Y | 1 |
+| 74 | `mdTrajectoryMetrics` | RMSD, RMSF, radius of gyration, H-bonds over time | GROMACS, MDAnalysis, mdtraj (non-R); bio3d | `.xvg` / CSV | VM base: `linePlot` | gromacs 965, MDAnalysis 1.7k GitHub stars | none (reader) | Y | Done |
 | 75 | `fscCurve` | Fourier shell correlation vs resolution | RELION, cryoSPARC (non-R) | RELION `postprocess.star` / FSC table | VM base: `linePlot` | relion GitHub 558 stars | none (reader) | Y | 3 |
 | 76 | `cytometryBiaxial` | Biaxial scatter/density on transformed channels with gates | flowCore, CATALYST, ggcyto | flowFrame / flowSet / SCE | VM base: `dittoViz_scatterPlot` | flowCore Bioc #133 | flowCore | N | 2 |
 | 77 | `cytometryMedianHeatmap` | Median marker expression per cluster | CATALYST, FlowSOM | SCE | VM base: `ComplexHeatmap_Heatmap` | CATALYST Bioc #354, FlowSOM #231 | CATALYST | N | 2 |
 | 78 | `forestPlot` | Effect estimates with CIs (Cox, logistic, meta-analysis) | survival, forestplot, metafor | model / tidy df | Native | survival 237k/mo | none | Y | Done |
-| 79 | `rocCurve` | ROC with AUC and CI, several predictors | pROC | df (response + predictors) | VM base: `linePlot` | pROC 149k/mo | pROC | Y | 1 |
+| 79 | `rocCurve` | ROC with AUC and CI, several predictors | pROC | df (response + predictors) | VM base: `linePlot` | pROC 149k/mo | pROC | Y | Done |
 | 80 | `waterfallPlot` | Best % change per patient, RECIST thresholds | none standard | df | VM base: `plotthis_BarPlot` | n/a | none | Y | 2 |
 | 81 | `swimmerPlot` | Per-patient time on treatment with events | swimplot (reference) | df | Native | 1k/mo | none | Y | 2 |
 | 82 | `decisionCurve` | Net benefit across threshold probabilities | dcurves | df / `dca` | VM base: `linePlot` | 3.7k/mo | dcurves | Y | 3 |
-| 83 | `pkConcentrationTime` | Concentration-time curves with NCA parameters | PKNCA | df | VM base: `linePlot` | 2.4k/mo | PKNCA | Y | 1 |
+| 83 | `pkConcentrationTime` | Concentration-time curves with NCA parameters | PKNCA | df | VM base: `linePlot` | 2.4k/mo | PKNCA | Y | Done |
 | 84 | `signalOverlay` | Spectra (UV-vis/IR/Raman/NMR), XRD, DSC/TGA and stress-strain traces | hyperSpec, ChemoSpec, rxylib | spectra object / long df | VM base: `linePlot` | 2.4k/mo | none | Y | 2 |
 | 85 | `growthCurve` | Microbial growth curves with logistic fits | growthcurver | df | VM base: `dittoViz_scatterPlot` + model backend | 0.8k/mo | growthcurver | Y | 2 |
 | 86 | `blandAltman` | Method-agreement plot | BlandAltmanLeh (reference) | df | VM base: `dittoViz_scatterPlot` | 1.3k/mo | none | Y | 2 (upstream?) |
 | 87 | `ternaryPlot` | Three-component compositions | ggtern (reference) | df | Native (`scatterternary`) | 3.4k/mo | none | Y | 3 (upstream?) |
 | 88 | `qpcrAnalysis` | Amplification and melt curves; delta-delta-Ct fold change | qpcR, pcr; instrument exports | Ct / fluorescence tables | VM base: `linePlot`, `plotthis_BarPlot` | qpcR 1.2k/mo | none | Y | 2 |
-| 89 | `plateHeatmap` | 96/384/1536-well plate map with Z'-factor and edge effects | platetools (reference), CellProfiler (non-R) | df with well IDs | Native (plotly heatmap) | CellProfiler GitHub 1.1k stars | none | Y | 1 |
+| 89 | `plateHeatmap` | 96/384/1536-well plate map with Z'-factor and edge effects | platetools (reference), CellProfiler (non-R) | df with well IDs | Native (plotly heatmap) | CellProfiler GitHub 1.1k stars | none | Y | Done |
 | 90 | `epiCurve` | Incidence over time by group | incidence2 | case linelist df | VM base: `plotthis_BarPlot` | incidence 1.9k/mo | incidence2 | Y | 2 |
 
 "Reference" in the Source column means the package is the conventional tool, but the module
@@ -596,7 +601,7 @@ that would not be plotly (allowed as a flagged exception).
     Multimer predictions add chain boundaries to the heatmap. jsonlite (already installed
     with plotly) reads the JSON.
 
-71. **`structureViewer`** - interactive 3D cartoon/surface of a PDB or mmCIF, coloured by
+71. **`structureViewer`** - **Done.** interactive 3D cartoon/surface of a PDB or mmCIF, coloured by
     pLDDT, B-factor, chain or a user column, with residue selection linked to the 2D
     plots. NGLVieweR and r3dmol both export Shiny bindings (`NGLVieweROutput()` /
     `renderNGLVieweR()`, `r3dmolOutput()` / `renderR3dmol()`; checked). **Not plotly**: no
@@ -612,7 +617,7 @@ that would not be plotly (allowed as a flagged exception).
     trajectory (`bio3d::cmap()`, `dm()`; its plot is base graphics, checked). Native
     heatmap, sharing code with the PAE view.
 
-74. **`mdTrajectoryMetrics`** - the standard molecular-dynamics summaries: RMSD and radius
+74. **`mdTrajectoryMetrics`** - **Done.** the standard molecular-dynamics summaries: RMSD and radius
     of gyration over time, RMSF per residue, hydrogen-bond counts, several replicas
     overlaid. GROMACS writes these as `.xvg` (whitespace columns with `#` comments and `@`
     Grace directives that carry the axis labels and legends); MDAnalysis and mdtraj users
@@ -648,7 +653,7 @@ that would not be plotly (allowed as a flagged exception).
     graphics, so build natively (horizontal error bars + log x-axis). Example data: the
     package's `survival_lung`.
 
-79. **`rocCurve`** - ROC for one or more predictors with AUC (+ DeLong CI) in the legend
+79. **`rocCurve`** - **Done.** ROC for one or more predictors with AUC (+ DeLong CI) in the legend
     (`pROC::roc()`, `coords()`, `ci.auc()`). pROC's `ggroc()` is ggplot, but the coordinates
     are what matter: `linePlot`, with the chance diagonal from the Lines tab. Example data:
     pROC's `aSAH`.
@@ -669,7 +674,7 @@ Wet-lab, applied and physical-science plots. Most are x-y traces or binned count
 `linePlot` and the plotthis bars; instrument exports are read with small readers or `readxl`
 (already an Import).
 
-83. **`pkConcentrationTime`** - plasma concentration vs time per subject or as mean +/- SD,
+83. **`pkConcentrationTime`** - **Done.** plasma concentration vs time per subject or as mean +/- SD,
     linear/log y, with Cmax/Tmax/AUC/half-life from `PKNCA::pk.nca()` in a table or
     annotation. `linePlot` (its error bars already do mean +/- SD/SEM). Example data: base R's
     `datasets::Theoph`. Cheap.
@@ -701,7 +706,7 @@ Wet-lab, applied and physical-science plots. Most are x-y traces or binned count
     CSV/XLSX with vendor headers; read them with `readxl` plus a documented long format.
     qpcR / pcr (CRAN) are reference implementations for efficiency correction.
 
-89. **`plateHeatmap`** - 96/384/1536-well plate maps of raw or normalised readouts, with
+89. **`plateHeatmap`** - **Done.** 96/384/1536-well plate maps of raw or normalised readouts, with
     control wells marked, Z'-factor per plate, and row/column edge-effect summaries. Input
     is any table with a well ID (`A01`, `P24`): plate-reader exports, CellProfiler's
     per-image CSVs (`Metadata_Well`), or screening data. Native plotly heatmap (rows A-P

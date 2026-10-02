@@ -84,6 +84,19 @@ holds the logic. Every module also ships a standalone `*App()` you can run to se
   coefficients (linear regression), fitted from the raw data inside the module. Choose the
   outcome and covariates interactively, and switch between one adjusted (multivariable) model
   and one model per covariate; factors show a row per level against their reference level.
+- **`rocCurve`** — ROC curves for one or more numeric predictors of a binary outcome, with the
+  AUC (and its DeLong 95% CI when [pROC](https://cran.r-project.org/package=pROC) is installed)
+  in the legend and the Youden-optimal cut-off marked. Curves and AUCs are computed in the
+  package and match pROC's.
+- **`pkConcentrationTime`** — pharmacokinetic concentration-time profiles per subject or as the
+  mean ± SD per group, on a linear or log axis, with the terminal elimination fits. Each
+  subject's non-compartmental parameters (Cmax, Tmax, AUC, half-life, CL/F, Vz/F) are computed
+  as [PKNCA](https://cran.r-project.org/package=PKNCA) computes them and go in the source-data
+  download.
+- **`plateHeatmap`** — 6- to 1536-well assay plates in their physical layout, raw or normalised
+  per plate (percent of control, percent inhibition, z, robust z, B-score), with the control
+  wells outlined, each plate's Z'-factor in its title, and optional row and column means for
+  spotting edge effects.
 - **`manhattanPlot`** / **`gwasQQPlot`** — GWAS summary statistics as a Manhattan plot
   (chromosomes end to end, genome-wide and suggestive lines) and a QQ plot (confidence band,
   lambda GC). Columns are detected from the usual names (qqman, PLINK, REGENIE, GWAS Catalog),
@@ -99,6 +112,16 @@ holds the logic. Every module also ships a standalone `*App()` you can run to se
   residue axis, with chain boundaries for multimers. `read_alphafold()` reads AlphaFold DB
   PAE/confidence JSON, ColabFold score files, or the pLDDT stored in a model's PDB/mmCIF
   B-factors.
+- **`structureViewer`** — an interactive 3D viewer for protein and molecule structures
+  (PDB / mmCIF, read with `read_structure()`), coloured by AlphaFold pLDDT band, B-factor,
+  chain, residue index, secondary structure or hydrophobicity, with residues highlighted by
+  number. It is the one module that is not a plotly figure: it is an
+  [NGL](https://nglviewer.org/) widget (via
+  [NGLVieweR](https://cran.r-project.org/package=NGLVieweR)) with its own PNG snapshot, and it
+  restyles in place without resetting the camera.
+- **`mdTrajectoryMetrics`** — molecular dynamics trajectory metrics (RMSD, radius of gyration,
+  RMSF, ...) from GROMACS `.xvg` files read with `read_xvg()`, one line per replica, with
+  running-mean smoothing, ps/ns and nm/Å conversion, and a panel per metric.
 
 ### Principal component analysis (PCAtools)
 
@@ -177,8 +200,10 @@ own modules (or with the VizModules ones) and pass the result to
 The single-cell modules, `cnSegmentPlot`, `michaelisMenten`, the PCAtools modules and
 `alphafoldConfidence` are not registered: the builder's dataset catalogue holds data frames,
 and those take a `SingleCellExperiment`, a `CNSegment` object, a bundle carrying a model fit,
-a PCAtools `pca` object and a `read_alphafold()` result respectively. `forestPlot` is not
-registered yet. Run their `*App()` functions instead.
+a PCAtools `pca` object and a `read_alphafold()` result respectively. `structureViewer` is a
+3D widget rather than a plotly figure. `forestPlot` and the newer data-frame modules (GWAS,
+GSEA, CRISPR, ROC, PK, plate and MD) are not registered yet. Run their `*App()` functions
+instead.
 
 ## Working with an AI Coding Agent
 

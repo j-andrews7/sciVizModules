@@ -46,26 +46,8 @@ pcaPairsPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, d
                 default_palette_values, defaults, params
             )
 
-            output$palette.selection <- renderUI({
-                groups <- palette_groups()
-                if (length(groups) == 0) {
-                    return(NULL)
-                }
-                initial_colors <- isolate(resolve_palette(
-                    groups, input$palette.colours, default_palette_values,
-                    default_group_colors(defaults, "palette.colours")
-                ))
-                palette_store(initial_colors)
-                multiColorPicker(
-                    session$ns("palette.colours"),
-                    label = "Group Colors",
-                    groups = groups,
-                    palette_options = default_palettes()[["choices"]],
-                    selected_palette = "dittoColors",
-                    colors = initial_colors,
-                    compact = TRUE
-                )
-            })
+            output$palette.selection <- .sci_palette_picker_ui(input, session, palette_groups, palette_store,
+                default_palette_values, defaults, "Group Colors")
 
             list(palette_groups = palette_groups, palette_store = palette_store)
         },

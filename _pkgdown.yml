@@ -79,13 +79,19 @@ reference:
 - title: Clinical models
   desc: >
     Forest plots of hazard ratios, odds ratios or coefficients, fitted from the
-    raw data inside the module (Cox, logistic or linear regression).
+    raw data inside the module (Cox, logistic or linear regression), and ROC
+    curves with AUCs and optimal cut-offs for diagnostic markers.
   contents:
   - forestPlot
   - forestPlotInputsUI
   - forestPlotOutputUI
   - forestPlotServer
   - forestPlotApp
+  - rocCurve
+  - rocCurveInputsUI
+  - rocCurveOutputUI
+  - rocCurveServer
+  - rocCurveApp
 
 - title: Principal component analysis (PCAtools)
   desc: >
@@ -120,8 +126,11 @@ reference:
 
 - title: Structural biology
   desc: >
-    AlphaFold prediction confidence: per-residue pLDDT and the predicted
-    aligned error, read from AlphaFold DB or ColabFold output.
+    AlphaFold prediction confidence (per-residue pLDDT and the predicted
+    aligned error), an interactive 3D structure viewer for PDB / mmCIF files,
+    and molecular dynamics trajectory metrics from GROMACS `.xvg` output.
+    `structureViewer` is the one module here that is not a plotly figure: it
+    is an NGL widget with its own PNG snapshot.
   contents:
   - read_alphafold
   - alphafoldConfidence
@@ -129,9 +138,24 @@ reference:
   - alphafoldConfidenceOutputUI
   - alphafoldConfidenceServer
   - alphafoldConfidenceApp
+  - read_structure
+  - structureViewer
+  - structureViewerInputsUI
+  - structureViewerOutputUI
+  - structureViewerServer
+  - structureViewerApp
+  - read_xvg
+  - mdTrajectoryMetrics
+  - mdTrajectoryMetricsInputsUI
+  - mdTrajectoryMetricsOutputUI
+  - mdTrajectoryMetricsServer
+  - mdTrajectoryMetricsApp
 
 - title: Pharmacology and kinetics
-  desc: Dose-response curves and Michaelis-Menten enzyme kinetics.
+  desc: >
+    Dose-response curves, Michaelis-Menten enzyme kinetics, and
+    pharmacokinetic concentration-time profiles with non-compartmental
+    parameters.
   contents:
   - doseResponseInputsUI
   - doseResponseOutputUI
@@ -142,6 +166,22 @@ reference:
   - michaelisMentenOutputUI
   - michaelisMentenServer
   - michaelisMentenApp
+  - pkConcentrationTime
+  - pkConcentrationTimeInputsUI
+  - pkConcentrationTimeOutputUI
+  - pkConcentrationTimeServer
+  - pkConcentrationTimeApp
+
+- title: Screening and plate assays
+  desc: >
+    Assay plate heatmaps in physical layout, raw or normalised per plate, with
+    control wells, Z'-factors and edge-effect margins.
+  contents:
+  - plateHeatmap
+  - plateHeatmapInputsUI
+  - plateHeatmapOutputUI
+  - plateHeatmapServer
+  - plateHeatmapApp
 
 - title: Copy number
   desc: >
@@ -206,11 +246,13 @@ reference:
   - airway_edger
   - airway_voom
   - dose_response
+  - example_biomarkers
   - example_cn_segment
   - example_enrichment
   - example_gsea
   - example_gwas
   - example_pca
+  - example_plate
   - example_sce
   - mm_kinetics
   - mm_kinetics_line

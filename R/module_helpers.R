@@ -235,3 +235,68 @@
 
     shinyApp(ui, server)
 }
+
+
+#' Require a data frame for a native module
+#'
+#' The `validate` function the data-frame modules built on [.sci_plot_server()]
+#' pass to it.
+#'
+#' @param x The module's data.
+#' @param arg Argument name for the error message.
+#' @return `x` as a data frame.
+#'
+#' @author Jared Andrews
+#' @rdname INTERNAL_sci_require_df
+#' @keywords internal
+.sci_require_df <- function(x, arg = "data") {
+    if (!is.data.frame(x)) {
+        x <- tryCatch(as.data.frame(x), error = function(e) NULL)
+        if (is.null(x)) stop("'", arg, "' must be a data frame.", call. = FALSE)
+    }
+    x
+}
+
+
+#' Render a group colour picker backed by a server-side store
+#'
+#' The `renderUI()` the native modules use for their group colours: the picker
+#' is built from the same [resolve_palette()] result it seeds the store with, so
+#' its first report back is a no-op rather than a redraw (see
+#' [setup_group_colors()]).
+#'
+#' @param input,session The module's input and session.
+#' @param groups A reactive returning the group levels.
+#' @param store The store from [setup_group_colors()].
+#' @param default_palette_values Fallback colours.
+#' @param defaults The module defaults (for a caller-supplied mapping).
+#' @param label Picker label.
+#' @param key The picker's input id.
+#' @return A `renderUI()` output.
+#'
+#' @import shiny
+#' @author Jared Andrews
+#' @rdname INTERNAL_sci_palette_picker_ui
+#' @keywords internal
+.sci_palette_picker_ui <- function(input, session, groups, store, default_palette_values, defaults,
+                                   label = "Group Colors", key = "palette.colours") {
+    renderUI({
+        lv <- groups()
+        if (length(lv) == 0) {
+            return(NULL)
+        }
+        initial_colors <- isolate(resolve_palette(
+            lv, input[[key]], default_palette_values, default_group_colors(defaults, key)
+        ))
+        store(initial_colors)
+        multiColorPicker(
+            session$ns(key),
+            label = label,
+            groups = lv,
+            palette_options = default_palettes()[["choices"]],
+            selected_palette = "dittoColors",
+            colors = initial_colors,
+            compact = TRUE
+        )
+    })
+}
