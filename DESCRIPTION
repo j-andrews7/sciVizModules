@@ -25,8 +25,7 @@ Description: sciVizModules extends VizModules with a curated collection of
 License: MIT + file LICENSE
 Depends:
     R (>= 4.6.0),
-    shiny,
-    VizModules (>= 0.6.0)
+    shiny
 Imports:
     colourpicker,
     dittoSeq,
@@ -49,7 +48,8 @@ Imports:
     SingleCellExperiment,
     stats,
     SummarizedExperiment,
-    survival
+    survival,
+    VizModules (>= 0.6.0)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Suggests:
