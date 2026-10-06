@@ -25,7 +25,8 @@ Description: sciVizModules extends VizModules with a curated collection of
 License: MIT + file LICENSE
 Depends:
     R (>= 4.6.0),
-    shiny
+    shiny,
+    VizModules (>= 0.6.0)
 Imports:
     colourpicker,
     dittoSeq,
