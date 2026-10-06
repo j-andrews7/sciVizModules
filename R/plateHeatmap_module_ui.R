@@ -30,7 +30,9 @@
 #' - `positive.color`, `negative.color` - Control outline colours
 #'
 #' The Axes and Plotly tabs carry the shared VizModules inputs. Gridlines mean
-#' nothing over a plate, so `show.grid.x` and `show.grid.y` default to FALSE.
+#' nothing over a plate, so `show.grid.x` and `show.grid.y` default to FALSE and
+#' [plateHeatmapServer()] hides them and `grid.color`. A caller can still turn
+#' them on through `defaults`.
 #'
 #' @param id The ID for the Shiny module.
 #' @param data The plate data frame, one row per well.
@@ -165,7 +167,8 @@ plateHeatmapOutputUI <- function(id, resizable = TRUE) {
 #' The plateHeatmap defaults for the shared Axes tab
 #'
 #' Gridlines drawn over the wells (and the row and column means) carry no
-#' information, so they are off unless the caller asks for them.
+#' information, so they are off unless the caller asks for them, and their
+#' inputs (`.plate_grid_inputs`) are hidden.
 #'
 #' @param defaults A named list of user defaults, or `NULL`.
 #' @return `defaults` with `show.grid.x` and `show.grid.y` set to FALSE where
@@ -177,6 +180,9 @@ plateHeatmapOutputUI <- function(id, resizable = TRUE) {
 .plate_axes_defaults <- function(defaults) {
     utils::modifyList(list(show.grid.x = FALSE, show.grid.y = FALSE), defaults %||% list())
 }
+
+# The Axes tab inputs plateHeatmapServer() always hides.
+.plate_grid_inputs <- c("show.grid.x", "show.grid.y", "grid.color")
 
 
 #' The labels in a plate's control column

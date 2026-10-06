@@ -32,7 +32,8 @@ The sorted unique labels.
 }
 \description{
 Gridlines drawn over the wells (and the row and column means) carry no
-information, so they are off unless the caller asks for them.
+information, so they are off unless the caller asks for them, and their
+inputs (\code{.plate_grid_inputs}) are hidden.
 }
 \author{
 Jared Andrews

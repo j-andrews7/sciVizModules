@@ -60,7 +60,9 @@ The following parameters can be accessed via UI inputs and/or the \code{defaults
 }
 
 The Axes and Plotly tabs carry the shared VizModules inputs. Gridlines mean
-nothing over a plate, so \code{show.grid.x} and \code{show.grid.y} default to FALSE.
+nothing over a plate, so \code{show.grid.x} and \code{show.grid.y} default to FALSE and
+\code{\link[=plateHeatmapServer]{plateHeatmapServer()}} hides them and \code{grid.color}. A caller can still turn
+them on through \code{defaults}.
 }
 
 \examples{

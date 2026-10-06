@@ -17,7 +17,8 @@ plateHeatmapServer(
 
 \item{data}{A \code{reactive} containing the plate data frame.}
 
-\item{hide.inputs}{A character vector of input IDs to hide.}
+\item{hide.inputs}{A character vector of input IDs to hide. The gridline
+inputs (\code{show.grid.x}, \code{show.grid.y}, \code{grid.color}) are always hidden.}
 
 \item{hide.tabs}{A character vector of tab names to hide.}
 

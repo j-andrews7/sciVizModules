@@ -6,7 +6,8 @@
 #'
 #' @param id The ID for the Shiny module.
 #' @param data A `reactive` containing the plate data frame.
-#' @param hide.inputs A character vector of input IDs to hide.
+#' @param hide.inputs A character vector of input IDs to hide. The gridline
+#'   inputs (`show.grid.x`, `show.grid.y`, `grid.color`) are always hidden.
 #' @param hide.tabs A character vector of tab names to hide.
 #' @param defaults A named list of default values used when resetting the inputs.
 #'   Typically the same list passed to [plateHeatmapInputsUI()].
@@ -25,7 +26,7 @@
 #' @author Jared Andrews
 plateHeatmapServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL) {
     .sci_plot_server(
-        id, data, hide.inputs, hide.tabs, .plate_axes_defaults(defaults),
+        id, data, union(hide.inputs, .plate_grid_inputs), hide.tabs, .plate_axes_defaults(defaults),
         name = "plateHeatmap",
         validate = .sci_require_df,
         setup = function(input, output, session, object, params) {

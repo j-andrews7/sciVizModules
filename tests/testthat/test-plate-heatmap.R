@@ -145,3 +145,15 @@ test_that("gridlines are off by default and a caller can turn them back on", {
     html <- as.character(plateHeatmapInputsUI("p", example_plate, defaults = list(show.grid.y = TRUE)))
     expect_true(checked(html, "show.grid.y"))
 })
+
+test_that("the server hides the gridline inputs along with the caller's", {
+    data("example_plate", package = "sciVizModules", envir = environment())
+    hidden <- NULL
+    local_mocked_bindings(hide_input = function(session, ids) hidden <<- c(hidden, ids))
+    shiny::testServer(
+        plateHeatmapServer,
+        args = list(data = shiny::reactive(example_plate), hide.inputs = "ncols"),
+        expr = NULL
+    )
+    expect_true(all(c("ncols", "show.grid.x", "show.grid.y", "grid.color") %in% hidden))
+})
