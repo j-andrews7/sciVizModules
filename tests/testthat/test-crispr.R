@@ -52,39 +52,47 @@ test_that("read_mageck() reads an MLE gene summary and rejects other tables", {
     expect_error(read_mageck("no-such-file.txt"), "File not found")
 })
 
-test_that("genes are ranked by the chosen selection and flagged by FDR", {
+test_that("RRA genes take their better side, signed, with hits flagged by that side's FDR", {
     screen <- read_mageck(crispr_example_file())
-    neg <- .crispr_prepare(screen, "neg", "lfc", 0.05)
-    expect_identical(neg$screen.rank, seq_len(nrow(screen)))
-    expect_identical(neg$screen.lfc, neg$neg.lfc)
-    expect_identical(sum(neg$screen.group == "Depleted"), sum(screen$neg.fdr < 0.05))
-    expect_false(any(neg$screen.group == "Enriched"))
+    lfc <- .crispr_prepare(screen, "lfc", 0.05)
+    expect_identical(lfc$screen.rank, seq_len(nrow(screen)))
+    expect_identical(lfc$screen.lfc, lfc$neg.lfc)
+    expect_identical(lfc$screen.metric, lfc$neg.lfc)
 
-    pos <- .crispr_prepare(screen, "pos", "fdr", 0.05)
-    # Ranked by FDR, with MAGeCK's rank breaking the ties.
-    best <- screen[screen$pos.fdr == min(screen$pos.fdr), ]
-    expect_identical(pos$gene[1], best$gene[which.min(best$pos.rank)])
-    expect_equal(pos$screen.metric, -log10(pmax(pos$pos.fdr, min(pos$pos.fdr[pos$pos.fdr > 0]))))
-    expect_identical(sum(pos$screen.group == "Enriched"), sum(screen$pos.fdr < 0.05))
+    # Each gene's side is the one with the smaller RRA score.
+    depleted <- lfc$neg.score <= lfc$pos.score
+    expect_identical(lfc$screen.fdr, ifelse(depleted, lfc$neg.fdr, lfc$pos.fdr))
+    expect_identical(sum(lfc$screen.group == "Depleted"), sum(depleted & lfc$neg.fdr < 0.05))
+    expect_identical(sum(lfc$screen.group == "Enriched"), sum(!depleted & lfc$pos.fdr < 0.05))
+    # Both directions are on the one plot.
+    expect_gt(sum(lfc$screen.group == "Depleted"), 0)
+    expect_gt(sum(lfc$screen.group == "Enriched"), 0)
+
+    fdr <- .crispr_prepare(screen, "fdr", 0.05)
+    neglog <- function(v) -log10(pmax(v, min(v[v > 0])))
+    expect_equal(fdr$screen.metric, ifelse(fdr$neg.score <= fdr$pos.score, -1, 1) * neglog(fdr$screen.fdr))
+    expect_true(all(fdr$screen.metric[fdr$screen.group == "Depleted"] < 0))
+    expect_true(all(fdr$screen.metric[fdr$screen.group == "Enriched"] > 0))
+    # The hits do not depend on the statistic plotted.
+    expect_identical(sort(fdr$gene[fdr$screen.group != "n.s."]), sort(lfc$gene[lfc$screen.group != "n.s."]))
 })
 
-test_that("genes are ranked by the plotted statistic, so the curve is monotone", {
+test_that("genes are ranked by the plotted statistic, depleted first and enriched last", {
     screen <- read_mageck(crispr_example_file())
     for (metric in c("lfc", "score", "fdr")) {
-        neg <- .crispr_prepare(screen, "neg", metric, 0.05)
-        pos <- .crispr_prepare(screen, "pos", metric, 0.05)
-        if (metric == "lfc") {
-            expect_false(is.unsorted(neg$screen.metric), label = metric)
-        } else {
-            expect_false(is.unsorted(rev(neg$screen.metric)), label = metric)
-        }
-        expect_false(is.unsorted(rev(pos$screen.metric)), label = metric)
+        p <- .crispr_prepare(screen, metric, 0.05)
+        expect_false(is.unsorted(p$screen.metric), label = metric)
+        expect_identical(as.character(p$screen.group[1]), "Depleted", label = metric)
+        expect_identical(as.character(p$screen.group[nrow(p)]), "Enriched", label = metric)
     }
-    # The RRA score keeps MAGeCK's own rank.
-    expect_identical(.crispr_prepare(screen, "pos", "score")$pos.rank, seq_len(nrow(screen)))
+    # The signed score ranks each side by its RRA score, as MAGeCK does.
+    score <- .crispr_prepare(screen, "score")
+    side <- score$neg.score <= score$pos.score
+    expect_false(is.unsorted(score$neg.score[side]))
+    expect_false(is.unsorted(rev(score$pos.score[!side])))
 })
 
-test_that("an MLE summary is ranked within one condition, with hits in the chosen direction", {
+test_that("an MLE summary is ranked within one condition, its FDR signed by the beta", {
     mle <- read_mageck(crispr_mle_file())
     expect_identical(attr(mle, "mageck_type"), "mle")
     expect_identical(.mageck_conditions(mle), c("dmso", "drug"))
@@ -92,24 +100,25 @@ test_that("an MLE summary is ranked within one condition, with hits in the chose
     uploaded <- utils::read.delim(gzfile(crispr_mle_file()), stringsAsFactors = TRUE)
     expect_identical(names(.mageck_tidy(uploaded)), names(mle))
 
-    neg <- .crispr_prepare(mle, "neg", "lfc", 0.05)
-    expect_identical(attr(neg, "mageck_condition"), "dmso")
-    expect_identical(neg$screen.lfc, neg$dmso.beta)
-    expect_false(is.unsorted(neg$screen.metric))
-    expect_true(all(neg$dmso.beta[neg$screen.group == "Depleted"] < 0))
-    expect_identical(sum(neg$screen.group == "Depleted"), sum(mle$dmso.fdr < 0.05 & mle$dmso.beta < 0))
+    beta <- .crispr_prepare(mle, "lfc", 0.05)
+    expect_identical(attr(beta, "mageck_condition"), "dmso")
+    expect_identical(beta$screen.lfc, beta$dmso.beta)
+    expect_false(is.unsorted(beta$screen.metric))
+    expect_identical(sum(beta$screen.group == "Depleted"), sum(mle$dmso.fdr < 0.05 & mle$dmso.beta < 0))
+    expect_identical(sum(beta$screen.group == "Enriched"), sum(mle$dmso.fdr < 0.05 & mle$dmso.beta >= 0))
 
-    pos <- .crispr_prepare(mle, "pos", "fdr", 0.05, condition = "drug")
-    expect_identical(attr(pos, "mageck_condition"), "drug")
-    expect_identical(sum(pos$screen.group == "Enriched"), sum(mle$drug.fdr < 0.05 & mle$drug.beta > 0))
-    # Genes whose beta points the chosen way rank first, by FDR.
-    up <- pos$drug.beta > 0
-    expect_false(is.unsorted(!up))
-    expect_false(is.unsorted(rev(pos$screen.metric[up])))
+    fdr <- .crispr_prepare(mle, "fdr", 0.05, condition = "drug")
+    expect_identical(attr(fdr, "mageck_condition"), "drug")
+    expect_false(is.unsorted(fdr$screen.metric))
+    expect_identical(sign(fdr$screen.metric[fdr$screen.metric != 0]),
+        ifelse(fdr$drug.beta < 0, -1, 1)[fdr$screen.metric != 0])
+    expect_true(all(fdr$drug.beta[fdr$screen.group == "Depleted"] < 0))
+    expect_true(all(fdr$drug.beta[fdr$screen.group == "Enriched"] > 0))
+    expect_gt(sum(fdr$screen.group == "Enriched"), 0)
 
-    z <- .crispr_prepare(mle, "pos", "score", 0.05, condition = "drug")
+    z <- .crispr_prepare(mle, "score", 0.05, condition = "drug")
     expect_identical(z$screen.metric, z$drug.z)
-    expect_false(is.unsorted(rev(z$screen.metric)))
+    expect_false(is.unsorted(z$screen.metric))
     # An unknown condition falls back to the first.
     expect_identical(attr(.crispr_prepare(mle, condition = "nope"), "mageck_condition"), "dmso")
 })
@@ -117,11 +126,11 @@ test_that("an MLE summary is ranked within one condition, with hits in the chose
 test_that("factor gene columns, as the data filter delivers them, label as text", {
     screen <- read_mageck(crispr_example_file())
     screen$gene <- factor(screen$gene)
-    prepared <- .crispr_prepare(screen, "neg", "lfc", 0.05)
+    prepared <- .crispr_prepare(screen, "lfc", 0.05)
     expect_type(prepared$gene, "character")
 
     fig <- plotly::plotly_build(plotly::plot_ly(x = 1:2, y = 1:2, type = "scatter", mode = "markers"))
-    input <- list(x.by = "screen.rank", y.by = "screen.metric", direction = "neg", metric = "lfc",
+    input <- list(x.by = "screen.rank", y.by = "screen.metric", metric = "lfc",
         fdr.threshold = 0.05, n.labels = 3, label.size = 10)
     out <- .crispr_layers(fig, prepared, input, identity)
     texts <- lapply(out$x$layout$annotations, `[[`, "text")
@@ -131,15 +140,22 @@ test_that("factor gene columns, as the data filter delivers them, label as text"
     expect_false(anyNA(keys))
 })
 
-test_that("the layers label the top genes and draw the FDR line", {
-    screen <- .crispr_prepare(read_mageck(crispr_example_file()), "neg", "fdr", 0.05)
+test_that("the layers label the extreme hits at each end and draw both FDR lines", {
+    screen <- .crispr_prepare(read_mageck(crispr_example_file()), "fdr", 0.05)
     fig <- plotly::plotly_build(plotly::plot_ly(x = 1:2, y = 1:2, type = "scatter", mode = "markers"))
-    input <- list(x.by = "screen.rank", y.by = "screen.metric", direction = "neg", metric = "fdr",
+    input <- list(x.by = "screen.rank", y.by = "screen.metric", metric = "fdr",
         fdr.threshold = 0.05, n.labels = 5, label.size = 10)
     out <- .crispr_layers(fig, screen, input, identity)
-    expect_identical(vapply(out$x$layout$annotations, `[[`, "", "text"), screen$gene[1:5])
-    expect_equal(out$x$layout$shapes[[1]]$y0, -log10(0.05))
-    expect_identical(out$x$layout$yaxis$title$text, "-log10(FDR)")
+    texts <- vapply(out$x$layout$annotations, `[[`, "", "text")
+    depleted <- screen$gene[screen$screen.group == "Depleted"]
+    enriched <- screen$gene[screen$screen.group == "Enriched"]
+    expect_identical(texts, c(utils::head(depleted, 5), utils::tail(enriched, 5)))
+    # Labels point in from each end.
+    ax <- vapply(out$x$layout$annotations, `[[`, 0, "ax")
+    expect_true(all(ax[1:5] > 0) && all(ax[6:10] < 0))
+    expect_equal(vapply(out$x$layout$shapes, `[[`, 0, "y0"), c(log10(0.05), -log10(0.05)))
+    expect_identical(out$x$layout$yaxis$title$text, "Signed -log10(FDR)")
+    expect_identical(out$x$layout$xaxis$title$text, "Gene rank")
 
     lfc <- .crispr_layers(fig, screen, utils::modifyList(input, list(metric = "lfc", n.labels = 0)), identity)
     expect_length(lfc$x$layout$shapes, 0)
@@ -147,8 +163,12 @@ test_that("the layers label the top genes and draw the FDR line", {
     moved <- .crispr_layers(fig, screen, utils::modifyList(input, list(y.by = "neg.p")), identity)
     expect_length(moved$x$layout$annotations, 0)
 
+    # Only hits are labelled: a cut-off nothing passes labels nothing.
+    none <- .crispr_prepare(read_mageck(crispr_example_file()), "fdr", 0)
+    expect_length(.crispr_layers(fig, none, input, identity)$x$layout$annotations, 0)
+
     # An MLE table titles the y-axis with its own statistic.
-    mle <- .crispr_prepare(read_mageck(crispr_mle_file()), "neg", "lfc", 0.05)
+    mle <- .crispr_prepare(read_mageck(crispr_mle_file()), "lfc", 0.05)
     beta <- .crispr_layers(fig, mle, utils::modifyList(input, list(metric = "lfc", n.labels = 0)), identity)
     expect_identical(beta$x$layout$yaxis$title$text, "Beta")
 })
@@ -162,9 +182,10 @@ test_that("the server hands the scatter module the ranked table and a fig.fn hoo
         }
     )
     shiny::testServer(crisprScreenRankServer, args = list(data = shiny::reactive(screen)), expr = {
-        session$setInputs(auto.update = TRUE, direction = "pos", metric = "score", fdr.threshold = 0.1)
+        session$setInputs(auto.update = TRUE, metric = "score", fdr.threshold = 0.1)
         prepared <- captured$data()
-        expect_identical(prepared$gene[1], screen$gene[which.min(screen$pos.rank)])
+        expect_identical(prepared$gene[1], screen$gene[which.min(screen$neg.score)])
+        expect_identical(prepared$gene[nrow(prepared)], screen$gene[which.min(screen$pos.score)])
     })
     expect_true(is.function(captured$fig.fn))
     expect_identical(captured$defaults$x.by, "screen.rank")
@@ -173,14 +194,15 @@ test_that("the server hands the scatter module the ranked table and a fig.fn hoo
 })
 
 test_that("a rank plot builds end to end through the scatter module", {
-    screen <- .crispr_prepare(read_mageck(crispr_example_file()), "neg", "lfc", 0.05)
+    screen <- .crispr_prepare(read_mageck(crispr_example_file()), "lfc", 0.05)
     built <- build_scatter_figure(screen,
         fig.fn = function(fig, input, isolate_fn) .crispr_layers(fig, screen, input, isolate_fn),
         inputs = test_scatter_inputs(x.by = "screen.rank", y.by = "screen.metric", color.by = "screen.group",
-            direction = "neg", metric = "lfc", fdr.threshold = 0.05, n.labels = 3, label.size = 11, webgl = FALSE)
+            metric = "lfc", fdr.threshold = 0.05, n.labels = 3, label.size = 11, webgl = FALSE)
     )
     texts <- vapply(built$x$layout$annotations, function(a) as.character(a$text %||% ""), "")
-    expect_true(all(c("Gene rank (depletion)", "Log2 fold change", screen$gene[1:3]) %in% texts))
+    depleted <- screen$gene[screen$screen.group == "Depleted"]
+    expect_true(all(c("Gene rank", "Log2 fold change", depleted[1:3]) %in% texts))
     expect_true(inherits(crisprScreenRankInputsUI("c", read_mageck(crispr_example_file())),
         c("shiny.tag", "shiny.tag.list")))
 })
@@ -188,7 +210,8 @@ test_that("a rank plot builds end to end through the scatter module", {
 test_that("the inputs offer a condition and MLE labels only for an MLE summary", {
     rra <- as.character(crisprScreenRankInputsUI("c", read_mageck(crispr_example_file())))
     expect_false(grepl("c-condition", rra, fixed = TRUE))
-    expect_true(grepl("-log10(RRA score)", rra, fixed = TRUE))
+    expect_false(grepl("c-direction", rra, fixed = TRUE))
+    expect_true(grepl("Signed -log10(RRA score)", rra, fixed = TRUE))
 
     mle <- as.character(crisprScreenRankInputsUI("c", read_mageck(crispr_mle_file()),
         defaults = list(condition = "drug")))
@@ -208,11 +231,10 @@ test_that("the server plots the chosen MLE condition", {
         }
     )
     shiny::testServer(crisprScreenRankServer, args = list(data = shiny::reactive(mle)), expr = {
-        session$setInputs(auto.update = TRUE, direction = "pos", metric = "lfc", fdr.threshold = 0.05,
-            condition = "drug")
+        session$setInputs(auto.update = TRUE, metric = "lfc", fdr.threshold = 0.05, condition = "drug")
         prepared <- captured$data()
         expect_identical(attr(prepared, "mageck_condition"), "drug")
-        expect_identical(prepared$gene[1], mle$gene[which.max(mle$drug.beta)])
+        expect_identical(prepared$gene[nrow(prepared)], mle$gene[which.max(mle$drug.beta)])
     })
 })
 

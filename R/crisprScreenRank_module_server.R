@@ -1,7 +1,8 @@
 #' Server logic for the crisprScreenRank module
 #'
-#' Ranks the genes of a MAGeCK RRA or MLE gene summary for the chosen
-#' selection by the plotted statistic, flags hits by FDR, and plots them through
+#' Ranks the genes of a MAGeCK RRA or MLE gene summary by the plotted
+#' statistic, signed so that depleted genes fall on the left and enriched genes
+#' on the right, flags hits by FDR, and plots them through
 #' [VizModules::dittoViz_scatterPlotServer()]. Its `fig.fn` hook titles the
 #' axes, labels the top genes and draws the FDR cut-off.
 #'
@@ -33,7 +34,6 @@ crisprScreenRankServer <- function(id, data, hide.inputs = NULL, hide.tabs = c("
 
     prepared <- moduleServer(id, function(input, output, session) {
         observeEvent(input$reset, {
-            update_viz_select(session, "direction", selected = d$direction)
             update_viz_select(session, "metric", selected = d$metric)
             updateNumericInput(session, "fdr.threshold", value = d$fdr.threshold)
             updateNumericInput(session, "n.labels", value = d$n.labels)
@@ -50,11 +50,10 @@ crisprScreenRankServer <- function(id, data, hide.inputs = NULL, hide.tabs = c("
             df <- data()
             req(df)
             isolate_fn <- setup_auto_update_logic(input)
-            direction <- isolate_fn(input$direction)
             metric <- isolate_fn(input$metric)
             thr <- isolate_fn(input$fdr.threshold)
-            req(nz_value(direction), nz_value(metric), !is.null(thr))
-            .crispr_prepare(df, direction, metric, thr, isolate_fn(input$condition))
+            req(nz_value(metric), !is.null(thr))
+            .crispr_prepare(df, metric, thr, isolate_fn(input$condition))
         })
     })
 

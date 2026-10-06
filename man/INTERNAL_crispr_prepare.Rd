@@ -10,23 +10,16 @@
 
 .crispr_metric_labels(type = "rra")
 
-.crispr_prepare(
-  df,
-  direction = "neg",
-  metric = "lfc",
-  fdr.threshold = 0.05,
-  condition = NULL
-)
+.crispr_prepare(df, metric = "lfc", fdr.threshold = 0.05, condition = NULL)
 }
 \arguments{
 \item{df}{A MAGeCK RRA or MLE gene summary, raw or tidied.}
 
 \item{type}{\code{"rra"} or \code{"mle"}.}
 
-\item{direction}{\code{"neg"} (depletion) or \code{"pos"} (enrichment).}
-
 \item{metric}{\code{"lfc"} (log2 fold change, or beta for MLE), \code{"score"}
-(-log10 RRA score, or the z-score for MLE) or \code{"fdr"} (-log10 FDR).}
+(signed -log10 RRA score, or the z-score for MLE) or \code{"fdr"} (signed
+-log10 FDR).}
 
 \item{fdr.threshold}{FDR below which a gene is a hit.}
 
@@ -40,22 +33,29 @@ column), or \code{character(0)} for an RRA summary.
 A named character vector, labels as names.
 
 The tidy table with \code{screen.rank}, \code{screen.metric}, \code{screen.lfc}
-(beta for MLE), \code{screen.fdr} and \code{screen.group} ("Depleted" / "Enriched" /
-"n.s.") added, sorted by rank. The \code{"mageck_type"} attribute is kept, and an
-MLE table records the plotted condition in \code{"mageck_condition"}.
+(beta for MLE), \code{screen.fdr} (the FDR behind the gene's call) and
+\code{screen.group} ("Depleted" / "Enriched" / "n.s.") added, sorted by rank.
+The \code{"mageck_type"} attribute is kept, and an MLE table records the
+plotted condition in \code{"mageck_condition"}.
 }
 \description{
 The keys are shared by both summaries, so \code{defaults} and Reset do not depend
 on which one is loaded; only what they plot differs.
 
-Genes are ranked by the statistic on the y-axis, so the plotted values fall
-(or rise) steadily along the rank, with MAGeCK's own rank breaking ties.
-For an RRA summary, \code{"score"} keeps MAGeCK's rank for the selection.
-For an MLE summary, the statistics are those of one condition. \code{"lfc"} is
-its beta and \code{"score"} its z-score, both signed so that the strongest effect
-in the chosen direction ranks first. The MLE FDR is two-sided, so for
-\code{"fdr"} the genes whose beta points the chosen way rank first, by FDR, and a
-hit must point that way too.
+Every statistic is signed by the direction of its effect, negative for
+depletion and positive for enrichment, so depleted and enriched genes share
+one plot: the most depleted gene ranks first and the most enriched last.
+Genes are ranked by the statistic on the y-axis, so the curve rises steadily.
+}
+\details{
+An RRA summary tests each gene for depletion and for enrichment. Each gene
+takes the side with the smaller RRA score, and its score and FDR are that
+side's, negated for depletion. A hit is a gene whose FDR on that side is
+below \code{fdr.threshold}. The log2 fold change needs no sign.
+
+An MLE summary is plotted for one condition. Its beta and z-score are signed
+already. Its FDR is two-sided, so it takes the sign of the beta, and a hit is
+"Depleted" or "Enriched" by that sign.
 }
 \author{
 Jared Andrews

@@ -128,43 +128,48 @@ read_mageck <- function(file) {
 #' @keywords internal
 .crispr_metric_labels <- function(type = "rra") {
     if (identical(type, "mle")) {
-        c("Beta" = "lfc", "z-score" = "score", "-log10(FDR)" = "fdr")
+        c("Beta" = "lfc", "z-score" = "score", "Signed -log10(FDR)" = "fdr")
     } else {
-        c("Log2 fold change" = "lfc", "-log10(RRA score)" = "score", "-log10(FDR)" = "fdr")
+        c("Log2 fold change" = "lfc", "Signed -log10(RRA score)" = "score", "Signed -log10(FDR)" = "fdr")
     }
 }
 
 
 #' Prepare a MAGeCK gene summary for the rank plot
 #'
-#' Genes are ranked by the statistic on the y-axis, so the plotted values fall
-#' (or rise) steadily along the rank, with MAGeCK's own rank breaking ties.
-#' For an RRA summary, `"score"` keeps MAGeCK's rank for the selection.
-#' For an MLE summary, the statistics are those of one condition. `"lfc"` is
-#' its beta and `"score"` its z-score, both signed so that the strongest effect
-#' in the chosen direction ranks first. The MLE FDR is two-sided, so for
-#' `"fdr"` the genes whose beta points the chosen way rank first, by FDR, and a
-#' hit must point that way too.
+#' Every statistic is signed by the direction of its effect, negative for
+#' depletion and positive for enrichment, so depleted and enriched genes share
+#' one plot: the most depleted gene ranks first and the most enriched last.
+#' Genes are ranked by the statistic on the y-axis, so the curve rises steadily.
+#'
+#' An RRA summary tests each gene for depletion and for enrichment. Each gene
+#' takes the side with the smaller RRA score, and its score and FDR are that
+#' side's, negated for depletion. A hit is a gene whose FDR on that side is
+#' below `fdr.threshold`. The log2 fold change needs no sign.
+#'
+#' An MLE summary is plotted for one condition. Its beta and z-score are signed
+#' already. Its FDR is two-sided, so it takes the sign of the beta, and a hit is
+#' "Depleted" or "Enriched" by that sign.
 #'
 #' @param df A MAGeCK RRA or MLE gene summary, raw or tidied.
-#' @param direction `"neg"` (depletion) or `"pos"` (enrichment).
 #' @param metric `"lfc"` (log2 fold change, or beta for MLE), `"score"`
-#'   (-log10 RRA score, or the z-score for MLE) or `"fdr"` (-log10 FDR).
+#'   (signed -log10 RRA score, or the z-score for MLE) or `"fdr"` (signed
+#'   -log10 FDR).
 #' @param fdr.threshold FDR below which a gene is a hit.
 #' @param condition For an MLE summary, the condition to plot. Defaults to the
 #'   first; ignored for RRA.
 #' @return The tidy table with `screen.rank`, `screen.metric`, `screen.lfc`
-#'   (beta for MLE), `screen.fdr` and `screen.group` ("Depleted" / "Enriched" /
-#'   "n.s.") added, sorted by rank. The `"mageck_type"` attribute is kept, and an
-#'   MLE table records the plotted condition in `"mageck_condition"`.
+#'   (beta for MLE), `screen.fdr` (the FDR behind the gene's call) and
+#'   `screen.group` ("Depleted" / "Enriched" / "n.s.") added, sorted by rank.
+#'   The `"mageck_type"` attribute is kept, and an MLE table records the
+#'   plotted condition in `"mageck_condition"`.
 #'
 #' @author Jared Andrews
 #' @rdname INTERNAL_crispr_prepare
 #' @keywords internal
-.crispr_prepare <- function(df, direction = "neg", metric = "lfc", fdr.threshold = 0.05, condition = NULL) {
+.crispr_prepare <- function(df, metric = "lfc", fdr.threshold = 0.05, condition = NULL) {
     df <- .mageck_tidy(df)
     type <- attr(df, "mageck_type")
-    direction <- match.arg(direction, c("neg", "pos"))
     metric <- match.arg(metric, c("lfc", "score", "fdr"))
     # The data filter hands character columns over as factors; labels need the text.
     df$gene <- as.character(df$gene)
@@ -172,46 +177,38 @@ read_mageck <- function(file) {
         floor <- min(v[v > 0], na.rm = TRUE)
         -log10(pmax(v, floor))
     }
-    # Signed so that the strongest effect in the chosen direction sorts first.
-    sign <- if (direction == "neg") 1 else -1
 
     if (identical(type, "rra")) {
-        col <- function(stat) df[[paste0(direction, ".", stat)]]
-        lfc <- col("lfc")
-        fdr <- col("fdr")
-        mageck_rank <- col("rank")
-        hit <- !is.na(fdr) & fdr < fdr.threshold
-        value <- switch(metric, lfc = lfc, score = neglog(col("score")), fdr = neglog(fdr))
-        key <- switch(metric,
-            lfc = list(sign * lfc, mageck_rank),
-            score = list(mageck_rank),
-            fdr = list(fdr, mageck_rank)
-        )
+        lfc <- df$neg.lfc
+        # Each gene takes the side it scores better on. NA scores lose.
+        depleted <- !is.na(df$neg.score) & (is.na(df$pos.score) | df$neg.score <= df$pos.score)
+        sign <- ifelse(depleted, -1, 1)
+        score <- ifelse(depleted, df$neg.score, df$pos.score)
+        fdr <- ifelse(depleted, df$neg.fdr, df$pos.fdr)
+        signed_score <- sign * neglog(score)
+        value <- switch(metric, lfc = lfc, score = signed_score, fdr = sign * neglog(fdr))
+        tiebreak <- if (identical(metric, "score")) lfc else signed_score
     } else {
         conds <- .mageck_conditions(df)
         condition <- if (nz_value(condition) && condition %in% conds) condition else conds[1]
         col <- function(stat) df[[paste0(condition, ".", stat)]]
         lfc <- col("beta")
         fdr <- col("fdr")
-        z <- col("z")
-        in_direction <- !is.na(lfc) & sign * lfc < 0
-        hit <- in_direction & !is.na(fdr) & fdr < fdr.threshold
-        value <- switch(metric, lfc = lfc, score = z, fdr = neglog(fdr))
-        key <- switch(metric,
-            lfc = list(sign * lfc),
-            score = list(sign * z, sign * lfc),
-            fdr = list(!in_direction, fdr, sign * lfc)
-        )
+        depleted <- !is.na(lfc) & lfc < 0
+        sign <- ifelse(depleted, -1, 1)
+        value <- switch(metric, lfc = lfc, score = col("z"), fdr = sign * neglog(fdr))
+        tiebreak <- lfc
     }
+    hit <- !is.na(fdr) & fdr < fdr.threshold
 
     rank <- integer(nrow(df))
-    rank[do.call(order, key)] <- seq_len(nrow(df))
+    rank[order(value, tiebreak)] <- seq_len(nrow(df))
     df$screen.rank <- rank
     df$screen.lfc <- lfc
     df$screen.fdr <- fdr
     df$screen.metric <- value
     df$screen.group <- factor(
-        ifelse(hit, if (direction == "neg") "Depleted" else "Enriched", "n.s."),
+        ifelse(hit, ifelse(depleted, "Depleted", "Enriched"), "n.s."),
         levels = c("Depleted", "Enriched", "n.s.")
     )
     df <- df[order(df$screen.rank), , drop = FALSE]
@@ -234,7 +231,6 @@ read_mageck <- function(file) {
 #' @keywords internal
 .crispr_defaults <- function(data, defaults = NULL) {
     base <- list(
-        direction = "neg",
         metric = "lfc",
         fdr.threshold = 0.05,
         n.labels = 10,
@@ -252,15 +248,15 @@ read_mageck <- function(file) {
 }
 
 # Inputs the CRISPR module adds to the wrapped scatter module.
-.crispr_keys <- c("direction", "metric", "fdr.threshold", "n.labels", "label.size", "condition")
+.crispr_keys <- c("metric", "fdr.threshold", "n.labels", "label.size", "condition")
 
 
 #' Add the CRISPR rank plot's layers to the wrapped scatter figure
 #'
 #' The `fig.fn` hook [crisprScreenRankServer()] hands to the scatter module:
-#' axis titles for the chosen direction and metric, labels on the top-ranked
-#' genes, and the FDR cut-off when the metric is the FDR. Only applied while the
-#' axes are the rank and the metric with no adjustment or split.
+#' axis titles for the metric, labels on the most extreme hits at each end, and
+#' the FDR cut-offs (one per direction) when the metric is the FDR. Only applied
+#' while the axes are the rank and the metric with no adjustment or split.
 #'
 #' @param fig The scatter figure.
 #' @param prepared The prepared table from [.crispr_prepare()].
@@ -282,32 +278,38 @@ read_mageck <- function(file) {
         return(fig)
     }
 
-    direction <- isolate_fn(input$direction) %||% "neg"
     metric <- isolate_fn(input$metric) %||% "lfc"
-    fig$x$layout$xaxis$title$text <- if (identical(direction, "pos")) "Gene rank (enrichment)" else "Gene rank (depletion)"
+    fig$x$layout$xaxis$title$text <- "Gene rank"
     labels <- .crispr_metric_labels(attr(prepared, "mageck_type") %||% "rra")
     fig$x$layout$yaxis$title$text <- names(labels)[labels == metric]
 
     thr <- isolate_fn(input$fdr.threshold)
     if (identical(metric, "fdr") && is.numeric(thr) && length(thr) == 1 && !is.na(thr) && thr > 0 && thr < 1) {
-        fig$x$layout$shapes <- c(fig$x$layout$shapes, list(list(
-            type = "line", xref = "paper", x0 = 0, x1 = 1, yref = "y", y0 = -log10(thr), y1 = -log10(thr),
+        fig$x$layout$shapes <- c(fig$x$layout$shapes, lapply(c(-1, 1) * -log10(thr), function(y) list(
+            type = "line", xref = "paper", x0 = 0, x1 = 1, yref = "y", y0 = y, y1 = y,
             line = list(color = "#7F7F7F", dash = "dash", width = 1)
         )))
     }
 
     n <- isolate_fn(input$n.labels) %||% 0
     if (is.numeric(n) && !is.na(n) && n > 0) {
-        top <- utils::head(prepared, n)
+        # The most extreme hits at each end: depleted from the left, enriched from the right.
+        depleted <- utils::head(prepared[prepared$screen.group == "Depleted", , drop = FALSE], n)
+        enriched <- utils::tail(prepared[prepared$screen.group == "Enriched", , drop = FALSE], n)
         size <- isolate_fn(input$label.size) %||% 11
-        fig$x$layout$annotations <- c(fig$x$layout$annotations, lapply(seq_len(nrow(top)), function(i) {
-            list(
-                x = top$screen.rank[i], y = top$screen.metric[i], xref = "x", yref = "y",
-                text = as.character(top$gene[i]), showarrow = TRUE, arrowhead = 0, arrowwidth = 0.8,
-                arrowcolor = "#7F7F7F",
-                ax = 30, ay = if (top$screen.metric[i] < 0) 12 else -12, font = list(size = size)
-            )
-        }))
+        label <- function(top, inward) {
+            lapply(seq_len(nrow(top)), function(i) {
+                list(
+                    x = top$screen.rank[i], y = top$screen.metric[i], xref = "x", yref = "y",
+                    text = as.character(top$gene[i]), showarrow = TRUE, arrowhead = 0, arrowwidth = 0.8,
+                    arrowcolor = "#7F7F7F",
+                    # Alternate the reach so labels on neighbouring ranks do not stack.
+                    ax = inward * (if (i %% 2) 30 else 70), ay = if (top$screen.metric[i] < 0) 12 else -12,
+                    font = list(size = size)
+                )
+            })
+        }
+        fig$x$layout$annotations <- c(fig$x$layout$annotations, label(depleted, 1), label(enriched, -1))
     }
     fig
 }
