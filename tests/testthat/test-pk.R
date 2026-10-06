@@ -87,3 +87,23 @@ test_that("the server builds, finishes and exports the NCA table", {
     )
     expect_true(inherits(pkConcentrationTimeInputsUI("p", th), c("shiny.tag", "shiny.tag.list")))
 })
+
+test_that("Group Column offers small numeric dose groups but not wide columns", {
+    df <- data.frame(
+        Subject = rep(paste0("s", seq_len(60)), each = 2),
+        time = rep(c(0, 1), 60),
+        conc = seq_len(120) / 10,
+        dose = rep(c(10, 20), each = 60),
+        sample.id = paste0("x", seq_len(120)),
+        stringsAsFactors = FALSE
+    )
+    choices_of <- function(html, id) {
+        config <- regmatches(html, regexpr(paste0("data-for=\"", id, "\">.*?</script>"), html))
+        opts <- jsonlite::fromJSON(sub("</script>$", "", sub("^data-for=\"[^\"]+\">", "", config)))$options
+        unlist(opts$choices$value %||% lapply(opts$choices, function(g) g$value))
+    }
+
+    groups <- choices_of(as.character(pkConcentrationTimeInputsUI("pk", df)), "pk-group.col")
+    expect_true("dose" %in% groups)
+    expect_false(any(c("sample.id", "conc", "Subject") %in% groups))
+})

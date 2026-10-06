@@ -15,8 +15,8 @@ crisprScreenRankServer(
 \arguments{
 \item{id}{The ID for the Shiny module.}
 
-\item{data}{A \code{reactive} containing a MAGeCK RRA gene summary, from
-\code{\link[=read_mageck]{read_mageck()}} or read with \code{read.delim(check.names = FALSE)}.}
+\item{data}{A \code{reactive} containing a MAGeCK RRA or MLE gene summary, from
+\code{\link[=read_mageck]{read_mageck()}} or read with \code{read.delim()}.}
 
 \item{hide.inputs}{A character vector of input IDs to hide.}
 
@@ -30,8 +30,8 @@ defaults (user values win) and used to restore state on reset.}
 The value returned by \code{\link[VizModules:dittoViz_scatterPlotServer]{VizModules::dittoViz_scatterPlotServer()}}.
 }
 \description{
-Ranks the genes of a MAGeCK RRA gene summary for the chosen selection,
-flags hits by FDR, and plots them through
+Ranks the genes of a MAGeCK RRA or MLE gene summary for the chosen
+selection by the plotted statistic, flags hits by FDR, and plots them through
 \code{\link[VizModules:dittoViz_scatterPlotServer]{VizModules::dittoViz_scatterPlotServer()}}. Its \code{fig.fn} hook titles the
 axes, labels the top genes and draws the FDR cut-off.
 }

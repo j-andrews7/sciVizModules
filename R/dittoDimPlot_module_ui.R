@@ -83,7 +83,7 @@ dittoDimPlotInputsUI <- function(id, data, defaults = NULL, title = "DimPlot Set
     red.choices <- .ditto_reductions(data)
 
     default.var <- get_default(defaults, "var", {
-        metas <- .ditto_metas(data)
+        metas <- var.choices$Metadata
         if (length(metas)) metas[1] else if (length(.ditto_genes(data))) .ditto_genes(data)[1] else ""
     })
     default.red <- get_default(defaults, "reduction.use", get_default_reduction(data))

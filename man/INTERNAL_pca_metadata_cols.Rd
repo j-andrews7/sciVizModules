@@ -9,7 +9,8 @@
 \arguments{
 \item{p}{A \code{pca} object.}
 
-\item{type}{\code{"discrete"} (factor, character, logical) or \code{"numeric"}.}
+\item{type}{\code{"discrete"} (logical, or factor and character with fewer than
+50 levels; see \code{\link[=.sci_discrete_cols]{.sci_discrete_cols()}}) or \code{"numeric"}.}
 }
 \value{
 A character vector of column names, possibly empty.

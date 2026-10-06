@@ -64,7 +64,8 @@ survivalCurveInputsUI <- function(id, data, defaults = NULL, title = "Survival C
     }
 
     num.choices <- names(data)[vapply(data, is.numeric, logical(1))]
-    cat.choices <- names(data)[vapply(data, function(x) !is.numeric(x), logical(1))]
+    # Strata with too many levels to draw (an ID column) are left out.
+    cat.choices <- .sci_discrete_cols(data)
 
     # Auto-detect sensible defaults for the survival-specific columns.
     if (!"time" %in% names(defaults)) defaults$time <- .detect_time_col(data, num.choices)

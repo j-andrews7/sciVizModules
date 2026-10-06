@@ -14,8 +14,9 @@ The tidy table, with attribute \code{"mageck_type"}.
 }
 \description{
 Renames the \code{selection|statistic} columns of a MAGeCK gene summary (as read
-with \code{read.delim(check.names = FALSE)}) to \code{selection.statistic}. A table
-already tidied by \code{\link[=read_mageck]{read_mageck()}} is returned unchanged.
+with \code{read.delim(check.names = FALSE)}) to \code{selection.statistic}. The
+\code{check.names = TRUE} spelling (\code{neg.p.value}, \code{drug.wald.p.value}) is renamed
+the same way. A table already tidied by \code{\link[=read_mageck]{read_mageck()}} is returned unchanged.
 }
 \author{
 Jared Andrews

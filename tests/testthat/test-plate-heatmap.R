@@ -86,8 +86,12 @@ test_that("the example screen is detected and drawn one heatmap per plate", {
 
     marg <- plotly::plotly_build(plateHeatmap(example_plate, "well", "signal", "plate", "type", "positive",
         "negative", normalise = "bscore", marginals = TRUE, show.controls = FALSE))
-    expect_length(Filter(function(tr) identical(tr$type, "bar"), marg$x$data), 4)
+    bars <- Filter(function(tr) identical(tr$type, "bar"), marg$x$data)
+    expect_length(bars, 4)
     expect_length(marg$x$layout$shapes, 0)
+    # The row and column means are hover text only; the thin margins have no room to print them.
+    expect_true(all(unlist(lapply(bars, `[[`, "textposition")) == "none"))
+    expect_true(all(unlist(lapply(bars, `[[`, "hoverinfo")) == "text"))
 
     expect_error(plateHeatmap(rbind(example_plate, example_plate), "well", "signal", "plate"), "Duplicate")
 })
@@ -119,4 +123,25 @@ test_that("the server builds, follows the control column, and exports the plate 
         }
     )
     expect_true(inherits(plateHeatmapInputsUI("p", example_plate), c("shiny.tag", "shiny.tag.list")))
+})
+
+test_that("gridlines are off by default and a caller can turn them back on", {
+    data("example_plate", package = "sciVizModules", envir = environment())
+    d <- .plate_axes_defaults(NULL)
+    expect_false(d$show.grid.x)
+    expect_false(d$show.grid.y)
+    d <- .plate_axes_defaults(list(show.grid.x = TRUE, normalise = "zscore"))
+    expect_true(d$show.grid.x)
+    expect_false(d$show.grid.y)
+    expect_identical(d$normalise, "zscore")
+
+    checked <- function(html, id) {
+        tag <- regmatches(html, regexpr(paste0("<input id=\"p-", id, "\"[^>]*>"), html))
+        grepl("checked", tag, fixed = TRUE)
+    }
+    html <- as.character(plateHeatmapInputsUI("p", example_plate))
+    expect_false(checked(html, "show.grid.x"))
+    expect_false(checked(html, "show.grid.y"))
+    html <- as.character(plateHeatmapInputsUI("p", example_plate, defaults = list(show.grid.y = TRUE)))
+    expect_true(checked(html, "show.grid.y"))
 })

@@ -25,7 +25,7 @@
 #' @author Jared Andrews
 plateHeatmapServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL) {
     .sci_plot_server(
-        id, data, hide.inputs, hide.tabs, defaults,
+        id, data, hide.inputs, hide.tabs, .plate_axes_defaults(defaults),
         name = "plateHeatmap",
         validate = .sci_require_df,
         setup = function(input, output, session, object, params) {

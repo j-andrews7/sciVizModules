@@ -3,12 +3,15 @@
 \name{.plate_methods}
 \alias{.plate_methods}
 \alias{.plate_defaults}
+\alias{.plate_axes_defaults}
 \alias{.plate_control_labels}
 \title{Plate normalisation choices}
 \usage{
 .plate_methods
 
 .plate_defaults(data, defaults = NULL)
+
+.plate_axes_defaults(defaults)
 
 .plate_control_labels(data, col)
 }
@@ -22,14 +25,14 @@
 \value{
 A named list of defaults.
 
+\code{defaults} with \code{show.grid.x} and \code{show.grid.y} set to FALSE where
+the caller did not set them.
+
 The sorted unique labels.
 }
 \description{
-Plate normalisation choices
-
-Default inputs for the plateHeatmap module
-
-The labels in a plate's control column
+Gridlines drawn over the wells (and the row and column means) carry no
+information, so they are off unless the caller asks for them.
 }
 \author{
 Jared Andrews

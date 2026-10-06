@@ -1,7 +1,8 @@
-# Generate the example MAGeCK RRA gene summary shipped with sciVizModules.
+# Generate the example MAGeCK gene summaries shipped with sciVizModules.
 #
 # A simulated pooled CRISPR knockout screen summarised the way `mageck test`
-# writes `<prefix>.gene_summary.txt`, for read_mageck() and the
+# writes `<prefix>.gene_summary.txt` (and, below, the way `mageck mle` does),
+# for read_mageck() and the
 # crisprScreenRank module: 2,000 genes with 4 sgRNAs each, about 5% depleted
 # (essential-like) and 1% enriched (resistance-like) hits, and null genes in
 # between. Gene symbols are borrowed for readability, but every value is
@@ -65,4 +66,41 @@ summary <- summary[order(summary$`neg|rank`), ]
 dir.create("inst/extdata", showWarnings = FALSE, recursive = TRUE)
 out <- gzfile("inst/extdata/example_mageck.gene_summary.txt.gz", "w")
 utils::write.table(summary, out, sep = "\t", quote = FALSE, row.names = FALSE)
+close(out)
+
+
+# The same screen as a `mageck mle` gene summary: two conditions of a design
+# matrix, a vehicle arm (dmso) where the essential genes drop out, and a drug
+# arm where they drop out too and the resistance genes rise. Written after the
+# RRA summary, with its own seed, so that file regenerates unchanged.
+set.seed(20261005)
+n <- length(genes)
+mle_condition <- function(name, dep_mean, enr_mean) {
+    beta <- ifelse(type == "depleted", stats::rnorm(n, dep_mean, 0.25),
+        ifelse(type == "enriched", stats::rnorm(n, enr_mean, 0.2), stats::rnorm(n, 0, 0.12)))
+    se <- stats::runif(n, 0.08, 0.2)
+    z <- beta / se
+    wald_p <- 2 * stats::pnorm(-abs(z))
+    # The permutation p-value is coarser than the Wald one, floored by the permutation count.
+    perm_p <- pmin(1, pmax(wald_p * stats::runif(n, 1, 2), 2e-5))
+    out <- data.frame(
+        beta = round(beta, 5),
+        z = round(z, 4),
+        `p-value` = signif(perm_p, 4),
+        fdr = signif(stats::p.adjust(perm_p, "BH"), 4),
+        `wald-p-value` = signif(wald_p, 4),
+        `wald-fdr` = signif(stats::p.adjust(wald_p, "BH"), 4),
+        check.names = FALSE
+    )
+    names(out) <- paste0(name, "|", names(out))
+    out
+}
+mle <- cbind(
+    data.frame(Gene = genes, sgRNA = 4L),
+    mle_condition("dmso", -1.0, 0),
+    mle_condition("drug", -1.1, 0.9)
+)
+
+out <- gzfile("inst/extdata/example_mageck_mle.gene_summary.txt.gz", "w")
+utils::write.table(mle, out, sep = "	", quote = FALSE, row.names = FALSE)
 close(out)

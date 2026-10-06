@@ -36,3 +36,37 @@
         millis
     )
 }
+
+
+#' Columns fit to colour, shape or group by
+#'
+#' The categorical columns [VizModules::facet_check()] accepts (character or
+#' factor, with fewer than `max.levels` distinct values) plus the logical
+#' columns, in data order. A column of IDs or gene names would otherwise ask
+#' for one colour, shape or group per row, which can bring an app down.
+#'
+#' @param data A data frame (or anything [as.data.frame()] accepts).
+#' @param numeric Whether to also keep numeric columns with fewer than
+#'   `max.levels` distinct values, e.g. a dose.
+#' @param max.levels Columns with this many or more distinct values are left
+#'   out. Passed to [VizModules::facet_check()].
+#' @return A character vector of column names.
+#'
+#' @author Jared Andrews
+#' @rdname INTERNAL_sci_discrete_cols
+#' @keywords internal
+.sci_discrete_cols <- function(data, numeric = FALSE, max.levels = 50) {
+    if (is.null(data)) {
+        return(character(0))
+    }
+    data <- as.data.frame(data)
+    if (ncol(data) == 0) {
+        return(character(0))
+    }
+    nm <- names(data)
+    ok <- nm %in% facet_check(data, max.levels) | vapply(data, is.logical, logical(1))
+    if (isTRUE(numeric)) {
+        ok <- ok | vapply(data, function(x) is.numeric(x) && length(unique(x[!is.na(x)])) < max.levels, logical(1))
+    }
+    nm[ok]
+}

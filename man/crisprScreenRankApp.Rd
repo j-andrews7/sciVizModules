@@ -7,8 +7,8 @@
 crisprScreenRankApp(data_list = NULL)
 }
 \arguments{
-\item{data_list}{An optional named list of MAGeCK RRA gene summaries (data
-frames from \code{\link[=read_mageck]{read_mageck()}}).}
+\item{data_list}{An optional named list of MAGeCK RRA or MLE gene summaries
+(data frames from \code{\link[=read_mageck]{read_mageck()}}).}
 }
 \value{
 A Shiny app object.
@@ -20,7 +20,8 @@ filterable data table, and the plot with its settings.
 }
 \details{
 When \code{data_list} is not provided (or \code{NULL}), the app launches with the
-bundled simulated MAGeCK RRA gene summary, read with \code{\link[=read_mageck]{read_mageck()}}.
+bundled simulated MAGeCK gene summaries, one from \verb{mageck test} (RRA) and
+one from \verb{mageck mle}, read with \code{\link[=read_mageck]{read_mageck()}}.
 }
 \examples{
 library(sciVizModules)

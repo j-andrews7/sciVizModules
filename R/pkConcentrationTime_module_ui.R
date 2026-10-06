@@ -46,7 +46,9 @@ pkConcentrationTimeInputsUI <- function(id, data, defaults = NULL, title = "PK S
     data <- as.data.frame(data)
     d <- .pk_defaults(data, defaults)
     num <- names(data)[vapply(data, is.numeric, logical(1))]
-    none <- c("None" = "", stats::setNames(names(data), names(data)))
+    # Dose groups are often numeric; columns with too many levels to average over are left out.
+    groups <- .sci_discrete_cols(data, numeric = TRUE)
+    none <- c("None" = "", stats::setNames(groups, groups))
 
     data_tab <- tagList(
         .sci_tip(viz_select_input(ns("subject.col"), "Subject Column", choices = names(data), selected = d$subject.col),

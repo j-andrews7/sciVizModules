@@ -210,3 +210,36 @@ test_that("jittered points keep their positions when the plot rebuilds", {
         }
     )
 })
+
+test_that("metadata with too many levels to colour or group by are not offered", {
+    data(example_sce, package = "sciVizModules")
+    sce <- example_sce
+    SummarizedExperiment::colData(sce)$barcode <- paste0("cell", seq_len(ncol(sce)))
+    SummarizedExperiment::colData(sce)$flag <- rep_len(c(TRUE, FALSE), ncol(sce))
+
+    disc <- .ditto_discrete_metas(sce)
+    expect_false("barcode" %in% disc)
+    expect_true("flag" %in% disc)
+    expect_true("barcode" %in% .ditto_discrete_metas(sce, max.categories = ncol(sce) + 1))
+    expect_false("barcode" %in% .ditto_var_choices(sce)$Metadata)
+    # Every discrete and continuous metadata column is still a colour choice.
+    expect_setequal(
+        .ditto_var_choices(sce)$Metadata,
+        c(.ditto_discrete_metas(sce), .ditto_continuous_metas(sce))
+    )
+
+    choices_of <- function(html, id) {
+        config <- regmatches(html, regexpr(paste0("data-for=\"", id, "\">.*?</script>"), html))
+        opts <- jsonlite::fromJSON(sub("</script>$", "", sub("^data-for=\"[^\"]+\">", "", config)))$options
+        unlist(opts$choices$value %||% lapply(opts$choices, function(g) g$value))
+    }
+
+    html <- as.character(dittoDimPlotInputsUI("dim", sce))
+    expect_true(all(c("celltype", "nCount") %in% choices_of(html, "dim-var")))
+    expect_false("barcode" %in% choices_of(html, "dim-var"))
+    expect_false("barcode" %in% choices_of(html, "dim-shape.by"))
+    expect_true("flag" %in% choices_of(html, "dim-shape.by"))
+    html <- as.character(dittoBarPlotInputsUI("bar", sce))
+    expect_false("barcode" %in% choices_of(html, "bar-var"))
+    expect_false("barcode" %in% choices_of(html, "bar-group.by"))
+})

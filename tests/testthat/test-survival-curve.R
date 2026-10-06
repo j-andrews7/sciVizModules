@@ -110,3 +110,22 @@ test_that("the server applies every Legend tab control", {
         }
     )
 })
+
+test_that("Group By leaves out columns with too many levels to draw a curve each", {
+    df <- data.frame(
+        time = seq_len(60),
+        status = rep(c(0, 1), 30),
+        patient = paste0("p", seq_len(60)),
+        arm = rep(c("A", "B"), 30),
+        stringsAsFactors = FALSE
+    )
+    choices_of <- function(html, id) {
+        config <- regmatches(html, regexpr(paste0("data-for=\"", id, "\">.*?</script>"), html))
+        opts <- jsonlite::fromJSON(sub("</script>$", "", sub("^data-for=\"[^\"]+\">", "", config)))$options
+        unlist(opts$choices$value %||% lapply(opts$choices, function(g) g$value))
+    }
+
+    groups <- choices_of(as.character(survivalCurveInputsUI("surv", df)), "surv-group.by")
+    expect_true("arm" %in% groups)
+    expect_false("patient" %in% groups)
+})

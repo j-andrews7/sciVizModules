@@ -80,7 +80,8 @@
 #' Metadata columns of a `pca` object, by type
 #'
 #' @param p A `pca` object.
-#' @param type `"discrete"` (factor, character, logical) or `"numeric"`.
+#' @param type `"discrete"` (logical, or factor and character with fewer than
+#'   50 levels; see [.sci_discrete_cols()]) or `"numeric"`.
 #' @return A character vector of column names, possibly empty.
 #'
 #' @author Jared Andrews
@@ -93,10 +94,11 @@
         return(character(0))
     }
     meta <- as.data.frame(meta)
-    keep <- vapply(meta, function(x) {
-        if (identical(type, "numeric")) is.numeric(x) else is.factor(x) || is.character(x) || is.logical(x)
-    }, logical(1))
-    names(meta)[keep]
+    if (identical(type, "discrete")) {
+        # Sample IDs and other columns with too many levels to colour or shape by are left out.
+        return(.sci_discrete_cols(meta))
+    }
+    names(meta)[vapply(meta, is.numeric, logical(1))]
 }
 
 

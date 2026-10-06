@@ -198,11 +198,12 @@ plateHeatmap <- function(data, well, value, plate = NULL, control = NULL, positi
     cm <- is.finite(col_means)
     rm <- is.finite(row_means)
     top <- plot_ly(x = seq_len(nc)[cm], y = as.vector(col_means)[cm], type = "bar", marker = list(color = bar),
-        text = sprintf("Column %d mean %s", seq_len(nc)[cm], num(as.vector(col_means)[cm])), hoverinfo = "text") %>%
+        text = sprintf("Column %d mean %s", seq_len(nc)[cm], num(as.vector(col_means)[cm])), hoverinfo = "text",
+        textposition = "none") %>%
         layout(yaxis = list(title = list(text = ""), showgrid = FALSE))
     right <- plot_ly(y = seq_len(nr)[rm], x = as.vector(row_means)[rm], type = "bar", orientation = "h",
         marker = list(color = bar), text = sprintf("Row %s mean %s", rev(row_labels)[rm], num(as.vector(row_means)[rm])),
-        hoverinfo = "text") %>%
+        hoverinfo = "text", textposition = "none") %>%
         layout(xaxis = list(title = list(text = ""), showgrid = FALSE))
     corner <- plot_ly(type = "scatter", mode = "markers") %>%
         layout(xaxis = list(visible = FALSE), yaxis = list(visible = FALSE))

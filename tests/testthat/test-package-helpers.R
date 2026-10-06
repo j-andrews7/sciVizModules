@@ -67,3 +67,22 @@ test_that("the modules that render a colour picker read a server-side store", {
         expect_true(any(grepl("default_group_colors(defaults, \"palette.colours\")", src, fixed = TRUE)), info = name)
     }
 })
+
+test_that(".sci_discrete_cols offers the categorical columns with few enough levels", {
+    df <- data.frame(
+        id = paste0("gene", seq_len(60)),
+        grp = rep(c("a", "b", "c"), 20),
+        fct = factor(rep(c("x", "y"), 30)),
+        flag = rep(c(TRUE, FALSE), 30),
+        dose = rep(c(1, 10, 100), 20),
+        value = seq_len(60) / 7,
+        stringsAsFactors = FALSE
+    )
+    expect_identical(.sci_discrete_cols(df), c("grp", "fct", "flag"))
+    expect_identical(.sci_discrete_cols(df, numeric = TRUE), c("grp", "fct", "flag", "dose"))
+    # The cap is the caller's to move.
+    expect_identical(.sci_discrete_cols(df, max.levels = 100), c("id", "grp", "fct", "flag"))
+    expect_identical(.sci_discrete_cols(df, max.levels = 3), c("fct", "flag"))
+    expect_identical(.sci_discrete_cols(NULL), character(0))
+    expect_identical(.sci_discrete_cols(data.frame()), character(0))
+})

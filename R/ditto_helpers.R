@@ -128,18 +128,22 @@ get_default_reduction <- function(object) {
 
 #' Identify discrete metadata columns in a dittoSeq object
 #'
-#' Metadata are treated as discrete when they are factors, characters, logicals,
-#' or numeric columns with a small number of unique values (<= `max.levels`).
+#' Metadata are treated as discrete when they are logicals, numeric columns
+#' with a small number of unique values (<= `max.levels`), or factors and
+#' characters with fewer than `max.categories` levels. A character column of
+#' cell barcodes is left out, since it would ask for one colour per cell.
 #'
 #' @param object A dittoSeq-compatible object.
 #' @param max.levels Maximum number of unique values for a numeric column to be
 #'   treated as discrete.
+#' @param max.categories Factor and character columns with this many or more
+#'   levels are left out. Passed to [VizModules::facet_check()].
 #' @return A character vector of discrete metadata names.
 #'
 #' @author Jacob Martin, Jared Andrews
 #' @rdname INTERNAL_ditto_discrete_metas
 #' @keywords internal
-.ditto_discrete_metas <- function(object, max.levels = 30) {
+.ditto_discrete_metas <- function(object, max.levels = 30, max.categories = 50) {
     metas <- .ditto_metas(object)
     if (length(metas) == 0) {
         return(character(0))
@@ -149,8 +153,10 @@ get_default_reduction <- function(object) {
         if (is.null(vals)) {
             return(FALSE)
         }
-        is.factor(vals) || is.character(vals) || is.logical(vals) ||
-            length(unique(stats::na.omit(vals))) <= max.levels
+        if (is.factor(vals) || is.character(vals)) {
+            return(length(facet_check(data.frame(v = vals), max.categories)) > 0)
+        }
+        is.logical(vals) || length(unique(stats::na.omit(vals))) <= max.levels
     }, logical(1))
     metas[keep]
 }
@@ -190,7 +196,9 @@ get_default_reduction <- function(object) {
 #' @rdname INTERNAL_ditto_var_choices
 #' @keywords internal
 .ditto_var_choices <- function(object, include.blank = TRUE) {
+    # Discrete metadata with too many levels to colour by are left out.
     metas <- .ditto_metas(object)
+    metas <- metas[metas %in% c(.ditto_discrete_metas(object), .ditto_continuous_metas(object))]
     genes <- .ditto_genes(object)
     choices <- list()
     if (length(metas) > 0) choices[["Metadata"]] <- metas

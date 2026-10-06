@@ -28,12 +28,18 @@ and \code{lfc}.
 for each condition, \code{beta}, \code{z}, \code{p-value}, \code{fdr}, \code{wald-p-value} and
 \code{wald-fdr}.
 }
-The file may be gzip-compressed.
+The file may be gzip-compressed. A table read with \code{read.delim()}'s default
+\code{check.names = TRUE} (\code{neg.p.value} rather than \code{neg|p-value}), as a Shiny
+file upload reads it, is recognised too.
 }
 \examples{
 screen <- read_mageck(system.file("extdata", "example_mageck.gene_summary.txt.gz",
     package = "sciVizModules"))
 head(screen)
+
+mle <- read_mageck(system.file("extdata", "example_mageck_mle.gene_summary.txt.gz",
+    package = "sciVizModules"))
+head(mle)
 }
 \seealso{
 \code{\link[=crisprScreenRankServer]{crisprScreenRankServer()}}

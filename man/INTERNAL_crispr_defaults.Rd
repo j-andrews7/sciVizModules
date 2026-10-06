@@ -7,7 +7,8 @@
 .crispr_defaults(data, defaults = NULL)
 }
 \arguments{
-\item{data}{The gene summary (raw or tidy), or \code{NULL}.}
+\item{data}{The gene summary (raw or tidy), or \code{NULL}. For an MLE summary
+the default \code{condition} is its first.}
 
 \item{defaults}{A named list of user defaults, or \code{NULL}.}
 }

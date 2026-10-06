@@ -365,12 +365,18 @@ example_cn_segment
 
 | Module | Server function | Data type | Expected data | Example data |
 |---|---|---|---|---|
-| CRISPR screen rank | `crisprScreenRankServer()` | `data.frame` | A MAGeCK RRA `gene_summary.txt`, read with `read_mageck()` | simulated, in `inst/extdata` |
+| CRISPR screen rank | `crisprScreenRankServer()` | `data.frame` | A MAGeCK RRA (`mageck test`) or MLE (`mageck mle`) `gene_summary.txt`, read with `read_mageck()` | simulated, in `inst/extdata` |
 
 ```{r crispr-format}
 screen <- read_mageck(system.file("extdata", "example_mageck.gene_summary.txt.gz",
     package = "sciVizModules"))
 head(screen)
+
+# An MLE summary carries one beta, z-score and FDR per condition; the module
+# plots one condition at a time.
+mle <- read_mageck(system.file("extdata", "example_mageck_mle.gene_summary.txt.gz",
+    package = "sciVizModules"))
+head(mle)
 ```
 
 ### Principal component analysis (PCAtools)

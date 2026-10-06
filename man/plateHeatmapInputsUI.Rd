@@ -59,7 +59,8 @@ The following parameters can be accessed via UI inputs and/or the \code{defaults
 \item \code{positive.color}, \code{negative.color} - Control outline colours
 }
 
-The Axes and Plotly tabs carry the shared VizModules inputs.
+The Axes and Plotly tabs carry the shared VizModules inputs. Gridlines mean
+nothing over a plate, so \code{show.grid.x} and \code{show.grid.y} default to FALSE.
 }
 
 \examples{

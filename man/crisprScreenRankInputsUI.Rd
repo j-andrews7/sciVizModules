@@ -15,8 +15,8 @@ crisprScreenRankInputsUI(
 \arguments{
 \item{id}{The ID for the Shiny module.}
 
-\item{data}{A MAGeCK RRA gene summary, from \code{\link[=read_mageck]{read_mageck()}} or read with
-\code{read.delim(check.names = FALSE)}.}
+\item{data}{A MAGeCK RRA or MLE gene summary, from \code{\link[=read_mageck]{read_mageck()}} or read
+with \code{read.delim()}.}
 
 \item{defaults}{A named list of default values for the inputs.}
 
@@ -34,10 +34,14 @@ that matches the \code{id} used in the \code{crisprScreenRankServer()} and
 }
 \details{
 The module draws the gene rank plot of a pooled CRISPR screen from a
-MAGeCK RRA gene summary (\code{\link[=read_mageck]{read_mageck()}}): genes ordered by their rank for
-depletion (negative selection) or enrichment (positive selection) against
-their log2 fold change, -log10 RRA score or -log10 FDR, with hits below the
-FDR cut-off coloured and the top genes labelled. It wraps
+MAGeCK gene summary (\code{\link[=read_mageck]{read_mageck()}}): genes ranked for depletion (negative
+selection) or enrichment (positive selection) by the statistic on the y-axis,
+with hits below the FDR cut-off coloured and the top genes labelled.
+
+A \verb{mageck test} (RRA) summary plots the log2 fold change, -log10 RRA score or
+-log10 FDR of the chosen selection. A \verb{mageck mle} summary plots the beta,
+z-score or -log10 FDR of one condition, and a hit must also have its beta in
+the chosen direction, since the MLE FDR is two-sided. It wraps
 \code{\link[VizModules:dittoViz_scatterPlotInputsUI]{VizModules::dittoViz_scatterPlotInputsUI()}}, so the scatter controls (point
 highlighting by gene, hover data, colours) all apply; those inputs are
 documented there.
@@ -47,8 +51,10 @@ documented there.
 The following parameters can be accessed via UI inputs and/or the \code{defaults} argument:
 \itemize{
 \item \code{direction} - \code{"neg"} (depletion) or \code{"pos"} (enrichment) (default: \code{"neg"})
-\item \code{metric} - y-axis: \code{"lfc"}, \code{"score"} (-log10 RRA score) or \code{"fdr"}
-(-log10 FDR) (default: \code{"lfc"})
+\item \code{metric} - y-axis, and the statistic genes are ranked by: \code{"lfc"} (log2
+fold change; beta for MLE), \code{"score"} (-log10 RRA score; z-score for MLE)
+or \code{"fdr"} (-log10 FDR) (default: \code{"lfc"})
+\item \code{condition} - MLE only: the condition plotted (default: the first)
 \item \code{fdr.threshold} - FDR below which a gene is a hit (default: 0.05)
 \item \code{n.labels} - Number of top-ranked genes labelled (default: 10)
 \item \code{label.size} - Label font size (default: 11)

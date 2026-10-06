@@ -200,3 +200,15 @@ test_that("a native module server builds, finishes and exports its plot", {
         }
     )
 })
+
+test_that("sample IDs and other wide metadata are not offered to colour or shape by", {
+    p <- list(metadata = data.frame(
+        sample = paste0("s", seq_len(60)),
+        grp = rep(c("a", "b"), 30),
+        flag = rep(c(TRUE, FALSE), 30),
+        depth = seq_len(60),
+        stringsAsFactors = FALSE
+    ))
+    expect_identical(.pca_metadata_cols(p, "discrete"), c("grp", "flag"))
+    expect_identical(.pca_metadata_cols(p, "numeric"), "depth")
+})

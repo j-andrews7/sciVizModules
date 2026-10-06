@@ -2,15 +2,19 @@
 % Please edit documentation in R/mageck_readers.R
 \name{.crispr_example}
 \alias{.crispr_example}
-\title{The bundled MAGeCK example}
+\title{The bundled MAGeCK examples}
 \usage{
-.crispr_example()
+.crispr_example(type = c("rra", "mle"))
+}
+\arguments{
+\item{type}{\code{"rra"} for the simulated \verb{mageck test} gene summary, \code{"mle"}
+for the simulated \verb{mageck mle} one.}
 }
 \value{
-The simulated RRA gene summary in \code{inst/extdata}, read with \code{\link[=read_mageck]{read_mageck()}}.
+The gene summary in \code{inst/extdata}, read with \code{\link[=read_mageck]{read_mageck()}}.
 }
 \description{
-The bundled MAGeCK example
+The bundled MAGeCK examples
 }
 \author{
 Jared Andrews

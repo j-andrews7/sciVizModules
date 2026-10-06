@@ -81,3 +81,24 @@ test_that("the server builds, finishes and exports the summary", {
     expect_identical(.md_defaults(ex$rmsf)$facet.col, "")
     expect_true(inherits(mdTrajectoryMetricsInputsUI("m", ex$trajectory), c("shiny.tag", "shiny.tag.list")))
 })
+
+test_that("Group By and Panel By leave out columns with too many levels", {
+    df <- data.frame(
+        time = seq_len(60),
+        rmsd = seq_len(60) / 10,
+        frame.id = paste0("f", seq_len(60)),
+        series = rep(c("rep1", "rep2"), 30),
+        stringsAsFactors = FALSE
+    )
+    choices_of <- function(html, id) {
+        config <- regmatches(html, regexpr(paste0("data-for=\"", id, "\">.*?</script>"), html))
+        opts <- jsonlite::fromJSON(sub("</script>$", "", sub("^data-for=\"[^\"]+\">", "", config)))$options
+        unlist(opts$choices$value %||% lapply(opts$choices, function(g) g$value))
+    }
+
+    html <- as.character(mdTrajectoryMetricsInputsUI("md", df))
+    for (id in c("md-group.col", "md-facet.col")) {
+        expect_true("series" %in% choices_of(html, id), info = id)
+        expect_false("frame.id" %in% choices_of(html, id), info = id)
+    }
+})
