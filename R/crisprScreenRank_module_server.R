@@ -4,7 +4,8 @@
 #' statistic, signed so that depleted genes fall on the left and enriched genes
 #' on the right, flags hits by FDR, and plots them through
 #' [VizModules::dittoViz_scatterPlotServer()]. Its `fig.fn` hook titles the
-#' axes, labels the top genes and draws the FDR cut-off.
+#' axes and draws the FDR cut-offs. Genes are labelled through the scatter
+#' module's Annotations tab.
 #'
 #' @param id The ID for the Shiny module.
 #' @param data A `reactive` containing a MAGeCK RRA or MLE gene summary, from
@@ -36,8 +37,6 @@ crisprScreenRankServer <- function(id, data, hide.inputs = NULL, hide.tabs = c("
         observeEvent(input$reset, {
             update_viz_select(session, "metric", selected = d$metric)
             updateNumericInput(session, "fdr.threshold", value = d$fdr.threshold)
-            updateNumericInput(session, "n.labels", value = d$n.labels)
-            updateNumericInput(session, "label.size", value = d$label.size)
             conds <- .mageck_conditions(data())
             if (length(conds)) {
                 update_viz_select(session, "condition",

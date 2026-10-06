@@ -105,8 +105,8 @@ holds the logic. Every module also ships a standalone `*App()` you can run to se
 - **`gseaEnrichmentPlot`** — the GSEA running enrichment score for one or more gene sets, with
   hit ticks and the ranked statistic, from fgsea output or a clusterProfiler `gseaResult`.
 - **`crisprScreenRank`** — gene rank plot of a pooled CRISPR screen from a MAGeCK RRA or MLE
-  gene summary (`read_mageck()`), with FDR hits coloured and the top genes labelled (wraps
-  `VizModules::dittoViz_scatterPlot`).
+  gene summary (`read_mageck()`), with depletion and enrichment on one signed axis and FDR hits
+  coloured (wraps `VizModules::dittoViz_scatterPlot`).
 - **`alphafoldConfidence`** — AlphaFold prediction confidence: the per-residue pLDDT over the
   AlphaFold DB confidence bands, above the predicted aligned error (PAE) heatmap on the same
   residue axis, with chain boundaries for multimers. `read_alphafold()` reads AlphaFold DB

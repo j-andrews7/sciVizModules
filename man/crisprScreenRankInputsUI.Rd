@@ -36,9 +36,9 @@ that matches the \code{id} used in the \code{crisprScreenRankServer()} and
 The module draws the gene rank plot of a pooled CRISPR screen from a
 MAGeCK gene summary (\code{\link[=read_mageck]{read_mageck()}}): every gene, ranked by the statistic on
 the y-axis, with depleted (negative selection) genes on the left, enriched
-(positive selection) genes on the right, hits below the FDR cut-off coloured
-and the most extreme hits at each end labelled. Every statistic is signed:
-negative for depletion, positive for enrichment.
+(positive selection) genes on the right and hits below the FDR cut-off
+coloured. Every statistic is signed: negative for depletion, positive for
+enrichment.
 
 A \verb{mageck test} (RRA) summary plots the log2 fold change, or the RRA score
 or FDR of the side (depletion or enrichment) each gene scores better on. A
@@ -46,7 +46,9 @@ or FDR of the side (depletion or enrichment) each gene scores better on. A
 signed by the beta. It wraps
 \code{\link[VizModules:dittoViz_scatterPlotInputsUI]{VizModules::dittoViz_scatterPlotInputsUI()}}, so the scatter controls (point
 highlighting by gene, hover data, colours) all apply; those inputs are
-documented there.
+documented there. Genes are labelled through its Annotations tab: list them
+under "Points to Highlight" (matched against the \code{gene} column, the default
+"Annotate By"), or select points on the plot.
 }
 \section{Plot parameters and defaults}{
 
@@ -57,8 +59,6 @@ fold change; beta for MLE), \code{"score"} (signed -log10 RRA score; z-score for
 MLE) or \code{"fdr"} (signed -log10 FDR) (default: \code{"lfc"})
 \item \code{condition} - MLE only: the condition plotted (default: the first)
 \item \code{fdr.threshold} - FDR below which a gene is a hit (default: 0.05)
-\item \code{n.labels} - Number of hits labelled at each end (default: 10)
-\item \code{label.size} - Label font size (default: 11)
 \item \code{color.panel} - Colours of "Depleted", "Enriched" and "n.s." (scatter colour picker)
 \item All other \code{\link[VizModules:dittoViz_scatterPlotInputsUI]{VizModules::dittoViz_scatterPlotInputsUI()}} parameters
 }

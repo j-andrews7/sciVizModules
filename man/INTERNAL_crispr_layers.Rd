@@ -20,9 +20,10 @@ The figure.
 }
 \description{
 The \code{fig.fn} hook \code{\link[=crisprScreenRankServer]{crisprScreenRankServer()}} hands to the scatter module:
-axis titles for the metric, labels on the most extreme hits at each end, and
-the FDR cut-offs (one per direction) when the metric is the FDR. Only applied
-while the axes are the rank and the metric with no adjustment or split.
+axis titles for the metric, and the FDR cut-offs (one per direction) when
+the metric is the FDR. Only applied while the axes are the rank and the
+metric with no adjustment or split. Gene labels come from the scatter
+module's own Annotations controls.
 }
 \author{
 Jared Andrews

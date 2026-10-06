@@ -129,47 +129,41 @@ test_that("factor gene columns, as the data filter delivers them, label as text"
     prepared <- .crispr_prepare(screen, "lfc", 0.05)
     expect_type(prepared$gene, "character")
 
-    fig <- plotly::plotly_build(plotly::plot_ly(x = 1:2, y = 1:2, type = "scatter", mode = "markers"))
-    input <- list(x.by = "screen.rank", y.by = "screen.metric", metric = "lfc",
-        fdr.threshold = 0.05, n.labels = 3, label.size = 10)
-    out <- .crispr_layers(fig, prepared, input, identity)
-    texts <- lapply(out$x$layout$annotations, `[[`, "text")
-    expect_true(all(vapply(texts, is.character, logical(1))))
+    # Genes are labelled through the scatter module's Annotations controls.
+    genes <- prepared$gene[1:3]
+    built <- build_scatter_figure(prepared,
+        fig.fn = function(fig, input, isolate_fn) .crispr_layers(fig, prepared, input, isolate_fn),
+        inputs = test_scatter_inputs(x.by = "screen.rank", y.by = "screen.metric", color.by = "screen.group",
+            metric = "lfc", fdr.threshold = 0.05, annotate.by = "gene",
+            highlight.points = paste(genes, collapse = ", "), webgl = FALSE)
+    )
+    anns <- built$x$layout$annotations
+    texts <- vapply(anns, function(a) as.character(a$text %||% ""), "")
+    expect_true(all(genes %in% texts))
     # The manual-edit capture keys annotations by their text; it must not error on these.
-    expect_silent(keys <- VizModules:::.annotation_edit_keys(out$x$layout$annotations))
-    expect_false(anyNA(keys))
+    expect_silent(keys <- VizModules:::.annotation_edit_keys(anns))
+    expect_false(anyNA(keys[texts %in% genes]))
 })
 
-test_that("the layers label the extreme hits at each end and draw both FDR lines", {
+test_that("the layers title the axes and draw both FDR lines, and add no labels", {
     screen <- .crispr_prepare(read_mageck(crispr_example_file()), "fdr", 0.05)
     fig <- plotly::plotly_build(plotly::plot_ly(x = 1:2, y = 1:2, type = "scatter", mode = "markers"))
-    input <- list(x.by = "screen.rank", y.by = "screen.metric", metric = "fdr",
-        fdr.threshold = 0.05, n.labels = 5, label.size = 10)
+    input <- list(x.by = "screen.rank", y.by = "screen.metric", metric = "fdr", fdr.threshold = 0.05)
     out <- .crispr_layers(fig, screen, input, identity)
-    texts <- vapply(out$x$layout$annotations, `[[`, "", "text")
-    depleted <- screen$gene[screen$screen.group == "Depleted"]
-    enriched <- screen$gene[screen$screen.group == "Enriched"]
-    expect_identical(texts, c(utils::head(depleted, 5), utils::tail(enriched, 5)))
-    # Labels point in from each end.
-    ax <- vapply(out$x$layout$annotations, `[[`, 0, "ax")
-    expect_true(all(ax[1:5] > 0) && all(ax[6:10] < 0))
+    expect_length(out$x$layout$annotations, 0)
     expect_equal(vapply(out$x$layout$shapes, `[[`, 0, "y0"), c(log10(0.05), -log10(0.05)))
     expect_identical(out$x$layout$yaxis$title$text, "Signed -log10(FDR)")
     expect_identical(out$x$layout$xaxis$title$text, "Gene rank")
 
-    lfc <- .crispr_layers(fig, screen, utils::modifyList(input, list(metric = "lfc", n.labels = 0)), identity)
+    lfc <- .crispr_layers(fig, screen, utils::modifyList(input, list(metric = "lfc")), identity)
     expect_length(lfc$x$layout$shapes, 0)
-    expect_length(lfc$x$layout$annotations, 0)
     moved <- .crispr_layers(fig, screen, utils::modifyList(input, list(y.by = "neg.p")), identity)
-    expect_length(moved$x$layout$annotations, 0)
-
-    # Only hits are labelled: a cut-off nothing passes labels nothing.
-    none <- .crispr_prepare(read_mageck(crispr_example_file()), "fdr", 0)
-    expect_length(.crispr_layers(fig, none, input, identity)$x$layout$annotations, 0)
+    expect_length(moved$x$layout$shapes, 0)
+    expect_null(moved$x$layout$yaxis$title$text)
 
     # An MLE table titles the y-axis with its own statistic.
     mle <- .crispr_prepare(read_mageck(crispr_mle_file()), "lfc", 0.05)
-    beta <- .crispr_layers(fig, mle, utils::modifyList(input, list(metric = "lfc", n.labels = 0)), identity)
+    beta <- .crispr_layers(fig, mle, utils::modifyList(input, list(metric = "lfc")), identity)
     expect_identical(beta$x$layout$yaxis$title$text, "Beta")
 })
 
@@ -198,11 +192,12 @@ test_that("a rank plot builds end to end through the scatter module", {
     built <- build_scatter_figure(screen,
         fig.fn = function(fig, input, isolate_fn) .crispr_layers(fig, screen, input, isolate_fn),
         inputs = test_scatter_inputs(x.by = "screen.rank", y.by = "screen.metric", color.by = "screen.group",
-            metric = "lfc", fdr.threshold = 0.05, n.labels = 3, label.size = 11, webgl = FALSE)
+            metric = "lfc", fdr.threshold = 0.05, webgl = FALSE)
     )
     texts <- vapply(built$x$layout$annotations, function(a) as.character(a$text %||% ""), "")
-    depleted <- screen$gene[screen$screen.group == "Depleted"]
-    expect_true(all(c("Gene rank", "Log2 fold change", depleted[1:3]) %in% texts))
+    expect_true(all(c("Gene rank", "Log2 fold change") %in% texts))
+    # No gene is labelled until one is asked for in the Annotations tab.
+    expect_false(any(screen$gene %in% texts))
     expect_true(inherits(crisprScreenRankInputsUI("c", read_mageck(crispr_example_file())),
         c("shiny.tag", "shiny.tag.list")))
 })

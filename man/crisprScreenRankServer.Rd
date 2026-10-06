@@ -34,7 +34,8 @@ Ranks the genes of a MAGeCK RRA or MLE gene summary by the plotted
 statistic, signed so that depleted genes fall on the left and enriched genes
 on the right, flags hits by FDR, and plots them through
 \code{\link[VizModules:dittoViz_scatterPlotServer]{VizModules::dittoViz_scatterPlotServer()}}. Its \code{fig.fn} hook titles the
-axes, labels the top genes and draws the FDR cut-off.
+axes and draws the FDR cut-offs. Genes are labelled through the scatter
+module's Annotations tab.
 }
 \examples{
 library(sciVizModules)

@@ -233,8 +233,6 @@ read_mageck <- function(file) {
     base <- list(
         metric = "lfc",
         fdr.threshold = 0.05,
-        n.labels = 10,
-        label.size = 11,
         x.by = "screen.rank",
         y.by = "screen.metric",
         color.by = "screen.group",
@@ -248,15 +246,16 @@ read_mageck <- function(file) {
 }
 
 # Inputs the CRISPR module adds to the wrapped scatter module.
-.crispr_keys <- c("metric", "fdr.threshold", "n.labels", "label.size", "condition")
+.crispr_keys <- c("metric", "fdr.threshold", "condition")
 
 
 #' Add the CRISPR rank plot's layers to the wrapped scatter figure
 #'
 #' The `fig.fn` hook [crisprScreenRankServer()] hands to the scatter module:
-#' axis titles for the metric, labels on the most extreme hits at each end, and
-#' the FDR cut-offs (one per direction) when the metric is the FDR. Only applied
-#' while the axes are the rank and the metric with no adjustment or split.
+#' axis titles for the metric, and the FDR cut-offs (one per direction) when
+#' the metric is the FDR. Only applied while the axes are the rank and the
+#' metric with no adjustment or split. Gene labels come from the scatter
+#' module's own Annotations controls.
 #'
 #' @param fig The scatter figure.
 #' @param prepared The prepared table from [.crispr_prepare()].
@@ -291,26 +290,6 @@ read_mageck <- function(file) {
         )))
     }
 
-    n <- isolate_fn(input$n.labels) %||% 0
-    if (is.numeric(n) && !is.na(n) && n > 0) {
-        # The most extreme hits at each end: depleted from the left, enriched from the right.
-        depleted <- utils::head(prepared[prepared$screen.group == "Depleted", , drop = FALSE], n)
-        enriched <- utils::tail(prepared[prepared$screen.group == "Enriched", , drop = FALSE], n)
-        size <- isolate_fn(input$label.size) %||% 11
-        label <- function(top, inward) {
-            lapply(seq_len(nrow(top)), function(i) {
-                list(
-                    x = top$screen.rank[i], y = top$screen.metric[i], xref = "x", yref = "y",
-                    text = as.character(top$gene[i]), showarrow = TRUE, arrowhead = 0, arrowwidth = 0.8,
-                    arrowcolor = "#7F7F7F",
-                    # Alternate the reach so labels on neighbouring ranks do not stack.
-                    ax = inward * (if (i %% 2) 30 else 70), ay = if (top$screen.metric[i] < 0) 12 else -12,
-                    font = list(size = size)
-                )
-            })
-        }
-        fig$x$layout$annotations <- c(fig$x$layout$annotations, label(depleted, 1), label(enriched, -1))
-    }
     fig
 }
 

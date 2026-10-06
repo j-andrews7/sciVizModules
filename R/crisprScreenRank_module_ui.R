@@ -7,9 +7,9 @@
 #' @details The module draws the gene rank plot of a pooled CRISPR screen from a
 #' MAGeCK gene summary ([read_mageck()]): every gene, ranked by the statistic on
 #' the y-axis, with depleted (negative selection) genes on the left, enriched
-#' (positive selection) genes on the right, hits below the FDR cut-off coloured
-#' and the most extreme hits at each end labelled. Every statistic is signed:
-#' negative for depletion, positive for enrichment.
+#' (positive selection) genes on the right and hits below the FDR cut-off
+#' coloured. Every statistic is signed: negative for depletion, positive for
+#' enrichment.
 #'
 #' A `mageck test` (RRA) summary plots the log2 fold change, or the RRA score
 #' or FDR of the side (depletion or enrichment) each gene scores better on. A
@@ -17,7 +17,9 @@
 #' signed by the beta. It wraps
 #' [VizModules::dittoViz_scatterPlotInputsUI()], so the scatter controls (point
 #' highlighting by gene, hover data, colours) all apply; those inputs are
-#' documented there.
+#' documented there. Genes are labelled through its Annotations tab: list them
+#' under "Points to Highlight" (matched against the `gene` column, the default
+#' "Annotate By"), or select points on the plot.
 #'
 #' @section Plot parameters and defaults:
 #' The following parameters can be accessed via UI inputs and/or the `defaults` argument:
@@ -27,8 +29,6 @@
 #'   MLE) or `"fdr"` (signed -log10 FDR) (default: `"lfc"`)
 #' - `condition` - MLE only: the condition plotted (default: the first)
 #' - `fdr.threshold` - FDR below which a gene is a hit (default: 0.05)
-#' - `n.labels` - Number of hits labelled at each end (default: 10)
-#' - `label.size` - Label font size (default: 11)
 #' - `color.panel` - Colours of "Depleted", "Enriched" and "n.s." (scatter colour picker)
 #' - All other [VizModules::dittoViz_scatterPlotInputsUI()] parameters
 #'
@@ -69,11 +69,7 @@ crisprScreenRankInputsUI <- function(id, data, defaults = NULL, title = "CRISPR 
             "Genes are ranked by it.")),
         .sci_tip(numericInput(ns("fdr.threshold"), "FDR Threshold",
             value = d$fdr.threshold, min = 0, max = 1, step = 0.01
-        ), "Genes below this FDR are hits, depleted or enriched."),
-        .sci_tip(numericInput(ns("n.labels"), "Label Top Hits", value = d$n.labels, min = 0, step = 1),
-            "Number of hits to label at each end of the curve."),
-        .sci_tip(numericInput(ns("label.size"), "Label Size", value = d$label.size, min = 4, step = 1),
-            "Font size of the gene labels.")
+        ), "Genes below this FDR are hits, depleted or enriched.")
     )
 
     tagList(
