@@ -22,6 +22,28 @@ reference:
   - maPlotServer
   - maPlotApp
 
+- title: Bulk expression
+  desc: >
+    Sample-level views of a bulk RNA-seq (or array) experiment held in a
+    `SummarizedExperiment`: the sample PCA (feeding the PCAtools biplot), the
+    sample-distance heatmap, and the heatmap of the top differentially
+    expressed genes. The two heatmaps wrap VizModules' ComplexHeatmap module,
+    so they are InteractiveComplexHeatmap widgets rather than plotly figures.
+  contents:
+  - sample_pca
+  - samplePCAInputsUI
+  - samplePCAOutputUI
+  - samplePCAServer
+  - samplePCAApp
+  - sampleDistanceHeatmapInputsUI
+  - sampleDistanceHeatmapOutputUI
+  - sampleDistanceHeatmapServer
+  - sampleDistanceHeatmapApp
+  - deHeatmapInputsUI
+  - deHeatmapOutputUI
+  - deHeatmapServer
+  - deHeatmapApp
+
 - title: Functional enrichment
   desc: >
     Dot plot and GO sunburst ("fan") plot over over-representation or GSEA
@@ -66,6 +88,34 @@ reference:
   - crisprScreenRankOutputUI
   - crisprScreenRankServer
   - crisprScreenRankApp
+
+- title: Somatic mutations
+  desc: >
+    Cohort views of somatic mutations from a maftools `MAF` object or a data
+    frame in MAF columns - the oncoplot, the MAF summary dashboard and the
+    protein lollipop plot, built natively in plotly and checked against
+    maftools - and the 96-channel substitution spectrum of a mutational
+    count matrix.
+  contents:
+  - oncoPlot
+  - oncoPlotInputsUI
+  - oncoPlotOutputUI
+  - oncoPlotServer
+  - oncoPlotApp
+  - mafSummary
+  - mafSummaryInputsUI
+  - mafSummaryOutputUI
+  - mafSummaryServer
+  - mafSummaryApp
+  - mutationLollipop
+  - mutationLollipopInputsUI
+  - mutationLollipopOutputUI
+  - mutationLollipopServer
+  - mutationLollipopApp
+  - mutationalProfileInputsUI
+  - mutationalProfileOutputUI
+  - mutationalProfileServer
+  - mutationalProfileApp
 
 - title: Survival analysis
   desc: Kaplan-Meier curves with confidence bands, censor marks and risk table.
@@ -199,7 +249,17 @@ reference:
     Wrappers around the dittoSeq plotting functions. Each takes a
     `SingleCellExperiment`, `Seurat` or `SummarizedExperiment` object rather
     than a data frame, and so takes `object_list` in its `*App()`.
+    `dittoHeatmap` wraps VizModules' ComplexHeatmap module, so it is an
+    InteractiveComplexHeatmap widget rather than a plotly figure.
   contents:
+  - dittoDotPlotInputsUI
+  - dittoDotPlotOutputUI
+  - dittoDotPlotServer
+  - dittoDotPlotApp
+  - dittoHeatmapInputsUI
+  - dittoHeatmapOutputUI
+  - dittoHeatmapServer
+  - dittoHeatmapApp
   - dittoDimPlotInputsUI
   - dittoDimPlotOutputUI
   - dittoDimPlotServer
@@ -253,6 +313,7 @@ reference:
   - example_gwas
   - example_pca
   - example_plate
+  - example_sbs96
   - example_sce
   - mm_kinetics
   - mm_kinetics_line

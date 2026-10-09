@@ -15,6 +15,7 @@ Also implemented: `mdTrajectoryMetrics` (#74, with `read_xvg()` for GROMACS outp
 Also implemented: `rocCurve` (#79; native; curves, AUCs and Youden cut-offs computed in-package and tested equal to pROC's, DeLong CI via pROC when installed; simulated `example_biomarkers`).
 Also implemented: `pkConcentrationTime` (#83; native; per-subject or mean +/- SD profiles, linear or log, with terminal fits; NCA parameters computed in-package and tested equal to PKNCA's on `Theoph`).
 Also implemented: `plateHeatmap` (#89; native; plates in physical layout from any 6- to 1536-well format, raw, percent-of-control, percent-inhibition, z, robust-z or B-score per plate, outlined controls, Z' per plate, row/column means for edge effects; simulated `example_plate`).
+Also implemented (2026-10-08): `oncoPlot`, `mafSummary` and `mutationLollipop` (#1-3; native plotly from a maftools `MAF` object or a MAF data frame through a shared `.maf_table()`, with gene, sample, Ti/Tv and oncoplot-matrix summaries tested equal to maftools'; `mafSummary` is a native six-panel dashboard rather than a `plotthis_BarPlot` wrapper, since that base does not refresh its y range when its data changes; examples use the TCGA LAML cohort maftools ships), `mutationalProfile` (#4; wraps `plotthis_BarPlot`, reads MutationalPatterns, maftools and SigProfiler layouts, registered with the Figure Builder; simulated `example_sbs96`), `samplePCA` (#16; with `sample_pca()`, tested equal to `PCAtools::pca()`; MDS not included), `sampleDistanceHeatmap` and `deHeatmap` (#18, #19; examples use the airway package), and `dittoDotPlot` and `dittoHeatmap` (#35, #36). The three heatmaps wrap `ComplexHeatmap_Heatmap` through shared helpers in `R/heatmap_wrapper_helpers.R`.
 Their rows are marked **Done**.
 
 **How candidates were chosen.** Popular packages with a standard input structure (a MAF
@@ -66,10 +67,10 @@ in `sci_figure_builder_registry()`; **N** for S4 inputs (MAF, SE, phyloseq, ...)
 
 | # | Module | Plot | Source package(s) | Input | Build path | Popularity | New Suggests | FB | Tier |
 |---|---|---|---|---|---|---|---|---|---|
-| 1 | `oncoPlot` | Oncoprint: gene x sample mutation tiles, TMB and frequency bars, clinical tracks | maftools | MAF | Native | Bioc #154 | maftools | N | 1 |
-| 2 | `mutationLollipop` | Protein lollipop with domains | maftools | MAF | Native | Bioc #154 | maftools | N | 1 |
-| 3 | `mafSummary` | Variant classification / type / SNV class / per-sample counts | maftools | MAF | VM base: `plotthis_BarPlot` | Bioc #154 | maftools | N | 1 |
-| 4 | `mutationalProfile` | SBS96 trinucleotide spectrum | MutationalPatterns, maftools, sigminer | 96 x sample matrix | VM base: `plotthis_BarPlot` | Bioc #371 | none | Y | 1 |
+| 1 | `oncoPlot` | Oncoprint: gene x sample mutation tiles, TMB and frequency bars, clinical tracks | maftools | MAF | Native | Bioc #154 | maftools | N | Done |
+| 2 | `mutationLollipop` | Protein lollipop with domains | maftools | MAF | Native | Bioc #154 | maftools | N | Done |
+| 3 | `mafSummary` | Variant classification / type / SNV class / per-sample counts | maftools | MAF | Native (dashboard) | Bioc #154 | maftools | N | Done |
+| 4 | `mutationalProfile` | SBS96 trinucleotide spectrum | MutationalPatterns, maftools, sigminer | 96 x sample matrix | VM base: `plotthis_BarPlot` | Bioc #371 | none | Y | Done |
 | 5 | `signatureContribution` | Signature exposure per sample | MutationalPatterns, sigminer | signature x sample matrix | VM base: `plotthis_BarPlot` | Bioc #371 | none | Y | 2 |
 | 6 | `tiTvPlot` | Transition/transversion fractions | maftools | MAF | VM base: `plotthis_BarPlot`, `dittoViz_yPlot` | Bioc #154 | maftools | N | 2 |
 | 7 | `vafPlot` | VAF distribution of top genes | maftools | MAF | VM base: `dittoViz_yPlot` | Bioc #154 | maftools | N | 2 |
@@ -81,10 +82,10 @@ in `sci_figure_builder_registry()`; **N** for S4 inputs (MAF, SE, phyloseq, ...)
 | 13 | `regionalAssociationPlot` | LocusZoom-style regional plot | locuszoomr | summary stats df + EnsDb | Native (`locus_plotly()`) | 2.2k/mo | locuszoomr, ensembldb | Y | 2 |
 | 14 | `variantQC` | QUAL / DP / allele-frequency distributions | VariantAnnotation | VCF | VM base: `plotthis_Histogram` | Bioc #79 | VariantAnnotation | N | 3 |
 | 15 | `admixturePlot` | Ancestry proportions per individual (structure plot) | ADMIXTURE, LEA (sNMF), pophelper (reference) | `.Q` matrix + sample/population labels | VM base: `plotthis_BarPlot` | LEA Bioc #303 | none (reader) | Y | 2 |
-| 16 | `samplePCA` | Sample PCA / MDS from counts; front-end to `pcaPlot` | DESeq2, PCAtools, limma | SE / DESeqDataSet / DGEList | VM base via `pcaPlot` | DESeq2 Bioc #21 | none | N | 1 |
+| 16 | `samplePCA` | Sample PCA / MDS from counts; front-end to `pcaPlot` | DESeq2, PCAtools, limma | SE / DESeqDataSet / DGEList | VM base via `pcaPlot` | DESeq2 Bioc #21 | none | N | Done |
 | 17 | `pcaPlot` | Scores biplot (+ loading vectors), scree with elbow/Horn markers, loadings, pairs, PC-metadata correlations | PCAtools | PCAtools `pca` object | VM base: `dittoViz_scatterPlot`, `plotthis_BarPlot`, `ComplexHeatmap_Heatmap`; native pairs grid | Bioc #247 | PCAtools | N | Done |
-| 18 | `sampleDistanceHeatmap` | Sample distance or correlation heatmap | DESeq2, stats | SE | VM base: `ComplexHeatmap_Heatmap` | Bioc #41 | none | N | 1 |
-| 19 | `deHeatmap` | Top DE genes, z-scored, annotated | DESeq2, edgeR, limma | SE + DE results | VM base: `ComplexHeatmap_Heatmap` | Bioc #17-24 | none | N | 1 |
+| 18 | `sampleDistanceHeatmap` | Sample distance or correlation heatmap | DESeq2, stats | SE | VM base: `ComplexHeatmap_Heatmap` | Bioc #41 | none | N | Done |
+| 19 | `deHeatmap` | Top DE genes, z-scored, annotated | DESeq2, edgeR, limma | SE + DE results | VM base: `ComplexHeatmap_Heatmap` | Bioc #17-24 | none | N | Done |
 | 20 | `pValueHistogram` | DE p-value histogram (diagnostic) | any DE tool | DE results df | VM base: `plotthis_Histogram` | n/a | none | Y | 2 |
 | 21 | `countDistributions` | Library sizes, log-CPM boxes/densities, before/after normalisation | edgeR, DESeq2 | SE / DGEList | VM base: `plotthis_BoxPlot`, `plotthis_DensityPlot` | Bioc #24 | none | N | 2 |
 | 22 | `meanVariance` | Mean-SD / dispersion / voom trend | vsn, DESeq2, limma | SE / DESeqDataSet | VM base: `dittoViz_scatterPlot` | vsn Bioc #91 | none | N | 3 |
@@ -100,8 +101,8 @@ in `sci_figure_builder_registry()`; **N** for S4 inputs (MAF, SE, phyloseq, ...)
 | 32 | `crisprScreenRank` | Gene rank vs LFC/score with labelled hits | MAGeCK (non-R), MAGeCKFlute | MAGeCK `gene_summary.txt` | VM base: `dittoViz_scatterPlot` | MAGeCK: de facto screen tool | none (reader) | Y | Done |
 | 33 | `crisprBetaScatter` | MLE beta scores, treatment vs control, nine-square view | MAGeCK MLE, MAGeCKFlute | MAGeCK MLE `gene_summary.txt` | VM base: `dittoViz_scatterPlot` | as above | none (reader) | Y | 2 |
 | 34 | `screenQC` | sgRNA count distributions, Gini index, zero-count guides, mapping rate | MAGeCK count | `countsummary.txt`, `count.txt` | VM base: `plotthis_BarPlot`, `plotthis_DensityPlot` | as above | none (reader) | Y | 2 |
-| 35 | `dittoDotPlot` | Marker dot plot (expression x percent) | dittoSeq | SCE / SE / Seurat | ggplotly | Bioc #240 | none (Imports) | N | 1 |
-| 36 | `dittoHeatmap` | Expression heatmap with cell/sample annotations | dittoSeq | SCE / SE | VM base: `ComplexHeatmap_Heatmap` | Bioc #240 | none (Imports) | N | 1 |
+| 35 | `dittoDotPlot` | Marker dot plot (expression x percent) | dittoSeq | SCE / SE / Seurat | ggplotly | Bioc #240 | none (Imports) | N | Done |
+| 36 | `dittoHeatmap` | Expression heatmap with cell/sample annotations | dittoSeq | SCE / SE | VM base: `ComplexHeatmap_Heatmap` | Bioc #240 | none (Imports) | N | Done |
 | 37 | `scQC` | Per-cell QC metrics with MAD outlier thresholds | scuttle, scater | SCE | VM base: `dittoViz_yPlot`, `dittoViz_scatterPlot` | scuttle Bioc #66 | scuttle | N | 1 |
 | 38 | `dittoScatterHex` | Binned scatter of two features | dittoSeq | SCE / SE | ggplotly | Bioc #240 | none (Imports) | N | 2 |
 | 39 | `dittoPlotVarsAcrossGroups` | Gene-set scores across groups | dittoSeq | SCE / SE | ggplotly | Bioc #240 | none (Imports) | N | 2 |
@@ -170,22 +171,22 @@ maftools computes, and draws them itself. A shared helper converting a MAF into 
 tables would serve every module in this section. Example data: maftools ships
 `tcga_laml.maf.gz` with clinical annotations (`tcga_laml_annot.tsv`) in `inst/extdata`.
 
-1. **`oncoPlot`** - the most recognisable cancer-genomics figure. Gene x sample tiles
+1. **`oncoPlot`** - **Done.** the most recognisable cancer-genomics figure. Gene x sample tiles
    coloured by variant classification, with a top bar of mutations per sample, a side bar of
    gene frequency, and optional clinical tracks. Build natively as plotly subplots sharing
    axes; the tile layer is a heatmap on a categorical matrix (`getGeneSummary()`,
    `getSampleSummary()`, `subsetMaf()`). Tracks come from `getClinicalData()`. Hover per
    tile is the big win over the static plot.
 
-2. **`mutationLollipop`** - mutation positions along a protein, stem height by count,
+2. **`mutationLollipop`** - **Done.** mutation positions along a protein, stem height by count,
    domains as rectangles. maftools reads domains from its bundled `protein_domains.RDs`;
    positions come from the amino-acid change column. Native (segments + markers + shapes).
 
-3. **`mafSummary`** - the panels of `plotmafSummary()`: variant classification, variant type,
+3. **`mafSummary`** - **Done.** the panels of `plotmafSummary()`: variant classification, variant type,
    SNV class and per-sample counts, each a `plotthis_BarPlot` from `getSampleSummary()` /
    `getGeneSummary()`. One module with a panel selector, or a set of thin wrappers.
 
-4. **`mutationalProfile`** - the SBS96 bar chart (six substitution classes x 16 contexts).
+4. **`mutationalProfile`** - **Done.** the SBS96 bar chart (six substitution classes x 16 contexts).
    The input is the standard 96 x sample count matrix produced by MutationalPatterns
    (`mut_matrix()`), maftools (`trinucleotideMatrix()`) or SigProfiler. Taking the matrix
    (a data frame) rather than the VCFs avoids a `BSgenome` dependency and makes it Figure
@@ -255,7 +256,7 @@ these modules need the counts too. The `airway` data package's `SummarizedExperi
 the natural example. Gene-by-group expression is already covered: `dittoPlot` accepts a
 `SummarizedExperiment` (see Extensions).
 
-16. **`samplePCA`** - the first plot of every bulk analysis, as a thin front-end to
+16. **`samplePCA`** - **Done.** the first plot of every bulk analysis, as a thin front-end to
     `pcaPlot`. It takes a `SummarizedExperiment` / `DESeqDataSet` / `DGEList`, applies a
     variance-stabilising or log-CPM transform, keeps the most variable genes, and builds a
     PCAtools-shaped `pca` object (`PCAtools::pca()` when installed, otherwise `prcomp()` packed
@@ -291,11 +292,11 @@ the natural example. Gene-by-group expression is already covered: `dittoPlot` ac
     Example data: `PCAtools::pca()` on the `airway` counts, or on the package's own
     `example_sce` logcounts with its `colData`.
 
-18. **`sampleDistanceHeatmap`** - Euclidean or correlation distances between samples, with
+18. **`sampleDistanceHeatmap`** - **Done.** Euclidean or correlation distances between samples, with
     `colData` annotations; the standard DESeq2-vignette QC. `ComplexHeatmap_Heatmap` fed a
     distance matrix as a data frame.
 
-19. **`deHeatmap`** - z-scored expression of the top-N DE genes (by padj/LFC from a results
+19. **`deHeatmap`** - **Done.** z-scored expression of the top-N DE genes (by padj/LFC from a results
     table) across samples, with condition annotations. `ComplexHeatmap_Heatmap`; the module's
     job is the gene selection and scaling.
 
@@ -388,12 +389,12 @@ download rank (#2182) undersells MAGeCK's reach. One reader serves all three mod
 
 ## Single-cell (beyond the shipped dittoSeq modules)
 
-35. **`dittoDotPlot`** - expression (colour) x percent expressing (size) per gene per group,
+35. **`dittoDotPlot`** - **Done.** expression (colour) x percent expressing (size) per gene per group,
     the standard marker figure. `dittoSeq::dittoDotPlot()` returns a ggplot (checked), so it
     fits the existing dittoSeq wrapper pattern exactly, with no new dependencies. The
     cheapest high-value module on this list.
 
-36. **`dittoHeatmap`** - `dittoHeatmap(data.out = TRUE)` returns the matrix and annotations
+36. **`dittoHeatmap`** - **Done.** `dittoHeatmap(data.out = TRUE)` returns the matrix and annotations
     (checked), which `ComplexHeatmap_Heatmap` can render with the cell/sample metadata as
     annotation tracks. No new dependencies.
 

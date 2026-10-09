@@ -16,6 +16,10 @@ export(crisprScreenRankApp)
 export(crisprScreenRankInputsUI)
 export(crisprScreenRankOutputUI)
 export(crisprScreenRankServer)
+export(deHeatmapApp)
+export(deHeatmapInputsUI)
+export(deHeatmapOutputUI)
+export(deHeatmapServer)
 export(dittoBarPlotApp)
 export(dittoBarPlotInputsUI)
 export(dittoBarPlotOutputUI)
@@ -28,10 +32,18 @@ export(dittoDimPlotApp)
 export(dittoDimPlotInputsUI)
 export(dittoDimPlotOutputUI)
 export(dittoDimPlotServer)
+export(dittoDotPlotApp)
+export(dittoDotPlotInputsUI)
+export(dittoDotPlotOutputUI)
+export(dittoDotPlotServer)
 export(dittoFreqPlotApp)
 export(dittoFreqPlotInputsUI)
 export(dittoFreqPlotOutputUI)
 export(dittoFreqPlotServer)
+export(dittoHeatmapApp)
+export(dittoHeatmapInputsUI)
+export(dittoHeatmapOutputUI)
+export(dittoHeatmapServer)
 export(dittoPlotApp)
 export(dittoPlotInputsUI)
 export(dittoPlotOutputUI)
@@ -75,6 +87,11 @@ export(maPlotApp)
 export(maPlotInputsUI)
 export(maPlotOutputUI)
 export(maPlotServer)
+export(mafSummary)
+export(mafSummaryApp)
+export(mafSummaryInputsUI)
+export(mafSummaryOutputUI)
+export(mafSummaryServer)
 export(manhattanPlotApp)
 export(manhattanPlotInputsUI)
 export(manhattanPlotOutputUI)
@@ -89,6 +106,20 @@ export(michaelisMentenInputsUI)
 export(michaelisMentenOutputUI)
 export(michaelisMentenPlot)
 export(michaelisMentenServer)
+export(mutationLollipop)
+export(mutationLollipopApp)
+export(mutationLollipopInputsUI)
+export(mutationLollipopOutputUI)
+export(mutationLollipopServer)
+export(mutationalProfileApp)
+export(mutationalProfileInputsUI)
+export(mutationalProfileOutputUI)
+export(mutationalProfileServer)
+export(oncoPlot)
+export(oncoPlotApp)
+export(oncoPlotInputsUI)
+export(oncoPlotOutputUI)
+export(oncoPlotServer)
 export(pcaBiplotApp)
 export(pcaBiplotInputsUI)
 export(pcaBiplotOutputUI)
@@ -132,6 +163,15 @@ export(rocCurveApp)
 export(rocCurveInputsUI)
 export(rocCurveOutputUI)
 export(rocCurveServer)
+export(sampleDistanceHeatmapApp)
+export(sampleDistanceHeatmapInputsUI)
+export(sampleDistanceHeatmapOutputUI)
+export(sampleDistanceHeatmapServer)
+export(samplePCAApp)
+export(samplePCAInputsUI)
+export(samplePCAOutputUI)
+export(samplePCAServer)
+export(sample_pca)
 export(sciFigureBuilderApp)
 export(sci_figure_builder_registry)
 export(structureViewer)
@@ -153,6 +193,7 @@ import(ggplot2, except = last_plot)
 
 import(plotly)
 import(shiny)
+importClassesFrom(SingleCellExperiment,SingleCellExperiment)
 importFrom(DT,
   DTOutput,
   renderDT
@@ -195,13 +236,24 @@ importFrom(Seqinfo,
   seqlengths,
   seqnames
 )
-importFrom(SummarizedExperiment,colData)
+importFrom(SummarizedExperiment,
+  assay,
+  assayNames,
+  colData,
+  rowData
+)
 importFrom(VizModules,
+  ComplexHeatmap_HeatmapInputsUI,
+  ComplexHeatmap_HeatmapOutputUI,
+  ComplexHeatmap_HeatmapServer,
+  add_size_legend,
   createModuleApp,
   dittoViz_scatterPlotInputsUI,
   dittoViz_scatterPlotOutputUI,
   dittoViz_scatterPlotServer,
   figureBuilderApp,
+  plotthis_BarPlotInputsUI,
+  plotthis_BarPlotServer,
   plotthis_DotPlotInputsUI,
   plotthis_DotPlotOutputUI,
   plotthis_DotPlotServer,
@@ -215,6 +267,7 @@ importFrom(dittoSeq,
   dittoBarPlot,
   dittoDimHex,
   dittoDimPlot,
+  dittoDotPlot,
   dittoFreqPlot,
   dittoPlot,
   dittoRidgeJitter,
@@ -262,17 +315,22 @@ importFrom(shinyWidgets,
 importFrom(shinyjqui,jqui_resizable)
 importFrom(shinyjs,useShinyjs)
 importFrom(stats,
+  as.dist,
   as.formula,
   binomial,
   coef,
   complete.cases,
   confint,
   confint.default,
+  cor,
   cor.test,
+  dist,
   glm,
+  hclust,
   lm,
   p.adjust,
   p.adjust.methods,
+  prcomp,
   sd,
   setNames
 )

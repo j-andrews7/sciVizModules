@@ -123,6 +123,43 @@ holds the logic. Every module also ships a standalone `*App()` you can run to se
   RMSF, ...) from GROMACS `.xvg` files read with `read_xvg()`, one line per replica, with
   running-mean smoothing, ps/ns and nm/Å conversion, and a panel per metric.
 
+### Somatic mutations
+
+The cohort figures of [maftools](https://bioconductor.org/packages/maftools/), drawn natively in
+plotly from a maftools `MAF` object or a plain data frame in Mutation Annotation Format columns
+(so maftools is optional; its summaries are matched in the tests). The `*App()` functions open on
+the TCGA LAML cohort maftools ships (so need maftools).
+
+- **`oncoPlot`** — the oncoplot: genes by samples coloured by variant class (Multi_Hit where a
+  gene carries several), each sample's mutation burden above, each gene's frequency beside, and
+  sample annotations as tracks, with a hover per tile.
+- **`mafSummary`** — the `plotmafSummary()` dashboard: counts per variant classification, type
+  and substitution class, variants per sample, and the most mutated genes.
+- **`mutationLollipop`** — one gene's mutations along its protein, over its Pfam/SMART domains
+  (from maftools' table when installed).
+- **`mutationalProfile`** — the 96-channel single-base-substitution spectrum of each sample,
+  from a MutationalPatterns, maftools or SigProfiler count matrix (wraps
+  `VizModules::plotthis_BarPlot`).
+
+### Bulk expression
+
+Sample-level views of a bulk experiment in a `SummarizedExperiment`, with the counts transformed
+in the module (DESeq2's variance-stabilising transformation, log2 CPM or log2). The `*App()`
+functions open on the [airway](https://bioconductor.org/packages/airway/) package's counts, so
+need airway.
+
+- **`samplePCA`** — the sample PCA over the most variable genes, drawn by `pcaBiplot`;
+  `sample_pca()` builds the same PCA for the other PCAtools modules.
+- **`sampleDistanceHeatmap`** — Euclidean distances (or correlations) between samples,
+  clustered, with `colData` annotations.
+- **`deHeatmap`** — per-gene z-scores of the top differentially expressed genes from a results
+  table, split into up and down.
+
+The two heatmaps, like `dittoHeatmap` below, wrap VizModules' `ComplexHeatmap_Heatmap` module:
+they are [InteractiveComplexHeatmap](https://bioconductor.org/packages/InteractiveComplexHeatmap/)
+widgets (hover, click, brush a sub-heatmap) rather than plotly figures, and need ComplexHeatmap,
+InteractiveComplexHeatmap and circlize.
+
 ### Principal component analysis (PCAtools)
 
 One module per [PCAtools](https://bioconductor.org/packages/PCAtools/) view, each taking a
@@ -162,6 +199,11 @@ and reuses the standard VizModules aesthetic/axis/legend/reference-line controls
   (wraps `dittoSeq::dittoFreqPlot`).
 - **`dittoRidgeJitter`** — ridgeline-with-jitter distribution plot
   (wraps `dittoSeq::dittoRidgeJitter`).
+- **`dittoDotPlot`** — marker dot plot: mean expression (colour) and fraction expressing (size)
+  per gene and group (wraps `dittoSeq::dittoDotPlot`).
+- **`dittoHeatmap`** — expression of chosen genes across cells, ordered and annotated by cell
+  metadata (wraps `dittoSeq::dittoHeatmap`'s data through VizModules'
+  `ComplexHeatmap_Heatmap`; an InteractiveComplexHeatmap widget, not plotly).
 
 ### Example
 
@@ -197,13 +239,14 @@ sciFigureBuilderApp()
 own modules (or with the VizModules ones) and pass the result to
 `VizModules::figureBuilderApp()`.
 
-The single-cell modules, `cnSegmentPlot`, `michaelisMenten`, the PCAtools modules and
-`alphafoldConfidence` are not registered: the builder's dataset catalogue holds data frames,
-and those take a `SingleCellExperiment`, a `CNSegment` object, a bundle carrying a model fit,
-a PCAtools `pca` object and a `read_alphafold()` result respectively. `structureViewer` is a
-3D widget rather than a plotly figure. `forestPlot` and the newer data-frame modules (GWAS,
-GSEA, CRISPR, ROC, PK, plate and MD) are not registered yet. Run their `*App()` functions
-instead.
+The single-cell modules, the bulk expression modules, `cnSegmentPlot`, `michaelisMenten`, the
+PCAtools modules and `alphafoldConfidence` are not registered: the builder's dataset catalogue
+holds data frames, and those take a `SingleCellExperiment`, a `SummarizedExperiment`, a
+`CNSegment` object, a bundle carrying a model fit, a PCAtools `pca` object and a
+`read_alphafold()` result respectively. `structureViewer` is a 3D widget rather than a plotly
+figure. `mutationalProfile` is registered; `forestPlot` and the other newer data-frame modules
+(GWAS, GSEA, CRISPR, the MAF modules, ROC, PK, plate and MD) are not registered yet. Run their
+`*App()` functions instead.
 
 ## Working with an AI Coding Agent
 

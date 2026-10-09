@@ -70,3 +70,25 @@
     }
     nm[ok]
 }
+
+
+#' Fill inputs that have not reported yet
+#'
+#' A wrapper reads its own inputs before its UI may exist (or an empty
+#' `numericInput()` reports `NA`); each such value falls back to the module's
+#' default.
+#'
+#' @param vals A named list of input values.
+#' @param fallback A named list of defaults covering the same names.
+#' @return `vals`, with `NULL` and `NA` numeric entries replaced from `fallback`.
+#'
+#' @author Jared Andrews
+#' @rdname INTERNAL_sci_fill_inputs
+#' @keywords internal
+.sci_fill_inputs <- function(vals, fallback) {
+    for (k in names(vals)) {
+        v <- vals[[k]]
+        if (is.null(v) || (is.numeric(v) && length(v) == 1 && is.na(v))) vals[k] <- list(fallback[[k]])
+    }
+    vals
+}

@@ -17,3 +17,5 @@
 ^docs$
 ^pkgdown$
 ^\.agents$
+^LICENSE\.md$
+^Rplots\.pdf$

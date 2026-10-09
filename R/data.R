@@ -460,3 +460,31 @@
 #' @author Jared Andrews
 #' @keywords datasets
 "example_plate"
+
+#' Example single-base-substitution spectra (simulated)
+#'
+#' Simulated 96-channel mutational spectra for six tumours, for the
+#' [mutationalProfileServer()] module. Each tumour mixes three synthetic
+#' processes (an ageing-like C>T at CpG, an APOBEC-like C>T and C>G in TpCpW, and
+#' a smoking-like broad C>A) in different proportions, plus a flat background.
+#' The profiles are shaped after familiar ones but are not copied from any
+#' published signature catalogue.
+#'
+#' @format A data frame with 96 rows and 7 columns:
+#' \describe{
+#'   \item{context}{Trinucleotide channel, e.g. `"A[C>A]A"`, in the order
+#'     MutationalPatterns and maftools use}
+#'   \item{Tumour_1, Tumour_2, Tumour_3, Tumour_4, Tumour_5, Tumour_6}{Substitution
+#'     counts per channel, one column per tumour}
+#' }
+#'
+#' @source Simulated in `data-raw/generate_example_sbs96.R`.
+#'
+#' @examples
+#' data(example_sbs96)
+#' head(example_sbs96)
+#' colSums(example_sbs96[-1])
+#'
+#' @author Jared Andrews
+#' @keywords datasets
+"example_sbs96"

@@ -21,7 +21,7 @@ test_that("every *App() default dataset resolves", {
     for (name in c(
         "airway_deseq2", "dose_response", "example_enrichment", "example_sce",
         "example_cn_segment", "mm_kinetics", "mm_kinetics_line",
-        "mm_kinetics_fit", "survival_lung"
+        "mm_kinetics_fit", "survival_lung", "example_sbs96"
     )) {
         expect_false(is.null(.sci_example_data(name)), info = name)
     }

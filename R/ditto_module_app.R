@@ -59,9 +59,10 @@
     server <- function(input, output, session) {
         rv <- reactiveValues(objects = object_list)
 
+        # The first object until the selector reports, so a server that reads
+        # its data when it is constructed (for its Reset defaults) sees one.
         active_object <- reactive({
-            req(input$object_select)
-            rv$objects[[input$object_select]]
+            rv$objects[[input$object_select %||% names(object_list)[1]]]
         })
 
         output$plot_inputs_ui <- renderUI({

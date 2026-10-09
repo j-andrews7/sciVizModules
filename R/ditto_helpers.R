@@ -5,6 +5,7 @@
 #'   or `Seurat` object, otherwise `FALSE`.
 #'
 #' @importFrom methods is
+#' @importClassesFrom SingleCellExperiment SingleCellExperiment
 #' @author Jacob Martin, Jared Andrews
 #' @rdname INTERNAL_is_ditto_object
 #' @keywords internal

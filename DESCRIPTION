@@ -26,7 +26,7 @@ License: MIT + file LICENSE
 Depends:
     R (>= 4.6.0),
     shiny,
-    VizModules (>= 0.6.0)
+    VizModules (>= 0.6.0.9001)
 Imports:
     colourpicker,
     dittoSeq,
@@ -53,10 +53,18 @@ Imports:
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Suggests:
+    airway,
+    circlize,
+    ComplexHeatmap,
+    DESeq2,
     drc,
+    edgeR,
     fgsea,
     GOfan,
+    htmltools,
+    InteractiveComplexHeatmap,
     knitr,
+    maftools,
     org.Hs.eg.db,
     PCAtools,
     PKNCA,
@@ -74,4 +82,5 @@ URL: https://github.com/j-andrews7/sciVizModules, https://j-andrews7.github.io/s
 BugReports: https://github.com/j-andrews7/sciVizModules/issues
 Config/roxygen2/version: 8.1.0
 biocViews: Visualization, ShinyApps, GUI, DifferentialExpression,
-    GeneExpression, SingleCell, GeneSetEnrichment, Pathways, GO, Survival
+    GeneExpression, SingleCell, GeneSetEnrichment, Pathways, GO, Survival,
+    SomaticMutation, PrincipalComponent, Clustering

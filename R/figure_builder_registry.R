@@ -10,11 +10,12 @@
 #' `inputs_ui` / `output_ui` / `server_fn` (the module's trio), and `defaults`.
 #'
 #' Only the modules that take a plain data frame can be registered. The
-#' builder's dataset catalogue holds data frames, so the seven `dittoSeq`
-#' modules (which take a `SingleCellExperiment`, `Seurat` or
-#' `SummarizedExperiment`), `cnSegmentPlot` (a `CNSegment` object) and
-#' `michaelisMenten` (a bundle whose `stats` element is a model fit) have no
-#' place in it. Run their `*App()` functions instead.
+#' builder's dataset catalogue holds data frames, so the `dittoSeq` modules
+#' (which take a `SingleCellExperiment`, `Seurat` or `SummarizedExperiment`),
+#' the bulk expression modules (`samplePCA`, `sampleDistanceHeatmap`,
+#' `deHeatmap`), `cnSegmentPlot` (a `CNSegment` object) and `michaelisMenten`
+#' (a bundle whose `stats` element is a model fit) have no place in it. Run
+#' their `*App()` functions instead.
 #'
 #' `goFanPlot` and `survivalCurve` are included only when the packages they
 #' need are installed (`GOfan` plus an `OrgDb`, and `survminer`), so the picker
@@ -64,6 +65,13 @@ sci_figure_builder_registry <- function() {
             output_ui = doseResponseOutputUI,
             server_fn = doseResponseServer,
             defaults = NULL
+        ),
+        mutational = list(
+            label = "Mutational Profile", dataset = "example_sbs96",
+            inputs_ui = mutationalProfileInputsUI,
+            output_ui = mutationalProfileOutputUI,
+            server_fn = mutationalProfileServer,
+            defaults = NULL
         )
     )
 
@@ -110,7 +118,8 @@ sci_figure_builder_registry <- function() {
         "airway_voom"        = .sci_example_data("airway_voom"),
         "example_enrichment" = .sci_example_data("example_enrichment"),
         "survival_lung"      = .sci_example_data("survival_lung"),
-        "dose_response"      = .sci_example_data("dose_response")
+        "dose_response"      = .sci_example_data("dose_response"),
+        "example_sbs96"      = .sci_example_data("example_sbs96")
     )
 }
 

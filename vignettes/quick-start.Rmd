@@ -141,6 +141,11 @@ if (interactive()) pkConcentrationTimeApp() # oral theophylline, datasets::Theop
 if (interactive()) plateHeatmapApp()    # two 384-well plates, example_plate
 if (interactive()) structureViewerApp() # 3D AlphaFold model of p53
 if (interactive()) mdTrajectoryMetricsApp() # simulated GROMACS RMSD, Rg and RMSF
+if (interactive()) oncoPlotApp()        # somatic mutations, maftools' TCGA LAML
+if (interactive()) mutationalProfileApp() # simulated SBS96 spectra, example_sbs96
+if (interactive()) samplePCAApp()       # bulk RNA-seq counts, the airway package
+if (interactive()) deHeatmapApp()       # airway with its DESeq2 results (airway_deseq2)
+if (interactive()) dittoDotPlotApp()    # marker dot plot, example_sce
 ```
 
 ## Set defaults and hide controls
@@ -379,6 +384,51 @@ mle <- read_mageck(system.file("extdata", "example_mageck_mle.gene_summary.txt.g
 head(mle)
 ```
 
+### Somatic mutations
+
+| Module | Server function | Data type | Expected data | Example data |
+|---|---|---|---|---|
+| Oncoplot | `oncoPlotServer()` | `data.frame` or maftools `MAF` | Variants in MAF columns: `Hugo_Symbol`, `Tumor_Sample_Barcode`, `Variant_Classification`, and a protein-change column (`HGVSp_Short`, `Protein_Change` or `AAChange`); columns constant within a sample are its annotations | maftools' TCGA LAML |
+| MAF summary | `mafSummaryServer()` | `data.frame` or maftools `MAF` | As above, plus `Variant_Type`, `Reference_Allele` and `Tumor_Seq_Allele2` for the type and substitution panels | maftools' TCGA LAML |
+| Mutation lollipop | `mutationLollipopServer()` | `data.frame` or maftools `MAF` | As above; domains from maftools when installed, or the server's `domains` argument | maftools' TCGA LAML |
+| SBS96 spectrum | `mutationalProfileServer()` | matrix or `data.frame` | 96-channel substitution counts: 96 x samples (MutationalPatterns `mut_matrix()`), samples x 96 (maftools `trinucleotideMatrix()$nmf_matrix`), or a channel column plus one column per sample | `example_sbs96` |
+
+Silent variants are dropped as `maftools::read.maf()` drops them; the gene,
+sample and substitution summaries match maftools'.
+
+```{r maf-format}
+# The TCGA LAML cohort maftools ships, with its clinical annotations.
+laml <- read.delim(system.file("extdata", "tcga_laml.maf.gz", package = "maftools"),
+    comment.char = "#")
+clinical <- read.delim(system.file("extdata", "tcga_laml_annot.tsv", package = "maftools"))
+laml <- merge(laml, clinical, by = "Tumor_Sample_Barcode")
+head(laml[, c("Hugo_Symbol", "Tumor_Sample_Barcode", "Variant_Classification", "Protein_Change")])
+oncoPlot(laml, top.n = 15, clinical.tracks = "FAB_classification")
+```
+
+### Bulk expression
+
+| Module | Server function | Data type | Expected data | Example data |
+|---|---|---|---|---|
+| Sample PCA | `samplePCAServer()` | `SummarizedExperiment` | Counts (or any assay) with sample metadata in `colData` | `airway` (airway package) |
+| Sample distances | `sampleDistanceHeatmapServer()` | `SummarizedExperiment` | As above | `airway` (airway package) |
+| DE heatmap | `deHeatmapServer()` | bundle | `list(object = <SummarizedExperiment>, results = <DE results table>)`, or a `SummarizedExperiment` whose `rowData` holds the results | `airway` with `airway_deseq2` |
+
+Their `*App()` functions take a named list of experiments (or, for the DE
+heatmap, of bundles). The counts are transformed in the module: DESeq2's
+variance-stabilising transformation when DESeq2 is installed, otherwise log2
+CPM. The two heatmaps (and `dittoHeatmap`) wrap VizModules'
+`ComplexHeatmap_Heatmap` module, so they are InteractiveComplexHeatmap widgets
+rather than plotly figures and need ComplexHeatmap, InteractiveComplexHeatmap
+and circlize. `sample_pca()` builds the same PCA for the PCAtools modules
+below.
+
+```{r bulk-format}
+data("airway", package = "airway")
+airway
+pcaScreePlot(sample_pca(airway, transform = "log2cpm"))
+```
+
 ### Principal component analysis (PCAtools)
 
 | Module | Server function | Data type | Expected data | Example data |
@@ -464,6 +514,8 @@ or `SummarizedExperiment` object.
 | Ridge + jitter | `dittoRidgeJitterServer()` | Ridge plots with overlaid jitter |
 | Composition bar | `dittoBarPlotServer()` | Discrete composition per group (percent or count) |
 | Frequency | `dittoFreqPlotServer()` | Per-sample frequencies of a discrete variable across groups |
+| Dot plot | `dittoDotPlotServer()` | Marker genes: mean expression (colour) and fraction expressing (size) per group |
+| Heatmap | `dittoHeatmapServer()` | Expression of chosen genes across cells, with metadata annotations (an InteractiveComplexHeatmap widget) |
 
 ```{r sce-format}
 data(example_sce)
@@ -492,12 +544,15 @@ str(registry$volcano, max.level = 1)
 The `vizmodules-app` agent skill covers embedding the Figure Builder in your own
 app, and `vizmodules-custom-module` covers building a module to register in it.
 
-The dittoSeq modules, `cnSegmentPlot`, `michaelisMenten`, the PCAtools modules,
-`gseaEnrichmentPlot` and `alphafoldConfidence` are not registered: the
-builder's dataset catalogue holds data frames, and those take other objects.
-`structureViewer` is a 3D widget rather than a plotly figure. `forestPlot`, the
-GWAS modules, `crisprScreenRank`, `rocCurve`, `pkConcentrationTime`,
-`plateHeatmap` and `mdTrajectoryMetrics` are not registered yet.
+`mutationalProfile` is registered alongside the differential-expression,
+enrichment, dose-response and survival modules. The dittoSeq modules, the bulk
+expression modules, `cnSegmentPlot`, `michaelisMenten`, the PCAtools modules,
+`gseaEnrichmentPlot` and `alphafoldConfidence` are not: the builder's dataset
+catalogue holds data frames, and those take other objects. `structureViewer`
+is a 3D widget rather than a plotly figure. `forestPlot`, the GWAS modules,
+`crisprScreenRank`, the MAF modules (`oncoPlot`, `mafSummary`,
+`mutationLollipop`), `rocCurve`, `pkConcentrationTime`, `plateHeatmap` and
+`mdTrajectoryMetrics` are not registered yet.
 
 ## Export the source data
 

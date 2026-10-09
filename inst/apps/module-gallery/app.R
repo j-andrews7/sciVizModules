@@ -10,6 +10,8 @@ library(sciVizModules)
 ##               so users can filter/edit the data feeding the plot.
 ##   * "sce"   - dittoSeq / single-cell modules. Bound directly to a
 ##               SingleCellExperiment; no data-table filter applies.
+##   * "se"    - bulk expression modules, bound to a SummarizedExperiment.
+##   * "de"    - the DE heatmap, bound to an experiment plus its results.
 ##   * "mm"    - the Michaelis-Menten module, which needs a bundle of
 ##               observed points, a fitted line, and a stats object.
 ##   * "cn"    - the copy-number module, bound to a CNSegment object.
@@ -18,6 +20,12 @@ library(sciVizModules)
 ##   * "gsea"  - the GSEA module, bound to an fgsea input bundle.
 ##   * "structure" - the 3D structure viewer, bound to a read_structure()
 ##               object. Its output is an NGL widget, not a plotly figure.
+##
+## The heatmap modules (dittoHeatmap, sampleDistanceHeatmap, deHeatmap) are
+## InteractiveComplexHeatmap widgets rather than plotly figures, and appear
+## only when ComplexHeatmap, InteractiveComplexHeatmap and circlize are installed.
+## The somatic-mutation tabs use the TCGA LAML cohort maftools ships, and the
+## bulk expression tabs the airway package's counts, so each needs that package.
 ## ---------------------------------------------------------------------------
 
 ## ---- Package metadata (for the About tab / navbar) ------------------------
@@ -41,6 +49,7 @@ data("example_gwas",       package = "sciVizModules", envir = environment())
 data("example_gsea",       package = "sciVizModules", envir = environment())
 data("example_biomarkers", package = "sciVizModules", envir = environment())
 data("example_plate",      package = "sciVizModules", envir = environment())
+data("example_sbs96",      package = "sciVizModules", envir = environment())
 
 ## Oral theophylline in 12 subjects, from base R.
 theoph <- as.data.frame(datasets::Theoph)
@@ -77,6 +86,27 @@ mm_bundle <- list(
     stats = mm_kinetics_fit
 )
 
+## Example data other packages already ship. Both are Suggests, so the tabs
+## using them (see `needs` below) are left out when they are not installed.
+## The TCGA LAML somatic mutations maftools ships, with their clinical data:
+laml <- NULL
+if (requireNamespace("maftools", quietly = TRUE)) {
+    laml <- read.delim(system.file("extdata", "tcga_laml.maf.gz", package = "maftools"),
+        comment.char = "#")
+    laml <- merge(laml, read.delim(system.file("extdata", "tcga_laml_annot.tsv", package = "maftools")),
+        by = "Tumor_Sample_Barcode")
+}
+## The airway RNA-seq counts, and those with their DESeq2 results for the DE heatmap:
+airway <- de_bundle <- NULL
+if (requireNamespace("airway", quietly = TRUE)) {
+    data("airway", package = "airway", envir = environment())
+    airway$dex <- relevel(airway$dex, ref = "untrt")
+    de_bundle <- list(object = airway, results = airway_deseq2)
+}
+
+## The heatmap modules draw with ComplexHeatmap and InteractiveComplexHeatmap.
+heatmap_pkgs <- c("ComplexHeatmap", "InteractiveComplexHeatmap", "circlize")
+
 ## ---- Module registry ------------------------------------------------------
 ## Each entry defines one gallery tab. `type` selects the data-wiring path.
 module_registry <- list(
@@ -89,6 +119,21 @@ module_registry <- list(
         label = "MA", id = "ma", type = "df",
         inputs_ui = maPlotInputsUI, output_ui = maPlotOutputUI,
         server_fn = maPlotServer, data = airway_deseq2, defaults = NULL
+    ),
+    list(
+        label = "Sample PCA", id = "samplepca", type = "se", needs = "airway",
+        inputs_ui = samplePCAInputsUI, output_ui = samplePCAOutputUI,
+        server_fn = samplePCAServer, data = airway, defaults = NULL
+    ),
+    list(
+        label = "Sample Distance", id = "sampledist", type = "se", needs = c(heatmap_pkgs, "airway"),
+        inputs_ui = sampleDistanceHeatmapInputsUI, output_ui = sampleDistanceHeatmapOutputUI,
+        server_fn = sampleDistanceHeatmapServer, data = airway, defaults = NULL
+    ),
+    list(
+        label = "DE Heatmap", id = "deheatmap", type = "de", needs = c(heatmap_pkgs, "airway"),
+        inputs_ui = deHeatmapInputsUI, output_ui = deHeatmapOutputUI,
+        server_fn = deHeatmapServer, data = de_bundle, defaults = NULL
     ),
     list(
         label = "Enrichment Dot", id = "enrich", type = "df",
@@ -119,6 +164,26 @@ module_registry <- list(
         label = "CRISPR Screen", id = "crispr", type = "df",
         inputs_ui = crisprScreenRankInputsUI, output_ui = crisprScreenRankOutputUI,
         server_fn = crisprScreenRankServer, data = example_mageck, defaults = NULL
+    ),
+    list(
+        label = "Oncoplot", id = "oncoplot", type = "df", needs = "maftools",
+        inputs_ui = oncoPlotInputsUI, output_ui = oncoPlotOutputUI,
+        server_fn = oncoPlotServer, data = laml, defaults = NULL
+    ),
+    list(
+        label = "MAF Summary", id = "mafsummary", type = "df", needs = "maftools",
+        inputs_ui = mafSummaryInputsUI, output_ui = mafSummaryOutputUI,
+        server_fn = mafSummaryServer, data = laml, defaults = NULL
+    ),
+    list(
+        label = "Lollipop", id = "lollipop", type = "df", needs = "maftools",
+        inputs_ui = mutationLollipopInputsUI, output_ui = mutationLollipopOutputUI,
+        server_fn = mutationLollipopServer, data = laml, defaults = NULL
+    ),
+    list(
+        label = "SBS96 Profile", id = "sbs96", type = "df",
+        inputs_ui = mutationalProfileInputsUI, output_ui = mutationalProfileOutputUI,
+        server_fn = mutationalProfileServer, data = example_sbs96, defaults = NULL
     ),
     list(
         label = "Dose-Response", id = "dose", type = "df",
@@ -222,6 +287,16 @@ module_registry <- list(
         server_fn = dittoPlotServer, data = example_sce, defaults = NULL
     ),
     list(
+        label = "Dot Plot", id = "dotplot", type = "sce",
+        inputs_ui = dittoDotPlotInputsUI, output_ui = dittoDotPlotOutputUI,
+        server_fn = dittoDotPlotServer, data = example_sce, defaults = NULL
+    ),
+    list(
+        label = "Heatmap", id = "dittoheatmap", type = "sce", needs = heatmap_pkgs,
+        inputs_ui = dittoHeatmapInputsUI, output_ui = dittoHeatmapOutputUI,
+        server_fn = dittoHeatmapServer, data = example_sce, defaults = NULL
+    ),
+    list(
         label = "Ridge + Jitter", id = "ridge", type = "sce",
         inputs_ui = dittoRidgeJitterInputsUI, output_ui = dittoRidgeJitterOutputUI,
         server_fn = dittoRidgeJitterServer, data = example_sce, defaults = NULL
@@ -237,6 +312,11 @@ module_registry <- list(
         server_fn = dittoFreqPlotServer, data = example_sce, defaults = NULL
     )
 )
+
+## Leave out the tabs whose packages are not installed.
+module_registry <- Filter(function(m) {
+    all(vapply(m$needs %||% character(0), requireNamespace, logical(1), quietly = TRUE))
+}, module_registry)
 
 ## ---- Tab builders ---------------------------------------------------------
 build_tab <- function(mod) {
@@ -255,6 +335,11 @@ build_tab <- function(mod) {
             sce = "This module is bound to the bundled 'example_sce' SingleCellExperiment.",
             cn = "This module is bound to the bundled 'example_cn_segment' CNSegment object.",
             pca = "This module is bound to the bundled 'example_pca' PCAtools object (airway RNA-seq).",
+            se = "This module is bound to the airway package's RNA-seq counts (a SummarizedExperiment).",
+            de = paste(
+                "This module is bound to the airway package's RNA-seq counts and their DESeq2 results,",
+                "the bundled 'airway_deseq2'."
+            ),
             gsea = "This module is bound to the bundled 'example_gsea' input (fgsea's example ranks and pathways).",
             af = paste(
                 "This module is bound to the bundled AlphaFold DB prediction for human p53",
@@ -305,10 +390,10 @@ about_tab <- tabPanel(
                     "modules using bundled example datasets so you can preview",
                     "each scientific plot type and its configurable inputs.",
                     "Differential-expression, enrichment, survival, forest, ROC, GWAS,",
-                    "CRISPR screen, pharmacology, plate and MD trajectory modules are",
-                    "driven by editable data tables; the single-cell (dittoSeq), copy",
-                    "number, PCA (PCAtools), GSEA, AlphaFold and 3D structure modules",
-                    "are bound to bundled example objects."
+                    "CRISPR screen, somatic mutation, pharmacology, plate and MD trajectory",
+                    "modules are driven by editable data tables; the single-cell (dittoSeq),",
+                    "bulk expression, copy number, PCA (PCAtools), GSEA, AlphaFold and 3D",
+                    "structure modules are bound to bundled example objects."
                 ),
                 tags$p(
                     tags$strong("Repository: "),
@@ -373,7 +458,7 @@ server <- function(input, output, session) {
             })
             m$server_fn(m$id, data = filtered_data)
 
-        } else if (m$type %in% c("sce", "cn", "pca", "af", "gsea", "structure")) {
+        } else if (m$type %in% c("sce", "se", "de", "cn", "pca", "af", "gsea", "structure")) {
             ## An object bound directly (no data table): SingleCellExperiment,
             ## CNSegment, PCAtools pca, read_alphafold() or read_structure() result.
             obj_data <- reactive(m$data)

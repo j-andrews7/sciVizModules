@@ -13,7 +13,9 @@ module_prefixes <- c(
     "cnSegmentPlot", "dittoBarPlot", "dittoDimHex", "dittoDimPlot",
     "dittoFreqPlot", "dittoPlot", "dittoRidgeJitter", "dittoScatterPlot",
     "doseResponse", "enrichmentDotPlot", "goFanPlot", "maPlot",
-    "michaelisMenten", "survivalCurve", "volcanoPlot"
+    "michaelisMenten", "survivalCurve", "volcanoPlot",
+    "dittoDotPlot", "dittoHeatmap", "samplePCA", "sampleDistanceHeatmap", "deHeatmap",
+    "mutationalProfile", "mafSummary", "mutationLollipop", "oncoPlot"
 )
 
 module_functions <- function() {

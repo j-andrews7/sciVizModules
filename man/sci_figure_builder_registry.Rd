@@ -20,11 +20,12 @@ picker), \code{dataset} (the dataset name its \code{defaults} were written for),
 \code{inputs_ui} / \code{output_ui} / \code{server_fn} (the module's trio), and \code{defaults}.
 
 Only the modules that take a plain data frame can be registered. The
-builder's dataset catalogue holds data frames, so the seven \code{dittoSeq}
-modules (which take a \code{SingleCellExperiment}, \code{Seurat} or
-\code{SummarizedExperiment}), \code{cnSegmentPlot} (a \code{CNSegment} object) and
-\code{michaelisMenten} (a bundle whose \code{stats} element is a model fit) have no
-place in it. Run their \verb{*App()} functions instead.
+builder's dataset catalogue holds data frames, so the \code{dittoSeq} modules
+(which take a \code{SingleCellExperiment}, \code{Seurat} or \code{SummarizedExperiment}),
+the bulk expression modules (\code{samplePCA}, \code{sampleDistanceHeatmap},
+\code{deHeatmap}), \code{cnSegmentPlot} (a \code{CNSegment} object) and \code{michaelisMenten}
+(a bundle whose \code{stats} element is a model fit) have no place in it. Run
+their \verb{*App()} functions instead.
 
 \code{goFanPlot} and \code{survivalCurve} are included only when the packages they
 need are installed (\code{GOfan} plus an \code{OrgDb}, and \code{survminer}), so the picker

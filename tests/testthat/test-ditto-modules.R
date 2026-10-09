@@ -12,7 +12,8 @@ ditto_modules <- c(
     "dittoBarPlot",
     "dittoDimHex",
     "dittoFreqPlot",
-    "dittoRidgeJitter"
+    "dittoRidgeJitter",
+    "dittoDotPlot"
 )
 
 test_that("all ditto module functions are exported", {
@@ -242,4 +243,39 @@ test_that("metadata with too many levels to colour or group by are not offered",
     html <- as.character(dittoBarPlotInputsUI("bar", sce))
     expect_false("barcode" %in% choices_of(html, "bar-var"))
     expect_false("barcode" %in% choices_of(html, "bar-group.by"))
+})
+
+test_that("dittoDotPlot draws the dot-size legend as the VizModules DotPlot module does", {
+    # The dots the legend describes: within the size-scale limits.
+    dat <- data.frame(size = c(0.005, 0.2, 0.6, 1, NA))
+    expect_equal(.ddp_size_legend_data(dat, 0.01, NA)$percent, c(20, 60, 100))
+    expect_equal(.ddp_size_legend_data(dat, 0.01, 0.8)$percent, c(20, 60))
+
+    data(example_sce, package = "sciVizModules")
+    shiny::testServer(dittoDotPlotServer, args = list(data = shiny::reactive(example_sce)), expr = {
+        inputs <- c(
+            list(auto.update = TRUE, vars = c("Gene32", "Gene20", "Gene1"), group.by = "celltype", split.by = "",
+                scale = TRUE, vars.dir = "x", assay = "logcounts", summary.fxn.color = "nonzero.mean",
+                min.color = "grey90", max.color = "#C51B7D", mid.color = "", size = 6, min.percent = 0.01,
+                max.percent = NA, size.legend.x = 1.04, size.legend.y = 0.35, download.format = "png"),
+            test_axes_inputs(), test_legend_inputs()
+        )
+        inputs$legend.show <- TRUE
+        do.call(session$setInputs, inputs)
+        built <- plotly::plotly_build(generate_dittoDotPlot())
+        texts <- vapply(built$x$layout$annotations, function(a) as.character(a$text), character(1))
+        expect_true("percent<br>expression" %in% texts)
+        expect_length(grep("&#9679;", texts, fixed = TRUE), 5)
+        # Labels are whole percentages, the largest the fully expressed genes.
+        expect_true("100" %in% texts)
+        # The colour bar keeps to the upper half, clear of the size legend.
+        cb <- Filter(Negate(is.null), lapply(built$x$data, function(t) t$marker$colorbar))
+        expect_equal(cb[[1]]$len, 0.5)
+
+        # Hiding the legend hides the size legend too.
+        session$setInputs(legend.show = FALSE)
+        hidden <- plotly::plotly_build(generate_dittoDotPlot())
+        texts <- vapply(hidden$x$layout$annotations, function(a) as.character(a$text), character(1))
+        expect_length(grep("&#9679;", texts, fixed = TRUE), 0)
+    })
 })
