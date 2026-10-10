@@ -48,11 +48,11 @@ test_that("the free-text inputs that feed a plot are debounced", {
 
 test_that("the modules that render a colour picker read a server-side store", {
     # setup_group_colors() holds the resolved mapping, so a rebuilt picker
-    # echoing what the server seeded it with does not re-render the plot.
+    # echoing what the server seeded it with does not re-render the plot. The
+    # .sci_plot_server() modules render theirs through .sci_palette_picker_ui().
     servers <- c(
         "dittoBarPlotServer", "dittoDimPlotServer", "dittoFreqPlotServer",
-        "dittoPlotServer", "dittoRidgeJitterServer", "dittoScatterPlotServer",
-        "survivalCurveServer"
+        "dittoPlotServer", "dittoRidgeJitterServer", "dittoScatterPlotServer"
     )
     for (name in servers) {
         src <- deparse(body(get(name, envir = asNamespace("sciVizModules"))))

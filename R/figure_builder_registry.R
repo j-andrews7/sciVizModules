@@ -17,9 +17,8 @@
 #' (a bundle whose `stats` element is a model fit) have no place in it. Run
 #' their `*App()` functions instead.
 #'
-#' `goFanPlot` and `survivalCurve` are included only when the packages they
-#' need are installed (`GOfan` plus an `OrgDb`, and `survminer`), so the picker
-#' never offers a panel that cannot draw.
+#' `goFanPlot` is included only when the packages it needs are installed
+#' (`GOfan` plus an `OrgDb`), so the picker never offers a panel that cannot draw.
 #'
 #' Every registered module renders a plotly graph, so the builder's SVG figure
 #' export and its source-data archive photograph them in the browser; none of
@@ -75,15 +74,13 @@ sci_figure_builder_registry <- function() {
         )
     )
 
-    if (requireNamespace("survminer", quietly = TRUE)) {
-        registry$survival <- list(
-            label = "Survival Curve", dataset = "survival_lung",
-            inputs_ui = survivalCurveInputsUI,
-            output_ui = survivalCurveOutputUI,
-            server_fn = survivalCurveServer,
-            defaults = list("time" = "time", "status" = "status", "group.by" = "sex")
-        )
-    }
+    registry$survival <- list(
+        label = "Survival Curve", dataset = "survival_lung",
+        inputs_ui = survivalCurveInputsUI,
+        output_ui = survivalCurveOutputUI,
+        server_fn = survivalCurveServer,
+        defaults = list("time" = "time", "status" = "status", "group.by" = "sex")
+    )
 
     if (requireNamespace("GOfan", quietly = TRUE) &&
         requireNamespace("org.Hs.eg.db", quietly = TRUE)) {

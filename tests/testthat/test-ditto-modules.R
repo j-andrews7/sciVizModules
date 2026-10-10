@@ -266,8 +266,13 @@ test_that("dittoDotPlot draws the dot-size legend as the VizModules DotPlot modu
         texts <- vapply(built$x$layout$annotations, function(a) as.character(a$text), character(1))
         expect_true("percent<br>expression" %in% texts)
         expect_length(grep("&#9679;", texts, fixed = TRUE), 5)
-        # Labels are whole percentages, the largest the fully expressed genes.
-        expect_true("100" %in% texts)
+        # Labels are round percentages up to the fully expressed genes, without the
+        # empty circle dittoSeq's scale gives min.percent.
+        expect_identical(texts[grepl("^[0-9]+$", texts)], c("20", "40", "60", "80", "100"))
+        # Circles follow dittoSeq's area scale from 1% (size 0) to 100%.
+        circles <- texts[grepl("&#9679;", texts, fixed = TRUE)]
+        font <- as.numeric(sub(".*font-size:([0-9.eE+-]+)px.*", "\\1", circles))
+        expect_equal((font / font[5])^2, (c(20, 40, 60, 80, 100) - 1) / 99, tolerance = 1e-3)
         # The colour bar keeps to the upper half, clear of the size legend.
         cb <- Filter(Negate(is.null), lapply(built$x$data, function(t) t$marker$colorbar))
         expect_equal(cb[[1]]$len, 0.5)

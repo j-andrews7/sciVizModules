@@ -16,7 +16,12 @@ pkConcentrationTime(
   show.lambda = FALSE,
   auc.method = "lin up/log down",
   colors = NULL,
-  main = NULL
+  main = NULL,
+  error.type = c("sd", "sem", "ci95"),
+  error.ci.method = c("t", "normal"),
+  error.bar = TRUE,
+  error.ribbon = FALSE,
+  error.ribbon.opacity = 0.25
 )
 }
 \arguments{
@@ -29,10 +34,12 @@ subject.}
 
 \item{dose}{Column of doses (one per subject), or \code{NULL}.}
 
-\item{mode}{\code{"individual"} (a line per subject) or \code{"mean"} (mean +/- SD per
-group at each nominal time).}
+\item{mode}{\code{"individual"} (a line per subject) or \code{"mean"} (each group's mean
+at each nominal time, with the interval \code{error.type} selects).}
 
-\item{log.y}{Logical; log concentration axis.}
+\item{log.y}{Logical; log concentration axis. In mean mode, a lower bound at or
+below zero, which a log axis cannot show, is drawn at the smallest
+concentration plotted instead.}
 
 \item{show.lambda}{Logical; draw each subject's terminal elimination fit
 (individual mode).}
@@ -43,24 +50,50 @@ group at each nominal time).}
 groups (mean mode).}
 
 \item{main}{Optional plot title.}
+
+\item{error.type}{The interval around each mean (mean mode): \code{"sd"} (one
+standard deviation), \code{"sem"} (one standard error of the mean) or \code{"ci95"} (a
+95\% confidence interval for the mean).}
+
+\item{error.ci.method}{How a \code{"ci95"} interval is computed: \code{"t"} (the t
+distribution on \code{n - 1} degrees of freedom, the default, which suits the
+small groups of a PK study) or \code{"normal"} (1.96 standard errors).}
+
+\item{error.bar}{Logical; draw the interval as error bars (mean mode).}
+
+\item{error.ribbon}{Logical; draw the interval as a shaded band behind each
+group's line (mean mode).}
+
+\item{error.ribbon.opacity}{Fill opacity of the band, between 0 and 1.}
 }
 \value{
 A \code{plotly} object, with the per-subject NCA table as attribute \code{"table"}.
 }
 \description{
 Plots plasma (or tissue) concentration against time, either one line per
-subject or the mean +/- SD per group at each nominal sampling time, on a
-linear or log axis, with each subject's non-compartmental parameters (Cmax,
-Tmax, AUC, terminal half-life and, given a dose, CL/F and Vz/F) computed as
-PKNCA computes them by default. The terminal elimination fit can be drawn on
-each subject's curve.
+subject or each group's mean at each nominal sampling time with an interval
+around it, on a linear or log axis, with each subject's non-compartmental
+parameters (Cmax, Tmax, AUC, terminal half-life and, given a dose, CL/F and
+Vz/F) computed as PKNCA computes them by default. The terminal elimination fit
+can be drawn on each subject's curve.
+}
+\details{
+The group means are drawn by \code{\link[VizModules:linePlot]{VizModules::linePlot()}}, so the interval can be
+error bars, a shaded ribbon in each group's colour, or both, as in the
+VizModules line plot module. Its half-width is
+\code{\link[VizModules:error_bar_halfwidth]{VizModules::error_bar_halfwidth()}} of the concentrations at that time. A time
+with a single sample has no spread and is drawn without an interval.
 }
 \examples{
 pkConcentrationTime(datasets::Theoph, time = "Time", conc = "conc", subject = "Subject",
     dose = "Dose", log.y = TRUE, show.lambda = TRUE)
+
+# Group means with a 95\% confidence band.
+pkConcentrationTime(datasets::Theoph, time = "Time", conc = "conc", subject = "Subject",
+    mode = "mean", error.type = "ci95", error.bar = FALSE, error.ribbon = TRUE)
 }
 \seealso{
-\code{\link[=pkConcentrationTimeServer]{pkConcentrationTimeServer()}}
+\code{\link[=pkConcentrationTimeServer]{pkConcentrationTimeServer()}}, \code{\link[VizModules:linePlot]{VizModules::linePlot()}}
 }
 \author{
 Jared Andrews

@@ -33,7 +33,7 @@ that matches the \code{id} used in the \code{pkConcentrationTimeServer()} and
 }
 \details{
 The module draws \code{\link[=pkConcentrationTime]{pkConcentrationTime()}}: concentration-time
-profiles per subject or as group means +/- SD, linear or log, with each
+profiles per subject or as group means with an interval, linear or log, with each
 subject's non-compartmental parameters (Cmax, Tmax, AUC, half-life, CL/F,
 Vz/F) in the source-data download. Columns are detected from the usual names
 (\code{Subject} / \code{ID}, \code{Time} / \code{TAD}, \code{conc} / \code{DV}, \code{Dose} / \code{AMT}). The
@@ -45,7 +45,15 @@ The following parameters can be accessed via UI inputs and/or the \code{defaults
 \itemize{
 \item \code{subject.col}, \code{time.col}, \code{conc.col} - Columns (default: detected)
 \item \code{group.col}, \code{dose.col} - Optional treatment group and dose columns (default: detected, else none)
-\item \code{mode} - \code{"individual"} or \code{"mean"} (default: \code{"individual"})
+\item \code{mode} - \code{"individual"} or \code{"mean"} (UI: "Display", default: \code{"individual"})
+\item \code{error.bar} - Draw the group-mean interval as error bars (UI: "Error Bars", default: TRUE; mean mode)
+\item \code{error.ribbon} - Draw the interval as a shaded band in each group's colour (UI: "Error Ribbon",
+default: FALSE; mean mode)
+\item \code{error.bar.type} - The interval: \code{"sd"}, \code{"sem"} or \code{"ci95"} (UI: "Error Type", default: \code{"sd"};
+\code{error.type} in \code{\link[=pkConcentrationTime]{pkConcentrationTime()}}; mean mode)
+\item \code{error.bar.ci.method} - How a 95\% CI is computed: \code{"t"} or \code{"normal"} (UI: "Confidence Interval Method",
+default: \code{"t"}; \code{error.ci.method} in \code{\link[=pkConcentrationTime]{pkConcentrationTime()}}; shown while the error type is \code{"ci95"})
+\item \code{error.ribbon.opacity} - Band fill opacity, 0 to 1 (UI: "Ribbon Opacity", default: 0.25; mean mode)
 \item \code{log.y} - Log concentration axis (default: TRUE)
 \item \code{show.lambda} - Draw the terminal elimination fits (default: FALSE)
 \item \code{auc.method} - \code{"lin up/log down"} or \code{"linear"} (default: \code{"lin up/log down"})

@@ -145,6 +145,61 @@
 }
 
 
+# The interval choices of the group-mean display; the values are what
+# pkConcentrationTime() accepts, the names what the module's selects display.
+.pk_error_type_choices <- c(
+    "Standard deviation (SD)" = "sd",
+    "Standard error of the mean (SEM)" = "sem",
+    "95% confidence interval" = "ci95"
+)
+.pk_ci_method_choices <- c("t distribution" = "t", "Normal approximation" = "normal")
+
+# The interval controls, which apply only to the group-mean display.
+.pk_error_inputs <- c("error.bar", "error.ribbon", "error.bar.type", "error.ribbon.opacity")
+
+
+#' Group means and their intervals at each nominal time
+#'
+#' The frame [pkConcentrationTime()]'s mean mode hands [VizModules::linePlot()]:
+#' each group's mean concentration at each nominal time, with the interval
+#' [VizModules::error_bar_halfwidth()] gives around it as bound columns. A time
+#' with one sample has no interval. On a log axis, a lower bound at or below zero
+#' is raised to the smallest concentration plotted, so the bar runs to the foot
+#' of the axis instead of stretching it towards zero.
+#'
+#' @param plotted The concentrations being plotted, with `.group`, `.nominal` and
+#'   `.conc` columns.
+#' @param type,ci.method The interval, as for [VizModules::error_bar_halfwidth()].
+#' @param log.y Logical; whether the concentration axis is logarithmic.
+#' @return A data frame with columns `group`, `time`, `mean`, `sd`, `n`,
+#'   `halfwidth`, `lower` and `upper`, ordered by group and time.
+#'
+#' @author Jared Andrews
+#' @rdname INTERNAL_pk_mean_summary
+#' @keywords internal
+.pk_mean_summary <- function(plotted, type = "sd", ci.method = "t", log.y = FALSE) {
+    cells <- split(plotted, list(plotted$.group, plotted$.nominal), drop = TRUE)
+    summ <- do.call(rbind, lapply(cells, function(d) {
+        data.frame(
+            group = d$.group[1], time = d$.nominal[1], mean = mean(d$.conc),
+            sd = if (nrow(d) > 1) stats::sd(d$.conc) else NA_real_, n = nrow(d),
+            halfwidth = VizModules::error_bar_halfwidth(d$.conc, type, ci.method),
+            stringsAsFactors = FALSE
+        )
+    }))
+    summ$lower <- summ$mean - summ$halfwidth
+    summ$upper <- summ$mean + summ$halfwidth
+    if (isTRUE(log.y)) {
+        positive <- plotted$.conc[plotted$.conc > 0]
+        clip <- !is.na(summ$lower) & summ$lower <= 0
+        if (length(positive)) summ$lower[clip] <- min(positive)
+    }
+    summ <- summ[order(summ$group, summ$time), , drop = FALSE]
+    rownames(summ) <- NULL
+    summ
+}
+
+
 #' Detect the columns of concentration-time data
 #'
 #' @param data The data frame.
@@ -170,4 +225,18 @@
         dose = pick(c("Dose", "DOSE", "AMT", "dose_mg"), numeric = TRUE),
         group = pick(c("Treatment", "TRT", "ARM", "Group", "Cohort", "Formulation"))
     )
+}
+
+
+#' A select's value, or the first choice if it is not one
+#'
+#' @param value The input value.
+#' @param choices The select's choices.
+#' @return One of `choices`.
+#'
+#' @author Jared Andrews
+#' @rdname INTERNAL_pk_choice
+#' @keywords internal
+.pk_choice <- function(value, choices) {
+    if (isTRUE(value %in% choices)) value else unname(choices[1])
 }

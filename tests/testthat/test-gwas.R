@@ -80,6 +80,12 @@ test_that("the QQ layers add the band and lambda GC only on the QQ axes", {
     expect_identical(out$x$layout$shapes[[1]]$type, "path")
     expect_match(out$x$layout$annotations[[1]]$text, "1.050")
     expect_identical(out$x$layout$xaxis$title$text, "Expected -log10(p)")
+    # Without colour inputs the band keeps its grey fill.
+    expect_identical(out$x$layout$shapes[[1]]$fillcolor, plotly::toRGB("#7F7F7F", 0.25))
+
+    styled <- .gwas_qq_layers(fig, 1000, 1.05, c(input, band.color = "#1B9E77", band.opacity = 0.5), identity)
+    expect_identical(styled$x$layout$shapes[[1]]$fillcolor, plotly::toRGB("#1B9E77", 0.5))
+    expect_identical(.gwas_band_fill("not a colour", 3), plotly::toRGB("#7F7F7F", 1))
 
     off <- .gwas_qq_layers(fig, 1000, 1.05, utils::modifyList(input, list(y.adj.fxn = "log10")), identity)
     expect_length(off$x$layout$shapes, 0)

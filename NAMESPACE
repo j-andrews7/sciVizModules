@@ -336,7 +336,9 @@ importFrom(stats,
 )
 importFrom(survival,
   Surv,
-  coxph
+  coxph,
+  survdiff,
+  survfit
 )
 importFrom(utils,
   data,

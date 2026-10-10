@@ -106,13 +106,20 @@ dittoDotPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, d
             fig <- .sci_finalize_plotly(fig, input, isolate_fn, faceted = !is.null(split.by))
 
             # ggplotly() drops the size legend; draw it as the VizModules DotPlot
-            # module does. Hiding the legend hides this one too.
+            # module does, from dittoSeq's own size scale (scale_size() over
+            # min.percent to max.percent, sizes 0 to `size`) so the circles match
+            # the dots. Hiding the legend hides this one too.
+            legend_data <- .ddp_size_legend_data(out$data, min.percent, max.percent)
+            limits <- 100 * c(min.percent, max.percent)
             add_size_legend(
                 fig,
-                data = .ddp_size_legend_data(out$data, min.percent, max.percent),
+                data = legend_data,
                 size.by = if (isFALSE(isolate_fn(input$legend.show))) NULL else "percent",
                 title = "percent<br>expression",
                 digits = 0,
+                limits = limits,
+                size.range = c(0, args$size),
+                breaks = .ddp_size_breaks(legend_data$percent, limits),
                 gap = 0.04,
                 title.size = isolate_fn(input$legend.title.size),
                 text.size = isolate_fn(input$legend.text.size),

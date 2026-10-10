@@ -5,7 +5,7 @@
 #' `pkConcentrationTimeOutputUI()` functions.
 #'
 #' @details The module draws [pkConcentrationTime()]: concentration-time
-#' profiles per subject or as group means +/- SD, linear or log, with each
+#' profiles per subject or as group means with an interval, linear or log, with each
 #' subject's non-compartmental parameters (Cmax, Tmax, AUC, half-life, CL/F,
 #' Vz/F) in the source-data download. Columns are detected from the usual names
 #' (`Subject` / `ID`, `Time` / `TAD`, `conc` / `DV`, `Dose` / `AMT`). The
@@ -16,7 +16,15 @@
 #'
 #' - `subject.col`, `time.col`, `conc.col` - Columns (default: detected)
 #' - `group.col`, `dose.col` - Optional treatment group and dose columns (default: detected, else none)
-#' - `mode` - `"individual"` or `"mean"` (default: `"individual"`)
+#' - `mode` - `"individual"` or `"mean"` (UI: "Display", default: `"individual"`)
+#' - `error.bar` - Draw the group-mean interval as error bars (UI: "Error Bars", default: TRUE; mean mode)
+#' - `error.ribbon` - Draw the interval as a shaded band in each group's colour (UI: "Error Ribbon",
+#'   default: FALSE; mean mode)
+#' - `error.bar.type` - The interval: `"sd"`, `"sem"` or `"ci95"` (UI: "Error Type", default: `"sd"`;
+#'   `error.type` in [pkConcentrationTime()]; mean mode)
+#' - `error.bar.ci.method` - How a 95% CI is computed: `"t"` or `"normal"` (UI: "Confidence Interval Method",
+#'   default: `"t"`; `error.ci.method` in [pkConcentrationTime()]; shown while the error type is `"ci95"`)
+#' - `error.ribbon.opacity` - Band fill opacity, 0 to 1 (UI: "Ribbon Opacity", default: 0.25; mean mode)
 #' - `log.y` - Log concentration axis (default: TRUE)
 #' - `show.lambda` - Draw the terminal elimination fits (default: FALSE)
 #' - `auc.method` - `"lin up/log down"` or `"linear"` (default: `"lin up/log down"`)
@@ -62,8 +70,18 @@ pkConcentrationTimeInputsUI <- function(id, data, defaults = NULL, title = "PK S
         .sci_tip(viz_select_input(ns("dose.col"), "Dose Column", choices = c("None" = "", stats::setNames(num, num)),
             selected = d$dose.col), "Optional dose, for CL/F and Vz/F."),
         .sci_tip(viz_select_input(ns("mode"), "Display",
-            choices = c("Individual subjects" = "individual", "Mean +/- SD" = "mean"), selected = d$mode
-        ), "A line per subject, or the mean and SD at each nominal sampling time."),
+            choices = c("Individual subjects" = "individual", "Group mean" = "mean"), selected = d$mode
+        ), "A line per subject, or each group's mean and its interval at each nominal sampling time."),
+        .sci_tip(materialSwitch(ns("error.bar"), "Error Bars", value = isTRUE(d$error.bar), status = "success"),
+            "Draw each mean's interval as error bars."),
+        .sci_tip(materialSwitch(ns("error.ribbon"), "Error Ribbon", value = isTRUE(d$error.ribbon), status = "success"),
+            "Draw the interval as a shaded band behind each group's line, in its colour."),
+        .sci_tip(viz_select_input(ns("error.bar.type"), "Error Type",
+            choices = .pk_error_type_choices, selected = d$error.bar.type
+        ), "What the interval around each mean shows. A time with a single sample has none."),
+        .sci_tip(viz_select_input(ns("error.bar.ci.method"), "Confidence Interval Method",
+            choices = .pk_ci_method_choices, selected = d$error.bar.ci.method
+        ), "The t interval is wider for the small groups typical of a PK study; the normal one uses 1.96 SEM."),
         .sci_tip(materialSwitch(ns("log.y"), "Log Scale", value = isTRUE(d$log.y), status = "success"),
             "Log concentration axis, on which the terminal phase is a straight line."),
         .sci_tip(materialSwitch(ns("show.lambda"), "Terminal Fits", value = isTRUE(d$show.lambda), status = "success"),
@@ -72,7 +90,12 @@ pkConcentrationTimeInputsUI <- function(id, data, defaults = NULL, title = "PK S
             choices = c("Linear up / log down" = "lin up/log down", "Linear" = "linear"), selected = d$auc.method
         ), "Trapezoid rule for the AUC.")
     )
-    aes_tab <- tagList(uiOutput(ns("palette.selection")))
+    aes_tab <- tagList(
+        uiOutput(ns("palette.selection")),
+        .sci_tip(numericInput(ns("error.ribbon.opacity"), "Ribbon Opacity",
+            value = d$error.ribbon.opacity, min = 0, max = 1, step = 0.05
+        ), "Fill opacity of the error ribbon.")
+    )
 
     .sci_plot_inputs_ui(ns, "pkConcentrationTime", data_tab, aes_tab, defaults, title, columns)
 }
@@ -113,7 +136,12 @@ pkConcentrationTimeOutputUI <- function(id, resizable = TRUE) {
         mode = "individual",
         log.y = TRUE,
         show.lambda = FALSE,
-        auc.method = "lin up/log down"
+        auc.method = "lin up/log down",
+        error.bar = TRUE,
+        error.ribbon = FALSE,
+        error.bar.type = "sd",
+        error.bar.ci.method = "t",
+        error.ribbon.opacity = 0.25
     )
     lapply(stats::setNames(names(base), names(base)), function(k) get_default(defaults, k, base[[k]]))
 }

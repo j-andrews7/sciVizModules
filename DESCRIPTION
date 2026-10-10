@@ -72,7 +72,6 @@ Suggests:
     rmarkdown,
     sesame,
     sesameData,
-    survminer,
     testthat (>= 3.0.0)
 Remotes:
     j-andrews7/VizModules@v0.6.0

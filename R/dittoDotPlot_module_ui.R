@@ -249,6 +249,29 @@ dittoDotPlotOutputUI <- function(id, resizable = TRUE) {
 }
 
 
+#' The percentages the dot plot's size legend shows
+#'
+#' Round values across the size scale. dittoSeq sizes its dots from 0 at
+#' `min.percent`, so a circle there would be empty and is left out.
+#'
+#' @param percent The drawn dots' percentages (0-100).
+#' @param limits The size scale's limits in percent; an `NA` upper limit is the
+#'   largest dot drawn.
+#' @return A numeric vector of breaks.
+#'
+#' @author Jared Andrews
+#' @rdname INTERNAL_ddp_size_breaks
+#' @keywords internal
+.ddp_size_breaks <- function(percent, limits) {
+    upper <- if (is.na(limits[2])) suppressWarnings(max(percent, na.rm = TRUE)) else limits[2]
+    if (!is.finite(upper) || upper <= limits[1]) {
+        return(NULL)
+    }
+    b <- pretty(c(limits[1], upper), n = 4)
+    b[b > limits[1] & b <= upper]
+}
+
+
 #' Keep the dot plot's colour bar in the upper half of the legend area
 #'
 #' `ggplotly()` gives the colour bar the full plot height, where the size

@@ -30,10 +30,12 @@ mdTrajectoryMetricsServer <- function(id, data, hide.inputs = NULL, hide.tabs = 
         name = "mdTrajectoryMetrics",
         validate = .sci_require_df,
         setup = function(input, output, session, object, params) {
+            # An ungrouped trace is the single series "all", as mdTrajectoryMetrics()
+            # names it, so its colour can still be picked.
             palette_groups <- reactive({
                 col <- blank_to_null(input$group.col)
                 df <- object()
-                if (is.null(col) || !col %in% names(df)) character(0) else unique(as.character(df[[col]]))
+                if (is.null(col) || !col %in% names(df)) "all" else unique(as.character(df[[col]]))
             })
             palette_store <- setup_group_colors(
                 input, "palette.colours", palette_groups, default_palette_values, defaults, params

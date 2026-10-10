@@ -30,22 +30,23 @@ not be able to see/adjust them in the UI.}
 inputs. Typically the same list passed to \code{\link[=survivalCurveInputsUI]{survivalCurveInputsUI()}}.}
 }
 \value{
-The \code{moduleServer} function for the survivalCurve module.
+A \code{reactive} returning the source-data list.
 }
 \description{
-This module fits a Kaplan-Meier survival curve with the
-\href{https://cran.r-project.org/package=survminer}{survminer} package and renders
-it as an interactive \code{plotly} figure via \code{\link[=survivalCurve]{survivalCurve()}}.
+This module fits a Kaplan-Meier survival curve with \code{\link[survival:survfit]{survival::survfit()}} and
+renders it as an interactive \code{plotly} figure via \code{\link[=survivalCurve]{survivalCurve()}}. The
+per-stratum summary (subjects, events, median survival, log-rank test) is
+included in the source-data download as the statistics table.
 }
 \examples{
 library(sciVizModules)
 if (interactive()) survivalCurveApp()
 }
 \seealso{
-\code{\link[survminer:ggsurvplot]{survminer::ggsurvplot()}}, \code{\link[=survivalCurve]{survivalCurve()}},
+\code{\link[survival:survfit]{survival::survfit()}}, \code{\link[=survivalCurve]{survivalCurve()}},
 \code{\link[=survivalCurveInputsUI]{survivalCurveInputsUI()}}, \code{\link[=survivalCurveOutputUI]{survivalCurveOutputUI()}},
 \code{\link[=survivalCurveApp]{survivalCurveApp()}}
 }
 \author{
-Jacob Martin
+Jacob Martin, Jared Andrews
 }

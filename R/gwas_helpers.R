@@ -409,6 +409,8 @@
     base <- list(
         show.band = TRUE,
         ci.level = 0.95,
+        band.color = "#7F7F7F",
+        band.opacity = 0.25,
         show.lambda = TRUE,
         x.by = "qq.expected",
         y.by = "qq.observed",
@@ -422,7 +424,7 @@
 }
 
 # Inputs the QQ module adds on top of the shared GWAS ones.
-.gwas_qq_keys <- c(.gwas_shared_keys, "show.band", "ci.level", "show.lambda")
+.gwas_qq_keys <- c(.gwas_shared_keys, "show.band", "ci.level", "band.color", "band.opacity", "show.lambda")
 
 
 #' Confidence band of a QQ plot as an SVG path
@@ -489,7 +491,8 @@
         level > 0 && level < 1 && n > 1) {
         fig$x$layout$shapes <- c(fig$x$layout$shapes, list(list(
             type = "path", path = .gwas_qq_band(n, level), xref = "x", yref = "y", layer = "below",
-            fillcolor = "rgba(127, 127, 127, 0.25)", line = list(width = 0)
+            fillcolor = .gwas_band_fill(isolate_fn(input$band.color), isolate_fn(input$band.opacity)),
+            line = list(width = 0)
         )))
     }
     if (isTRUE(isolate_fn(input$show.lambda)) && is.finite(lambda)) {
@@ -499,4 +502,25 @@
         )))
     }
     fig
+}
+
+
+#' Fill colour of the QQ plot's confidence band
+#'
+#' @param color The band colour; an unusable value falls back to grey.
+#' @param opacity The fill opacity, clamped to 0-1; an unusable value falls back
+#'   to 0.25.
+#' @return An `rgba()` colour string.
+#'
+#' @author Jared Andrews
+#' @rdname INTERNAL_gwas_band_fill
+#' @keywords internal
+.gwas_band_fill <- function(color = "#7F7F7F", opacity = 0.25) {
+    if (!nz_value(color) || inherits(try(grDevices::col2rgb(color), silent = TRUE), "try-error")) {
+        color <- "#7F7F7F"
+    }
+    if (!is.numeric(opacity) || length(opacity) != 1 || is.na(opacity)) {
+        opacity <- 0.25
+    }
+    plotly::toRGB(color, min(max(opacity, 0), 1))
 }

@@ -16,6 +16,7 @@
 #'
 #' @import shiny
 #' @importFrom shinyWidgets updateMaterialSwitch
+#' @importFrom colourpicker updateColourInput
 #' @importFrom VizModules dittoViz_scatterPlotServer
 #'
 #' @seealso [sciVizModules::gwasQQPlotInputsUI()], [sciVizModules::gwasQQPlotOutputUI()],
@@ -53,6 +54,8 @@ gwasQQPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = c("Trajec
             .gwas_reset_inputs(session, d)
             updateMaterialSwitch(session, "show.band", value = isTRUE(d$show.band))
             updateNumericInput(session, "ci.level", value = d$ci.level)
+            updateColourInput(session, "band.color", value = d$band.color)
+            updateNumericInput(session, "band.opacity", value = d$band.opacity)
             updateMaterialSwitch(session, "show.lambda", value = isTRUE(d$show.lambda))
         })
 

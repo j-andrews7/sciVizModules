@@ -41,6 +41,19 @@ pkConcentrationTimeServer <- function(id, data, hide.inputs = NULL, hide.tabs = 
             )
             output$palette.selection <- .sci_palette_picker_ui(input, session, palette_groups, palette_store,
                 default_palette_values, defaults, "Colors")
+
+            # The interval controls apply only to the group means, and the CI method
+            # only to a confidence interval. What the app hid via hide.inputs is
+            # never shown again here.
+            observeEvent(list(input$mode, input$error.bar.type), {
+                mean_mode <- identical(input$mode, "mean")
+                toggle <- function(ids, show) {
+                    if (show) show_input(session, setdiff(ids, hide.inputs)) else hide_input(session, ids)
+                }
+                toggle(.pk_error_inputs, mean_mode)
+                toggle("error.bar.ci.method", mean_mode && identical(input$error.bar.type, "ci95"))
+            }, ignoreInit = FALSE)
+
             list(palette_groups = palette_groups, palette_store = palette_store)
         },
         build = function(df, input, isolate_fn, state) {
@@ -55,16 +68,24 @@ pkConcentrationTimeServer <- function(id, data, hide.inputs = NULL, hide.tabs = 
                 log.y = isTRUE(isolate_fn(input$log.y)),
                 show.lambda = isTRUE(isolate_fn(input$show.lambda)),
                 auc.method = isolate_fn(input$auc.method) %||% "lin up/log down",
-                colors = isolate_fn(state$palette_store())
+                colors = isolate_fn(state$palette_store()),
+                error.type = .pk_choice(isolate_fn(input$error.bar.type), .pk_error_type_choices),
+                error.ci.method = .pk_choice(isolate_fn(input$error.bar.ci.method), .pk_ci_method_choices),
+                error.bar = !isFALSE(isolate_fn(input$error.bar)),
+                error.ribbon = isTRUE(isolate_fn(input$error.ribbon)),
+                error.ribbon.opacity = isolate_fn(input$error.ribbon.opacity) %||% 0.25
             )
         },
         reset = function(session, df, defaults, state) {
             d <- .pk_defaults(df, defaults)
-            for (k in c("subject.col", "time.col", "conc.col", "group.col", "dose.col", "mode", "auc.method")) {
+            for (k in c("subject.col", "time.col", "conc.col", "group.col", "dose.col", "mode", "auc.method",
+                "error.bar.type", "error.bar.ci.method")) {
                 update_viz_select(session, k, selected = d[[k]])
             }
-            updateMaterialSwitch(session, "log.y", value = isTRUE(d$log.y))
-            updateMaterialSwitch(session, "show.lambda", value = isTRUE(d$show.lambda))
+            for (k in c("log.y", "show.lambda", "error.bar", "error.ribbon")) {
+                updateMaterialSwitch(session, k, value = isTRUE(d[[k]]))
+            }
+            updateNumericInput(session, "error.ribbon.opacity", value = d$error.ribbon.opacity)
             reset_group_colors(session, "palette.colours", defaults, state$palette_groups(), default_palette_values)
         }
     )

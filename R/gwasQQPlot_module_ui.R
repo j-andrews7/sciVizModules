@@ -21,6 +21,8 @@
 #' - `p.col`, `snp.col` - P-value and variant columns (default: detected)
 #' - `show.band` - Draw the confidence band (default: TRUE)
 #' - `ci.level` - Confidence level of the band (default: 0.95)
+#' - `band.color` - Fill colour of the band (UI: "Band Color", default: "#7F7F7F")
+#' - `band.opacity` - Fill opacity of the band, 0 to 1 (UI: "Band Opacity", default: 0.25)
 #' - `show.lambda` - Print lambda GC (default: TRUE)
 #' - `thin`, `thin.p`, `thin.fraction` - Thinning, as in [manhattanPlotInputsUI()]
 #' - All other [VizModules::dittoViz_scatterPlotInputsUI()] parameters
@@ -34,6 +36,7 @@
 #'
 #' @import shiny
 #' @importFrom shinyWidgets materialSwitch
+#' @importFrom colourpicker colourInput
 #' @importFrom VizModules dittoViz_scatterPlotInputsUI
 #'
 #' @export
@@ -55,6 +58,10 @@ gwasQQPlotInputsUI <- function(id, data, defaults = NULL, title = "QQ Plot Setti
             "Shade where the observed p-values would fall under the null."),
         .sci_tip(numericInput(ns("ci.level"), "Band Level", value = d$ci.level, min = 0.5, max = 0.999, step = 0.01),
             "Confidence level of the band."),
+        .sci_tip(colourInput(ns("band.color"), "Band Color", value = d$band.color),
+            "Fill colour of the confidence band."),
+        .sci_tip(numericInput(ns("band.opacity"), "Band Opacity", value = d$band.opacity, min = 0, max = 1,
+            step = 0.05), "Fill opacity of the confidence band."),
         .sci_tip(materialSwitch(ns("show.lambda"), "Lambda GC", value = isTRUE(d$show.lambda), status = "success"),
             "Print the genomic inflation factor, computed from every variant."),
         .gwas_thin_inputs(ns, d)

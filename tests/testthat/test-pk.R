@@ -68,6 +68,35 @@ test_that("the plot draws subjects or group means, with terminal fits on a log a
     expect_error(pkConcentrationTime(th, "Time", "nope", "Subject"), "not in the data")
 })
 
+test_that("group means take their interval from error_bar_halfwidth(), as bars or a ribbon", {
+    th <- .pk_example()
+    plotted <- data.frame(.group = "All", .subject = as.character(th$Subject), .time = th$Time, .conc = th$conc)
+    plotted$.nominal <- .pk_nominal_time(plotted$.time, plotted$.subject)
+    summ <- .pk_mean_summary(plotted, "ci95", "t")
+    first <- plotted$.conc[plotted$.nominal == summ$time[2]]
+    expect_equal(summ$upper[2] - summ$mean[2], VizModules::error_bar_halfwidth(first, "ci95", "t"))
+    expect_equal(summ$mean - summ$lower, summ$upper - summ$mean)
+
+    # On a log axis, no lower bound reaches zero or below.
+    sd_log <- .pk_mean_summary(plotted[plotted$.conc > 0, ], "sd", "t", log.y = TRUE)
+    expect_true(all(sd_log$lower > 0, na.rm = TRUE))
+    expect_true(any(.pk_mean_summary(plotted, "sd")$lower <= 0, na.rm = TRUE))
+
+    # A single sample has no interval.
+    one <- .pk_mean_summary(data.frame(.group = "A", .nominal = c(1, 2, 2), .conc = c(5, 4, 6)), "sd")
+    expect_true(is.na(one$halfwidth[1]))
+
+    ribbon <- plotly::plotly_build(pkConcentrationTime(th, "Time", "conc", "Subject", mode = "mean",
+        error.type = "sem", error.bar = FALSE, error.ribbon = TRUE, error.ribbon.opacity = 0.3))
+    band <- Filter(function(t) identical(t$fill, "toself"), ribbon$x$data)
+    line <- Filter(function(t) !identical(t$fill, "toself"), ribbon$x$data)
+    expect_length(band, 1)
+    expect_identical(band[[1]]$legendgroup, line[[1]]$legendgroup)
+    expect_match(band[[1]]$fillcolor, ",0.3\\)$")
+    expect_null(line[[1]]$error_y$array)
+    expect_true(all(grepl("SEM .* to .*\\(n = 12\\)|no interval", line[[1]]$text)))
+})
+
 test_that("the server builds, finishes and exports the NCA table", {
     th <- .pk_example()
     shiny::testServer(
@@ -83,6 +112,12 @@ test_that("the server builds, finishes and exports the NCA table", {
             built <- plotly::plotly_build(generate_plot())
             expect_identical(built$x$layout$yaxis$type, "log")
             expect_identical(nrow(plot_source_reactive()$stats), 12L)
+
+            session$setInputs(mode = "mean", error.bar = TRUE, error.ribbon = TRUE, error.bar.type = "ci95",
+                error.bar.ci.method = "normal", error.ribbon.opacity = 0.5)
+            built <- plotly::plotly_build(generate_plot())
+            expect_length(Filter(function(t) identical(t$fill, "toself"), built$x$data), 1)
+            expect_true(any(grepl("95% CI", unlist(lapply(built$x$data, function(t) t$text)))))
         }
     )
     expect_true(inherits(pkConcentrationTimeInputsUI("p", th), c("shiny.tag", "shiny.tag.list")))

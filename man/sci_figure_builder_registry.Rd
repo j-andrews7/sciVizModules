@@ -27,9 +27,8 @@ the bulk expression modules (\code{samplePCA}, \code{sampleDistanceHeatmap},
 (a bundle whose \code{stats} element is a model fit) have no place in it. Run
 their \verb{*App()} functions instead.
 
-\code{goFanPlot} and \code{survivalCurve} are included only when the packages they
-need are installed (\code{GOfan} plus an \code{OrgDb}, and \code{survminer}), so the picker
-never offers a panel that cannot draw.
+\code{goFanPlot} is included only when the packages it needs are installed
+(\code{GOfan} plus an \code{OrgDb}), so the picker never offers a panel that cannot draw.
 
 Every registered module renders a plotly graph, so the builder's SVG figure
 export and its source-data archive photograph them in the browser; none of

@@ -59,10 +59,10 @@ holds the logic. Every module also ships a standalone `*App()` you can run to se
   (e.g. `qvalue`) to colour by, and renders an interactive plotly sunburst (wraps
   `GOfan::sunburstGO`). Requires the [GOfan](https://github.com/jianhong/GOfan) package and the
   relevant organism annotation (`OrgDb`) package (e.g. `org.Hs.eg.db`).
-- **`survivalCurve`** — Kaplan-Meier survival curve built on the
-  [survminer](https://cran.r-project.org/package=survminer) package. Accepts a tidy survival
+- **`survivalCurve`** — Kaplan-Meier survival curve fitted with the
+  [survival](https://cran.r-project.org/package=survival) package. Accepts a tidy survival
   data frame (a numeric follow-up `time` column, an event `status` column, and an optional
-  grouping column) and renders an interactive plotly curve with optional confidence intervals,
+  grouping column) and renders an interactive plotly curve with optional confidence bands,
   censoring marks, log-rank p-value, median-survival lines, and a number-at-risk table.
 - **`maPlot`** — differential-expression MA plot: mean abundance on the x-axis (log10 for
   DESeq2's `baseMean`, identity for the already-logged edgeR/limma columns) against log fold

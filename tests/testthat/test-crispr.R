@@ -145,6 +145,26 @@ test_that("factor gene columns, as the data filter delivers them, label as text"
     expect_false(anyNA(keys[texts %in% genes]))
 })
 
+test_that("each hit group keeps its colour when another group is empty", {
+    # Without its Enriched hits the screen still carries that factor level, which a
+    # positional palette would let shift n.s. into the Enriched colour.
+    prepared <- .crispr_prepare(read_mageck(crispr_example_file()), "lfc", 0.05)
+    prepared <- prepared[prepared$screen.group != "Enriched", , drop = FALSE]
+    expect_identical(levels(prepared$screen.group), c("Depleted", "Enriched", "n.s."))
+
+    built <- build_scatter_figure(prepared,
+        fig.fn = function(fig, input, isolate_fn) fig,
+        inputs = test_scatter_inputs(x.by = "screen.rank", y.by = "screen.metric", color.by = "screen.group",
+            webgl = FALSE),
+        defaults = .crispr_defaults(prepared)[c("color.by", "color.panel")]
+    )
+    traces <- Filter(function(t) identical(t$mode, "markers") && isTRUE(t$name %in% levels(prepared$screen.group)),
+        built$x$data)
+    colours <- vapply(traces, function(t) as.character(t$marker$color[1]), "")
+    names(colours) <- vapply(traces, function(t) t$name, "")
+    expect_identical(unname(colours[c("Depleted", "n.s.")]), c(plotly::toRGB("#2166AC"), plotly::toRGB("#BFBFBF")))
+})
+
 test_that("the layers title the axes and draw both FDR lines, and add no labels", {
     screen <- .crispr_prepare(read_mageck(crispr_example_file()), "fdr", 0.05)
     fig <- plotly::plotly_build(plotly::plot_ly(x = 1:2, y = 1:2, type = "scatter", mode = "markers"))

@@ -1,8 +1,9 @@
 #' Server logic for survivalCurve module
 #'
-#' This module fits a Kaplan-Meier survival curve with the
-#' [survminer](https://cran.r-project.org/package=survminer) package and renders
-#' it as an interactive `plotly` figure via [survivalCurve()].
+#' This module fits a Kaplan-Meier survival curve with [survival::survfit()] and
+#' renders it as an interactive `plotly` figure via [survivalCurve()]. The
+#' per-stratum summary (subjects, events, median survival, log-rank test) is
+#' included in the source-data download as the statistics table.
 #'
 #' @param id The ID for the Shiny module.
 #' @param data A `reactive` containing the data frame to plot. Must contain a
@@ -15,228 +16,98 @@
 #' @param hide.tabs A character vector of tab names to hide.
 #' @param defaults A named list of default values used when resetting the
 #'   inputs. Typically the same list passed to [survivalCurveInputsUI()].
-#' @return The `moduleServer` function for the survivalCurve module.
+#' @return A `reactive` returning the source-data list.
 #'
 #' @import shiny
-#' @import plotly
 #' @importFrom shinyWidgets updateMaterialSwitch
 #'
-#' @seealso [survminer::ggsurvplot()], [sciVizModules::survivalCurve()],
+#' @seealso [survival::survfit()], [sciVizModules::survivalCurve()],
 #' [sciVizModules::survivalCurveInputsUI()], [sciVizModules::survivalCurveOutputUI()],
 #' [sciVizModules::survivalCurveApp()]
-#'
 #'
 #' @examples
 #' library(sciVizModules)
 #' if (interactive()) survivalCurveApp()
 #' @export
-#' @author Jacob Martin
+#' @author Jacob Martin, Jared Andrews
 survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL) {
-    stopifnot(is.reactive(data))
-    # A NULL (a parent app switching datasets) becomes a silent wait, and anything
-    # coercible, such as a DataFrame, is converted before the module reads it.
-    data_reactive <- require_data_frame(data)
+    default_palette_values <- default_palettes()[["choices"]][["Defaults"]][["dittoColors"]]
 
-    moduleServer(id, function(input, output, session) {
-        # Resolve any reactive() entries in `defaults` server-side, so a parent
-        # app driving a parameter costs one render rather than a client round-trip.
-        params <- setup_reactive_defaults(defaults, input, session)
-
-        # Hide individual inputs if requested.
-        hide_input(session, hide.inputs)
-
-        # Hide whole tabs if requested.
-        if (!is.null(hide.tabs)) {
-            for (tab.name in hide.tabs) hideTab(inputId = "survivalCurveTabsetPanel", target = tab.name)
-        }
-
-        default_palette_values <- default_palettes()[["choices"]][["Defaults"]][["dittoColors"]]
-
-        # The strata that need colors depend on the grouping selection.
-        palette_groups <- reactive({
-            df <- data_reactive()
-            group_col <- input$group.by
-            if (is.null(df) || !nz_value(group_col) || !group_col %in% names(df)) {
-                return("All")
-            }
-            grp <- unique(stats::na.omit(as.character(df[[group_col]])))
-            if (length(grp) == 0) "All" else grp
-        })
-
-        # The group-to-colour mapping the plot draws with. The picker is rebuilt
-        # by renderUI() whenever the group set changes, and the value it then
-        # reports is exactly what the server seeded it with -- reading the raw
-        # input would rebuild the plot for that echo, on load and again the first
-        # time the user opens the tab the picker lives on. See
-        # VizModules::setup_group_colors().
-        palette_store <- setup_group_colors(
-            input, "palette.colours", palette_groups,
-            default_palette_values, defaults, params
-        )
-
-        output$palette.selection <- renderUI({
-            ns <- session$ns
-            groups <- palette_groups()
-            initial_colors <- isolate(resolve_palette(
-                groups, input$palette.colours, default_palette_values,
-                default_group_colors(defaults, "palette.colours")
-            ))
-            # Seed the store with what the picker is built from, so its first
-            # report back is a no-op rather than a change.
-            palette_store(initial_colors)
-            multiColorPicker(
-                ns("palette.colours"),
-                label = "Curve Colors",
-                groups = groups,
-                palette_options = default_palettes()[["choices"]],
-                selected_palette = "dittoColors",
-                colors = initial_colors,
-                compact = TRUE
+    .sci_plot_server(
+        id, data, hide.inputs, hide.tabs, defaults,
+        name = "survivalCurve",
+        validate = .sci_require_df,
+        setup = function(input, output, session, object, params) {
+            # The strata that need colors depend on the grouping selection.
+            palette_groups <- reactive({
+                df <- object()
+                group_col <- input$group.by
+                if (!nz_value(group_col) || !group_col %in% names(df)) {
+                    return("All")
+                }
+                grp <- .surv_levels(df[[group_col]])
+                if (length(grp) == 0) "All" else grp
+            })
+            palette_store <- setup_group_colors(
+                input, "palette.colours", palette_groups, default_palette_values, defaults, params
             )
-        })
+            output$palette.selection <- .sci_palette_picker_ui(input, session, palette_groups, palette_store,
+                default_palette_values, defaults, "Curve Colors")
 
-        # Reset inputs to their defaults (or sensible fallbacks).
-        observeEvent(input$reset, {
-            df <- data_reactive()
-            req(df)
-            num.choices <- names(df)[vapply(df, is.numeric, logical(1))]
+            # The band's controls apply only while it is drawn. What the app hid
+            # via hide.inputs is never shown again here.
+            observeEvent(input$conf.int, {
+                if (isTRUE(input$conf.int)) {
+                    show_input(session, setdiff(.surv_band_inputs, hide.inputs))
+                } else {
+                    hide_input(session, .surv_band_inputs)
+                }
+            }, ignoreInit = FALSE)
 
-            update_viz_select(session, "time", selected = get_default(defaults, "time", .detect_time_col(df, num.choices)))
-            update_viz_select(session, "status", selected = get_default(defaults, "status", .detect_status_col(df, num.choices)))
-            update_viz_select(session, "group.by", selected = get_default(defaults, "group.by", ""))
-            updateMaterialSwitch(session, "pval", value = get_default(defaults, "pval", TRUE))
-            updateMaterialSwitch(session, "risk.table", value = get_default(defaults, "risk.table", FALSE))
-            updateMaterialSwitch(session, "censor", value = get_default(defaults, "censor", TRUE))
-            update_viz_select(session, "surv.median.line", selected = get_default(defaults, "surv.median.line", "none"))
-            update_viz_select(session, "fun", selected = get_default(defaults, "fun", "survival"))
-            updateNumericInput(session, "line.size", value = get_default(defaults, "line.size", 1))
-            updateNumericInput(session, "break.time.by", value = get_default(defaults, "break.time.by", NA))
-            updateTextInput(session, "legend.title", value = get_default(defaults, "legend.title", ""))
-            reset_lines_inputs(session, defaults = defaults)
-            reset_axes_inputs(session, defaults)
-            reset_plotly_inputs(session, defaults)
-            reset_legend_inputs(session, defaults)
-            reset_group_colors(session, "palette.colours", defaults, palette_groups(), default_palette_values)
-        })
-
-        # Build the plot (shared by the output and the source download).
-        generate_survivalCurve <- reactive({
-            isolate_fn <- setup_auto_update_logic(input, params)
-
-            d <- data_reactive()
-            req(d)
-
+            list(palette_groups = palette_groups, palette_store = palette_store)
+        },
+        build = function(df, input, isolate_fn, state) {
             time_col <- isolate_fn(input$time)
             status_col <- isolate_fn(input$status)
-            req(time_col, status_col)
-            req(time_col %in% names(d), status_col %in% names(d))
+            req(time_col, status_col, time_col %in% names(df), status_col %in% names(df))
 
-            group.by <- isolate_fn(input$group.by)
-            group.by <- blank_to_null(group.by)
-
-            fun_choice <- isolate_fn(input$fun)
-            fun <- if (is.null(fun_choice) || fun_choice == "survival") NULL else fun_choice
-
-            groups <- isolate_fn(palette_groups())
-            palette_values <- resolve_palette(
-                groups, isolate_fn(palette_store()), default_palette_values,
-                default_group_colors(defaults, "palette.colours")
-            )
-
+            fun <- isolate_fn(input$fun)
             break.time.by <- isolate_fn(input$break.time.by)
             if (length(break.time.by) != 1 || is.na(break.time.by)) break.time.by <- NULL
+            conf.type <- isolate_fn(input$conf.type)
+            if (!isTRUE(conf.type %in% .surv_conf_type_choices)) conf.type <- "log"
 
-            legend.title <- isolate_fn(input$legend.title)
-            legend.title <- blank_to_null(legend.title)
-          
-          
-            fig <- survivalCurve(
-                data = d,
+            survivalCurve(
+                data = df,
                 time = time_col,
                 status = status_col,
-                group.by = group.by,
-                pval = isolate_fn(input$pval),
-                risk.table = isolate_fn(input$risk.table),
-                censor = isolate_fn(input$censor),
-                surv.median.line = isolate_fn(input$surv.median.line),
-                fun = fun,
-                palette.selection = palette_values,
-                line.size = isolate_fn(input$line.size),
-                break.time.by = break.time.by,
-                legend.title = legend.title
+                group.by = blank_to_null(isolate_fn(input$group.by)),
+                conf.int = !isFALSE(isolate_fn(input$conf.int)),
+                conf.level = isolate_fn(input$conf.level),
+                conf.type = conf.type,
+                conf.int.opacity = isolate_fn(input$conf.int.opacity) %||% 0.25,
+                pval = isTRUE(isolate_fn(input$pval)),
+                risk.table = isTRUE(isolate_fn(input$risk.table)),
+                censor = isTRUE(isolate_fn(input$censor)),
+                surv.median.line = isolate_fn(input$surv.median.line) %||% "none",
+                fun = if (is.null(fun) || fun == "survival") NULL else fun,
+                palette.selection = isolate_fn(state$palette_store()),
+                line.size = isolate_fn(input$line.size) %||% 2,
+                break.time.by = break.time.by
             )
-            # VizModules layout, axis and line logic
-            fig <- VizModules::apply_title_layout(fig, input, isolate_fn, title_y = 0.95, title_x = isolate_fn(input$axis.title.horizontal.position))
-            xaxis_style <- VizModules::create_axis_styles(input, axis_side = "x", isolate_fn = isolate_fn, ggplot.axis.styling = FALSE)
-            yaxis_style <- VizModules::create_axis_styles(input, axis_side = "y", isolate_fn = isolate_fn, ggplot.axis.styling = FALSE)
-            fig <- VizModules::apply_subplot_axis_styling(fig, xaxis_style, yaxis_style)
-
-            fig <- VizModules::add_reference_lines(fig,
-                hline.intercepts = isolate_fn(input$hline.intercepts),
-                hline.colors = isolate_fn(input$hline.colors),
-                hline.widths = isolate_fn(input$hline.widths),
-                hline.linetypes = isolate_fn(input$hline.linetypes),
-                hline.opacities = isolate_fn(input$hline.opacities),
-                vline.intercepts = isolate_fn(input$vline.intercepts),
-                vline.colors = isolate_fn(input$vline.colors),
-                vline.widths = isolate_fn(input$vline.widths),
-                vline.linetypes = isolate_fn(input$vline.linetypes),
-                vline.opacities = isolate_fn(input$vline.opacities),
-                abline.slopes = isolate_fn(input$abline.slopes),
-                abline.intercepts = isolate_fn(input$abline.intercepts),
-                abline.colors = isolate_fn(input$abline.colors),
-                abline.widths = isolate_fn(input$abline.widths),
-                abline.linetypes = isolate_fn(input$abline.linetypes),
-                abline.opacities = isolate_fn(input$abline.opacities)
-            )
-
-            config_list <- add_plot_config(download.format = isolate_fn(input$download.format), include.modebar.buttons = TRUE, facet.by = NULL)
-            fig <- do.call(config, c(list(p = fig), config_list))
-            fig <- apply_plotly_newshape(fig, input, isolate_fn)
-            
-            #Legend styling: 
-            fig <- apply_legend_styling(
-                fig,
-                title.size = isolate_fn(input$legend.title.size),
-                text.size = isolate_fn(input$legend.text.size),
-                position = c(1.02, "left"),
-                font.family = isolate_fn(input$legend.font.family),
-                font.color = isolate_fn(input$legend.font.color),
-                show = isolate_fn(input$legend.show)
-            )
-            #Axis titles: 
-            fig <- .stats_annotation(fig)
-            fig <- axis_titles_as_annotations(fig)
-        })
-
-
-        output$survivalCurve <- renderPlotly({
-            req(input$time, input$status)
-            tryCatch(
-                fig <- apply_render_margins(generate_survivalCurve(), input),
-                error = function(e) {
-                    empty_plot(text = conditionMessage(e), plotly = TRUE)
-                }
-            )
-        })
-
-        # Capture all UI inputs for the source download.
-        AllInputs <- reactive({
-            reactiveValuesToList(input)
-        })
-
-        plot_source_reactive <- reactive({
-            collect_source_data(
-                plot_reactive = generate_survivalCurve,
-                inputs_reactive = AllInputs()
-            )
-        })
-
-        output$download.source <- create_source_download_handler(
-            data_list = plot_source_reactive,
-            filename_base = "survivalCurve_source"
-        )
-
-        return(plot_source_reactive)
-    })
+        },
+        reset = function(session, df, defaults, state) {
+            d <- .surv_defaults(df, defaults)
+            for (k in c("time", "status", "group.by", "conf.type", "surv.median.line", "fun")) {
+                update_viz_select(session, k, selected = d[[k]])
+            }
+            for (k in c("conf.int", "pval", "risk.table", "censor")) {
+                updateMaterialSwitch(session, k, value = isTRUE(d[[k]]))
+            }
+            for (k in c("conf.int.opacity", "conf.level", "line.size", "break.time.by")) {
+                updateNumericInput(session, k, value = d[[k]])
+            }
+            reset_group_colors(session, "palette.colours", defaults, state$palette_groups(), default_palette_values)
+        }
+    )
 }

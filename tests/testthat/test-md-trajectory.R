@@ -74,6 +74,13 @@ test_that("the server builds, finishes and exports the summary", {
             built <- plotly::plotly_build(generate_plot())
             expect_false(built$x$layout$showlegend)
             expect_identical(nrow(plot_source_reactive()$stats), 4L)
+
+            # An ungrouped trace still gets a colour picker, and honours it.
+            session$setInputs(group.col = "", palette.colours = c(all = "#123456"))
+            expect_identical(state$palette_groups(), "all")
+            built <- plotly::plotly_build(generate_plot())
+            colours <- unique(vapply(built$x$data, function(t) as.character(t$line$color %||% NA), ""))
+            expect_identical(colours, "#123456")
         }
     )
     d <- .md_defaults(ex$trajectory)

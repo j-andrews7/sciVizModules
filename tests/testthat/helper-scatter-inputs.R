@@ -6,7 +6,8 @@ test_scatter_inputs <- function(...) {
         x.by = "units", y.by = "revenue", color.by = "", shape.by = "", size.by = "", split.by = "",
         x.adjustment = "", y.adjustment = "", color.adjustment = "",
         x.adj.fxn = "", y.adj.fxn = "", color.adj.fxn = "",
-        size = 1, opacity = 1, show.others = FALSE, split.show.all.others = FALSE,
+        size = 1, size.min = 1, size.max = 6, size.scale.min = NA, size.scale.max = NA,
+        opacity = 1, show.others = FALSE, split.show.all.others = FALSE,
         plot.order = "unordered", shape.panel = "16, 15, 17, 23, 25, 8",
         min.color = "#F0E442", max.color = "#0072B2", min.value = NA, max.value = NA,
         do.contour = FALSE, contour.color = "black", contour.linetype = "solid", do.ellipse = FALSE,
@@ -44,12 +45,12 @@ test_scatter_inputs <- function(...) {
 }
 
 # Build a scatter-wrapper figure end to end: the real scatter server, the given
-# data and fig.fn hook, and `inputs` (completed by test_scatter_inputs()).
-build_scatter_figure <- function(df, fig.fn, inputs) {
+# data, fig.fn hook and defaults, and `inputs` (completed by test_scatter_inputs()).
+build_scatter_figure <- function(df, fig.fn, inputs, defaults = NULL) {
     fig <- NULL
     shiny::testServer(
         VizModules::dittoViz_scatterPlotServer,
-        args = list(id = "wrapped", data = shiny::reactive(df), fig.fn = fig.fn),
+        args = list(id = "wrapped", data = shiny::reactive(df), fig.fn = fig.fn, defaults = defaults),
         {
             suppressWarnings({
                 do.call(session$setInputs, inputs)

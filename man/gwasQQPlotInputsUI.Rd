@@ -50,6 +50,8 @@ The following parameters can be accessed via UI inputs and/or the \code{defaults
 \item \code{p.col}, \code{snp.col} - P-value and variant columns (default: detected)
 \item \code{show.band} - Draw the confidence band (default: TRUE)
 \item \code{ci.level} - Confidence level of the band (default: 0.95)
+\item \code{band.color} - Fill colour of the band (UI: "Band Color", default: "#7F7F7F")
+\item \code{band.opacity} - Fill opacity of the band, 0 to 1 (UI: "Band Opacity", default: 0.25)
 \item \code{show.lambda} - Print lambda GC (default: TRUE)
 \item \code{thin}, \code{thin.p}, \code{thin.fraction} - Thinning, as in \code{\link[=manhattanPlotInputsUI]{manhattanPlotInputsUI()}}
 \item All other \code{\link[VizModules:dittoViz_scatterPlotInputsUI]{VizModules::dittoViz_scatterPlotInputsUI()}} parameters

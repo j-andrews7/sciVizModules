@@ -39,10 +39,10 @@ The inputs are organized into tabs via the \code{\link[VizModules:organize_input
 with \code{columns} controlling the number of columns in each tab's grid.
 
 Defaults can be set for each input by providing a named list of values to the
-\code{defaults} argument. The module builds Kaplan-Meier survival curves with the
-\code{\link[survminer:ggsurvplot]{survminer::ggsurvplot()}} engine, so it expects a "tidy" survival data frame with a
-numeric follow-up \code{time} column and an event \code{status} column (and, optionally, a
-categorical column to stratify by).
+\code{defaults} argument. The module fits Kaplan-Meier survival curves with
+\code{\link[survival:survfit]{survival::survfit()}} and draws them with \code{\link[=survivalCurve]{survivalCurve()}}, so it expects a "tidy"
+survival data frame with a numeric follow-up \code{time} column and an event \code{status}
+column (and, optionally, a categorical column to stratify by).
 }
 \section{Plot parameters and defaults}{
 
@@ -53,17 +53,23 @@ time/os/pfs/fu, else first numeric column)
 \item \code{status} - Event/status column (auto-detected from columns named
 status/event/vital/dead/censor, else a numeric 0/1 or 1/2 column)
 \item \code{group.by} - Optional stratification column (default: none)
-\item \code{conf.int} - Show confidence interval ribbons (default: TRUE)
+\item \code{conf.int} - Show a confidence band around each curve (UI: "Confidence Band", default: TRUE)
+\item \code{conf.int.opacity} - Fill opacity of the band, 0 to 1 (UI: "Band Opacity", default: 0.25; shown while
+the band is on)
+\item \code{conf.level} - Confidence level of the band (UI: "Confidence Level", default: 0.95; shown while the band
+is on)
+\item \code{conf.type} - How the band is computed: "log", "log-log" or "plain" (UI: "CI Transform", default: "log",
+the \code{\link[survival:survfit]{survival::survfit()}} default; shown while the band is on)
 \item \code{pval} - Show log-rank p-value (default: TRUE; only when stratified)
 \item \code{risk.table} - Show "number at risk" table (default: FALSE)
 \item \code{censor} - Show censoring marks (default: TRUE)
 \item \code{surv.median.line} - Median survival reference lines (default: "none")
 \item \code{fun} - Curve transformation: survival probability, "pct", "event",
 or "cumhaz" (default: survival probability)
-\item \code{line.size} - Line width (default: 1)
-\item \code{palette.selection} - Colors for the strata (multiColorPicker)
-\item \code{break.time.by} - Spacing between x-axis ticks (default: blank/auto)
-\item \code{xlim.min}, \code{xlim.max} - X-axis limits (default: blank/auto)
+\item \code{line.size} - Line width in pixels (default: 2)
+\item \code{palette.colours} - Colors for the strata (multiColorPicker), a named character vector mapping
+stratum to color
+\item \code{break.time.by} - Spacing between x-axis ticks and risk table times (default: blank/auto)
 }
 }
 
@@ -73,7 +79,7 @@ data(survival_lung)
 survivalCurveInputsUI("survivalCurve", survival_lung)
 }
 \seealso{
-\code{\link[survminer:ggsurvplot]{survminer::ggsurvplot()}}, \code{\link[VizModules:organize_inputs]{VizModules::organize_inputs()}},
+\code{\link[survival:survfit]{survival::survfit()}}, \code{\link[VizModules:organize_inputs]{VizModules::organize_inputs()}},
 \code{\link[=survivalCurveOutputUI]{survivalCurveOutputUI()}}, \code{\link[=survivalCurveServer]{survivalCurveServer()}},
 \code{\link[=survivalCurveApp]{survivalCurveApp()}}
 }
