@@ -99,11 +99,18 @@ test_that("the server builds, finishes and exports the gene set summary", {
             do.call(session$setInputs, c(
                 list(auto.update = TRUE, pathways = sets, gsea.param = 1, show.ticks = TRUE,
                     show.metric = TRUE, metric.color = "#7F7F7F", download.format = "png"),
-                test_axes_inputs(), test_legend_inputs()
+                utils::modifyList(test_axes_inputs(), list(show.grid.y = TRUE)), test_legend_inputs()
             ))
             built <- plotly::plotly_build(generate_plot())
             expect_false(built$x$layout$showlegend)
             expect_identical(nrow(plot_source_reactive()$stats), 3L)
+            # The tick strip keeps its rows free of gridlines; the others take the Axes tab's.
+            expect_true(built$x$layout$yaxis$showgrid)
+            expect_false(built$x$layout$yaxis2$showgrid)
+            # Three ES lines and a border around each of the three panels.
+            rects <- Filter(function(s) identical(s$type, "rect"), built$x$layout$shapes)
+            expect_length(built$x$layout$shapes, 6)
+            expect_length(rects, 3)
         }
     )
     expect_true(inherits(gseaEnrichmentPlotInputsUI("g", example_gsea), c("shiny.tag", "shiny.tag.list")))

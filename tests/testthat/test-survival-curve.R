@@ -200,7 +200,26 @@ test_that("the p-value, medians and risk table match the survival package", {
     for (r in risk) {
         expect_equal(as.numeric(r$text), s$n.risk[s$strata == paste0(".stratum=", r$name)])
         expect_identical(r$yaxis, "y2")
+        # Black, and drawn whole at the ends of the time axis.
+        expect_identical(r$textfont$color, "#000000")
+        expect_false(r$cliponaxis)
     }
+
+    # The table has a time axis of its own, zoomed with the curve's, so the
+    # curve keeps its own border and the table takes none of its gridlines.
+    lay <- built$x$layout
+    expect_identical(lay$xaxis$anchor, "y")
+    expect_identical(lay$xaxis2$matches, "x")
+    expect_false(lay$xaxis$showticklabels)
+    expect_identical(lay$xaxis2$title$text, "Time")
+    expect_identical(lay$xaxis$title$text, "")
+    expect_equal(c(lay$xaxis$dtick, lay$xaxis2$dtick), c(250, 250))
+    # Half a row of room around the rows, which stay put on zoom.
+    expect_equal(lay$yaxis2$range, c(-0.5, 1.5))
+    expect_true(lay$yaxis2$fixedrange)
+    expect_false(lay$xaxis2$showgrid)
+    expect_false(lay$yaxis2$showgrid)
+    expect_named(attr(fig, "fixed.axes"), c("xaxis2", "yaxis2"))
 
     # One stratum: no p-value.
     single <- survivalCurve(survival_lung, time = "time", status = "status")
@@ -264,6 +283,34 @@ test_that("the server applies the band inputs and every Legend tab control", {
 
             session$setInputs(conf.int = FALSE)
             expect_length(bands_of(plotly::plotly_build(generate_plot())$x$data), 0)
+        }
+    )
+})
+
+test_that("the risk table stays gridless and the curve boxed under the Axes tab", {
+    data(survival_lung, package = "sciVizModules")
+
+    shiny::testServer(
+        survivalCurveServer,
+        args = list(data = shiny::reactive(survival_lung)),
+        expr = {
+            axes <- utils::modifyList(test_axes_inputs(), list(show.grid.x = TRUE, show.grid.y = TRUE))
+            do.call(session$setInputs, c(
+                list(auto.update = TRUE, time = "time", status = "status", group.by = "sex", risk.table = TRUE,
+                     download.format = "png"),
+                axes, test_legend_inputs()
+            ))
+            # As renderPlotly() draws it, margins and all.
+            lay <- plotly::plotly_build(apply_render_margins(generate_plot(), input))$x$layout
+            expect_true(lay$xaxis$showgrid)
+            expect_true(lay$yaxis$showgrid)
+            expect_false(lay$xaxis2$showgrid)
+            expect_false(lay$yaxis2$showgrid)
+            # Each panel is boxed by its own axis lines, so no border shapes.
+            expect_true(lay$xaxis$mirror)
+            expect_true(lay$xaxis$showline)
+            expect_identical(lay$xaxis$anchor, "y")
+            expect_length(lay$shapes, 0)
         }
     )
 })

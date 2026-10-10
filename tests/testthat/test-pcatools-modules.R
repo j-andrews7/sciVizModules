@@ -144,6 +144,8 @@ test_that("the pairs plot draws one panel per component pair", {
     scatter <- Filter(function(tr) !is.null(tr$legendgroup), fig$x$data)
     # 6 pairs x 2 treatment groups.
     expect_length(scatter, 12)
+    # The placeholders are dropped, so the upper triangle draws no gridlines.
+    expect_length(fig$x$data, 12)
     # One legend entry per group, not per panel.
     expect_identical(sum(vapply(scatter, function(tr) isTRUE(tr$showlegend), logical(1))), 2L)
     expect_match(fig$x$layout$xaxis$title$text, "^PC1 \\(")

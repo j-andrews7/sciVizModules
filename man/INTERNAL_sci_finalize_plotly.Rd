@@ -28,6 +28,18 @@ post-processing shared by the sciVizModules modules that build their own
 figure (the dittoSeq wrappers and the native plotly modules), so the figure
 respects the module's Axes, Legend, Lines and Plotly tab controls.
 }
+\details{
+The Axes tab styles every axis of the figure. A panel whose axes
+must keep their own settings whatever the Axes tab says (a risk table's or a
+tick strip's gridlines) names them in the figure's \code{"fixed.axes"} attribute,
+a named list of axis properties (\code{list(yaxis2 = list(showgrid = FALSE))}),
+which is applied last.
+
+The panels of a figure stacked with shared axes are boxed by
+\code{\link[=.sci_shared_panel_borders]{.sci_shared_panel_borders()}}, since plotly draws a shared axis's lines on
+one panel only. A faceted figure takes its panel borders from its ggplot
+theme instead.
+}
 \author{
 Jacob Martin, Jared Andrews
 }

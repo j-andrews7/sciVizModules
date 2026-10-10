@@ -260,6 +260,9 @@ pcaPairsPlot <- function(pcaobj, components = NULL, color.by = NULL, shape.by = 
     }
 
     fig <- subplot(panels, nrows = k - 1, shareX = TRUE, shareY = TRUE, margin = 0.02)
+    # The upper triangle's placeholders only hold its cells in the grid; left in,
+    # they make each cell a panel that draws the shared axes' gridlines.
+    fig$x$data <- Filter(function(tr) any(!is.na(unlist(tr[["x"]]))), fig$x$data)
     for (cc in seq_len(k - 1)) {
         key <- if (cc == 1) "xaxis" else paste0("xaxis", cc)
         fig$x$layout[[key]]$title <- list(text = .pca_axis_title(pcaobj, components[cc]))

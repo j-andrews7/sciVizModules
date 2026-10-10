@@ -32,7 +32,8 @@
 #' @param pval Logical; display the log-rank test p-value. Only applied when
 #'   `group.by` defines more than one group (default `TRUE`).
 #' @param risk.table Logical; append a "number at risk" table beneath the curve
-#'   (default `FALSE`).
+#'   (default `FALSE`). The table has no gridlines; its time axis zooms with the
+#'   curve's.
 #' @param censor Logical; draw censoring marks (default `TRUE`).
 #' @param surv.median.line Character; draw median survival reference lines. One
 #'   of `"none"`, `"hv"`, `"h"`, or `"v"` (default `"none"`). Drawn only for the
@@ -192,7 +193,7 @@ survivalCurve <- function(data,
     }
 
     if (isTRUE(risk.table)) {
-        fig <- .km_add_risk_table(fig, fit, lv, palette, km, break.time.by)
+        fig <- .km_add_risk_table(fig, fit, lv, km, break.time.by)
     }
 
     attr(fig, "table") <- .km_summary_table(fit, lv, logrank)

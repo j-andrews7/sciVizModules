@@ -130,5 +130,7 @@ gseaEnrichmentPlot <- function(x, pathways = NULL, gsea.param = 1, colors = NULL
         )
     }))
     attr(fig, "table") <- table
+    # The tick strip (second panel) keeps its rows free of gridlines.
+    if (isTRUE(show.ticks)) attr(fig, "fixed.axes") <- list(yaxis2 = list(showgrid = FALSE, zeroline = FALSE))
     fig
 }

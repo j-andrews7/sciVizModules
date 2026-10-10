@@ -4,7 +4,7 @@
 \alias{.km_add_risk_table}
 \title{Stack a number-at-risk table beneath a survival curve}
 \usage{
-.km_add_risk_table(fig, fit, levels, palette, km, break.time.by = NULL)
+.km_add_risk_table(fig, fit, levels, km, break.time.by = NULL)
 }
 \arguments{
 \item{fig}{The built survival curve figure.}
@@ -12,8 +12,6 @@
 \item{fit}{The \code{survfit} object.}
 
 \item{levels}{The strata, in the fit's order.}
-
-\item{palette}{Colours named by stratum.}
 
 \item{km}{A frame from \code{\link[=.km_frame]{.km_frame()}}, for the time range.}
 
@@ -23,7 +21,11 @@
 The two-panel figure.
 }
 \description{
-Stack a number-at-risk table beneath a survival curve
+The table gets an x axis of its own, matched to the curve's so the two zoom
+together: a shared axis would draw the curve's gridlines through the table
+and its border lines around the table only. The table's gridlines are kept
+off through the figure's \code{"fixed.axes"} attribute (see
+\code{\link[=.sci_finalize_plotly]{.sci_finalize_plotly()}}).
 }
 \author{
 Jared Andrews

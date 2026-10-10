@@ -86,3 +86,53 @@ test_that(".sci_discrete_cols offers the categorical columns with few enough lev
     expect_identical(.sci_discrete_cols(NULL), character(0))
     expect_identical(.sci_discrete_cols(data.frame()), character(0))
 })
+
+test_that(".sci_shared_panel_borders boxes each panel that shares an axis", {
+    top <- plotly::plot_ly(x = 1:3, y = 1:3, type = "scatter", mode = "lines")
+    bottom <- plotly::plot_ly(x = 1:3, y = 3:1, type = "scatter", mode = "lines")
+    stacked <- plotly::plotly_build(plotly::subplot(top, bottom, nrows = 2, shareX = TRUE))
+    domains <- function(lay) list(lay$yaxis$domain, lay$yaxis2$domain)
+
+    boxed <- .sci_shared_panel_borders(stacked, showline = TRUE, mirror = TRUE)
+    rects <- boxed$x$layout$shapes
+    expect_length(rects, 2)
+    expect_true(all(vapply(rects, function(s) identical(s$type, "rect") && identical(s$xref, "paper"), logical(1))))
+    expect_setequal(lapply(rects, function(s) c(s$y0, s$y1)), domains(stacked$x$layout))
+    # The borders stand in for the shared axes' own lines.
+    expect_false(boxed$x$layout$xaxis$showline)
+    expect_false(boxed$x$layout$yaxis2$showline)
+
+    # Unmirrored: the left and bottom edge of each panel.
+    open <- .sci_shared_panel_borders(stacked, showline = TRUE, mirror = FALSE)$x$layout$shapes
+    expect_length(open, 4)
+    expect_true(all(vapply(open, function(s) identical(s$type, "line"), logical(1))))
+    expect_length(.sci_shared_panel_borders(stacked, showline = FALSE)$x$layout$shapes, 0)
+    # Inputs that have not reported yet draw nothing.
+    expect_length(.sci_shared_panel_borders(stacked, showline = NULL)$x$layout$shapes, 0)
+
+    # Panels with axes of their own are boxed by them.
+    free <- plotly::plotly_build(plotly::subplot(top, bottom, nrows = 2, shareX = FALSE))
+    expect_length(.sci_shared_panel_borders(free)$x$layout$shapes, 0)
+
+    # An empty filler holds a grid cell but is not a panel to box.
+    filler <- plotly::plot_ly(type = "scatter", mode = "markers")
+    grid <- plotly::plotly_build(plotly::subplot(top, filler, bottom, plotly::plot_ly(x = 1:3, y = 1:3,
+        type = "scatter", mode = "lines"), nrows = 2, shareX = TRUE, shareY = TRUE))
+    expect_length(.sci_shared_panel_borders(grid)$x$layout$shapes, 3)
+})
+
+test_that(".sci_finalize_plotly keeps a panel's fixed axes over the Axes tab", {
+    input <- c(utils::modifyList(test_axes_inputs(), list(show.grid.x = TRUE, show.grid.y = TRUE)),
+        test_legend_inputs(), list(download.format = "png"))
+    top <- plotly::plot_ly(x = 1:3, y = 1:3, type = "scatter", mode = "lines")
+    fig <- plotly::subplot(top, top, nrows = 2, shareX = TRUE)
+    attr(fig, "fixed.axes") <- list(yaxis2 = list(showgrid = FALSE))
+    lay <- plotly::plotly_build(.sci_finalize_plotly(fig, input, identity))$x$layout
+    expect_true(lay$yaxis$showgrid)
+    expect_false(lay$yaxis2$showgrid)
+    expect_length(lay$shapes, 2)
+
+    # A faceted figure takes its borders from its ggplot theme.
+    lay <- plotly::plotly_build(.sci_finalize_plotly(fig, input, identity, faceted = TRUE))$x$layout
+    expect_length(lay$shapes, 0)
+})

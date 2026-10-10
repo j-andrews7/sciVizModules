@@ -22,8 +22,8 @@ for configuring and displaying an interactive Kaplan-Meier survival curve.
 }
 \details{
 When \code{data_list} is not provided (or \code{NULL}), the app launches with
-\code{survival_lung} as an example dataset. Uploaded files are added to the
-available datasets and can be selected for plotting.
+\code{survival_lung} as an example dataset, its curves grouped by \code{sex}. Uploaded
+files are added to the available datasets and can be selected for plotting.
 
 This is a convenience wrapper around \code{\link[VizModules:createModuleApp]{VizModules::createModuleApp()}}.
 }

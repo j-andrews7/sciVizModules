@@ -135,6 +135,8 @@ test_that("the server builds, finishes and exports the pLDDT table", {
             ))
             built <- plotly::plotly_build(generate_plot())
             expect_identical(built$x$data[[2]]$zmax, 30)
+            # The four bands, and a border around the track and the heatmap, which share an axis.
+            expect_length(built$x$layout$shapes, 6)
             expect_identical(nrow(plot_source_reactive()$stats), 120L)
         }
     )

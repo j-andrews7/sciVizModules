@@ -48,7 +48,8 @@ passed to \code{\link[survival:survfit]{survival::survfit()}} as its \code{conf.
 \code{group.by} defines more than one group (default \code{TRUE}).}
 
 \item{risk.table}{Logical; append a "number at risk" table beneath the curve
-(default \code{FALSE}).}
+(default \code{FALSE}). The table has no gridlines; its time axis zooms with the
+curve's.}
 
 \item{censor}{Logical; draw censoring marks (default \code{TRUE}).}
 

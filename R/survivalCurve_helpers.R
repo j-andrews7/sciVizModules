@@ -386,10 +386,15 @@
 
 #' Stack a number-at-risk table beneath a survival curve
 #'
+#' The table gets an x axis of its own, matched to the curve's so the two zoom
+#' together: a shared axis would draw the curve's gridlines through the table
+#' and its border lines around the table only. The table's gridlines are kept
+#' off through the figure's `"fixed.axes"` attribute (see
+#' [.sci_finalize_plotly()]).
+#'
 #' @param fig The built survival curve figure.
 #' @param fit The `survfit` object.
 #' @param levels The strata, in the fit's order.
-#' @param palette Colours named by stratum.
 #' @param km A frame from [.km_frame()], for the time range.
 #' @param break.time.by Spacing of the counting times, or `NULL` for pretty breaks.
 #' @return The two-panel figure.
@@ -398,7 +403,7 @@
 #' @author Jared Andrews
 #' @rdname INTERNAL_km_add_risk_table
 #' @keywords internal
-.km_add_risk_table <- function(fig, fit, levels, palette, km, break.time.by = NULL) {
+.km_add_risk_table <- function(fig, fit, levels, km, break.time.by = NULL) {
     tmax <- max(km$time, na.rm = TRUE)
     times <- if (!is.null(break.time.by)) {
         seq(0, tmax, by = break.time.by)
@@ -411,20 +416,35 @@
     tbl <- plot_ly()
     for (g in levels) {
         r <- rt[rt$stratum == g, , drop = FALSE]
+        # Unclipped, so a count at either end of the time axis is drawn whole.
         tbl <- add_trace(tbl,
             x = r$time, y = rep(g, nrow(r)), text = r$n.risk,
-            type = "scatter", mode = "text", textfont = list(color = palette[[g]], size = 12),
+            type = "scatter", mode = "text", textfont = list(color = "#000000", size = 12), cliponaxis = FALSE,
             name = g, legendgroup = g, showlegend = FALSE,
             hovertemplate = paste0(g, ": %{text} at risk at %{x}<extra></extra>")
         )
     }
-    tbl <- layout(tbl, yaxis = list(
+    nogrid <- list(showgrid = FALSE, zeroline = FALSE)
+    # Half a row of room above and below, which a text-only trace does not pad.
+    tbl <- layout(tbl, yaxis = c(list(
         type = "category", categoryorder = "array", categoryarray = rev(levels),
-        title = list(text = "At risk"), showgrid = FALSE, zeroline = FALSE
-    ))
-    subplot(fig, tbl,
-        nrows = 2, heights = c(0.75, 0.25), shareX = TRUE, titleX = TRUE, titleY = TRUE, margin = 0.05
+        range = c(-0.5, length(levels) - 0.5), fixedrange = TRUE, title = list(text = "At risk")
+    ), nogrid))
+    fig <- subplot(fig, tbl,
+        nrows = 2, heights = c(0.75, 0.25), shareX = FALSE, titleX = TRUE, titleY = TRUE, margin = 0.05
     )
+
+    # The table carries the time axis's labels and title, as a shared axis would.
+    lay <- fig$x$layout
+    lay$xaxis2 <- utils::modifyList(lay$xaxis2 %||% list(), c(list(
+        matches = "x", title = lay$xaxis$title %||% list(text = "Time"),
+        tick0 = lay$xaxis$tick0, dtick = lay$xaxis$dtick
+    ), nogrid))
+    lay$xaxis$title <- list(text = "")
+    lay$xaxis$showticklabels <- FALSE
+    fig$x$layout <- lay
+    attr(fig, "fixed.axes") <- list(xaxis2 = nogrid, yaxis2 = nogrid)
+    fig
 }
 
 
