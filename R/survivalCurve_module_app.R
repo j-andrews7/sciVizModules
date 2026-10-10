@@ -6,8 +6,8 @@
 #' for configuring and displaying an interactive Kaplan-Meier survival curve.
 #'
 #' When `data_list` is not provided (or `NULL`), the app launches with
-#' `survival_lung` as an example dataset. Uploaded files are added to the
-#' available datasets and can be selected for plotting.
+#' `survival_lung` as an example dataset, its curves grouped by `sex`. Uploaded
+#' files are added to the available datasets and can be selected for plotting.
 #'
 #' This is a convenience wrapper around [VizModules::createModuleApp()].
 #'
@@ -34,8 +34,10 @@
 #' app2 <- survivalCurveApp(list("lung" = survival_lung))
 #' if (interactive()) shiny::runApp(app2)
 survivalCurveApp <- function(data_list = NULL) {
+    defaults <- NULL
     if (is.null(data_list)) {
-        data_list <- list("survival_lung" = survival_lung)
+        data_list <- list("survival_lung" = .sci_example_data("survival_lung"))
+        defaults <- list(group.by = "sex")
     }
 
     stopifnot(is.list(data_list), length(data_list) >= 1)
@@ -48,6 +50,7 @@ survivalCurveApp <- function(data_list = NULL) {
         output_ui_fn = survivalCurveOutputUI,
         server_fn    = survivalCurveServer,
         data_list    = data_list,
+        defaults     = defaults,
         title        = "Modular Survival Curve"
     )
 }

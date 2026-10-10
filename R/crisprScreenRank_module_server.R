@@ -1,0 +1,67 @@
+#' Server logic for the crisprScreenRank module
+#'
+#' Ranks the genes of a MAGeCK RRA or MLE gene summary by the plotted
+#' statistic, signed so that depleted genes fall on the left and enriched genes
+#' on the right, flags hits by FDR, and plots them through
+#' [VizModules::dittoViz_scatterPlotServer()]. Its `fig.fn` hook titles the
+#' axes and draws the FDR cut-offs. Genes are labelled through the scatter
+#' module's Annotations tab.
+#'
+#' @param id The ID for the Shiny module.
+#' @param data A `reactive` containing a MAGeCK RRA or MLE gene summary, from
+#'   [read_mageck()] or read with `read.delim()`.
+#' @param hide.inputs A character vector of input IDs to hide.
+#' @param hide.tabs A character vector of tab names to hide. Default hides the
+#'   scatter module's "Trajectory" and "Facet" tabs.
+#' @param defaults A named list of default values, merged over the rank-plot
+#'   defaults (user values win) and used to restore state on reset.
+#' @return The value returned by [VizModules::dittoViz_scatterPlotServer()].
+#'
+#' @import shiny
+#' @importFrom VizModules dittoViz_scatterPlotServer
+#'
+#' @seealso [read_mageck()], [sciVizModules::crisprScreenRankInputsUI()],
+#' [sciVizModules::crisprScreenRankOutputUI()], [sciVizModules::crisprScreenRankApp()]
+#' @examples
+#' library(sciVizModules)
+#' if (interactive()) crisprScreenRankApp()
+#' @export
+#' @author Jared Andrews
+crisprScreenRankServer <- function(id, data, hide.inputs = NULL, hide.tabs = c("Trajectory", "Facet"),
+                                   defaults = NULL) {
+    stopifnot(is.reactive(data))
+    d <- .crispr_defaults(NULL, defaults)
+    scatter_defaults <- d[setdiff(names(d), .crispr_keys)]
+
+    prepared <- moduleServer(id, function(input, output, session) {
+        observeEvent(input$reset, {
+            update_viz_select(session, "metric", selected = d$metric)
+            updateNumericInput(session, "fdr.threshold", value = d$fdr.threshold)
+            conds <- .mageck_conditions(data())
+            if (length(conds)) {
+                update_viz_select(session, "condition",
+                    selected = if (isTRUE(d$condition %in% conds)) d$condition else conds[1]
+                )
+            }
+        })
+
+        reactive({
+            df <- data()
+            req(df)
+            isolate_fn <- setup_auto_update_logic(input)
+            metric <- isolate_fn(input$metric)
+            thr <- isolate_fn(input$fdr.threshold)
+            req(nz_value(metric), !is.null(thr))
+            .crispr_prepare(df, metric, thr, isolate_fn(input$condition))
+        })
+    })
+
+    dittoViz_scatterPlotServer(
+        id = id,
+        data = prepared,
+        hide.inputs = hide.inputs,
+        hide.tabs = hide.tabs,
+        defaults = scatter_defaults,
+        fig.fn = function(fig, input, isolate_fn) .crispr_layers(fig, prepared(), input, isolate_fn)
+    )
+}

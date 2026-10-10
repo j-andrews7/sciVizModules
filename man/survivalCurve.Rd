@@ -10,13 +10,16 @@ survivalCurve(
   status,
   group.by = NULL,
   conf.int = TRUE,
+  conf.level = 0.95,
+  conf.type = c("log", "log-log", "plain"),
+  conf.int.opacity = 0.25,
   pval = TRUE,
   risk.table = FALSE,
   censor = TRUE,
   surv.median.line = "none",
   fun = NULL,
   palette.selection = NULL,
-  line.size = 1,
+  line.size = 2,
   break.time.by = NULL,
   legend.title = NULL
 )
@@ -29,57 +32,70 @@ survivalCurve(
 \item{status}{The name of the event/status indicator column.}
 
 \item{group.by}{Optional name of a categorical column to stratify the curves
-by. When \code{NULL} or \code{""} a single overall survival curve is drawn.}
+by. When \code{NULL} or \code{""} a single overall survival curve (named "All") is drawn.}
 
-\item{conf.int}{Logical; draw confidence interval ribbons (default \code{TRUE}).}
+\item{conf.int}{Logical; draw a confidence band around each curve (default \code{TRUE}).}
+
+\item{conf.level}{Confidence level of the band, between 0 and 1 (default 0.95),
+passed to \code{\link[survival:survfit]{survival::survfit()}} as its \code{conf.int}.}
+
+\item{conf.type}{How the band is computed, one of \code{"log"} (the
+\code{\link[survival:survfit]{survival::survfit()}} default), \code{"log-log"} or \code{"plain"}.}
+
+\item{conf.int.opacity}{Fill opacity of the band, between 0 and 1 (default 0.25).}
 
 \item{pval}{Logical; display the log-rank test p-value. Only applied when
 \code{group.by} defines more than one group (default \code{TRUE}).}
 
 \item{risk.table}{Logical; append a "number at risk" table beneath the curve
-(default \code{FALSE}).}
+(default \code{FALSE}). The table has no gridlines; its time axis zooms with the
+curve's.}
 
 \item{censor}{Logical; draw censoring marks (default \code{TRUE}).}
 
 \item{surv.median.line}{Character; draw median survival reference lines. One
-of \code{"none"}, \code{"hv"}, \code{"h"}, or \code{"v"} (default \code{"none"}).}
+of \code{"none"}, \code{"hv"}, \code{"h"}, or \code{"v"} (default \code{"none"}). Drawn only for the
+survival probability and percentage curves.}
 
-\item{fun}{Optional transformation of the survival curve passed to
-\code{\link[survminer:ggsurvplot]{survminer::ggsurvplot()}}. One of \code{NULL} (survival probability), \code{"pct"}
-(survival percentage), \code{"event"} (cumulative events), or \code{"cumhaz"}
-(cumulative hazard).}
+\item{fun}{Optional transformation of the survival curve. One of \code{NULL} or
+\code{"survival"} (survival probability), \code{"pct"} (survival percentage), \code{"event"}
+(cumulative events, \code{1 - S}), or \code{"cumhaz"} (cumulative hazard, \code{-log(S)}).
+The band is transformed with the curve.}
 
-\item{palette.selection}{Optional vector of colors used for the strata. Passed
-through to the \code{palette} argument of \code{\link[survminer:ggsurvplot]{survminer::ggsurvplot()}}.}
+\item{palette.selection}{Optional vector of colors for the strata, named by
+stratum level (an unnamed vector is used in level order).}
 
-\item{line.size}{Numeric line width for the survival curves (default \code{1}).}
+\item{line.size}{Numeric width of the survival curves in pixels (default \code{2}).}
 
-\item{break.time.by}{Optional numeric spacing between x-axis tick marks.}
+\item{break.time.by}{Optional numeric spacing between x-axis tick marks, which
+also sets the times the risk table counts at.}
 
 \item{legend.title}{Legend title. Defaults to \code{group.by} when stratified.}
 }
 \value{
-A \code{\link[plotly:plot_ly]{plotly::plot_ly()}} object containing the interactive survival curve.
+A \code{\link[plotly:plot_ly]{plotly::plot_ly()}} object containing the interactive survival curve,
+with a per-stratum summary (subjects, events, median survival and its
+confidence interval, and the log-rank test) as attribute \code{"table"}.
 }
 \description{
-Builds a Kaplan-Meier survival curve from a survival-style data frame and
-returns an interactive \code{plotly} figure. The statistical fit and the base plot
-are produced with the \href{https://cran.r-project.org/package=survminer}{survminer}
-package (via \code{\link[survminer:surv_fit]{survminer::surv_fit()}} and \code{\link[survminer:ggsurvplot]{survminer::ggsurvplot()}}); the
-resulting \code{ggplot} is then converted to \code{plotly} with \code{\link[plotly:ggplotly]{plotly::ggplotly()}} to
-provide the interactivity-first experience shared by all VizModules modules.
+Fits a Kaplan-Meier survival curve with \code{\link[survival:survfit]{survival::survfit()}} and draws it as
+an interactive \code{plotly} figure. The curves and their confidence bands are drawn
+by \code{\link[VizModules:linePlot]{VizModules::linePlot()}} from the curve's step coordinates, so the band takes
+its line's colour, sits underneath it and toggles with it from the legend.
 }
 \details{
-The input \code{data} should be in the "tidy" survival format expected by
-survminer: one row per subject with a numeric follow-up \code{time} column and a
-\code{status} (event) indicator. The status column may be numeric (\code{0}/\code{1} where
-\code{1} = event, or \code{1}/\code{2} where \code{2} = event, following the
-\code{\link[survival:Surv]{survival::Surv()}} conventions), logical (\code{TRUE} = event), or a two-level
-factor/character where the level containing "dead"/"death"/"event"/"yes"/
-"true"/"1" is treated as the event.
+The input \code{data} should be in the "tidy" survival format: one row per
+subject with a numeric follow-up \code{time} column and a \code{status} (event) indicator.
+The status column may be numeric (\code{0}/\code{1} where \code{1} = event, or \code{1}/\code{2} where
+\code{2} = event, following the \code{\link[survival:Surv]{survival::Surv()}} conventions), logical (\code{TRUE} =
+event), or a two-level factor/character where the level containing
+"dead"/"death"/"event"/"yes"/"true"/"1" is treated as the event.
 
-When \code{group.by} is supplied the curve is stratified by that column and a
-log-rank p-value can be shown via \code{pval}.
+When \code{group.by} is supplied the curve is stratified by that column and the
+log-rank test p-value (from \code{\link[survival:survdiff]{survival::survdiff()}}) can be shown via \code{pval}.
+
+The figure is built natively in plotly rather than converted from a ggplot:
+\code{\link[plotly:ggplotly]{plotly::ggplotly()}} cannot draw the stepped confidence band survminer uses.
 }
 \examples{
 library(sciVizModules)
@@ -88,12 +104,18 @@ fig <- survivalCurve(survival_lung,
     time = "time", status = "status", group.by = "sex"
 )
 if (interactive()) fig
+
+# Cumulative events with a number-at-risk table.
+fig2 <- survivalCurve(survival_lung,
+    time = "time", status = "status", group.by = "sex",
+    fun = "event", risk.table = TRUE
+)
 }
 \seealso{
-\code{\link[survminer:ggsurvplot]{survminer::ggsurvplot()}}, \code{\link[survival:survfit]{survival::survfit()}},
+\code{\link[survival:survfit]{survival::survfit()}}, \code{\link[VizModules:linePlot]{VizModules::linePlot()}},
 \code{\link[=survivalCurveInputsUI]{survivalCurveInputsUI()}}, \code{\link[=survivalCurveServer]{survivalCurveServer()}},
 \code{\link[=survivalCurveApp]{survivalCurveApp()}}
 }
 \author{
-Jacob Martin
+Jacob Martin, Jared Andrews
 }

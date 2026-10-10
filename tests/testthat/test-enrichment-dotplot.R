@@ -59,3 +59,19 @@ test_that("InputsUI builds UI from example_enrichment", {
     ui <- enrichmentDotPlotInputsUI("test", example_enrichment)
     expect_true(inherits(ui, c("shiny.tag", "shiny.tag.list")))
 })
+
+test_that("the size scale starts at zero for a ratio, not for a signed score", {
+    data(example_enrichment, package = "sciVizModules")
+    prep <- .prepare_enrichment(example_enrichment)
+    expect_identical(prep$mapping$size.scale.min, 0)
+    expect_identical(.enrich_defaults(NULL, prep$mapping)$size.scale.min, 0)
+    # A caller's own limit or Size By wins.
+    expect_identical(.enrich_defaults(list(size.scale.min = 0.05), prep$mapping)$size.scale.min, 0.05)
+    expect_null(.enrich_defaults(list(size.by = "Count"), prep$mapping)$size.scale.min)
+
+    gsea <- data.frame(Description = c("a", "b", "c"), NES = c(-1.8, 1.2, 2.1), pvalue = c(0.01, 0.02, 0.03))
+    nes <- .prepare_enrichment(gsea)
+    expect_identical(nes$mapping$size, "NES")
+    expect_null(nes$mapping$size.scale.min)
+    expect_null(.enrich_defaults(NULL, nes$mapping)$size.scale.min)
+})

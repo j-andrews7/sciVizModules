@@ -5,7 +5,7 @@
 \title{Create a standalone Shiny app for the cnSegmentPlot module}
 \usage{
 cnSegmentPlotApp(
-  seg = example_cn_segment,
+  seg = .sci_example_data("example_cn_segment"),
   defaults = NULL,
   title = "Array Copy Number Segments"
 )

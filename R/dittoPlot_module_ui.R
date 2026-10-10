@@ -82,19 +82,19 @@ dittoPlotInputsUI <- function(id, data, defaults = NULL, title = "dittoPlot Sett
 
     inputs <- list(
         "Data" = tagList(
-            tipify(selectInput(ns("var"), "Variable (gene / metadata)",
+            tipify(viz_select_input(ns("var"), "Variable (gene / metadata)",
                 choices = cont.choices,
-                selected = default.var, selectize = FALSE
+                selected = default.var
             ), documentParameters$var,
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("group.by"), "Group By",
+            tipify(viz_select_input(ns("group.by"), "Group By",
                 choices = group.choices,
-                selected = default.group, selectize = FALSE
+                selected = default.group
             ), documentParameters$group.by,
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("color.by"), "Color By",
+            tipify(viz_select_input(ns("color.by"), "Color By",
                 choices = color.choices,
-                selected = get_default(defaults, "color.by", ""), selectize = FALSE
+                selected = get_default(defaults, "color.by", "")
             ), documentParameters$color.by,
                 placement = "top", options = list(container = "body")),
             tipify(checkboxGroupInput(ns("plots"), "Representations",
@@ -103,9 +103,9 @@ dittoPlotInputsUI <- function(id, data, defaults = NULL, title = "dittoPlot Sett
                 selected = get_default(defaults, "plots", c("jitter", "vlnplot"))
             ), documentParameters$plots,
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("split.by"), "Split By (facet)",
+            tipify(viz_select_input(ns("split.by"), "Split By (facet)",
                 choices = color.choices,
-                selected = get_default(defaults, "split.by", ""), selectize = FALSE
+                selected = get_default(defaults, "split.by", "")
             ), documentParameters$split.by,
                 placement = "top", options = list(container = "body"))
         ),
@@ -139,9 +139,9 @@ dittoPlotInputsUI <- function(id, data, defaults = NULL, title = "dittoPlot Sett
                 value = get_default(defaults, "vlnplot.width", 1), min = 0, step = 0.05),
                 documentParameters$vlnplot.width,
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("vlnplot.scaling"), "Violin Scaling",
+            tipify(viz_select_input(ns("vlnplot.scaling"), "Violin Scaling",
                 choices = c("Area" = "area", "Count" = "count", "Width" = "width"),
-                selected = get_default(defaults, "vlnplot.scaling", "area"), selectize = FALSE
+                selected = get_default(defaults, "vlnplot.scaling", "area")
             ), documentParameters$vlnplot.scaling,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("ridgeplot.scale"), "Ridge Scale (overlap)",

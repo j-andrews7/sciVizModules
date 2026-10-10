@@ -30,6 +30,7 @@ that are irrelevant to a single dose-response curve are hidden by
 }
 \examples{
 library(sciVizModules)
+data(dose_response)
 doseResponseInputsUI("dose", dose_response)
 }
 \seealso{

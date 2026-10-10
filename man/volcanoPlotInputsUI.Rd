@@ -47,9 +47,11 @@ Additional inputs specific to volcano plots are added to control significance th
 \itemize{
 \item \code{sig.thresh}: Significance threshold (default 0.05)
 \item \code{fc.thresh}: Log2 fold change threshold (default 0)
-\item \code{volcano.colors}: A multiColorPicker for Up/Down/n.s. group colors
-(defaults: Up="red", Down="blue", n.s.="lightgray")
 }
+
+Group colors are the wrapped module's own "Color palette" picker on its
+\strong{Colors} tab, seeded from \code{color.up} / \code{color.down} / \code{color.ns} (defaults:
+red / blue / lightgray) and therefore fully editable and covered by Reset.
 }
 \section{Plot parameters and defaults}{
 
@@ -71,7 +73,9 @@ The following parameters can be accessed via UI inputs and/or the \code{defaults
 
 The following parameters implementing volcano-specific features are also available:
 \itemize{
-\item \code{volcano.colors} - Named color vector for Up/Down/n.s. groups (UI: "Group Colors" multiColorPicker)
+\item \code{color.up}, \code{color.down}, \code{color.ns} - Colors for the three significance
+groups, assembled into the wrapped module's \code{color.panel} mapping. A named
+\code{color.panel} vector may be given instead and takes precedence.
 \item \code{group} - Auto-generated grouping column based on sig.thresh and fc.thresh
 }
 }

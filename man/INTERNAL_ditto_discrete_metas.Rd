@@ -4,20 +4,25 @@
 \alias{.ditto_discrete_metas}
 \title{Identify discrete metadata columns in a dittoSeq object}
 \usage{
-.ditto_discrete_metas(object, max.levels = 30)
+.ditto_discrete_metas(object, max.levels = 30, max.categories = 50)
 }
 \arguments{
 \item{object}{A dittoSeq-compatible object.}
 
 \item{max.levels}{Maximum number of unique values for a numeric column to be
 treated as discrete.}
+
+\item{max.categories}{Factor and character columns with this many or more
+levels are left out. Passed to \code{\link[VizModules:facet_check]{VizModules::facet_check()}}.}
 }
 \value{
 A character vector of discrete metadata names.
 }
 \description{
-Metadata are treated as discrete when they are factors, characters, logicals,
-or numeric columns with a small number of unique values (<= \code{max.levels}).
+Metadata are treated as discrete when they are logicals, numeric columns
+with a small number of unique values (<= \code{max.levels}), or factors and
+characters with fewer than \code{max.categories} levels. A character column of
+cell barcodes is left out, since it would ask for one colour per cell.
 }
 \author{
 Jacob Martin, Jared Andrews

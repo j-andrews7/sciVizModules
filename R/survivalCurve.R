@@ -1,56 +1,65 @@
 #' Create an interactive Kaplan-Meier survival curve
 #'
-#' Builds a Kaplan-Meier survival curve from a survival-style data frame and
-#' returns an interactive `plotly` figure. The statistical fit and the base plot
-#' are produced with the [survminer](https://cran.r-project.org/package=survminer)
-#' package (via [survminer::surv_fit()] and [survminer::ggsurvplot()]); the
-#' resulting `ggplot` is then converted to `plotly` with [plotly::ggplotly()] to
-#' provide the interactivity-first experience shared by all VizModules modules.
+#' Fits a Kaplan-Meier survival curve with [survival::survfit()] and draws it as
+#' an interactive `plotly` figure. The curves and their confidence bands are drawn
+#' by [VizModules::linePlot()] from the curve's step coordinates, so the band takes
+#' its line's colour, sits underneath it and toggles with it from the legend.
 #'
-#' @details The input `data` should be in the "tidy" survival format expected by
-#' survminer: one row per subject with a numeric follow-up `time` column and a
-#' `status` (event) indicator. The status column may be numeric (`0`/`1` where
-#' `1` = event, or `1`/`2` where `2` = event, following the
-#' [survival::Surv()] conventions), logical (`TRUE` = event), or a two-level
-#' factor/character where the level containing "dead"/"death"/"event"/"yes"/
-#' "true"/"1" is treated as the event.
+#' @details The input `data` should be in the "tidy" survival format: one row per
+#' subject with a numeric follow-up `time` column and a `status` (event) indicator.
+#' The status column may be numeric (`0`/`1` where `1` = event, or `1`/`2` where
+#' `2` = event, following the [survival::Surv()] conventions), logical (`TRUE` =
+#' event), or a two-level factor/character where the level containing
+#' "dead"/"death"/"event"/"yes"/"true"/"1" is treated as the event.
 #'
-#' When `group.by` is supplied the curve is stratified by that column and a
-#' log-rank p-value can be shown via `pval`.
+#' When `group.by` is supplied the curve is stratified by that column and the
+#' log-rank test p-value (from [survival::survdiff()]) can be shown via `pval`.
+#'
+#' The figure is built natively in plotly rather than converted from a ggplot:
+#' [plotly::ggplotly()] cannot draw the stepped confidence band survminer uses.
 #'
 #' @param data A data frame containing at least the `time` and `status` columns.
 #' @param time The name of the numeric follow-up time column.
 #' @param status The name of the event/status indicator column.
 #' @param group.by Optional name of a categorical column to stratify the curves
-#'   by. When `NULL` or `""` a single overall survival curve is drawn.
-#' @param legend.title Legend title. Defaults to `group.by` when stratified.
-#' @param conf.int Logical; draw confidence interval ribbons (default `TRUE`).
+#'   by. When `NULL` or `""` a single overall survival curve (named "All") is drawn.
+#' @param conf.int Logical; draw a confidence band around each curve (default `TRUE`).
+#' @param conf.level Confidence level of the band, between 0 and 1 (default 0.95),
+#'   passed to [survival::survfit()] as its `conf.int`.
+#' @param conf.type How the band is computed, one of `"log"` (the
+#'   [survival::survfit()] default), `"log-log"` or `"plain"`.
+#' @param conf.int.opacity Fill opacity of the band, between 0 and 1 (default 0.25).
 #' @param pval Logical; display the log-rank test p-value. Only applied when
 #'   `group.by` defines more than one group (default `TRUE`).
 #' @param risk.table Logical; append a "number at risk" table beneath the curve
-#'   (default `FALSE`).
+#'   (default `FALSE`). The table has no gridlines; its time axis zooms with the
+#'   curve's.
 #' @param censor Logical; draw censoring marks (default `TRUE`).
 #' @param surv.median.line Character; draw median survival reference lines. One
-#'   of `"none"`, `"hv"`, `"h"`, or `"v"` (default `"none"`).
-#' @param fun Optional transformation of the survival curve passed to
-#'   [survminer::ggsurvplot()]. One of `NULL` (survival probability), `"pct"`
-#'   (survival percentage), `"event"` (cumulative events), or `"cumhaz"`
-#'   (cumulative hazard).
-#' @param palette.selection Optional vector of colors used for the strata. Passed
-#'   through to the `palette` argument of [survminer::ggsurvplot()].
-#' @param line.size Numeric line width for the survival curves (default `1`).
-#' @param break.time.by Optional numeric spacing between x-axis tick marks.
-
+#'   of `"none"`, `"hv"`, `"h"`, or `"v"` (default `"none"`). Drawn only for the
+#'   survival probability and percentage curves.
+#' @param fun Optional transformation of the survival curve. One of `NULL` or
+#'   `"survival"` (survival probability), `"pct"` (survival percentage), `"event"`
+#'   (cumulative events, `1 - S`), or `"cumhaz"` (cumulative hazard, `-log(S)`).
+#'   The band is transformed with the curve.
+#' @param palette.selection Optional vector of colors for the strata, named by
+#'   stratum level (an unnamed vector is used in level order).
+#' @param line.size Numeric width of the survival curves in pixels (default `2`).
+#' @param break.time.by Optional numeric spacing between x-axis tick marks, which
+#'   also sets the times the risk table counts at.
+#' @param legend.title Legend title. Defaults to `group.by` when stratified.
 #'
-#' @return A [plotly::plot_ly()] object containing the interactive survival curve.
+#' @return A [plotly::plot_ly()] object containing the interactive survival curve,
+#'   with a per-stratum summary (subjects, events, median survival and its
+#'   confidence interval, and the log-rank test) as attribute `"table"`.
 #'
-#' @importFrom survival Surv
+#' @importFrom survival Surv survfit survdiff
 #' @importFrom stats as.formula
 #' @import plotly
 #'
 #' @export
-#' @author Jacob Martin
-#' @seealso [survminer::ggsurvplot()], [survival::survfit()],
+#' @author Jacob Martin, Jared Andrews
+#' @seealso [survival::survfit()], [VizModules::linePlot()],
 #' [sciVizModules::survivalCurveInputsUI()], [sciVizModules::survivalCurveServer()],
 #' [sciVizModules::survivalCurveApp()]
 #' @examples
@@ -60,28 +69,38 @@
 #'     time = "time", status = "status", group.by = "sex"
 #' )
 #' if (interactive()) fig
+#'
+#' # Cumulative events with a number-at-risk table.
+#' fig2 <- survivalCurve(survival_lung,
+#'     time = "time", status = "status", group.by = "sex",
+#'     fun = "event", risk.table = TRUE
+#' )
 survivalCurve <- function(data,
                           time,
                           status,
                           group.by = NULL,
                           conf.int = TRUE,
+                          conf.level = 0.95,
+                          conf.type = c("log", "log-log", "plain"),
+                          conf.int.opacity = 0.25,
                           pval = TRUE,
                           risk.table = FALSE,
                           censor = TRUE,
                           surv.median.line = "none",
                           fun = NULL,
                           palette.selection = NULL,
-                          line.size = 1,
+                          line.size = 2,
                           break.time.by = NULL,
-                          legend.title = NULL
-                        ) {
-    if (!requireNamespace("survminer", quietly = TRUE)) {
-        stop("The 'survminer' package is required for survivalCurve(). Please install it.")
-    }
-
+                          legend.title = NULL) {
+    conf.type <- match.arg(conf.type)
     stopifnot(is.data.frame(data))
     if (!time %in% names(data)) stop("Time column '", time, "' not found in data.")
     if (!status %in% names(data)) stop("Status column '", status, "' not found in data.")
+    if (!is.numeric(conf.level) || length(conf.level) != 1 || is.na(conf.level) ||
+        conf.level <= 0 || conf.level >= 1) {
+        conf.level <- 0.95
+    }
+    if (is.null(fun) || identical(fun, "survival")) fun <- NULL
 
     df <- as.data.frame(data)
 
@@ -90,72 +109,94 @@ survivalCurve <- function(data,
     df[[".surv_time"]] <- as.numeric(df[[time]])
     df[[".surv_status"]] <- .normalize_survival_status(df[[status]])
 
+    has_group <- !is.null(group.by) && length(group.by) == 1 && nzchar(group.by) && group.by %in% names(df)
+    df[[".stratum"]] <- if (has_group) as.character(df[[group.by]]) else "All"
+
     # Drop rows that cannot contribute to the fit.
-    keep <- !is.na(df[[".surv_time"]]) & !is.na(df[[".surv_status"]])
+    keep <- !is.na(df[[".surv_time"]]) & !is.na(df[[".surv_status"]]) & !is.na(df[[".stratum"]])
     df <- df[keep, , drop = FALSE]
     if (nrow(df) == 0) {
         stop("No non-missing time/status observations available to fit a survival curve.")
     }
 
-    # Build the survival formula, stratifying by group.by when supplied.
-    has_group <- !is.null(group.by) && length(group.by) == 1 && nzchar(group.by) && group.by %in% names(df)
-    if (has_group) {
-        df[[group.by]] <- as.factor(df[[group.by]])
-        fml <- stats::as.formula(paste0("survival::Surv(.surv_time, .surv_status) ~ `", group.by, "`"))
-    } else {
-        fml <- stats::as.formula("survival::Surv(.surv_time, .surv_status) ~ 1")
-    }
+    # Levels in the column's own order, keeping only those with subjects, so the
+    # fit's strata line up with them one to one.
+    lv <- .surv_levels(if (has_group) data[[group.by]] else df[[".stratum"]])
+    lv <- lv[lv %in% df[[".stratum"]]]
+    df[[".stratum"]] <- factor(df[[".stratum"]], levels = lv)
+    fml <- stats::as.formula("survival::Surv(.surv_time, .surv_status) ~ .stratum")
 
-    fit <- survminer::surv_fit(fml, data = df)
+    fit <- survival::survfit(fml, data = df, conf.int = conf.level, conf.type = conf.type)
+    km <- .km_frame(fit, lv, fun)
+    steps <- .km_steps(km)
 
-    # A log-rank p-value is only meaningful when there is more than one stratum.
-    show_pval <- isTRUE(pval) && has_group
-
+    palette <- .km_palette(lv, palette.selection)
     if (is.null(legend.title)) {
         legend.title <- if (has_group) group.by else ""
     }
 
-    gg_args <- list(
-        fit = fit,
-        data = df,
-        conf.int = isTRUE(conf.int),
-        pval = show_pval,
-        risk.table = isTRUE(risk.table),
-        censor = isTRUE(censor),
-        surv.median.line = surv.median.line,
-        size = line.size,
-        ggtheme = survminer::theme_survminer(legend = "right"),
-        legend.title = legend.title
-        
+    fig <- VizModules::linePlot(
+        steps,
+        x = "time", y = "surv",
+        palette.selection = palette,
+        colour.group.by = ".stratum",
+        plot.mode = "lines",
+        x.title = "Time",
+        y.title = .km_axis_title(fun),
+        error.type = "columns",
+        error.lower = "lower",
+        error.upper = "upper",
+        error.bar = FALSE,
+        error.ribbon = isTRUE(conf.int),
+        error.ribbon.opacity = conf.int.opacity
     )
+    fig <- plotly::plotly_build(fig)
 
-    if (!is.null(fun)) gg_args$fun <- fun
-    if (!is.null(palette.selection) && length(palette.selection) > 0) {
-        gg_args$palette <- unname(palette.selection)
-    }
-    if (!is.null(break.time.by) && is.numeric(break.time.by) && break.time.by > 0) {
-        gg_args$break.time.by <- break.time.by
-    }
-
-    gg <- do.call(survminer::ggsurvplot, gg_args)
-
-    fig <- plotly::ggplotly(gg$plot)
-
-    # Optionally stack the "number at risk" table beneath the curve. This is
-    # wrapped defensively so a conversion failure never breaks the main plot.
-    if (isTRUE(risk.table) && !is.null(gg$table)) {
-        tbl <- tryCatch(plotly::ggplotly(gg$table), error = function(e) NULL)
-        if (!is.null(tbl)) {
-            fig <- tryCatch(
-                plotly::subplot(fig, tbl,
-                    nrows = 2, heights = c(0.75, 0.25),
-                    shareX = TRUE, titleX = TRUE, titleY = TRUE, margin = 0.05
-                ),
-                error = function(e) fig
-            )
+    # The curves (not their bands) take the line width, and every trace joins
+    # its stratum's legend group, so one legend click toggles a curve, its band
+    # and its censoring marks together.
+    for (i in seq_along(fig$x$data)) {
+        tr <- fig$x$data[[i]]
+        if (is.null(tr$legendgroup) && !is.null(tr$name)) fig$x$data[[i]]$legendgroup <- tr$name
+        if (!identical(tr$fill, "toself")) {
+            fig$x$data[[i]]$line$width <- line.size
+            fig$x$data[[i]]$hovertemplate <- paste0("%{x}, %{y:.3f}<extra>", tr$name, "</extra>")
         }
     }
 
+    if (isTRUE(censor)) {
+        fig$x$data <- c(fig$x$data, .km_censor_traces(km, palette))
+    }
+    if (is.null(fun) || identical(fun, "pct")) {
+        med <- .km_median_trace(fit, lv, surv.median.line, y = if (is.null(fun)) 0.5 else 50)
+        if (!is.null(med)) fig$x$data <- c(fig$x$data, list(med))
+    }
+
+    logrank <- if (has_group && length(lv) > 1) .km_logrank(df) else NULL
+    if (isTRUE(pval) && !is.null(logrank)) {
+        # Bottom left, clear of falling survival curves; top left for rising ones.
+        rising <- isTRUE(fun %in% c("event", "cumhaz"))
+        fig$x$layout$annotations <- c(fig$x$layout$annotations, list(list(
+            x = 0.08, y = if (rising) 0.95 else 0.1, xref = "paper", yref = "paper",
+            xanchor = "left", yanchor = if (rising) "top" else "bottom",
+            text = .km_pvalue_text(logrank$p), showarrow = FALSE, font = list(size = 14, color = "black")
+        )))
+    }
+
+    fig$x$layout$legend$title$text <- legend.title
+    break.time.by <- if (is.numeric(break.time.by) && length(break.time.by) == 1 && isTRUE(break.time.by > 0)) {
+        break.time.by
+    }
+    if (!is.null(break.time.by)) {
+        fig$x$layout$xaxis$tick0 <- 0
+        fig$x$layout$xaxis$dtick <- break.time.by
+    }
+
+    if (isTRUE(risk.table)) {
+        fig <- .km_add_risk_table(fig, fit, lv, km, break.time.by)
+    }
+
+    attr(fig, "table") <- .km_summary_table(fit, lv, logrank)
     fig
 }
 

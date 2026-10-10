@@ -40,6 +40,7 @@
 #' if (interactive()) shiny::runApp(app)
 #'
 #' # Launch with custom data:
+#' data(mm_kinetics)
 #' if (requireNamespace("drc", quietly = TRUE)) {
 #'     library(drc)
 #'     mm_model <- drm(v ~ S, data = mm_kinetics, fct = MM.2())
@@ -50,8 +51,9 @@
 #'     app2 <- michaelisMentenApp(mm_kinetics, mml, stats)
 #'     if (interactive()) shiny::runApp(app2)
 #' }
-michaelisMentenApp <- function(data = mm_kinetics, model = mm_kinetics_line,
-                               stats = mm_kinetics_fit, defaults = NULL,
+michaelisMentenApp <- function(data = .sci_example_data("mm_kinetics"),
+                               model = .sci_example_data("mm_kinetics_line"),
+                               stats = .sci_example_data("mm_kinetics_fit"), defaults = NULL,
                                title = "Modular Michaelis-Menten Plot") {
     stopifnot(is.data.frame(data), is.data.frame(model))
 

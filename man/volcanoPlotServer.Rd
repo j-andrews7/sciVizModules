@@ -8,7 +8,7 @@ volcanoPlotServer(
   id,
   data,
   hide.inputs = NULL,
-  hide.tabs = c("Trajectory", "Facet", "Colors", "Legend/Scale"),
+  hide.tabs = c("Trajectory", "Facet"),
   defaults = NULL
 )
 }
@@ -18,12 +18,17 @@ volcanoPlotServer(
 \item{data}{A \code{reactive} containing the data frame to plot.
 Must contain effect size (e.g., log2FoldChange) and significance (e.g., padj) columns.}
 
-\item{hide.inputs}{A character vector of input IDs to hide.}
+\item{hide.inputs}{A character vector of input IDs to hide. The continuous
+colour-scale and contour controls are always hidden, since a volcano plot
+colours by the discrete \code{group} column.}
 
-\item{hide.tabs}{A character vector of tab names to hide. Default hides: "Trajectory", "Facets", "Colors", "Legend/Scale".}
+\item{hide.tabs}{A character vector of tab names to hide. Default hides:
+"Trajectory" and "Facet".}
 
 \item{defaults}{A named list of default values. Merged over the module's
-volcano defaults (user values win) and used to restore state on reset.}
+volcano defaults (user values win) and used to restore state on reset.
+Group colours are set with \code{color.up} / \code{color.down} / \code{color.ns}, or
+directly with a named \code{color.panel} vector.}
 }
 \value{
 The \code{moduleServer} function for the volcanoPlot module.

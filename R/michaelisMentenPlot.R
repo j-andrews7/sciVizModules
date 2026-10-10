@@ -37,6 +37,7 @@
 #' @export
 #' @author Jacob Martin
 #' @examples
+#' data(mm_kinetics)
 #' if (requireNamespace("drc", quietly = TRUE)) {
 #'     library(drc)
 #'     mm_model <- drm(v ~ S, data = mm_kinetics, fct = MM.2())

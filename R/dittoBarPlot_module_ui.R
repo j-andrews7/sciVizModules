@@ -73,24 +73,24 @@ dittoBarPlotInputsUI <- function(id, data, defaults = NULL, title = "BarPlot Set
 
     inputs <- list(
         "Data" = tagList(
-            tipify(selectInput(ns("var"), "Variable",
+            tipify(viz_select_input(ns("var"), "Variable",
                 choices = var.choices,
-                selected = default.var, selectize = FALSE
+                selected = default.var
             ), documentParameters$var,
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("group.by"), "Group By",
+            tipify(viz_select_input(ns("group.by"), "Group By",
                 choices = group.choices,
-                selected = default.group, selectize = FALSE
+                selected = default.group
             ), documentParameters$group.by,
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("scale"), "Scale",
+            tipify(viz_select_input(ns("scale"), "Scale",
                 choices = c("Percent" = "percent", "Count" = "count"),
-                selected = get_default(defaults, "scale", "percent"), selectize = FALSE
+                selected = get_default(defaults, "scale", "percent")
             ), documentParameters$scale,
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("split.by"), "Split By (facet)",
+            tipify(viz_select_input(ns("split.by"), "Split By (facet)",
                 choices = split.choices,
-                selected = get_default(defaults, "split.by", ""), selectize = FALSE
+                selected = get_default(defaults, "split.by", "")
             ), documentParameters$split.by,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("split.nrow"), "Facet Rows",

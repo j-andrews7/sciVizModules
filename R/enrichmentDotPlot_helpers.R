@@ -109,7 +109,9 @@
 #'
 #' @param data A data frame of enrichment results.
 #' @return A list with elements `data` (the augmented data frame) and `mapping`
-#'   (a named list with `x`, `y`, `size`, and `fill` column names).
+#'   (a named list with `x`, `y`, `size`, and `fill` column names, and
+#'   `size.scale.min`: 0 when the size column is a ratio or count that cannot be
+#'   negative, so dot area is proportional to it, else `NULL`).
 #'
 #' @author Jacob Martin
 #' @rdname INTERNAL_prepare_enrichment
@@ -146,13 +148,24 @@
         fill_col <- "neg_log10_pvalue"
     }
 
+    # A ratio or count starts at zero, so its size scale does too: a dot's area is
+    # then proportional to its value and the size legend starts at 0. A signed
+    # score (NES) keeps the data's range, as negative values would all be squished
+    # to the smallest dot.
+    size_floor <- NULL
+    if (!is.null(size_col) && !identical(tolower(size_col), "nes")) {
+        v <- data[[size_col]]
+        if (is.numeric(v) && any(is.finite(v)) && all(v[is.finite(v)] >= 0)) size_floor <- 0
+    }
+
     list(
         data = data,
         mapping = list(
             x = group_col,
             y = term_col,
             size = size_col,
-            fill = fill_col
+            fill = fill_col,
+            size.scale.min = size_floor
         )
     )
 }
@@ -165,7 +178,7 @@
 #' @param mapping The mapping list produced by [.prepare_enrichment()].
 #' @return A named list of defaults keyed by DotPlot UI input IDs.
 #'
-#' @author Jacob Martin
+#' @author Jacob Martin, Jared Andrews
 #' @rdname INTERNAL_enrich_defaults
 #' @keywords internal
 .enrich_defaults <- function(defaults, mapping) {
@@ -174,5 +187,10 @@
     if (!is.null(mapping$x) && is.null(defaults[["x.data"]])) defaults[["x.data"]] <- mapping$x
     if (!is.null(mapping$size) && is.null(defaults[["size.by"]])) defaults[["size.by"]] <- mapping$size
     if (!is.null(mapping$fill) && is.null(defaults[["fill.by"]])) defaults[["fill.by"]] <- mapping$fill
+    # The zero floor belongs to the detected size column, so a caller's own Size By keeps its range.
+    if (!is.null(mapping$size.scale.min) && is.null(defaults[["size.scale.min"]]) &&
+        identical(defaults[["size.by"]], mapping$size)) {
+        defaults[["size.scale.min"]] <- mapping$size.scale.min
+    }
     defaults
 }
