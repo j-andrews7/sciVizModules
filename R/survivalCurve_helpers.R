@@ -77,7 +77,9 @@
         surv.median.line = "none",
         fun = "survival",
         line.size = 2,
-        break.time.by = NA
+        break.time.by = NA,
+        pairwise = FALSE,
+        stat.p.adjust = "holm"
     )
     lapply(stats::setNames(names(base), names(base)), function(k) get_default(defaults, k, base[[k]]))
 }
@@ -102,6 +104,28 @@
 
 # The band controls, shown only while the band is drawn.
 .surv_band_inputs <- c("conf.int.opacity", "conf.level", "conf.type")
+
+# The pairwise comparison controls, shown only while comparisons are on.
+.surv_pairwise_inputs <- c("stat.pairs", "stat.p.adjust")
+
+#' Comparisons offered for a set of strata
+#'
+#' Shared by [survivalCurveInputsUI()] and the module server, which refills the
+#' Comparisons select when the grouping changes.
+#'
+#' @param levels The strata, as from [.surv_levels()].
+#' @return `"A vs B"` strings for every pair, in level order, or `character(0)`
+#'   for fewer than three strata, where the one comparison is the global test.
+#'
+#' @author Jared Andrews
+#' @rdname INTERNAL_surv_pair_choices
+#' @keywords internal
+.surv_pair_choices <- function(levels) {
+    if (length(levels) < 3) {
+        return(character(0))
+    }
+    generate_pair_strings(data.frame(stratum = levels), "stratum")
+}
 
 # The `conf.type` and `fun` choices survivalCurve() accepts; the names are what
 # the module's selects display.
@@ -364,6 +388,151 @@
 #' @keywords internal
 .km_pvalue_text <- function(p) {
     if (p < 1e-4) "p < 0.0001" else paste0("p = ", format(signif(p, 2), scientific = FALSE))
+}
+
+
+#' Pairwise log-rank tests between strata
+#'
+#' Each pair of strata is compared on its own subjects, as survminer's
+#' `pairwise_survdiff()` does: a log-rank test, its p-value adjusted across the
+#' comparisons made. Each pair also gets the hazard ratio of its second group
+#' against its first, from a Cox model of the pair, with a 95% Wald interval.
+#' The hazard ratio is `NA` when either group has no events, or when the
+#' model's estimate runs off to infinity (a tiny group whose events all come
+#' first, say), since there is no finite estimate to report.
+#'
+#' @param df The fitted data, with `.surv_time`, `.surv_status` and `.stratum`.
+#' @param levels The strata, in the fit's order.
+#' @param pairs A list of length-2 character vectors naming the pairs to test,
+#'   or `NULL` for every pair, in level order. A pair naming a stratum not in
+#'   `levels`, or repeating another in either order, is dropped.
+#' @param p.adjust.method A [stats::p.adjust()] method.
+#' @return A data frame with one row per pair: `group1`, `group2`, `n1`, `n2`,
+#'   `events1`, `events2`, `test`, `chisq`, `p.value`, `p.adj`,
+#'   `p.adjust.method`, `hr` (`group2` relative to `group1`), `hr.lower` and
+#'   `hr.upper`. `NULL` when there is no pair to test.
+#'
+#' @author Jared Andrews
+#' @rdname INTERNAL_km_pairwise
+#' @keywords internal
+.km_pairwise <- function(df, levels, pairs = NULL, p.adjust.method = "holm") {
+    if (is.null(pairs)) {
+        pairs <- if (length(levels) >= 2) utils::combn(levels, 2, simplify = FALSE) else list()
+    }
+    pairs <- Filter(function(p) length(p) == 2 && all(p %in% levels) && p[1] != p[2], lapply(pairs, as.character))
+    pairs <- pairs[!duplicated(lapply(pairs, sort))]
+    if (length(pairs) == 0) {
+        return(NULL)
+    }
+
+    rows <- lapply(pairs, function(p) {
+        d <- df[as.character(df$.stratum) %in% p, , drop = FALSE]
+        d$.stratum <- factor(as.character(d$.stratum), levels = p)
+        n <- as.vector(table(d$.stratum))
+        events <- as.vector(tapply(d$.surv_status, d$.stratum, sum))
+        lr <- tryCatch(.km_logrank(d), error = function(e) list(chisq = NA_real_, p = NA_real_))
+        hr <- if (all(events > 0)) .km_pair_hr(d) else rep(NA_real_, 3)
+        data.frame(
+            group1 = p[1], group2 = p[2], n1 = n[1], n2 = n[2], events1 = events[1], events2 = events[2],
+            test = "log-rank", chisq = lr$chisq, p.value = lr$p, hr = hr[1], hr.lower = hr[2], hr.upper = hr[3],
+            stringsAsFactors = FALSE
+        )
+    })
+    out <- do.call(rbind, rows)
+    out$p.adj <- stats::p.adjust(out$p.value, method = p.adjust.method)
+    out$p.adjust.method <- p.adjust.method
+    out[, c("group1", "group2", "n1", "n2", "events1", "events2", "test", "chisq", "p.value", "p.adj",
+        "p.adjust.method", "hr", "hr.lower", "hr.upper")]
+}
+
+
+#' Hazard ratio of a pair of strata
+#'
+#' @param d One pair's subjects, `.stratum` a factor with the reference first.
+#' @return The hazard ratio of the second level against the first and its 95%
+#'   Wald interval, or three `NA`s when the Cox model has no finite estimate.
+#'
+#' @author Jared Andrews
+#' @rdname INTERNAL_km_pair_hr
+#' @keywords internal
+.km_pair_hr <- function(d) {
+    infinite <- FALSE
+    fit <- tryCatch(
+        withCallingHandlers(
+            survival::coxph(survival::Surv(.surv_time, .surv_status) ~ .stratum, data = d),
+            # coxph()'s "coefficient may be infinite" or "did not converge":
+            # the estimate diverged.
+            warning = function(w) {
+                if (grepl("infinite|did not converge", conditionMessage(w))) {
+                    infinite <<- TRUE
+                    invokeRestart("muffleWarning")
+                }
+            }
+        ),
+        error = function(e) NULL
+    )
+    if (is.null(fit) || infinite) {
+        return(rep(NA_real_, 3))
+    }
+    unname(exp(c(stats::coef(fit), stats::confint(fit, level = 0.95))))
+}
+
+
+# Comparisons beyond this many are left to the statistics table, not listed on the plot.
+.km_pairwise_max_lines <- 10
+
+#' On-plot lines and hover text of the pairwise comparisons
+#'
+#' @param pw A table from [.km_pairwise()].
+#' @param max.lines Most comparisons to list on the plot; more are summarised in
+#'   one line pointing to the statistics table.
+#' @return `.km_pairwise_text()`: a character vector, a header and then a line
+#'   per comparison. `.km_pairwise_hover()`: one string, a line per comparison
+#'   with its hazard ratio, p-values, subjects and events.
+#'
+#' @author Jared Andrews
+#' @rdname INTERNAL_km_pairwise_text
+#' @keywords internal
+.km_pairwise_text <- function(pw, max.lines = .km_pairwise_max_lines) {
+    method <- pw$p.adjust.method[1]
+    header <- if (identical(method, "none")) {
+        "Pairwise log-rank (unadjusted):"
+    } else {
+        paste0("Pairwise log-rank, ", .km_adjust_label(method), "-adjusted:")
+    }
+    if (nrow(pw) > max.lines) {
+        return(c(header, sprintf("%d comparisons: see the statistics table", nrow(pw))))
+    }
+    p <- vapply(pw$p.adj, function(v) if (is.na(v)) "p = NA" else .km_pvalue_text(v), "")
+    c(header, paste0(pw$group1, " vs ", pw$group2, ": ", p))
+}
+
+#' @rdname INTERNAL_km_pairwise_text
+.km_pairwise_hover <- function(pw) {
+    num <- function(x) ifelse(is.na(x), "NA", trimws(formatC(x, digits = 3, format = "g")))
+    hr <- ifelse(is.na(pw$hr), "HR not estimable",
+        sprintf("HR (%s / %s) %s, 95%% CI %s to %s", pw$group2, pw$group1, num(pw$hr), num(pw$hr.lower),
+            num(pw$hr.upper)))
+    paste(sprintf("%s vs %s: %s; p = %s, adjusted %s; n %d / %d, events %d / %d",
+        pw$group1, pw$group2, hr, num(pw$p.value), num(pw$p.adj), as.integer(pw$n1), as.integer(pw$n2),
+        as.integer(pw$events1), as.integer(pw$events2)), collapse = "<br>")
+}
+
+
+#' Display name of a p-value adjustment method
+#'
+#' @param method A [stats::p.adjust()] method.
+#' @return A short name, such as `"Holm"` or `"BH"`.
+#'
+#' @author Jared Andrews
+#' @rdname INTERNAL_km_adjust_label
+#' @keywords internal
+.km_adjust_label <- function(method) {
+    switch(method,
+        holm = "Holm", hochberg = "Hochberg", hommel = "Hommel", bonferroni = "Bonferroni",
+        BH = , fdr = "BH", BY = "BY",
+        method
+    )
 }
 
 

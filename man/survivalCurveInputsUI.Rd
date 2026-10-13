@@ -64,6 +64,14 @@ the \code{\link[survival:survfit]{survival::survfit()}} default; shown while the
 \item \code{risk.table} - Show "number at risk" table (default: FALSE)
 \item \code{censor} - Show censoring marks (default: TRUE)
 \item \code{surv.median.line} - Median survival reference lines (default: "none")
+\item \code{pairwise} - With three or more groups, also test each pair of groups (UI: "Pairwise Comparisons",
+default: FALSE). The adjusted p-values are listed on the plot, each pair's hazard ratio is in its hover
+text, and the source download carries the full comparison table. See \code{\link[=survivalCurve]{survivalCurve()}}'s Details for how
+to read them.
+\item \code{stat.pairs} - The pairs to test, as \code{"A vs B"} strings (UI: "Comparisons", default: all pairs; shown
+while comparisons are on)
+\item \code{stat.p.adjust} - Multiple-testing correction across the pairs, a \code{\link[stats:p.adjust]{stats::p.adjust()}} method (UI:
+"P-value Adjustment", default: "holm"; shown while comparisons are on)
 \item \code{fun} - Curve transformation: survival probability, "pct", "event",
 or "cumhaz" (default: survival probability)
 \item \code{line.size} - Line width in pixels (default: 2)

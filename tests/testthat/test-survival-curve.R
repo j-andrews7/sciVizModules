@@ -351,3 +351,135 @@ test_that("Group By leaves out columns with too many levels to draw a curve each
     expect_true("arm" %in% groups)
     expect_false("patient" %in% groups)
 })
+
+# The fitted frame survivalCurve() builds, stratified by ph.ecog (four groups,
+# one of them a single subject).
+ecog_frame <- function() {
+    data(survival_lung, package = "sciVizModules", envir = environment())
+    df <- survival_lung[!is.na(survival_lung$ph.ecog), ]
+    df$.surv_time <- df$time
+    df$.surv_status <- .normalize_survival_status(df$status)
+    df$.stratum <- factor(as.character(df$ph.ecog), levels = .surv_levels(df$ph.ecog))
+    df
+}
+
+test_that("pairwise log-rank tests match the survival package and survminer", {
+    df <- ecog_frame()
+    lv <- levels(df$.stratum)
+    for (method in c("holm", "BH")) {
+        pw <- .km_pairwise(df, lv, p.adjust.method = method)
+        expect_identical(nrow(pw), 6L)
+        # Each pair is tested on its own subjects.
+        ref <- vapply(seq_len(nrow(pw)), function(i) {
+            s <- df[df$.stratum %in% c(pw$group1[i], pw$group2[i]), ]
+            sd <- survival::survdiff(survival::Surv(.surv_time, .surv_status) ~ droplevels(.stratum), data = s)
+            stats::pchisq(sd$chisq, 1, lower.tail = FALSE)
+        }, numeric(1))
+        expect_equal(pw$p.value, ref)
+        expect_equal(pw$p.adj, stats::p.adjust(ref, method))
+        expect_identical(unique(pw$p.adjust.method), method)
+    }
+
+    # The hazard ratio is group2 relative to group1, from a Cox model of the pair.
+    s <- df[df$.stratum %in% c("Asymptomatic", "Symptomatic"), ]
+    s$.stratum <- factor(as.character(s$.stratum), levels = c("Asymptomatic", "Symptomatic"))
+    fit <- survival::coxph(survival::Surv(.surv_time, .surv_status) ~ .stratum, data = s)
+    expect_identical(c(pw$group1[1], pw$group2[1]), c("Asymptomatic", "Symptomatic"))
+    expect_equal(pw$hr[1], unname(exp(stats::coef(fit))))
+    expect_equal(c(pw$hr.lower[1], pw$hr.upper[1]), unname(exp(stats::confint(fit))[1, ]))
+    expect_identical(c(pw$n1[1], pw$n2[1], pw$events1[1], pw$events2[1]), c(63L, 113L, 37, 82))
+
+    skip_if_not_installed("survminer")
+    sm <- survminer::pairwise_survdiff(survival::Surv(time, status) ~ ph.ecog, data = df, p.adjust.method = "BH")
+    expect_equal(.km_pairwise(df, lv, p.adjust.method = "BH")$p.adj,
+        as.vector(sm$p.value[lower.tri(sm$p.value, diag = TRUE)]))
+})
+
+test_that("pairwise tests take only the chosen pairs, and no hazard ratio without a finite estimate", {
+    df <- ecog_frame()
+    lv <- levels(df$.stratum)
+    # A repeat in the other order and a pair naming no stratum are dropped, and
+    # the adjustment covers only the pairs tested.
+    pw <- .km_pairwise(df, lv, pairs = list(c("Symptomatic", "Asymptomatic"), c("Asymptomatic", "Symptomatic"),
+        c("Asymptomatic", "Nope"), c("Asymptomatic", "In bed <50%")), p.adjust.method = "bonferroni")
+    expect_identical(pw$group1, c("Symptomatic", "Asymptomatic"))
+    expect_identical(pw$group2, c("Asymptomatic", "In bed <50%"))
+    expect_equal(pw$p.adj, pmin(1, 2 * pw$p.value))
+    expect_null(.km_pairwise(df, lv, pairs = list(c("Nope", "Asymptomatic"))))
+
+    # A group without events still gets its log-rank test, but no hazard ratio.
+    toy <- data.frame(
+        .surv_time = c(2, 4, 6, 3, 5, 7, 8, 9, 10),
+        .surv_status = c(1, 1, 0, 1, 0, 1, 0, 0, 0),
+        .stratum = factor(rep(c("A", "B", "C"), each = 3))
+    )
+    pw <- .km_pairwise(toy, c("A", "B", "C"))
+    expect_false(anyNA(pw$p.value))
+    expect_true(all(is.na(pw$hr[pw$group2 == "C"])))
+    expect_false(is.na(pw$hr[pw$group2 == "B"]))
+
+    # Every event in one group before any in the other: the estimate diverges.
+    mono <- data.frame(.surv_time = c(1, 2, 5, 6), .surv_status = 1, .stratum = factor(c("A", "A", "B", "B")))
+    expect_no_warning(hr <- .km_pair_hr(mono))
+    expect_true(all(is.na(hr)))
+})
+
+test_that("pairwise comparisons are listed on the plot and returned beside the summary", {
+    data(survival_lung, package = "sciVizModules")
+    fig <- survivalCurve(survival_lung, time = "time", status = "status", group.by = "ph.ecog", pairwise = TRUE)
+    pw <- attr(fig, "pairwise")
+    expect_identical(nrow(pw), 6L)
+    # The standalone summary keeps its shape.
+    expect_s3_class(attr(fig, "table"), "data.frame")
+    expect_identical(nrow(attr(fig, "table")), 4L)
+
+    anns <- plotly::plotly_build(fig)$x$layout$annotations
+    ann <- anns[[length(anns)]]
+    lines <- strsplit(ann$text, "<br>", fixed = TRUE)[[1]]
+    expect_length(lines, 8)
+    expect_match(lines[1], "^Log-rank p")
+    expect_identical(lines[2], "Pairwise log-rank, Holm-adjusted:")
+    expect_identical(lines[3], paste0("Asymptomatic vs Symptomatic: ", .km_pvalue_text(pw$p.adj[1])))
+    expect_identical(ann$align, "left")
+    expect_match(ann$hovertext, "HR (Symptomatic / Asymptomatic) 1.44, 95% CI", fixed = TRUE)
+    expect_match(ann$hovertext, "n 63 / 1, events 37 / 1", fixed = TRUE)
+
+    # Without the global p-value, only the comparisons.
+    alone <- plotly::plotly_build(survivalCurve(survival_lung, time = "time", status = "status",
+        group.by = "ph.ecog", pairwise = TRUE, pval = FALSE, p.adjust.method = "none"))$x$layout$annotations
+    expect_true(startsWith(alone[[length(alone)]]$text, "Pairwise log-rank (unadjusted):<br>"))
+    # Too many to list: pointed to the table.
+    expect_identical(.km_pairwise_text(pw, max.lines = 3), c("Pairwise log-rank, Holm-adjusted:",
+        "6 comparisons: see the statistics table"))
+
+    # With two groups the one comparison is the global test.
+    two <- survivalCurve(survival_lung, time = "time", status = "status", group.by = "sex", pairwise = TRUE)
+    expect_null(attr(two, "pairwise"))
+})
+
+test_that("the server exports the pairwise table beside the strata summary", {
+    data(survival_lung, package = "sciVizModules")
+    shiny::testServer(
+        survivalCurveServer,
+        args = list(data = shiny::reactive(survival_lung)),
+        expr = {
+            do.call(session$setInputs, c(
+                list(auto.update = TRUE, time = "time", status = "status", group.by = "ph.ecog", pairwise = TRUE,
+                     stat.pairs = "", stat.p.adjust = "BH", download.format = "png"),
+                test_axes_inputs(), test_legend_inputs()
+            ))
+            expect_identical(state$pair_choices()[1], "Asymptomatic vs Symptomatic")
+            stats <- plot_source_reactive()$stats
+            expect_named(stats, c("strata", "pairwise"))
+            expect_identical(nrow(stats$strata), 4L)
+            expect_identical(nrow(stats$pairwise), 6L)
+            expect_identical(unique(stats$pairwise$p.adjust.method), "BH")
+
+            session$setInputs(stat.pairs = c("Asymptomatic vs Symptomatic", "Asymptomatic vs In bed <50%"))
+            expect_identical(nrow(plot_source_reactive()$stats$pairwise), 2L)
+
+            session$setInputs(pairwise = FALSE)
+            expect_s3_class(plot_source_reactive()$stats, "data.frame")
+        }
+    )
+})

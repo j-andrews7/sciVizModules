@@ -270,6 +270,54 @@ head(survival_lung)
 #> time, status, age, sex, ph.ecog
 ```
 
+#### Comparing three or more groups
+
+The log-rank p-value on the plot is a global test: it says whether survival
+differs anywhere among the groups, not which groups differ. With three or more
+groups, **Pairwise Comparisons** (`pairwise = TRUE`) also tests each pair, lists
+the adjusted p-values on the plot, shows each pair's hazard ratio on hover, and
+adds the full comparison table to the source download.
+
+```{r surv-pairwise}
+fig <- survivalCurve(survival_lung,
+    time = "time", status = "status", group.by = "ph.ecog",
+    pairwise = TRUE, p.adjust.method = "holm"
+)
+attr(fig, "pairwise")
+#> group1, group2, n1, n2, events1, events2, test, chisq, p.value, p.adj,
+#> p.adjust.method, hr, hr.lower, hr.upper
+```
+
+Points to keep in mind when reading them:
+
+- **Each pair is tested on its own subjects**, with a log-rank test of the two
+  groups (as survminer's `pairwise_survdiff()` computes).
+- **The p-values are adjusted for the number of comparisons made.** Holm, the
+  default, keeps the chance of any false positive among them at the nominal
+  level. BH controls the false discovery rate instead, which suits screening
+  many groups, and `none` overstates significance. Testing fewer,
+  pre-specified comparisons (**Comparisons**, e.g. each group against a
+  control) costs less power. The adjustment covers only the comparisons in this
+  run: picking them after looking at the curves, or regrouping the data until
+  something is significant, is not accounted for.
+- **A p-value is not the size of a difference.** The hazard ratio is `group2`
+  relative to `group1`, from a Cox model of the pair. Above 1, `group2` has the
+  higher hazard, and so shorter survival. Its 95% interval is not adjusted for
+  multiplicity, and it can disagree slightly with the log-rank p-value near the
+  significance cut-off.
+- **The log-rank test assumes proportional hazards.** It is most sensitive when
+  one group's hazard is a constant multiple of the other's. Curves that cross
+  can hide a real difference, and the hazard ratio then averages over opposite
+  effects, so read the tests against the curves.
+- **Small groups give unreliable results.** In `survival_lung`, `ph.ecog`'s
+  "In bed >50%" group is a single subject, yet its comparisons come out
+  "significant". Check each pair's subjects and events (`n1`, `n2`, `events1`,
+  `events2`), and drop or merge sparse groups (the data table filter) before
+  testing.
+- **These are unadjusted comparisons of unordered groups.** For ordered groups
+  (stage, dose), a trend test is more powerful. For the effect of a group
+  allowing for other covariates, fit a Cox model with `forestPlot()`.
+
 ### Clinical models
 
 | Module | Server function | Data type | Expected data | Example data |

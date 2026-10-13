@@ -3,7 +3,9 @@
 #' This module fits a Kaplan-Meier survival curve with [survival::survfit()] and
 #' renders it as an interactive `plotly` figure via [survivalCurve()]. The
 #' per-stratum summary (subjects, events, median survival, log-rank test) is
-#' included in the source-data download as the statistics table.
+#' included in the source-data download as the statistics table
+#' (`<name>_stats_strata.csv` while pairwise comparisons are on, beside the
+#' comparison table, `<name>_stats_pairwise.csv`).
 #'
 #' @param id The ID for the Shiny module.
 #' @param data A `reactive` containing the data frame to plot. Must contain a
@@ -54,8 +56,8 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             output$palette.selection <- .sci_palette_picker_ui(input, session, palette_groups, palette_store,
                 default_palette_values, defaults, "Curve Colors")
 
-            # The band's controls apply only while it is drawn. What the app hid
-            # via hide.inputs is never shown again here.
+            # The band's and the comparisons' controls apply only while they are
+            # on. What the app hid via hide.inputs is never shown again here.
             observeEvent(input$conf.int, {
                 if (isTRUE(input$conf.int)) {
                     show_input(session, setdiff(.surv_band_inputs, hide.inputs))
@@ -63,8 +65,30 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                     hide_input(session, .surv_band_inputs)
                 }
             }, ignoreInit = FALSE)
+            observeEvent(input$pairwise, {
+                if (isTRUE(input$pairwise)) {
+                    show_input(session, setdiff(.surv_pairwise_inputs, hide.inputs))
+                } else {
+                    hide_input(session, .surv_pairwise_inputs)
+                }
+            }, ignoreInit = FALSE)
 
-            list(palette_groups = palette_groups, palette_store = palette_store)
+            # The comparisons on offer follow the grouping. Frozen first, and
+            # ahead of the plot, so the plot is not drawn for the old selection
+            # and then again for the new one.
+            pair_choices <- reactive({
+                df <- object()
+                group_col <- input$group.by
+                .surv_pair_choices(if (nz_value(group_col) && group_col %in% names(df)) .surv_levels(df[[group_col]]))
+            })
+            observeEvent(pair_choices(), {
+                choices <- pair_choices()
+                freezeReactiveValue(input, "stat.pairs")
+                update_viz_select(session, "stat.pairs", choices = choices,
+                    selected = default_stat_pairs(defaults, choices))
+            }, ignoreInit = TRUE, priority = 10)
+
+            list(palette_groups = palette_groups, palette_store = palette_store, pair_choices = pair_choices)
         },
         build = function(df, input, isolate_fn, state) {
             time_col <- isolate_fn(input$time)
@@ -76,8 +100,13 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             if (length(break.time.by) != 1 || is.na(break.time.by)) break.time.by <- NULL
             conf.type <- isolate_fn(input$conf.type)
             if (!isTRUE(conf.type %in% .surv_conf_type_choices)) conf.type <- "log"
+            pairwise <- isTRUE(isolate_fn(input$pairwise))
+            # Read only while the comparisons are on, so their controls do not
+            # redraw a plot that shows none.
+            pairs <- if (pairwise) parse_pair_strings(isolate_fn(input$stat.pairs))
+            p.adjust.method <- if (pairwise) isolate_fn(input$stat.p.adjust)
 
-            survivalCurve(
+            fig <- survivalCurve(
                 data = df,
                 time = time_col,
                 status = status_col,
@@ -93,15 +122,24 @@ survivalCurveServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 fun = if (is.null(fun) || fun == "survival") NULL else fun,
                 palette.selection = isolate_fn(state$palette_store()),
                 line.size = isolate_fn(input$line.size) %||% 2,
-                break.time.by = break.time.by
+                break.time.by = break.time.by,
+                pairwise = pairwise,
+                pairs = pairs,
+                p.adjust.method = p.adjust.method %||% "holm"
             )
+            # Two statistics tables, written to the source download as one CSV each.
+            if (!is.null(attr(fig, "pairwise"))) {
+                attr(fig, "table") <- list(strata = attr(fig, "table"), pairwise = attr(fig, "pairwise"))
+            }
+            fig
         },
         reset = function(session, df, defaults, state) {
             d <- .surv_defaults(df, defaults)
-            for (k in c("time", "status", "group.by", "conf.type", "surv.median.line", "fun")) {
+            for (k in c("time", "status", "group.by", "conf.type", "surv.median.line", "fun", "stat.p.adjust")) {
                 update_viz_select(session, k, selected = d[[k]])
             }
-            for (k in c("conf.int", "pval", "risk.table", "censor")) {
+            update_viz_select(session, "stat.pairs", selected = default_stat_pairs(defaults, state$pair_choices()))
+            for (k in c("conf.int", "pval", "risk.table", "censor", "pairwise")) {
                 updateMaterialSwitch(session, k, value = isTRUE(d[[k]]))
             }
             for (k in c("conf.int.opacity", "conf.level", "line.size", "break.time.by")) {

@@ -15,6 +15,38 @@
 #' When `group.by` is supplied the curve is stratified by that column and the
 #' log-rank test p-value (from [survival::survdiff()]) can be shown via `pval`.
 #'
+#' **Comparing three or more groups.** The log-rank test above is a global test:
+#' it asks whether survival differs anywhere among the groups, not which groups
+#' differ. With `pairwise = TRUE` and three or more groups, each pair is also
+#' tested on its own subjects (a log-rank test of the two groups, as
+#' survminer's `pairwise_survdiff()` computes), and the results are listed on
+#' the plot and returned as attribute `"pairwise"`. To read them:
+#' - The p-values are adjusted for the number of comparisons made
+#'   (`p.adjust.method`, default Holm, which keeps the chance of any false
+#'   positive among them at the nominal level; `"BH"` controls the false
+#'   discovery rate instead and suits screening many groups; `"none"` overstates
+#'   significance). Testing only the comparisons that matter (`pairs`, each
+#'   group against a control, say) costs less power. The adjustment covers only
+#'   the comparisons in this call: picking them after looking at the curves, or
+#'   regrouping the data until something is significant, is not accounted for.
+#' - A p-value does not say how large a difference is. Each pair also gets the
+#'   hazard ratio (`hr`) of `group2` relative to `group1`, from a Cox model of
+#'   the pair, with its 95% confidence interval: above 1, `group2` has the
+#'   higher hazard (shorter survival). The interval is not adjusted for
+#'   multiplicity, and being a Wald interval it can disagree slightly with the
+#'   log-rank p-value near the significance cut-off.
+#' - The log-rank test is most sensitive when one group's hazard is a constant
+#'   multiple of the other's (proportional hazards). Curves that cross can hide
+#'   a real difference, and the hazard ratio then averages over opposite
+#'   effects, so read the tests against the curves.
+#' - Groups with few subjects or events give unstable results; in
+#'   `survival_lung`, `ph.ecog`'s "In bed >50%" group is a single subject, yet
+#'   its comparisons come out "significant". Check `n1`, `n2`, `events1` and
+#'   `events2`, and drop or merge sparse groups before testing.
+#' - The tests ignore any order among the groups (stage, dose), for which a trend
+#'   test is more powerful, and they are unadjusted for other covariates: see
+#'   [forestPlot()] for a Cox model with covariates.
+#'
 #' The figure is built natively in plotly rather than converted from a ggplot:
 #' [plotly::ggplotly()] cannot draw the stepped confidence band survminer uses.
 #'
@@ -48,10 +80,25 @@
 #' @param break.time.by Optional numeric spacing between x-axis tick marks, which
 #'   also sets the times the risk table counts at.
 #' @param legend.title Legend title. Defaults to `group.by` when stratified.
+#' @param pairwise Logical; also test each pair of groups (default `FALSE`). Only
+#'   applied when `group.by` defines three or more groups; with two, the pairwise
+#'   test is the global one. See Details for how to read the results.
+#' @param pairs Optional list of length-2 character vectors naming the pairs to
+#'   test, e.g. `list(c("Asymptomatic", "Symptomatic"))`, as for
+#'   [VizModules::compute_pairwise_stats()]. `NULL` (the default) tests every
+#'   pair. The p-values are adjusted across the pairs tested.
+#' @param p.adjust.method A [stats::p.adjust()] method for the pairwise p-values
+#'   (default `"holm"`).
 #'
 #' @return A [plotly::plot_ly()] object containing the interactive survival curve,
 #'   with a per-stratum summary (subjects, events, median survival and its
-#'   confidence interval, and the log-rank test) as attribute `"table"`.
+#'   confidence interval, and the log-rank test) as attribute `"table"`. With
+#'   `pairwise`, attribute `"pairwise"` holds a row per comparison: `group1`,
+#'   `group2`, their subjects (`n1`, `n2`) and events (`events1`, `events2`),
+#'   the log-rank `chisq` and `p.value`, the adjusted `p.adj` and its
+#'   `p.adjust.method`, and the hazard ratio of `group2` relative to `group1`
+#'   (`hr`) with its 95% confidence interval (`hr.lower`, `hr.upper`), `NA` when
+#'   a group has no events or the model has no finite estimate.
 #'
 #' @importFrom survival Surv survfit survdiff
 #' @importFrom stats as.formula
@@ -75,6 +122,12 @@
 #'     time = "time", status = "status", group.by = "sex",
 #'     fun = "event", risk.table = TRUE
 #' )
+#'
+#' # Four performance-status groups, each pair compared.
+#' fig3 <- survivalCurve(survival_lung,
+#'     time = "time", status = "status", group.by = "ph.ecog", pairwise = TRUE
+#' )
+#' attr(fig3, "pairwise")
 survivalCurve <- function(data,
                           time,
                           status,
@@ -91,7 +144,10 @@ survivalCurve <- function(data,
                           palette.selection = NULL,
                           line.size = 2,
                           break.time.by = NULL,
-                          legend.title = NULL) {
+                          legend.title = NULL,
+                          pairwise = FALSE,
+                          pairs = NULL,
+                          p.adjust.method = "holm") {
     conf.type <- match.arg(conf.type)
     stopifnot(is.data.frame(data))
     if (!time %in% names(data)) stop("Time column '", time, "' not found in data.")
@@ -173,14 +229,30 @@ survivalCurve <- function(data,
     }
 
     logrank <- if (has_group && length(lv) > 1) .km_logrank(df) else NULL
-    if (isTRUE(pval) && !is.null(logrank)) {
+    if (!isTRUE(p.adjust.method %in% stats::p.adjust.methods)) p.adjust.method <- "holm"
+    # With two groups the one pairwise test is the global test.
+    pw <- if (isTRUE(pairwise) && has_group && length(lv) >= 3) .km_pairwise(df, lv, pairs, p.adjust.method)
+    lines <- if (isTRUE(pval) && !is.null(logrank)) .km_pvalue_text(logrank$p) else character(0)
+    if (!is.null(pw)) {
+        lines <- c(if (length(lines)) paste("Log-rank", lines), .km_pairwise_text(pw))
+    }
+    if (length(lines)) {
         # Bottom left, clear of falling survival curves; top left for rising ones.
         rising <- isTRUE(fun %in% c("event", "cumhaz"))
-        fig$x$layout$annotations <- c(fig$x$layout$annotations, list(list(
+        ann <- list(
             x = 0.08, y = if (rising) 0.95 else 0.1, xref = "paper", yref = "paper",
             xanchor = "left", yanchor = if (rising) "top" else "bottom",
-            text = .km_pvalue_text(logrank$p), showarrow = FALSE, font = list(size = 14, color = "black")
-        )))
+            text = paste(lines, collapse = "<br>"), showarrow = FALSE, font = list(size = 14, color = "black")
+        )
+        if (!is.null(pw)) {
+            # Several lines that may sit over the curves: kept legible on a
+            # backing, and draggable out of the way like any annotation.
+            ann$align <- "left"
+            ann$font$size <- 12
+            ann$bgcolor <- "rgba(255,255,255,0.85)"
+            ann$hovertext <- .km_pairwise_hover(pw)
+        }
+        fig$x$layout$annotations <- c(fig$x$layout$annotations, list(ann))
     }
 
     fig$x$layout$legend$title$text <- legend.title
@@ -197,6 +269,7 @@ survivalCurve <- function(data,
     }
 
     attr(fig, "table") <- .km_summary_table(fit, lv, logrank)
+    attr(fig, "pairwise") <- pw
     fig
 }
 

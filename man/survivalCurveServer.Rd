@@ -36,7 +36,9 @@ A \code{reactive} returning the source-data list.
 This module fits a Kaplan-Meier survival curve with \code{\link[survival:survfit]{survival::survfit()}} and
 renders it as an interactive \code{plotly} figure via \code{\link[=survivalCurve]{survivalCurve()}}. The
 per-stratum summary (subjects, events, median survival, log-rank test) is
-included in the source-data download as the statistics table.
+included in the source-data download as the statistics table
+(\verb{<name>_stats_strata.csv} while pairwise comparisons are on, beside the
+comparison table, \verb{<name>_stats_pairwise.csv}).
 }
 \examples{
 library(sciVizModules)

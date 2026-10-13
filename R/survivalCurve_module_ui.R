@@ -35,6 +35,14 @@
 #' - `risk.table` - Show "number at risk" table (default: FALSE)
 #' - `censor` - Show censoring marks (default: TRUE)
 #' - `surv.median.line` - Median survival reference lines (default: "none")
+#' - `pairwise` - With three or more groups, also test each pair of groups (UI: "Pairwise Comparisons",
+#'   default: FALSE). The adjusted p-values are listed on the plot, each pair's hazard ratio is in its hover
+#'   text, and the source download carries the full comparison table. See [survivalCurve()]'s Details for how
+#'   to read them.
+#' - `stat.pairs` - The pairs to test, as `"A vs B"` strings (UI: "Comparisons", default: all pairs; shown
+#'   while comparisons are on)
+#' - `stat.p.adjust` - Multiple-testing correction across the pairs, a [stats::p.adjust()] method (UI:
+#'   "P-value Adjustment", default: "holm"; shown while comparisons are on)
 #' - `fun` - Curve transformation: survival probability, "pct", "event",
 #'   or "cumhaz" (default: survival probability)
 #' - `line.size` - Line width in pixels (default: 2)
@@ -73,6 +81,7 @@ survivalCurveInputsUI <- function(id, data, defaults = NULL, title = "Survival C
     # Strata with too many levels to draw (an ID column) are left out.
     cat.choices <- .sci_discrete_cols(data)
     group.choices <- c("None" = "", stats::setNames(cat.choices, cat.choices))
+    pair.choices <- .surv_pair_choices(if (isTRUE(d$group.by %in% names(data))) .surv_levels(data[[d$group.by]]))
 
     inputs <- list(
         "Data" = tagList(
@@ -110,7 +119,26 @@ survivalCurveInputsUI <- function(id, data, defaults = NULL, title = "Survival C
                 "Draw marks where observations were censored."),
             .sci_tip(viz_select_input(ns("surv.median.line"), "Median Survival Line",
                 choices = c("none", "hv", "h", "v"), selected = d$surv.median.line),
-                "Draw reference lines at the median survival time (survival probability or percentage curves).")
+                "Draw reference lines at the median survival time (survival probability or percentage curves)."),
+            .sci_tip(materialSwitch(ns("pairwise"), "Pairwise Comparisons", value = isTRUE(d$pairwise),
+                status = "success"),
+                paste(
+                    "With three or more groups, also test each pair (log-rank, on that pair's subjects), adjusted",
+                    "for the number of comparisons. Hover the results for each pair's hazard ratio and its",
+                    "subjects and events; small groups give unreliable results."
+                )),
+            .sci_tip(viz_select_input(ns("stat.pairs"), "Comparisons", choices = pair.choices,
+                selected = default_stat_pairs(defaults, pair.choices), multiple = TRUE),
+                paste(
+                    "The pairs to test. Empty tests every pair. Fewer, pre-specified comparisons (each group",
+                    "against a control) cost less adjustment."
+                )),
+            .sci_tip(viz_select_input(ns("stat.p.adjust"), "P-value Adjustment",
+                choices = stats::p.adjust.methods, selected = d$stat.p.adjust),
+                paste(
+                    "Correction for testing several pairs. Holm controls the chance of any false positive;",
+                    "BH controls the false discovery rate, for screening many groups; none overstates significance."
+                ))
         ),
         "Aesthetics" = tagList(
             .sci_tip(viz_select_input(ns("fun"), "Curve Type",

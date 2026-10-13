@@ -21,7 +21,10 @@ survivalCurve(
   palette.selection = NULL,
   line.size = 2,
   break.time.by = NULL,
-  legend.title = NULL
+  legend.title = NULL,
+  pairwise = FALSE,
+  pairs = NULL,
+  p.adjust.method = "holm"
 )
 }
 \arguments{
@@ -71,11 +74,29 @@ stratum level (an unnamed vector is used in level order).}
 also sets the times the risk table counts at.}
 
 \item{legend.title}{Legend title. Defaults to \code{group.by} when stratified.}
+
+\item{pairwise}{Logical; also test each pair of groups (default \code{FALSE}). Only
+applied when \code{group.by} defines three or more groups; with two, the pairwise
+test is the global one. See Details for how to read the results.}
+
+\item{pairs}{Optional list of length-2 character vectors naming the pairs to
+test, e.g. \code{list(c("Asymptomatic", "Symptomatic"))}, as for
+\code{\link[VizModules:compute_pairwise_stats]{VizModules::compute_pairwise_stats()}}. \code{NULL} (the default) tests every
+pair. The p-values are adjusted across the pairs tested.}
+
+\item{p.adjust.method}{A \code{\link[stats:p.adjust]{stats::p.adjust()}} method for the pairwise p-values
+(default \code{"holm"}).}
 }
 \value{
 A \code{\link[plotly:plot_ly]{plotly::plot_ly()}} object containing the interactive survival curve,
 with a per-stratum summary (subjects, events, median survival and its
-confidence interval, and the log-rank test) as attribute \code{"table"}.
+confidence interval, and the log-rank test) as attribute \code{"table"}. With
+\code{pairwise}, attribute \code{"pairwise"} holds a row per comparison: \code{group1},
+\code{group2}, their subjects (\code{n1}, \code{n2}) and events (\code{events1}, \code{events2}),
+the log-rank \code{chisq} and \code{p.value}, the adjusted \code{p.adj} and its
+\code{p.adjust.method}, and the hazard ratio of \code{group2} relative to \code{group1}
+(\code{hr}) with its 95\% confidence interval (\code{hr.lower}, \code{hr.upper}), \code{NA} when
+a group has no events or the model has no finite estimate.
 }
 \description{
 Fits a Kaplan-Meier survival curve with \code{\link[survival:survfit]{survival::survfit()}} and draws it as
@@ -94,6 +115,40 @@ event), or a two-level factor/character where the level containing
 When \code{group.by} is supplied the curve is stratified by that column and the
 log-rank test p-value (from \code{\link[survival:survdiff]{survival::survdiff()}}) can be shown via \code{pval}.
 
+\strong{Comparing three or more groups.} The log-rank test above is a global test:
+it asks whether survival differs anywhere among the groups, not which groups
+differ. With \code{pairwise = TRUE} and three or more groups, each pair is also
+tested on its own subjects (a log-rank test of the two groups, as
+survminer's \code{pairwise_survdiff()} computes), and the results are listed on
+the plot and returned as attribute \code{"pairwise"}. To read them:
+\itemize{
+\item The p-values are adjusted for the number of comparisons made
+(\code{p.adjust.method}, default Holm, which keeps the chance of any false
+positive among them at the nominal level; \code{"BH"} controls the false
+discovery rate instead and suits screening many groups; \code{"none"} overstates
+significance). Testing only the comparisons that matter (\code{pairs}, each
+group against a control, say) costs less power. The adjustment covers only
+the comparisons in this call: picking them after looking at the curves, or
+regrouping the data until something is significant, is not accounted for.
+\item A p-value does not say how large a difference is. Each pair also gets the
+hazard ratio (\code{hr}) of \code{group2} relative to \code{group1}, from a Cox model of
+the pair, with its 95\% confidence interval: above 1, \code{group2} has the
+higher hazard (shorter survival). The interval is not adjusted for
+multiplicity, and being a Wald interval it can disagree slightly with the
+log-rank p-value near the significance cut-off.
+\item The log-rank test is most sensitive when one group's hazard is a constant
+multiple of the other's (proportional hazards). Curves that cross can hide
+a real difference, and the hazard ratio then averages over opposite
+effects, so read the tests against the curves.
+\item Groups with few subjects or events give unstable results; in
+\code{survival_lung}, \code{ph.ecog}'s "In bed >50\%" group is a single subject, yet
+its comparisons come out "significant". Check \code{n1}, \code{n2}, \code{events1} and
+\code{events2}, and drop or merge sparse groups before testing.
+\item The tests ignore any order among the groups (stage, dose), for which a trend
+test is more powerful, and they are unadjusted for other covariates: see
+\code{\link[=forestPlot]{forestPlot()}} for a Cox model with covariates.
+}
+
 The figure is built natively in plotly rather than converted from a ggplot:
 \code{\link[plotly:ggplotly]{plotly::ggplotly()}} cannot draw the stepped confidence band survminer uses.
 }
@@ -110,6 +165,12 @@ fig2 <- survivalCurve(survival_lung,
     time = "time", status = "status", group.by = "sex",
     fun = "event", risk.table = TRUE
 )
+
+# Four performance-status groups, each pair compared.
+fig3 <- survivalCurve(survival_lung,
+    time = "time", status = "status", group.by = "ph.ecog", pairwise = TRUE
+)
+attr(fig3, "pairwise")
 }
 \seealso{
 \code{\link[survival:survfit]{survival::survfit()}}, \code{\link[VizModules:linePlot]{VizModules::linePlot()}},
