@@ -235,7 +235,7 @@
     base <- list(
         show.loadings = FALSE,
         n.top.loadings = 5,
-        loadings.length.factor = 1.5,
+        loadings.length.factor = 0.5,
         loadings.color = "#000000",
         loadings.label.size = 12
     )
@@ -294,7 +294,7 @@
         arrows <- .pca_loading_arrows(
             p, x, y,
             n = isolate_fn(input$n.top.loadings) %||% 5,
-            length.factor = isolate_fn(input$loadings.length.factor) %||% 1.5
+            length.factor = isolate_fn(input$loadings.length.factor) %||% 0.5
         )
         fig <- .pca_add_loading_arrows(
             fig, arrows,

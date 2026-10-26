@@ -8,7 +8,7 @@ samplePCAServer(
   id,
   data,
   hide.inputs = NULL,
-  hide.tabs = "Trajectory",
+  hide.tabs = NULL,
   defaults = NULL
 )
 }
@@ -19,8 +19,8 @@ samplePCAServer(
 
 \item{hide.inputs}{A character vector of input IDs to hide.}
 
-\item{hide.tabs}{A character vector of tab names to hide. Default hides the
-scatter module's "Trajectory" tab.}
+\item{hide.tabs}{A character vector of tab names to hide. None are hidden by
+default.}
 
 \item{defaults}{A named list of default values, typically the same list
 passed to \code{\link[=samplePCAInputsUI]{samplePCAInputsUI()}}.}
@@ -32,7 +32,10 @@ The value returned by \code{\link[=pcaBiplotServer]{pcaBiplotServer()}}.
 Transforms the assay of a \code{SummarizedExperiment}, keeps its most variable
 genes, runs the PCA (\code{\link[=sample_pca]{sample_pca()}}) and draws the sample scores through
 \code{\link[=pcaBiplotServer]{pcaBiplotServer()}}. The transformation is kept in its own step, so changing
-the gene count or the centring does not repeat it.
+the gene count or the centring does not repeat it. The scatter module's
+Trajectory tab draws arrowed paths through the median scores of chosen
+sample groups, and its Marginals tab draws each group's distribution along
+each component.
 }
 \examples{
 library(sciVizModules)

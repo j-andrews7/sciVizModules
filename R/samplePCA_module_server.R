@@ -3,13 +3,16 @@
 #' Transforms the assay of a `SummarizedExperiment`, keeps its most variable
 #' genes, runs the PCA ([sample_pca()]) and draws the sample scores through
 #' [pcaBiplotServer()]. The transformation is kept in its own step, so changing
-#' the gene count or the centring does not repeat it.
+#' the gene count or the centring does not repeat it. The scatter module's
+#' Trajectory tab draws arrowed paths through the median scores of chosen
+#' sample groups, and its Marginals tab draws each group's distribution along
+#' each component.
 #'
 #' @param id The ID for the Shiny module.
 #' @param data A `reactive` returning a `SummarizedExperiment` of counts.
 #' @param hide.inputs A character vector of input IDs to hide.
-#' @param hide.tabs A character vector of tab names to hide. Default hides the
-#'   scatter module's "Trajectory" tab.
+#' @param hide.tabs A character vector of tab names to hide. None are hidden by
+#'   default.
 #' @param defaults A named list of default values, typically the same list
 #'   passed to [samplePCAInputsUI()].
 #' @return The value returned by [pcaBiplotServer()].
@@ -24,7 +27,7 @@
 #' if (interactive()) samplePCAApp()
 #' @export
 #' @author Jared Andrews
-samplePCAServer <- function(id, data, hide.inputs = NULL, hide.tabs = "Trajectory", defaults = NULL) {
+samplePCAServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL) {
     stopifnot(is.reactive(data))
     initial <- tryCatch(isolate(data()), error = function(e) NULL)
     if (!methods::is(initial, "SummarizedExperiment")) initial <- NULL

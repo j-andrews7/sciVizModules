@@ -26,7 +26,7 @@
 #' - `show.loadings` - Draw loading arrows (default: FALSE; PCAtools `showLoadings`)
 #' - `n.top.loadings` - Variables with the largest absolute loading on each
 #'   axis to draw (default: 5; PCAtools `ntopLoadings`)
-#' - `loadings.length.factor` - Arrow length multiplier (default: 1.5;
+#' - `loadings.length.factor` - Arrow length multiplier (default: 0.5;
 #'   PCAtools `lengthLoadingsArrowsFactor`)
 #' - `loadings.color` - Arrow and label colour (default: "#000000")
 #' - `loadings.label.size` - Arrow label font size (default: 12)
@@ -71,7 +71,7 @@ pcaBiplotInputsUI <- function(id, data, defaults = NULL, title = "PCA Biplot Set
             value = get_default(defaults, "n.top.loadings", 5, is.numeric), min = 1, step = 1
         ), "Number of variables with the largest absolute loading on each axis to draw."),
         tip(numericInput(ns("loadings.length.factor"), "Arrow Length Factor",
-            value = get_default(defaults, "loadings.length.factor", 1.5, is.numeric), min = 0.1, step = 0.1
+            value = get_default(defaults, "loadings.length.factor", 0.5, is.numeric), min = 0.1, step = 0.1
         ), "Multiplier on the arrow lengths after scaling the loadings to the scores."),
         tip(colourInput(ns("loadings.color"), "Arrow Color",
             value = get_default(defaults, "loadings.color", "#000000")

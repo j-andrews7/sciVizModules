@@ -34,7 +34,7 @@ doseResponseServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL,
 
     # Tabs and inputs that are not relevant to a single dose-response curve.
     dose_response_hidden_tabs <- c(
-        "Adjustments", "Facet", "Annotations", "Trajectory", "Extras"
+        "Adjustments", "Facet", "Annotations", "Trajectory", "Marginals", "Extras"
     )
     dose_response_hidden_inputs <- c(
         "color.by", "shape.by", "split.by",

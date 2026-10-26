@@ -98,7 +98,7 @@ test_that("samplePCAServer hands the biplot a PCA that follows its inputs", {
     # The first colData column that groups samples, skipping airway's sample IDs.
     expect_identical(captured$defaults$color.by, "cell")
     expect_false(any(.spca_keys %in% names(captured$defaults)))
-    expect_identical(captured$hide.tabs, "Trajectory")
+    expect_null(captured$hide.tabs)
 })
 
 test_that("samplePCAInputsUI builds the wrapper and biplot controls", {

@@ -12,7 +12,8 @@
 #'   [read_mageck()] or read with `read.delim()`.
 #' @param hide.inputs A character vector of input IDs to hide.
 #' @param hide.tabs A character vector of tab names to hide. Default hides the
-#'   scatter module's "Trajectory" and "Facet" tabs.
+#'   scatter module's "Trajectory", "Facet" and "Marginals" tabs; ranks are
+#'   evenly spaced by construction, so their distribution is uninformative.
 #' @param defaults A named list of default values, merged over the rank-plot
 #'   defaults (user values win) and used to restore state on reset.
 #' @return The value returned by [VizModules::dittoViz_scatterPlotServer()].
@@ -27,7 +28,7 @@
 #' if (interactive()) crisprScreenRankApp()
 #' @export
 #' @author Jared Andrews
-crisprScreenRankServer <- function(id, data, hide.inputs = NULL, hide.tabs = c("Trajectory", "Facet"),
+crisprScreenRankServer <- function(id, data, hide.inputs = NULL, hide.tabs = c("Trajectory", "Facet", "Marginals"),
                                    defaults = NULL) {
     stopifnot(is.reactive(data))
     d <- .crispr_defaults(NULL, defaults)

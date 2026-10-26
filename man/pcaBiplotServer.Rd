@@ -8,7 +8,7 @@ pcaBiplotServer(
   id,
   data,
   hide.inputs = NULL,
-  hide.tabs = "Trajectory",
+  hide.tabs = NULL,
   defaults = NULL
 )
 }
@@ -19,8 +19,8 @@ pcaBiplotServer(
 
 \item{hide.inputs}{A character vector of input IDs to hide.}
 
-\item{hide.tabs}{A character vector of tab names to hide. Default hides the
-scatter module's "Trajectory" tab.}
+\item{hide.tabs}{A character vector of tab names to hide. None are hidden by
+default.}
 
 \item{defaults}{A named list of default values, merged over the biplot
 defaults (user values win) and used to restore state on reset.}
@@ -32,7 +32,9 @@ The value returned by \code{\link[VizModules:dittoViz_scatterPlotServer]{VizModu
 Plots the sample scores of a PCAtools \code{pca} object through
 \code{\link[VizModules:dittoViz_scatterPlotServer]{VizModules::dittoViz_scatterPlotServer()}}, and uses its \code{fig.fn} hook to title
 the axes with each component's explained variance and to draw the loading
-arrows.
+arrows. The scatter module's Trajectory tab draws arrowed paths through the
+median scores of chosen sample groups (a time course, say), and its Marginals
+tab draws each group's distribution along each component.
 }
 \examples{
 library(sciVizModules)

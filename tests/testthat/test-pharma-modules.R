@@ -34,6 +34,19 @@ test_that("doseResponseInputsUI builds from the bundled dose_response data", {
     expect_true(grepl("dr-y.by", html, fixed = TRUE))
 })
 
+test_that("doseResponseServer hides the tabs a single curve has no use for, plus the caller's", {
+    data(dose_response, package = "sciVizModules")
+    captured <- NULL
+    local_mocked_bindings(
+        dittoViz_scatterPlotServer = function(id, data, hide.inputs, hide.tabs, defaults) {
+            captured <<- list(hide.tabs = hide.tabs)
+        }
+    )
+    doseResponseServer("dr", shiny::reactive(dose_response), hide.tabs = "Legend")
+    # Marginals of the doses say nothing: they are the design, not a result.
+    expect_true(all(c("Trajectory", "Marginals", "Legend") %in% captured$hide.tabs))
+})
+
 test_that("michaelisMentenInputsUI builds from the bundled kinetics data", {
     data(mm_kinetics, package = "sciVizModules")
     ui <- michaelisMentenInputsUI("mm", mm_kinetics)

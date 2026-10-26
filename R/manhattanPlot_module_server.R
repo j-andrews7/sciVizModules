@@ -9,7 +9,8 @@
 #' @param data A `reactive` containing a data frame of GWAS summary statistics.
 #' @param hide.inputs A character vector of input IDs to hide.
 #' @param hide.tabs A character vector of tab names to hide. Default hides the
-#'   scatter module's "Trajectory" tab.
+#'   scatter module's "Trajectory" and "Marginals" tabs; the distribution of
+#'   genomic positions along the x-axis says nothing about the associations.
 #' @param defaults A named list of default values, merged over the Manhattan
 #'   defaults (user values win) and used to restore state on reset.
 #' @return The value returned by [VizModules::dittoViz_scatterPlotServer()].
@@ -24,7 +25,8 @@
 #' if (interactive()) manhattanPlotApp()
 #' @export
 #' @author Jared Andrews
-manhattanPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = "Trajectory", defaults = NULL) {
+manhattanPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = c("Trajectory", "Marginals"),
+                                defaults = NULL) {
     stopifnot(is.reactive(data))
     d <- .manhattan_defaults(tryCatch(isolate(data()), error = function(e) NULL), defaults)
     scatter_defaults <- d[setdiff(names(d), .manhattan_keys)]

@@ -85,7 +85,40 @@ test_that("pcaBiplotServer hands the scatter module the scores and its fig.fn ho
     expect_identical(captured$defaults$x.by, "PC1")
     expect_identical(captured$defaults$color.by, "dex")
     expect_false(any(.pca_biplot_keys %in% names(captured$defaults)))
-    expect_identical(captured$hide.tabs, "Trajectory")
+    # Trajectories through group medians and per-group marginals both suit PC scores.
+    expect_null(captured$hide.tabs)
+})
+
+test_that("a biplot keeps its loading arrows beside a trajectory and marginals", {
+    data(example_pca, package = "sciVizModules")
+    df <- .pca_scores_df(example_pca)
+    built <- build_scatter_figure(df,
+        fig.fn = function(fig, input, isolate_fn) .pca_biplot_layers(fig, example_pca, input, isolate_fn),
+        inputs = test_scatter_inputs(x.by = "PC1", y.by = "PC2", color.by = "dex", trajectory.group.by = "dex",
+            add.trajectory.by.groups = list(trajectories1 = list(groups = c("untrt", "trt"))),
+            marginal.x = "density", marginal.y = "density",
+            show.loadings = TRUE, n.top.loadings = 2, loadings.length.factor = 1.5,
+            loadings.color = "#FF0000", loadings.label.size = 10)
+    )
+
+    # One density per dex group on each side, the main panel shrunk to make room.
+    off_main <- Filter(function(tr) !identical(tr$xaxis %||% "x", "x") || !identical(tr$yaxis %||% "y", "y"),
+        built$x$data)
+    expect_length(off_main, 4)
+    expect_lt(built$x$layout$xaxis$domain[2], 1)
+    expect_lt(built$x$layout$yaxis$domain[2], 1)
+
+    # The fig.fn hook appends its arrows, so the trajectory's head, added before it, survives.
+    anns <- built$x$layout$annotations
+    colour_of <- function(a) as.character(a$arrowcolor %||% "")
+    expect_length(Filter(function(a) colour_of(a) == "#FF0000", anns),
+        nrow(.pca_loading_arrows(example_pca, "PC1", "PC2", n = 2)))
+    head <- Filter(function(a) colour_of(a) == "#000000" && isTRUE(a$showarrow), anns)
+    expect_length(head, 1)
+    expect_equal(head[[1]]$x, stats::median(df$PC1[df$dex == "trt"]))
+    # The variance axis titles, made draggable annotations, are still there.
+    texts <- vapply(anns, function(a) as.character(a$text %||% ""), "")
+    expect_true(any(grepl("^PC1 \\(.*% variance\\)$", texts)))
 })
 
 test_that("the scree plot shows variance and its cumulative sum, and marks the elbow", {

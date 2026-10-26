@@ -96,7 +96,7 @@ test_that("the servers hand the scatter module prepared data and a fig.fn hook",
     captured <- NULL
     local_mocked_bindings(
         dittoViz_scatterPlotServer = function(id, data, hide.inputs, hide.tabs, defaults, fig.fn) {
-            captured <<- list(defaults = defaults, fig.fn = fig.fn, data = data)
+            captured <<- list(defaults = defaults, fig.fn = fig.fn, data = data, hide.tabs = hide.tabs)
         }
     )
     shiny::testServer(manhattanPlotServer, args = list(data = shiny::reactive(example_gwas)), expr = {
@@ -114,12 +114,15 @@ test_that("the servers hand the scatter module prepared data and a fig.fn hook",
     expect_length(captured$defaults$color.panel, 22)
     expect_length(unique(captured$defaults$color.panel), 2)
     expect_false(any(.manhattan_keys %in% names(captured$defaults)))
+    # Marginals of genomic position and of expected quantiles say nothing.
+    expect_identical(captured$hide.tabs, c("Trajectory", "Marginals"))
 
     shiny::testServer(gwasQQPlotServer, args = list(data = shiny::reactive(example_gwas)), expr = {
         session$setInputs(auto.update = TRUE, p.col = "P", snp.col = "SNP", thin = FALSE)
         expect_identical(nrow(captured$data()), nrow(example_gwas))
     })
     expect_identical(captured$defaults$abline.slopes, "1")
+    expect_identical(captured$hide.tabs, c("Trajectory", "Facet", "Marginals"))
 })
 
 test_that("a Manhattan plot builds end to end through the scatter module", {

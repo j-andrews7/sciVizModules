@@ -204,7 +204,7 @@ test_that("the server hands the scatter module the ranked table and a fig.fn hoo
     expect_true(is.function(captured$fig.fn))
     expect_identical(captured$defaults$x.by, "screen.rank")
     expect_false(any(.crispr_keys %in% names(captured$defaults)))
-    expect_identical(captured$hide.tabs, c("Trajectory", "Facet"))
+    expect_identical(captured$hide.tabs, c("Trajectory", "Facet", "Marginals"))
 })
 
 test_that("a rank plot builds end to end through the scatter module", {

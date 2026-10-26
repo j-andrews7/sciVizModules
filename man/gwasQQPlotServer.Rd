@@ -8,7 +8,7 @@ gwasQQPlotServer(
   id,
   data,
   hide.inputs = NULL,
-  hide.tabs = c("Trajectory", "Facet"),
+  hide.tabs = c("Trajectory", "Facet", "Marginals"),
   defaults = NULL
 )
 }
@@ -20,7 +20,9 @@ gwasQQPlotServer(
 \item{hide.inputs}{A character vector of input IDs to hide.}
 
 \item{hide.tabs}{A character vector of tab names to hide. Default hides the
-scatter module's "Trajectory" and "Facet" tabs.}
+scatter module's "Trajectory", "Facet" and "Marginals" tabs; the expected
+quantiles are evenly spaced by construction, so their distribution is
+uninformative.}
 
 \item{defaults}{A named list of default values, merged over the QQ defaults
 (user values win) and used to restore state on reset.}

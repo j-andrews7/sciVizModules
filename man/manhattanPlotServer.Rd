@@ -8,7 +8,7 @@ manhattanPlotServer(
   id,
   data,
   hide.inputs = NULL,
-  hide.tabs = "Trajectory",
+  hide.tabs = c("Trajectory", "Marginals"),
   defaults = NULL
 )
 }
@@ -20,7 +20,8 @@ manhattanPlotServer(
 \item{hide.inputs}{A character vector of input IDs to hide.}
 
 \item{hide.tabs}{A character vector of tab names to hide. Default hides the
-scatter module's "Trajectory" tab.}
+scatter module's "Trajectory" and "Marginals" tabs; the distribution of
+genomic positions along the x-axis says nothing about the associations.}
 
 \item{defaults}{A named list of default values, merged over the Manhattan
 defaults (user values win) and used to restore state on reset.}

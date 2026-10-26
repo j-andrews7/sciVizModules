@@ -171,7 +171,8 @@ The tab names come from the module being wrapped, so check its help page before
 naming one: a `hide.tabs` entry that matches nothing is silently ignored. For
 the volcano and MA modules the tabs are those of
 `VizModules::dittoViz_scatterPlotInputsUI()` -- Data, Adjustments, Points,
-Colors, Facet, Annotations, Legend, Trajectory, Lines, Axes, Plotly, Extras.
+Colors, Facet, Annotations, Legend, Trajectory, Marginals, Lines, Axes, Plotly,
+Extras.
 The `vizmodules-app` agent skill (see above) lists the tab names and `defaults`
 keys of every VizModules base module in its module inventory.
 

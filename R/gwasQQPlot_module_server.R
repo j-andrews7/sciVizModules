@@ -9,7 +9,9 @@
 #' @param data A `reactive` containing a data frame of GWAS summary statistics.
 #' @param hide.inputs A character vector of input IDs to hide.
 #' @param hide.tabs A character vector of tab names to hide. Default hides the
-#'   scatter module's "Trajectory" and "Facet" tabs.
+#'   scatter module's "Trajectory", "Facet" and "Marginals" tabs; the expected
+#'   quantiles are evenly spaced by construction, so their distribution is
+#'   uninformative.
 #' @param defaults A named list of default values, merged over the QQ defaults
 #'   (user values win) and used to restore state on reset.
 #' @return The value returned by [VizModules::dittoViz_scatterPlotServer()].
@@ -26,7 +28,8 @@
 #' if (interactive()) gwasQQPlotApp()
 #' @export
 #' @author Jared Andrews
-gwasQQPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = c("Trajectory", "Facet"), defaults = NULL) {
+gwasQQPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = c("Trajectory", "Facet", "Marginals"),
+                             defaults = NULL) {
     stopifnot(is.reactive(data))
     d <- .gwas_qq_defaults(tryCatch(isolate(data()), error = function(e) NULL), defaults)
     scatter_defaults <- d[setdiff(names(d), .gwas_qq_keys)]
