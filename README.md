@@ -32,14 +32,22 @@ remotes::install_github("j-andrews7/sciVizModules")
 
 ## Module Gallery
 
-To preview every module in one place, launch the bundled gallery app. It presents each
-module on its own tab, wired to the relevant bundled example dataset, so you can explore
-the plot types and their interactive controls without writing any code:
+To preview every module in one place, launch the gallery. Every module has its own tab,
+grouped into menus by field, each opening on a bundled example dataset with the module's
+main features already switched on (labelled genes and variants, risk tables, trajectories,
+annotation tracks and more), so you can explore the plot types and their interactive
+controls without writing any code. An Overview page lists every module as a card, each tab
+links to the module's reference page, and a Figure Builder tab composes several modules
+into one figure:
 
 ```r
-library(shiny)
-runApp(system.file("apps/module-gallery", package = "sciVizModules"))
+library(sciVizModules)
+sciModuleGalleryApp()
 ```
+
+Each module's `*App()` opens on the same settings as its gallery tab. The same gallery
+ships as `system.file("apps/module-gallery", package = "sciVizModules")` for deployment to a
+Shiny server, shinyapps.io or Posit Connect.
 
 ## Available Modules
 
@@ -264,5 +272,7 @@ VizModules::use_vizmodules_skills(".", client = "claude")  # or "agents" / "copi
   most of sciVizModules does.
 - `vizmodules-new-module` — authoring a module inside VizModules itself.
 
-`AGENTS.md` in this repository covers the sciVizModules-specific conventions on top of those.
+`AGENTS.md` in this repository covers the sciVizModules-specific conventions on top of those,
+including adding a module: every module ships with a gallery entry (its showcase settings in
+`R/module_showcase.R`), and the test suite fails for one that has none.
 

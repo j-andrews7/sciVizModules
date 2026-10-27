@@ -19,6 +19,11 @@ Each entry is a list with \code{label} (shown in the builder's "Add Plot"
 picker), \code{dataset} (the dataset name its \code{defaults} were written for),
 \code{inputs_ui} / \code{output_ui} / \code{server_fn} (the module's trio), and \code{defaults}.
 
+The entries are those of the registry behind the module gallery
+(\code{\link[=sciModuleGalleryApp]{sciModuleGalleryApp()}}) and every module's \verb{*App()}, so a panel opens on
+the same settings as the module's gallery tab when its example dataset is
+the one chosen.
+
 Only the modules that take a plain data frame can be registered. The
 builder's dataset catalogue holds data frames, so the \code{dittoSeq} modules
 (which take a \code{SingleCellExperiment}, \code{Seurat} or \code{SummarizedExperiment}),
@@ -27,8 +32,9 @@ the bulk expression modules (\code{samplePCA}, \code{sampleDistanceHeatmap},
 (a bundle whose \code{stats} element is a model fit) have no place in it. Run
 their \verb{*App()} functions instead.
 
-\code{goFanPlot} is included only when the packages it needs are installed
-(\code{GOfan} plus an \code{OrgDb}), so the picker never offers a panel that cannot draw.
+A module is included only when the packages it needs are installed
+(\code{goFanPlot} needs \code{GOfan} plus an \code{OrgDb}, \code{doseResponse} needs \code{drc}), so
+the picker never offers a panel that cannot draw.
 
 Every registered module renders a plotly graph, so the builder's SVG figure
 export and its source-data archive photograph them in the browser; none of
@@ -40,8 +46,8 @@ registry <- sci_figure_builder_registry()
 names(registry)
 }
 \seealso{
-\code{\link[=sciFigureBuilderApp]{sciFigureBuilderApp()}}, \code{\link[VizModules:figureBuilderServer]{VizModules::figureBuilderServer()}},
-\code{\link[VizModules:figureBuilderApp]{VizModules::figureBuilderApp()}}
+\code{\link[=sciFigureBuilderApp]{sciFigureBuilderApp()}}, \code{\link[=sciModuleGalleryApp]{sciModuleGalleryApp()}},
+\code{\link[VizModules:figureBuilderServer]{VizModules::figureBuilderServer()}}, \code{\link[VizModules:figureBuilderApp]{VizModules::figureBuilderApp()}}
 }
 \author{
 Jared Andrews

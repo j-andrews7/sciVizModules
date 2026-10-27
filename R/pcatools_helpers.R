@@ -314,21 +314,35 @@
 #' @param inputs_ui_fn,output_ui_fn,server_fn The module's functions.
 #' @param pca_list A named list of PCAtools `pca` objects.
 #' @param title Page title.
+#' @param defaults,hide.inputs,hide.tabs Passed to the module.
 #' @return A [shiny::shinyApp()] object.
 #'
 #' @author Jared Andrews
 #' @rdname INTERNAL_pca_module_app
 #' @keywords internal
-.pca_module_app <- function(inputs_ui_fn, output_ui_fn, server_fn, pca_list, title) {
+.pca_module_app <- function(inputs_ui_fn, output_ui_fn, server_fn, pca_list, title,
+                            defaults = NULL, hide.inputs = NULL, hide.tabs = NULL) {
     .sci_object_app(
         inputs_ui_fn, output_ui_fn, server_fn, pca_list, title,
         validate = function(p) .assert_pca(p, "pca_list element"),
-        preview = function(p) {
-            md <- p$metadata
-            if (is.null(md)) data.frame(message = "This PCA object has no sample metadata.") else as.data.frame(md)
-        },
+        preview = .pca_preview,
         select_label = "Select PCA:",
         preview_title = "Sample Metadata",
-        preview_note = "Read-only preview of the PCA object's sample metadata."
+        preview_note = "Read-only preview of the PCA object's sample metadata.",
+        defaults = defaults, hide.inputs = hide.inputs, hide.tabs = hide.tabs
     )
+}
+
+
+#' Sample metadata of a PCAtools object, for a read-only preview
+#'
+#' @param p A PCAtools `pca` object.
+#' @return A data frame.
+#'
+#' @author Jared Andrews
+#' @rdname INTERNAL_pca_preview
+#' @keywords internal
+.pca_preview <- function(p) {
+    md <- p$metadata
+    if (is.null(md)) data.frame(message = "This PCA object has no sample metadata.") else as.data.frame(md)
 }

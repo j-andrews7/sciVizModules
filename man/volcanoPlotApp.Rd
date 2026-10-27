@@ -4,12 +4,27 @@
 \alias{volcanoPlotApp}
 \title{Create a standalone Shiny app for the volcanoPlot module}
 \usage{
-volcanoPlotApp(data_list = NULL)
+volcanoPlotApp(
+  data_list = NULL,
+  defaults = NULL,
+  hide.inputs = NULL,
+  hide.tabs = NULL
+)
 }
 \arguments{
 \item{data_list}{An optional named list of data frames. If \code{NULL} (the default),
 \code{list("airway_deseq2" = airway_deseq2)} is used as example data. Each data frame
 must contain effect size (e.g., log2FoldChange) and significance (e.g., padj) columns.}
+
+\item{defaults}{A named list of input IDs and their default values to apply on
+startup. With the example data, they are applied over the settings the module
+gallery opens the module on, a key given here replacing its showcase value.}
+
+\item{hide.inputs}{A character vector of input IDs to hide. Their values are still
+initialized and used, but the controls are not shown in the UI.}
+
+\item{hide.tabs}{A character vector of tab names to hide. Inputs in these tabs are
+still initialized and used. \code{NULL} (the default) keeps the module's own default.}
 }
 \value{
 A Shiny app object.
@@ -22,10 +37,12 @@ for configuring and displaying an interactive volcano plot.
 }
 \details{
 When \code{data_list} is not provided (or \code{NULL}), the app launches with
-\code{airway_deseq2} as an example dataset. Uploaded Excel files are added
-to the available datasets and can be selected for plotting. If an uploaded
-file shares a name with an existing dataset, the existing one is overwritten
-with a warning.
+\code{airway_deseq2} as an example dataset, on the settings the module gallery
+(\code{\link[=sciModuleGalleryApp]{sciModuleGalleryApp()}}) opens this module on: thresholds of FDR 0.05 and a
+two-fold change, with some well-known dexamethasone-responsive genes
+labelled. Uploaded Excel files are added to the available datasets and can
+be selected for plotting. If an uploaded file shares a name with an existing
+dataset, the existing one is overwritten with a warning.
 }
 \examples{
 library(sciVizModules)

@@ -6,7 +6,10 @@
 #'
 #' @param data_list An optional named list of concentration-time data frames. If
 #'   `NULL` (the default), base R's [datasets::Theoph] (oral theophylline in 12
-#'   subjects) is used.
+#'   subjects) is used, on the settings the module gallery
+#'   ([sciModuleGalleryApp()]) opens this module on: each subject's terminal
+#'   elimination fit drawn.
+#' @inheritParams volcanoPlotApp
 #' @return A Shiny app object.
 #'
 #' @seealso [pkConcentrationTime()], [sciVizModules::pkConcentrationTimeInputsUI()],
@@ -18,9 +21,11 @@
 #' library(sciVizModules)
 #' app <- pkConcentrationTimeApp()
 #' if (interactive()) shiny::runApp(app)
-pkConcentrationTimeApp <- function(data_list = NULL) {
+pkConcentrationTimeApp <- function(data_list = NULL, defaults = NULL, hide.inputs = NULL, hide.tabs = NULL) {
     if (is.null(data_list)) {
-        data_list <- list("Theoph" = .pk_example())
+        example <- .sci_module_example("pk", defaults)
+        data_list <- example$data_list
+        defaults <- example$defaults
     }
     stopifnot(is.list(data_list), length(data_list) >= 1)
     lapply(data_list, function(data) stopifnot(is.data.frame(data)))
@@ -30,6 +35,9 @@ pkConcentrationTimeApp <- function(data_list = NULL) {
         output_ui_fn = pkConcentrationTimeOutputUI,
         server_fn    = pkConcentrationTimeServer,
         data_list    = data_list,
+        defaults     = defaults,
+        hide.inputs  = hide.inputs,
+        hide.tabs    = hide.tabs,
         title        = "Modular PK Concentration-Time Plot"
     )
 }

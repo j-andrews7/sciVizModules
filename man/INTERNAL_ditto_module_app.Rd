@@ -4,7 +4,16 @@
 \alias{.ditto_module_app}
 \title{Build a standalone Shiny app for a dittoSeq-based module}
 \usage{
-.ditto_module_app(inputs_ui_fn, output_ui_fn, server_fn, object_list, title)
+.ditto_module_app(
+  inputs_ui_fn,
+  output_ui_fn,
+  server_fn,
+  object_list,
+  title,
+  defaults = NULL,
+  hide.inputs = NULL,
+  hide.tabs = NULL
+)
 }
 \arguments{
 \item{inputs_ui_fn}{A module \verb{*InputsUI(id, data, ...)} function.}
@@ -16,6 +25,9 @@
 \item{object_list}{A named list of dittoSeq-compatible objects.}
 
 \item{title}{A character string used as the page title.}
+
+\item{defaults, hide.inputs, hide.tabs}{Passed to the module; \code{NULL} ones are
+left to the module's own defaults (see \code{\link[=.sci_server_args]{.sci_server_args()}}).}
 }
 \value{
 A \code{\link[shiny:shinyApp]{shiny::shinyApp()}} object.

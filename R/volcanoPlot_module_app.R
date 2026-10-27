@@ -6,14 +6,23 @@
 #' for configuring and displaying an interactive volcano plot.
 #'
 #' When `data_list` is not provided (or `NULL`), the app launches with
-#' `airway_deseq2` as an example dataset. Uploaded Excel files are added
-#' to the available datasets and can be selected for plotting. If an uploaded
-#' file shares a name with an existing dataset, the existing one is overwritten
-#' with a warning.
+#' `airway_deseq2` as an example dataset, on the settings the module gallery
+#' ([sciModuleGalleryApp()]) opens this module on: thresholds of FDR 0.05 and a
+#' two-fold change, with some well-known dexamethasone-responsive genes
+#' labelled. Uploaded Excel files are added to the available datasets and can
+#' be selected for plotting. If an uploaded file shares a name with an existing
+#' dataset, the existing one is overwritten with a warning.
 #'
 #' @param data_list An optional named list of data frames. If `NULL` (the default),
 #'   `list("airway_deseq2" = airway_deseq2)` is used as example data. Each data frame
 #'   must contain effect size (e.g., log2FoldChange) and significance (e.g., padj) columns.
+#' @param defaults A named list of input IDs and their default values to apply on
+#'   startup. With the example data, they are applied over the settings the module
+#'   gallery opens the module on, a key given here replacing its showcase value.
+#' @param hide.inputs A character vector of input IDs to hide. Their values are still
+#'   initialized and used, but the controls are not shown in the UI.
+#' @param hide.tabs A character vector of tab names to hide. Inputs in these tabs are
+#'   still initialized and used. `NULL` (the default) keeps the module's own default.
 #' @return A Shiny app object.
 #'
 #' @import shiny
@@ -35,10 +44,12 @@
 #' data(airway_deseq2)
 #' app2 <- volcanoPlotApp(list("airway" = airway_deseq2))
 #' if (interactive()) runApp(app2)
-volcanoPlotApp <- function(data_list = NULL) {
+volcanoPlotApp <- function(data_list = NULL, defaults = NULL, hide.inputs = NULL, hide.tabs = NULL) {
     # Use default example data when none is provided
     if (is.null(data_list)) {
-        data_list <- list("airway_deseq2" = .sci_example_data("airway_deseq2"))
+        example <- .sci_module_example("volcano", defaults)
+        data_list <- example$data_list
+        defaults <- example$defaults
     }
 
     # Validate input
@@ -125,12 +136,13 @@ volcanoPlotApp <- function(data_list = NULL) {
         output$plot_inputs_ui <- renderUI({
             req(rv$datasets[[input$plot_select]])
             volcanoPlotInputsUI("active_plot", rv$datasets[[input$plot_select]],
+                defaults = defaults,
                 title = h3(paste(input$plot_select, "Settings"))
             )
         })
 
         # ---- Plot Module ----
-        volcanoPlotServer("active_plot", data = filtered_data)
+        do.call(volcanoPlotServer, .sci_server_args("active_plot", filtered_data, defaults, hide.inputs, hide.tabs))
     }
     shinyApp(ui, server)
 }

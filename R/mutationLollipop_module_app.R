@@ -7,7 +7,10 @@
 #'
 #' @param data_list An optional named list of MAF data frames or maftools `MAF`
 #'   objects. If `NULL` (the default), the TCGA LAML cohort maftools ships is
-#'   used (needs maftools).
+#'   used (needs maftools), on the settings the module gallery
+#'   ([sciModuleGalleryApp()]) opens this module on: DNMT3A, its R882 hotspot
+#'   labelled.
+#' @inheritParams volcanoPlotApp
 #' @return A Shiny app object.
 #'
 #' @seealso [mutationLollipop()], [sciVizModules::mutationLollipopInputsUI()],
@@ -21,7 +24,15 @@
 #'     app <- mutationLollipopApp()
 #'     if (interactive()) shiny::runApp(app)
 #' }
-mutationLollipopApp <- function(data_list = NULL) {
-    .maf_module_app(mutationLollipopInputsUI, mutationLollipopOutputUI, mutationLollipopServer, data_list,
-        "Modular Mutation Lollipop")
+mutationLollipopApp <- function(data_list = NULL, defaults = NULL, hide.inputs = NULL, hide.tabs = NULL) {
+    if (is.null(data_list)) {
+        example <- .sci_module_example("lollipop", defaults)
+        data_list <- example$data_list
+        defaults <- example$defaults
+    }
+    .maf_module_app(
+        mutationLollipopInputsUI, mutationLollipopOutputUI, mutationLollipopServer, data_list,
+        "Modular Mutation Lollipop",
+        defaults = defaults, hide.inputs = hide.inputs, hide.tabs = hide.tabs
+    )
 }

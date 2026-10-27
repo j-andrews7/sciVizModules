@@ -4,11 +4,26 @@
 \alias{crisprScreenRankApp}
 \title{Create a standalone Shiny app for the crisprScreenRank module}
 \usage{
-crisprScreenRankApp(data_list = NULL)
+crisprScreenRankApp(
+  data_list = NULL,
+  defaults = NULL,
+  hide.inputs = NULL,
+  hide.tabs = NULL
+)
 }
 \arguments{
 \item{data_list}{An optional named list of MAGeCK RRA or MLE gene summaries
 (data frames from \code{\link[=read_mageck]{read_mageck()}}).}
+
+\item{defaults}{A named list of input IDs and their default values to apply on
+startup. With the example data, they are applied over the settings the module
+gallery opens the module on, a key given here replacing its showcase value.}
+
+\item{hide.inputs}{A character vector of input IDs to hide. Their values are still
+initialized and used, but the controls are not shown in the UI.}
+
+\item{hide.tabs}{A character vector of tab names to hide. Inputs in these tabs are
+still initialized and used. \code{NULL} (the default) keeps the module's own default.}
 }
 \value{
 A Shiny app object.
@@ -21,7 +36,9 @@ filterable data table, and the plot with its settings.
 \details{
 When \code{data_list} is not provided (or \code{NULL}), the app launches with the
 bundled simulated MAGeCK gene summaries, one from \verb{mageck test} (RRA) and
-one from \verb{mageck mle}, read with \code{\link[=read_mageck]{read_mageck()}}.
+one from \verb{mageck mle}, read with \code{\link[=read_mageck]{read_mageck()}}. The RRA summary opens on
+the settings the module gallery (\code{\link[=sciModuleGalleryApp]{sciModuleGalleryApp()}}) shows it with:
+genes ranked by FDR, with the strongest hits labelled.
 }
 \examples{
 library(sciVizModules)

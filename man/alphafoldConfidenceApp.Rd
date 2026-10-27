@@ -4,10 +4,25 @@
 \alias{alphafoldConfidenceApp}
 \title{Create a standalone Shiny app for the alphafoldConfidence module}
 \usage{
-alphafoldConfidenceApp(af_list = NULL)
+alphafoldConfidenceApp(
+  af_list = NULL,
+  defaults = NULL,
+  hide.inputs = NULL,
+  hide.tabs = NULL
+)
 }
 \arguments{
 \item{af_list}{An optional named list of objects from \code{\link[=read_alphafold]{read_alphafold()}}.}
+
+\item{defaults}{A named list of input IDs and their default values to apply on
+startup. With the example data, they are applied over the settings the module
+gallery opens the module on, a key given here replacing its showcase value.}
+
+\item{hide.inputs}{A character vector of input IDs to hide. Their values are still
+initialized and used, but the controls are not shown in the UI.}
+
+\item{hide.tabs}{A character vector of tab names to hide. Inputs in these tabs are
+still initialized and used. \code{NULL} (the default) keeps the module's own default.}
 }
 \value{
 A Shiny app object.
@@ -19,7 +34,9 @@ pLDDT, and the confidence plot with its settings.
 }
 \details{
 When \code{af_list} is not provided (or \code{NULL}), the app launches with the bundled
-AlphaFold DB prediction for human p53 (UniProt P04637; AlphaFold DB, CC-BY 4.0).
+AlphaFold DB prediction for human p53 (UniProt P04637; AlphaFold DB, CC-BY 4.0),
+on the settings the module gallery (\code{\link[=sciModuleGalleryApp]{sciModuleGalleryApp()}}) opens this
+module on.
 }
 \examples{
 library(sciVizModules)

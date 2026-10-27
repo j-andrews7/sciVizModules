@@ -4,9 +4,13 @@
 #' built with [VizModules::createModuleApp()]: data import, a filterable data
 #' table, and the plot with its settings.
 #'
+#' With the example data, the app opens on the settings the module gallery
+#' ([sciModuleGalleryApp()]) opens this module on.
+#'
 #' @param data_list An optional named list of 96-channel substitution count
 #'   matrices or data frames. If `NULL` (the default), the simulated
 #'   [example_sbs96] spectra are used.
+#' @inheritParams volcanoPlotApp
 #' @return A Shiny app object.
 #'
 #' @seealso [sciVizModules::mutationalProfileInputsUI()], [sciVizModules::mutationalProfileOutputUI()],
@@ -20,9 +24,11 @@
 #' library(sciVizModules)
 #' app <- mutationalProfileApp()
 #' if (interactive()) shiny::runApp(app)
-mutationalProfileApp <- function(data_list = NULL) {
+mutationalProfileApp <- function(data_list = NULL, defaults = NULL, hide.inputs = NULL, hide.tabs = NULL) {
     if (is.null(data_list)) {
-        data_list <- list("example_sbs96" = .sci_example_data("example_sbs96"))
+        example <- .sci_module_example("mutational", defaults)
+        data_list <- example$data_list
+        defaults <- example$defaults
     }
     stopifnot(is.list(data_list), length(data_list) >= 1)
     # The app's data table holds data frames, so a channel-named matrix becomes
@@ -37,6 +43,9 @@ mutationalProfileApp <- function(data_list = NULL) {
         output_ui_fn = mutationalProfileOutputUI,
         server_fn    = mutationalProfileServer,
         data_list    = data_list,
+        defaults     = defaults,
+        hide.inputs  = hide.inputs,
+        hide.tabs    = hide.tabs,
         title        = "Modular Mutational Profile"
     )
 }

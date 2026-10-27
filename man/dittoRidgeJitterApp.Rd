@@ -4,12 +4,27 @@
 \alias{dittoRidgeJitterApp}
 \title{Create a standalone Shiny app for the dittoRidgeJitter module}
 \usage{
-dittoRidgeJitterApp(object_list = NULL)
+dittoRidgeJitterApp(
+  object_list = NULL,
+  defaults = NULL,
+  hide.inputs = NULL,
+  hide.tabs = NULL
+)
 }
 \arguments{
 \item{object_list}{An optional named list of \code{SingleCellExperiment}, \code{Seurat},
 or \code{SummarizedExperiment} objects. If \code{NULL} (the default),
 \code{list("example_sce" = example_sce)} is used as example data.}
+
+\item{defaults}{A named list of input IDs and their default values to apply on
+startup. With the example data, they are applied over the settings the module
+gallery opens the module on, a key given here replacing its showcase value.}
+
+\item{hide.inputs}{A character vector of input IDs to hide. Their values are still
+initialized and used, but the controls are not shown in the UI.}
+
+\item{hide.tabs}{A character vector of tab names to hide. Inputs in these tabs are
+still initialized and used. \code{NULL} (the default) keeps the module's own default.}
 }
 \value{
 A Shiny app object.
@@ -23,6 +38,9 @@ configuring and displaying an interactive \code{\link[dittoSeq:dittoRidgeJitter]
 \details{
 When \code{object_list} is not provided (or \code{NULL}), the app launches with the
 bundled \code{example_sce} dataset.
+
+With the example data, the app opens on the settings the module gallery
+(\code{\link[=sciModuleGalleryApp]{sciModuleGalleryApp()}}) opens this module on.
 }
 \examples{
 library(sciVizModules)

@@ -55,7 +55,7 @@ The following parameters can be accessed via UI inputs and/or the \code{defaults
 \item \code{show.loadings} - Draw loading arrows (default: FALSE; PCAtools \code{showLoadings})
 \item \code{n.top.loadings} - Variables with the largest absolute loading on each
 axis to draw (default: 5; PCAtools \code{ntopLoadings})
-\item \code{loadings.length.factor} - Arrow length multiplier (default: 1.5;
+\item \code{loadings.length.factor} - Arrow length multiplier (default: 0.5;
 PCAtools \code{lengthLoadingsArrowsFactor})
 \item \code{loadings.color} - Arrow and label colour (default: "#000000")
 \item \code{loadings.label.size} - Arrow label font size (default: 12)

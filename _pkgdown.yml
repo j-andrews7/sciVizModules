@@ -289,11 +289,13 @@ reference:
   - dittoFreqPlotServer
   - dittoFreqPlotApp
 
-- title: Figure Builder
+- title: Module Gallery & Figure Builder
   desc: >
-    Arrange several of these modules into one multi-panel figure using the
-    VizModules Figure Builder.
+    Every module in one app, each on example data with its main features
+    switched on, and the VizModules Figure Builder for arranging several of
+    these modules into one multi-panel figure.
   contents:
+  - sciModuleGalleryApp
   - sci_figure_builder_registry
   - sciFigureBuilderApp
 

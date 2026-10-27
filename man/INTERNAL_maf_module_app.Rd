@@ -4,7 +4,16 @@
 \alias{.maf_module_app}
 \title{Build a standalone Shiny app for a mutation module}
 \usage{
-.maf_module_app(inputs_ui_fn, output_ui_fn, server_fn, data_list, title)
+.maf_module_app(
+  inputs_ui_fn,
+  output_ui_fn,
+  server_fn,
+  data_list,
+  title,
+  defaults = NULL,
+  hide.inputs = NULL,
+  hide.tabs = NULL
+)
 }
 \arguments{
 \item{inputs_ui_fn, output_ui_fn, server_fn}{The module's functions.}
@@ -13,6 +22,8 @@
 or \code{NULL} for maftools' TCGA LAML example (see \code{\link[=.maf_example]{.maf_example()}}).}
 
 \item{title}{Page title.}
+
+\item{defaults, hide.inputs, hide.tabs}{Passed to the module.}
 }
 \value{
 A \code{\link[shiny:shinyApp]{shiny::shinyApp()}} object.

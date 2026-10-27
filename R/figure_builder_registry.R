@@ -9,6 +9,11 @@
 #' picker), `dataset` (the dataset name its `defaults` were written for),
 #' `inputs_ui` / `output_ui` / `server_fn` (the module's trio), and `defaults`.
 #'
+#' The entries are those of the registry behind the module gallery
+#' ([sciModuleGalleryApp()]) and every module's `*App()`, so a panel opens on
+#' the same settings as the module's gallery tab when its example dataset is
+#' the one chosen.
+#'
 #' Only the modules that take a plain data frame can be registered. The
 #' builder's dataset catalogue holds data frames, so the `dittoSeq` modules
 #' (which take a `SingleCellExperiment`, `Seurat` or `SummarizedExperiment`),
@@ -17,8 +22,9 @@
 #' (a bundle whose `stats` element is a model fit) have no place in it. Run
 #' their `*App()` functions instead.
 #'
-#' `goFanPlot` is included only when the packages it needs are installed
-#' (`GOfan` plus an `OrgDb`), so the picker never offers a panel that cannot draw.
+#' A module is included only when the packages it needs are installed
+#' (`goFanPlot` needs `GOfan` plus an `OrgDb`, `doseResponse` needs `drc`), so
+#' the picker never offers a panel that cannot draw.
 #'
 #' Every registered module renders a plotly graph, so the builder's SVG figure
 #' export and its source-data archive photograph them in the browser; none of
@@ -27,8 +33,8 @@
 #'
 #' @return A named list of Figure Builder module registry entries.
 #'
-#' @seealso [sciFigureBuilderApp()], [VizModules::figureBuilderServer()],
-#' [VizModules::figureBuilderApp()]
+#' @seealso [sciFigureBuilderApp()], [sciModuleGalleryApp()],
+#' [VizModules::figureBuilderServer()], [VizModules::figureBuilderApp()]
 #'
 #' @export
 #' @author Jared Andrews
@@ -36,71 +42,21 @@
 #' registry <- sci_figure_builder_registry()
 #' names(registry)
 sci_figure_builder_registry <- function() {
-    registry <- list(
-        volcano = list(
-            label = "Volcano Plot", dataset = "airway_deseq2",
-            inputs_ui = volcanoPlotInputsUI,
-            output_ui = volcanoPlotOutputUI,
-            server_fn = volcanoPlotServer,
-            defaults = list("sig.thresh" = 0.05, "fc.thresh" = 1)
-        ),
-        ma = list(
-            label = "MA Plot", dataset = "airway_deseq2",
-            inputs_ui = maPlotInputsUI,
-            output_ui = maPlotOutputUI,
-            server_fn = maPlotServer,
-            defaults = list("sig.thresh" = 0.05, "fc.thresh" = 1)
-        ),
-        enrichment = list(
-            label = "Enrichment Dot Plot", dataset = "example_enrichment",
-            inputs_ui = enrichmentDotPlotInputsUI,
-            output_ui = enrichmentDotPlotOutputUI,
-            server_fn = enrichmentDotPlotServer,
-            defaults = NULL
-        ),
-        dose = list(
-            label = "Dose-Response", dataset = "dose_response",
-            inputs_ui = doseResponseInputsUI,
-            output_ui = doseResponseOutputUI,
-            server_fn = doseResponseServer,
-            defaults = NULL
-        ),
-        mutational = list(
-            label = "Mutational Profile", dataset = "example_sbs96",
-            inputs_ui = mutationalProfileInputsUI,
-            output_ui = mutationalProfileOutputUI,
-            server_fn = mutationalProfileServer,
-            defaults = NULL
-        )
-    )
-
-    registry$survival <- list(
-        label = "Survival Curve", dataset = "survival_lung",
-        inputs_ui = survivalCurveInputsUI,
-        output_ui = survivalCurveOutputUI,
-        server_fn = survivalCurveServer,
-        defaults = list("time" = "time", "status" = "status", "group.by" = "sex")
-    )
-
-    if (requireNamespace("GOfan", quietly = TRUE) &&
-        requireNamespace("org.Hs.eg.db", quietly = TRUE)) {
-        registry$gofan <- list(
-            label = "GO Sunburst", dataset = "example_enrichment",
-            inputs_ui = goFanPlotInputsUI,
-            output_ui = goFanPlotOutputUI,
-            server_fn = goFanPlotServer,
-            defaults = NULL
-        )
-    }
-
-    registry
+    showcase <- .sci_module_showcase()
+    keep <- vapply(showcase, function(entry) {
+        isTRUE(entry$figure_builder) && !length(.sci_showcase_missing(entry))
+    }, logical(1))
+    lapply(showcase[keep], function(entry) {
+        entry[c("label", "dataset", "inputs_ui", "output_ui", "server_fn", "defaults")]
+    })
 }
 
 
 #' Datasets seeding the sciVizModules Figure Builder
 #'
-#' The bundled data frames the modules in [sci_figure_builder_registry()] are
-#' written for. Loaded on demand rather than referenced by name, since this
+#' The example datasets the modules in [sci_figure_builder_registry()] are
+#' written for, plus the airway edgeR and limma-voom results as alternatives to
+#' the DESeq2 ones. Loaded on demand rather than referenced by name, since this
 #' package sets no `LazyData`.
 #'
 #' @return A named list of data frames.
@@ -109,15 +65,11 @@ sci_figure_builder_registry <- function() {
 #' @rdname INTERNAL_sci_figure_builder_data
 #' @keywords internal
 .sci_figure_builder_data <- function() {
-    list(
-        "airway_deseq2"      = .sci_example_data("airway_deseq2"),
-        "airway_edger"       = .sci_example_data("airway_edger"),
-        "airway_voom"        = .sci_example_data("airway_voom"),
-        "example_enrichment" = .sci_example_data("example_enrichment"),
-        "survival_lung"      = .sci_example_data("survival_lung"),
-        "dose_response"      = .sci_example_data("dose_response"),
-        "example_sbs96"      = .sci_example_data("example_sbs96")
-    )
+    keys <- unique(c(
+        vapply(sci_figure_builder_registry(), function(entry) entry$dataset, character(1)),
+        "airway_edger", "airway_voom"
+    ))
+    stats::setNames(lapply(keys, .sci_example_dataset), keys)
 }
 
 

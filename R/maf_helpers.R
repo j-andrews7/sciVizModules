@@ -545,13 +545,15 @@
 #' @param data_list A named list of MAF data frames or maftools `MAF` objects,
 #'   or `NULL` for maftools' TCGA LAML example (see [.maf_example()]).
 #' @param title Page title.
+#' @param defaults,hide.inputs,hide.tabs Passed to the module.
 #' @return A [shiny::shinyApp()] object.
 #'
 #' @importFrom VizModules createModuleApp
 #' @author Jared Andrews
 #' @rdname INTERNAL_maf_module_app
 #' @keywords internal
-.maf_module_app <- function(inputs_ui_fn, output_ui_fn, server_fn, data_list, title) {
+.maf_module_app <- function(inputs_ui_fn, output_ui_fn, server_fn, data_list, title,
+                            defaults = NULL, hide.inputs = NULL, hide.tabs = NULL) {
     if (is.null(data_list)) {
         data_list <- list("TCGA LAML (maftools)" = .maf_example())
     }
@@ -572,6 +574,9 @@
         output_ui_fn = output_ui_fn,
         server_fn = server_fn,
         data_list = data_list,
+        defaults = defaults,
+        hide.inputs = hide.inputs,
+        hide.tabs = hide.tabs,
         title = title
     )
 }

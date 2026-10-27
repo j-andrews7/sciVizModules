@@ -385,19 +385,22 @@ sample_pca <- function(object, assay = NULL, transform = .se_default_transform()
 #' @param inputs_ui_fn,output_ui_fn,server_fn The module's functions.
 #' @param object_list A named list of `SummarizedExperiment` objects.
 #' @param title Page title.
+#' @param defaults,hide.inputs,hide.tabs Passed to the module.
 #' @return A [shiny::shinyApp()] object.
 #'
 #' @author Jared Andrews
 #' @rdname INTERNAL_se_module_app
 #' @keywords internal
-.se_module_app <- function(inputs_ui_fn, output_ui_fn, server_fn, object_list, title) {
+.se_module_app <- function(inputs_ui_fn, output_ui_fn, server_fn, object_list, title,
+                           defaults = NULL, hide.inputs = NULL, hide.tabs = NULL) {
     .sci_object_app(
         inputs_ui_fn, output_ui_fn, server_fn, object_list, title,
         validate = function(x) .assert_se(x, "object_list element"),
         preview = function(x) .se_coldata(x),
         select_label = "Select Experiment:",
         preview_title = "Sample Metadata",
-        preview_note = "Read-only preview of the experiment's colData."
+        preview_note = "Read-only preview of the experiment's colData.",
+        defaults = defaults, hide.inputs = hide.inputs, hide.tabs = hide.tabs
     )
 }
 

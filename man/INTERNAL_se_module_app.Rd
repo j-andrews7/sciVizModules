@@ -4,7 +4,16 @@
 \alias{.se_module_app}
 \title{Build a standalone Shiny app for a module that takes a SummarizedExperiment}
 \usage{
-.se_module_app(inputs_ui_fn, output_ui_fn, server_fn, object_list, title)
+.se_module_app(
+  inputs_ui_fn,
+  output_ui_fn,
+  server_fn,
+  object_list,
+  title,
+  defaults = NULL,
+  hide.inputs = NULL,
+  hide.tabs = NULL
+)
 }
 \arguments{
 \item{inputs_ui_fn, output_ui_fn, server_fn}{The module's functions.}
@@ -12,6 +21,8 @@
 \item{object_list}{A named list of \code{SummarizedExperiment} objects.}
 
 \item{title}{Page title.}
+
+\item{defaults, hide.inputs, hide.tabs}{Passed to the module.}
 }
 \value{
 A \code{\link[shiny:shinyApp]{shiny::shinyApp()}} object.

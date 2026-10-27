@@ -177,6 +177,8 @@
 #' @param preview A function returning the data frame to preview for an object.
 #' @param select_label,preview_title,preview_note Labels for the selector and
 #'   the preview.
+#' @param defaults,hide.inputs,hide.tabs Passed to the module; `NULL` ones are
+#'   left to the module's own defaults (see [.sci_server_args()]).
 #' @return A [shiny::shinyApp()] object.
 #'
 #' @import shiny
@@ -188,7 +190,7 @@
 #' @keywords internal
 .sci_object_app <- function(inputs_ui_fn, output_ui_fn, server_fn, object_list, title, validate,
                             preview, select_label = "Select Object:", preview_title = "Preview",
-                            preview_note = "") {
+                            preview_note = "", defaults = NULL, hide.inputs = NULL, hide.tabs = NULL) {
     stopifnot(is.list(object_list), length(object_list) >= 1)
     if (is.null(names(object_list)) || any(!nzchar(names(object_list)))) {
         stop("The object list must be named.", call. = FALSE)
@@ -224,14 +226,17 @@
         })
 
         output$plot_inputs_ui <- renderUI({
-            inputs_ui_fn("active_plot", active_object(), title = h3(paste(input$object_select, "Settings")))
+            inputs_ui_fn(
+                "active_plot", active_object(),
+                defaults = defaults, title = h3(paste(input$object_select, "Settings"))
+            )
         })
 
         output$meta_table <- DT::renderDT({
             preview(active_object())
         }, options = list(scrollX = TRUE, pageLength = 5))
 
-        server_fn("active_plot", data = active_object)
+        do.call(server_fn, .sci_server_args("active_plot", active_object, defaults, hide.inputs, hide.tabs))
     }
 
     shinyApp(ui, server)

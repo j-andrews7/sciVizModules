@@ -5,26 +5,36 @@
 \title{Create a standalone Shiny app for the michaelisMenten module}
 \usage{
 michaelisMentenApp(
-  data = .sci_example_data("mm_kinetics"),
-  model = .sci_example_data("mm_kinetics_line"),
-  stats = .sci_example_data("mm_kinetics_fit"),
+  data = NULL,
+  model = NULL,
+  stats = NULL,
   defaults = NULL,
+  hide.inputs = NULL,
+  hide.tabs = NULL,
   title = "Modular Michaelis-Menten Plot"
 )
 }
 \arguments{
-\item{data}{The plotting data frame of observed points. Defaults to the
-bundled \link{mm_kinetics}.}
+\item{data}{The plotting data frame of observed points. If \code{NULL} (the
+default), the bundled \link{mm_kinetics} is used, with \link{mm_kinetics_line} as
+\code{model} and \link{mm_kinetics_fit} as \code{stats}.}
 
 \item{model}{A data frame of fitted-line coordinates (e.g. \code{mml}) sharing the
-same x/y columns as \code{data}. Defaults to the bundled \link{mm_kinetics_line}.}
+same x/y columns as \code{data}. Required when \code{data} is given.}
 
 \item{stats}{Optional fitted model (e.g. an \code{nls} fit of
 \code{v ~ Vm * S / (K + S)}) or named coefficients from which K and Vmax are
-extracted for annotation. Defaults to the bundled \link{mm_kinetics_fit};
-pass \code{NULL} to disable the annotation.}
+extracted for annotation. \code{NULL} (the default, when \code{data} is given)
+disables the annotation.}
 
-\item{defaults}{An optional named list of default input values.}
+\item{defaults}{An optional named list of default input values, applied over
+the gallery's settings when the example data is used.}
+
+\item{hide.inputs}{A character vector of input IDs to hide. Their values are
+still initialized and used, but the controls are not shown in the UI.}
+
+\item{hide.tabs}{A character vector of tab names to hide. Inputs in these tabs
+are still initialized and used.}
 
 \item{title}{The app title.}
 }
@@ -43,7 +53,9 @@ single data frame: the observed data, the fitted line, and (optionally) the
 stats object used for K / Vmax annotations.
 
 When called with no arguments, the app launches with the bundled example
-kinetics data (\link{mm_kinetics}, \link{mm_kinetics_line}, and \link{mm_kinetics_fit}).
+kinetics data (\link{mm_kinetics}, \link{mm_kinetics_line}, and \link{mm_kinetics_fit}), on
+the settings the module gallery (\code{\link[=sciModuleGalleryApp]{sciModuleGalleryApp()}}) opens this module
+on.
 }
 \examples{
 library(sciVizModules)

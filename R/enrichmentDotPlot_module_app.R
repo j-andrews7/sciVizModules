@@ -14,10 +14,14 @@
 #'
 #' This is a convenience wrapper around [VizModules::createModuleApp()].
 #'
+#' With the example data, the app opens on the settings the module gallery
+#' ([sciModuleGalleryApp()]) opens this module on.
+#'
 #' @param data_list An optional named list of enrichment results data frames. If
 #'   `NULL` (the default), `list("example_enrichment" = example_enrichment)` is
 #'   used as example data. Each data frame should contain enrichment terms and,
 #'   ideally, `GeneRatio` and p-value columns.
+#' @inheritParams volcanoPlotApp
 #' @return A Shiny app object.
 #'
 #' @importFrom VizModules createModuleApp
@@ -37,9 +41,11 @@
 #' data(example_enrichment)
 #' app2 <- enrichmentDotPlotApp(list("enrichment" = example_enrichment))
 #' if (interactive()) shiny::runApp(app2)
-enrichmentDotPlotApp <- function(data_list = NULL) {
+enrichmentDotPlotApp <- function(data_list = NULL, defaults = NULL, hide.inputs = NULL, hide.tabs = NULL) {
     if (is.null(data_list)) {
-        data_list <- list("example_enrichment" = .sci_example_data("example_enrichment"))
+        example <- .sci_module_example("enrichment", defaults)
+        data_list <- example$data_list
+        defaults <- example$defaults
     }
 
     stopifnot(is.list(data_list), length(data_list) >= 1)
@@ -52,6 +58,9 @@ enrichmentDotPlotApp <- function(data_list = NULL) {
         output_ui_fn = enrichmentDotPlotOutputUI,
         server_fn    = enrichmentDotPlotServer,
         data_list    = data_list,
+        defaults     = defaults,
+        hide.inputs  = hide.inputs,
+        hide.tabs    = hide.tabs,
         title        = "Modular Enrichment DotPlot"
     )
 }

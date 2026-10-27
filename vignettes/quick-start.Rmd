@@ -37,7 +37,8 @@ Servers share a common signature, with `data` supplied as a **reactive**:
 someModuleServer(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL)
 ```
 
-Each module also ships a standalone `*App()` convenience function.
+Each module also ships a standalone `*App()` convenience function, and
+`sciModuleGalleryApp()` puts every module in one app (see below).
 
 Note that this package sets no `LazyData`, so the bundled example datasets need
 a `data()` call before you can use them by name:
@@ -83,10 +84,36 @@ repository covers the conventions specific to this package on top of those.
 
 ## The module gallery
 
-To preview every module in one place, launch the bundled gallery app:
+To preview every module in one place, launch the gallery:
 
 ```{r gallery}
-library(shiny)
+library(sciVizModules)
+sciModuleGalleryApp()
+```
+
+Every module has its own tab, grouped into menus by field (Expression,
+Enrichment, Single-cell, PCA, Genomics, Mutations, Clinical, Pharmacology,
+Structure). Each opens on an example dataset with the module's main features
+switched on: labelled genes on the volcano and MA plots, lead variants on the
+Manhattan and QQ plots, a risk table and median survival on the Kaplan-Meier
+curves, an untreated-to-treated trajectory on the sample PCA, terminal
+elimination fits on the PK profiles, and so on. Every control can still be
+changed from the tab's sidebar, a **Docs** link opens the module's reference
+page, and beneath the plot sits either a filterable table of the data feeding
+it or a read-only preview of the object it is bound to. The **Overview** page
+lists the modules as cards, and the **Figure Builder** tab composes several of
+them into one figure (see "Multi-panel figures" below).
+
+A module's server starts the first time its tab is opened, so the gallery
+launches quickly, and modules whose optional packages are not installed are
+left out, their Overview cards naming the packages to install.
+
+The settings each tab opens on are the ones the module's `*App()` opens on too,
+so passing the same `defaults` to a module in your own app reproduces any of
+them. For deployment to a Shiny server, shinyapps.io or Posit Connect, the
+same app ships as an `app.R`:
+
+```{r gallery-deploy}
 runApp(system.file("apps/module-gallery", package = "sciVizModules"))
 ```
 
@@ -123,7 +150,9 @@ shinyApp(ui, server)
 
 ## Try a module standalone
 
-The fastest way to explore a module is its `*App()` function:
+The fastest way to explore a single module is its `*App()` function. Called
+with no data, each opens on the same example dataset and showcase settings as
+its gallery tab:
 
 ```{r apps}
 if (interactive()) volcanoPlotApp()     # differential expression, airway_deseq2
@@ -146,6 +175,15 @@ if (interactive()) mutationalProfileApp() # simulated SBS96 spectra, example_sbs
 if (interactive()) samplePCAApp()       # bulk RNA-seq counts, the airway package
 if (interactive()) deHeatmapApp()       # airway with its DESeq2 results (airway_deseq2)
 if (interactive()) dittoDotPlotApp()    # marker dot plot, example_sce
+```
+
+Every `*App()` also takes `defaults`, `hide.inputs` and `hide.tabs`. With the
+example data, a key you set in `defaults` replaces its showcase value and the
+rest of the showcase stays; with your own data, only your `defaults` apply:
+
+```{r app-defaults}
+if (interactive()) survivalCurveApp(defaults = list(group.by = "ph.ecog"))
+if (interactive()) survivalCurveApp(list(lung = survival_lung), hide.tabs = "Legend")
 ```
 
 ## Set defaults and hide controls
@@ -191,10 +229,10 @@ volcanoPlotServer(
 
 ## App factory with `createModuleApp()`
 
-Every `*App()` convenience function (e.g. `volcanoPlotApp()`,
-`survivalCurveApp()`, `dittoDimPlotApp()`) is a thin wrapper around VizModules'
-`createModuleApp()`, which returns a full standalone app with data import, a
-filterable data table, and dataset switching for any module:
+The data-frame modules' `*App()` functions (e.g. `volcanoPlotApp()`,
+`survivalCurveApp()`) are thin wrappers around VizModules' `createModuleApp()`,
+which returns a full standalone app with data import, a filterable data table,
+and dataset switching for any module:
 
 ```{r create-module-app}
 library(sciVizModules)
@@ -574,7 +612,8 @@ example_sce
 ## Multi-panel figures
 
 The data-frame modules are registered with the VizModules Figure Builder, so
-several panels can be dragged, sized and exported as one figure:
+several panels can be dragged, sized and exported as one figure. It is also the
+last tab of the module gallery:
 
 ```{r figure-builder}
 sciFigureBuilderApp()
@@ -582,7 +621,8 @@ sciFigureBuilderApp()
 
 `sci_figure_builder_registry()` returns the registry itself, in the shape
 `VizModules::figureBuilderServer()` documents, so you can extend it with your
-own modules:
+own modules. Its entries come from the same registry as the gallery, so a panel
+opens on its gallery tab's settings when its example dataset is the one picked:
 
 ```{r figure-builder-registry}
 registry <- sci_figure_builder_registry()
@@ -637,3 +677,15 @@ and several specialized packages. To see which arguments a module surfaces:
 If an argument is listed as missing or non-functional in the module docs, it has
 been intentionally hidden because it does not round-trip well in the interactive
 Plotly output.
+
+## Contributing a module
+
+Every module in sciVizModules is in the gallery. A module's entry in the
+gallery's registry (`.sci_module_showcase()` in `R/module_showcase.R`) is part
+of the module: it gives the module its gallery tab, the example its `*App()`
+opens on, and, for a data-frame module, its Figure Builder entry, with showcase
+settings that switch on the features the module is worth reaching for. The test
+suite derives the package's modules from its exports and fails when one has no
+entry, or when an entry's settings name a column, value or control that does
+not exist, so a new module cannot ship without a working gallery tab.
+`AGENTS.md` in the repository walks through the steps.

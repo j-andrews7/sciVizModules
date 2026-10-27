@@ -4,11 +4,26 @@
 \alias{rocCurveApp}
 \title{Create a standalone Shiny app for the rocCurve module}
 \usage{
-rocCurveApp(data_list = NULL)
+rocCurveApp(
+  data_list = NULL,
+  defaults = NULL,
+  hide.inputs = NULL,
+  hide.tabs = NULL
+)
 }
 \arguments{
 \item{data_list}{An optional named list of data frames. If \code{NULL} (the
 default), the bundled \link{example_biomarkers} is used.}
+
+\item{defaults}{A named list of input IDs and their default values to apply on
+startup. With the example data, they are applied over the settings the module
+gallery opens the module on, a key given here replacing its showcase value.}
+
+\item{hide.inputs}{A character vector of input IDs to hide. Their values are still
+initialized and used, but the controls are not shown in the UI.}
+
+\item{hide.tabs}{A character vector of tab names to hide. Inputs in these tabs are
+still initialized and used. \code{NULL} (the default) keeps the module's own default.}
 }
 \value{
 A Shiny app object.
@@ -17,6 +32,10 @@ A Shiny app object.
 Generates a Shiny application with modular ROC curve components, built with
 \code{\link[VizModules:createModuleApp]{VizModules::createModuleApp()}}: data import, a filterable data table, and
 the plot with its settings.
+}
+\details{
+With the example data, the app opens on the settings the module gallery
+(\code{\link[=sciModuleGalleryApp]{sciModuleGalleryApp()}}) opens this module on.
 }
 \examples{
 library(sciVizModules)

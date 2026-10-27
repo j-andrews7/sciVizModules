@@ -17,5 +17,6 @@
 ^docs$
 ^pkgdown$
 ^\.agents$
+^inst/apps/module-gallery/manifest\.json$
 ^LICENSE\.md$
 ^Rplots\.pdf$

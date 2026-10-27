@@ -10,8 +10,9 @@
 A named list of data frames.
 }
 \description{
-The bundled data frames the modules in \code{\link[=sci_figure_builder_registry]{sci_figure_builder_registry()}} are
-written for. Loaded on demand rather than referenced by name, since this
+The example datasets the modules in \code{\link[=sci_figure_builder_registry]{sci_figure_builder_registry()}} are
+written for, plus the airway edgeR and limma-voom results as alternatives to
+the DESeq2 ones. Loaded on demand rather than referenced by name, since this
 package sets no \code{LazyData}.
 }
 \author{

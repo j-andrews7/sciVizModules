@@ -4,11 +4,26 @@
 \alias{pcaPairsPlotApp}
 \title{Create a standalone Shiny app for the pcaPairsPlot module}
 \usage{
-pcaPairsPlotApp(pca_list = NULL)
+pcaPairsPlotApp(
+  pca_list = NULL,
+  defaults = NULL,
+  hide.inputs = NULL,
+  hide.tabs = NULL
+)
 }
 \arguments{
 \item{pca_list}{An optional named list of PCAtools \code{pca} objects. If \code{NULL}
 (the default), the bundled \link{example_pca} is used.}
+
+\item{defaults}{A named list of input IDs and their default values to apply on
+startup. With the example data, they are applied over the settings the module
+gallery opens the module on, a key given here replacing its showcase value.}
+
+\item{hide.inputs}{A character vector of input IDs to hide. Their values are still
+initialized and used, but the controls are not shown in the UI.}
+
+\item{hide.tabs}{A character vector of tab names to hide. Inputs in these tabs are
+still initialized and used. \code{NULL} (the default) keeps the module's own default.}
 }
 \value{
 A Shiny app object.
@@ -17,6 +32,10 @@ A Shiny app object.
 Generates a Shiny application with an object selector over the supplied
 PCAtools \code{pca} objects, a read-only preview of the selected object's sample
 metadata, and the pairs plot with its settings.
+}
+\details{
+With the example data, the app opens on the settings the module gallery
+(\code{\link[=sciModuleGalleryApp]{sciModuleGalleryApp()}}) opens this module on.
 }
 \examples{
 library(sciVizModules)

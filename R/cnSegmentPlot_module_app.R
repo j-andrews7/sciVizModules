@@ -15,13 +15,19 @@
 #' "Samples to Plot" control chooses which ones are shown.
 #'
 #' When called with no arguments, the app launches with the bundled
-#' [example_cn_segment] object; a curated set of cancer genes is labeled
-#' initially.
+#' [example_cn_segment] object, on the settings the module gallery
+#' ([sciModuleGalleryApp()]) opens this module on; a curated set of cancer genes
+#' is labeled initially.
 #'
 #' @param seg A `CNSegment` object, as returned by [sesame::cnSegmentation()],
-#'   or a named list of them to compare several samples. Defaults to the bundled
-#'   [example_cn_segment].
-#' @param defaults An optional named list of default input values.
+#'   or a named list of them to compare several samples. If `NULL` (the
+#'   default), the bundled [example_cn_segment] is used.
+#' @param defaults An optional named list of default input values, applied over
+#'   the gallery's settings when the example data is used.
+#' @param hide.inputs A character vector of input IDs to hide. Their values are
+#'   still initialized and used, but the controls are not shown in the UI.
+#' @param hide.tabs A character vector of tab names to hide. Inputs in these tabs
+#'   are still initialized and used.
 #' @param title The app title.
 #' @return A Shiny app object.
 #'
@@ -47,9 +53,16 @@
 #' shifted$bin.signals <- shifted$bin.signals + 0.2
 #' app <- cnSegmentPlotApp(list(Tumor = example_cn_segment, Normal = shifted))
 #' if (interactive()) shiny::runApp(app)
-cnSegmentPlotApp <- function(seg = .sci_example_data("example_cn_segment"),
+cnSegmentPlotApp <- function(seg = NULL,
                              defaults = NULL,
+                             hide.inputs = NULL,
+                             hide.tabs = NULL,
                              title = "Array Copy Number Segments") {
+    if (is.null(seg)) {
+        example <- .sci_module_example("cnseg", defaults)
+        seg <- example$data_list[[1]]
+        defaults <- example$defaults
+    }
     seg.list <- .cn_seg_as_list(seg)
 
     # Stacked panels need vertical room; the figure still autosizes, so the
@@ -74,8 +87,21 @@ cnSegmentPlotApp <- function(seg = .sci_example_data("example_cn_segment"),
 
     server <- function(input, output, session) {
         seg_reactive <- reactive(seg.list)
-        cnSegmentPlotServer("cn_plot", data = seg_reactive, defaults = defaults)
+        do.call(cnSegmentPlotServer, .sci_server_args("cn_plot", seg_reactive, defaults, hide.inputs, hide.tabs))
     }
 
     shinyApp(ui, server)
+}
+
+
+#' Segments of a copy-number input, for a read-only preview
+#'
+#' @param seg A `CNSegment` object or a list of them.
+#' @return The segments of every sample, stacked.
+#'
+#' @author Jared Andrews
+#' @rdname INTERNAL_cn_preview
+#' @keywords internal
+.cn_preview <- function(seg) {
+    do.call(rbind, lapply(.cn_seg_as_list(seg), function(s) as.data.frame(s$seg.signals)))
 }

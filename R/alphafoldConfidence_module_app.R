@@ -5,9 +5,12 @@
 #' pLDDT, and the confidence plot with its settings.
 #'
 #' When `af_list` is not provided (or `NULL`), the app launches with the bundled
-#' AlphaFold DB prediction for human p53 (UniProt P04637; AlphaFold DB, CC-BY 4.0).
+#' AlphaFold DB prediction for human p53 (UniProt P04637; AlphaFold DB, CC-BY 4.0),
+#' on the settings the module gallery ([sciModuleGalleryApp()]) opens this
+#' module on.
 #'
 #' @param af_list An optional named list of objects from [read_alphafold()].
+#' @inheritParams volcanoPlotApp
 #' @return A Shiny app object.
 #'
 #' @seealso [read_alphafold()], [sciVizModules::alphafoldConfidenceInputsUI()],
@@ -19,9 +22,11 @@
 #' library(sciVizModules)
 #' app <- alphafoldConfidenceApp()
 #' if (interactive()) shiny::runApp(app)
-alphafoldConfidenceApp <- function(af_list = NULL) {
+alphafoldConfidenceApp <- function(af_list = NULL, defaults = NULL, hide.inputs = NULL, hide.tabs = NULL) {
     if (is.null(af_list)) {
-        af_list <- list("TP53 (P04637)" = .af_example())
+        example <- .sci_module_example("alphafold", defaults)
+        af_list <- example$data_list
+        defaults <- example$defaults
     }
     .sci_object_app(
         inputs_ui_fn = alphafoldConfidenceInputsUI,
@@ -33,6 +38,9 @@ alphafoldConfidenceApp <- function(af_list = NULL) {
         preview      = function(x) x$plddt,
         select_label = "Select Prediction:",
         preview_title = "Per-residue pLDDT",
-        preview_note = "Read-only preview of the prediction's per-residue confidence."
+        preview_note = "Read-only preview of the prediction's per-residue confidence.",
+        defaults     = defaults,
+        hide.inputs  = hide.inputs,
+        hide.tabs    = hide.tabs
     )
 }

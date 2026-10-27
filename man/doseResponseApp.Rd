@@ -4,14 +4,26 @@
 \alias{doseResponseApp}
 \title{Create a standalone Shiny app for the dose-response module}
 \usage{
-doseResponseApp(data_list = NULL, defaults = NULL)
+doseResponseApp(
+  data_list = NULL,
+  defaults = NULL,
+  hide.inputs = NULL,
+  hide.tabs = NULL
+)
 }
 \arguments{
 \item{data_list}{An optional named list of dose-response data frames. If
 \code{NULL} (the default), \code{list("dose_response" = dose_response)} is used.}
 
 \item{defaults}{A named list of default values, merged over the module's
-dose-response defaults (user values win).}
+dose-response defaults (user values win) and, with the example data, over
+the gallery's settings.}
+
+\item{hide.inputs}{A character vector of input IDs to hide. Their values are still
+initialized and used, but the controls are not shown in the UI.}
+
+\item{hide.tabs}{A character vector of tab names to hide. Inputs in these tabs are
+still initialized and used. \code{NULL} (the default) keeps the module's own default.}
 }
 \value{
 A Shiny app object.
@@ -24,7 +36,8 @@ plot tabs and inputs are hidden.
 }
 \details{
 When \code{data_list} is not provided, the app launches with the bundled
-\link{dose_response} example data.
+\link{dose_response} example data, on the settings the module gallery
+(\code{\link[=sciModuleGalleryApp]{sciModuleGalleryApp()}}) opens this module on.
 }
 \examples{
 library(sciVizModules)

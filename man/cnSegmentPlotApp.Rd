@@ -5,17 +5,26 @@
 \title{Create a standalone Shiny app for the cnSegmentPlot module}
 \usage{
 cnSegmentPlotApp(
-  seg = .sci_example_data("example_cn_segment"),
+  seg = NULL,
   defaults = NULL,
+  hide.inputs = NULL,
+  hide.tabs = NULL,
   title = "Array Copy Number Segments"
 )
 }
 \arguments{
 \item{seg}{A \code{CNSegment} object, as returned by \code{\link[sesame:cnSegmentation]{sesame::cnSegmentation()}},
-or a named list of them to compare several samples. Defaults to the bundled
-\link{example_cn_segment}.}
+or a named list of them to compare several samples. If \code{NULL} (the
+default), the bundled \link{example_cn_segment} is used.}
 
-\item{defaults}{An optional named list of default input values.}
+\item{defaults}{An optional named list of default input values, applied over
+the gallery's settings when the example data is used.}
+
+\item{hide.inputs}{A character vector of input IDs to hide. Their values are
+still initialized and used, but the controls are not shown in the UI.}
+
+\item{hide.tabs}{A character vector of tab names to hide. Inputs in these tabs
+are still initialized and used.}
 
 \item{title}{The app title.}
 }
@@ -39,8 +48,9 @@ shared genomic x-axis; the plot container is sized to fit them, and the
 "Samples to Plot" control chooses which ones are shown.
 
 When called with no arguments, the app launches with the bundled
-\link{example_cn_segment} object; a curated set of cancer genes is labeled
-initially.
+\link{example_cn_segment} object, on the settings the module gallery
+(\code{\link[=sciModuleGalleryApp]{sciModuleGalleryApp()}}) opens this module on; a curated set of cancer genes
+is labeled initially.
 }
 \examples{
 library(sciVizModules)

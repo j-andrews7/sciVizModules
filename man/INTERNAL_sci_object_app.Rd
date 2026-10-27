@@ -14,7 +14,10 @@
   preview,
   select_label = "Select Object:",
   preview_title = "Preview",
-  preview_note = ""
+  preview_note = "",
+  defaults = NULL,
+  hide.inputs = NULL,
+  hide.tabs = NULL
 )
 }
 \arguments{
@@ -30,6 +33,9 @@
 
 \item{select_label, preview_title, preview_note}{Labels for the selector and
 the preview.}
+
+\item{defaults, hide.inputs, hide.tabs}{Passed to the module; \code{NULL} ones are
+left to the module's own defaults (see \code{\link[=.sci_server_args]{.sci_server_args()}}).}
 }
 \value{
 A \code{\link[shiny:shinyApp]{shiny::shinyApp()}} object.
