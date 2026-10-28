@@ -48,8 +48,10 @@ mdTrajectoryMetricsInputsUI <- function(id, data, defaults = NULL, title = "MD T
     ns <- NS(id)
     d <- .md_defaults(data, defaults)
     num <- names(data)[vapply(data, is.numeric, logical(1))]
-    # One line or panel per level: columns with too many levels to draw are left out.
-    cat_cols <- .sci_discrete_cols(data)
+    # One line or panel per level: columns with too many levels to draw are left out,
+    # unless named in `defaults`.
+    cat_cols <- .sci_discrete_cols(data,
+        keep = c(get_default(defaults, "group.col", NULL), get_default(defaults, "facet.col", NULL)))
     none <- c("None" = "", stats::setNames(cat_cols, cat_cols))
 
     data_tab <- tagList(

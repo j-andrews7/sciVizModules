@@ -4,7 +4,7 @@
 \alias{.sci_discrete_cols}
 \title{Columns fit to colour, shape or group by}
 \usage{
-.sci_discrete_cols(data, numeric = FALSE, max.levels = 50)
+.sci_discrete_cols(data, numeric = FALSE, max.levels = 50, keep = NULL)
 }
 \arguments{
 \item{data}{A data frame (or anything \code{\link[=as.data.frame]{as.data.frame()}} accepts).}
@@ -13,16 +13,20 @@
 \code{max.levels} distinct values, e.g. a dose.}
 
 \item{max.levels}{Columns with this many or more distinct values are left
-out. Passed to \code{\link[VizModules:facet_check]{VizModules::facet_check()}}.}
+out. Passed to \code{\link[VizModules:discrete_choices]{VizModules::discrete_choices()}}.}
+
+\item{keep}{Column names to keep whatever their size, such as the column a
+caller named in \code{defaults}. Passed to \code{\link[VizModules:discrete_choices]{VizModules::discrete_choices()}}.}
 }
 \value{
 A character vector of column names.
 }
 \description{
-The categorical columns \code{\link[VizModules:facet_check]{VizModules::facet_check()}} accepts (character or
-factor, with fewer than \code{max.levels} distinct values) plus the logical
-columns, in data order. A column of IDs or gene names would otherwise ask
-for one colour, shape or group per row, which can bring an app down.
+\code{\link[VizModules:discrete_choices]{VizModules::discrete_choices()}} (the categorical columns
+\code{\link[VizModules:facet_check]{VizModules::facet_check()}} accepts, plus the logical columns and any named
+in \code{keep}), in data order, for any input \code{\link[=as.data.frame]{as.data.frame()}} accepts. A column
+of IDs or gene names would otherwise ask for one colour, shape or group per
+row, which can bring an app down.
 }
 \author{
 Jared Andrews

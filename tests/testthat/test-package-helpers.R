@@ -85,6 +85,29 @@ test_that(".sci_discrete_cols offers the categorical columns with few enough lev
     expect_identical(.sci_discrete_cols(df, max.levels = 3), c("fct", "flag"))
     expect_identical(.sci_discrete_cols(NULL), character(0))
     expect_identical(.sci_discrete_cols(data.frame()), character(0))
+    # A column a caller names (its `defaults` entry) is offered whatever its size, in data order.
+    expect_identical(.sci_discrete_cols(df, keep = c("id", "missing")), c("id", "grp", "fct", "flag"))
+    expect_identical(.sci_discrete_cols(df, numeric = TRUE, keep = "id"), c("id", "grp", "fct", "flag", "dose"))
+    expect_identical(.sci_discrete_cols(df), discrete_choices(df))
+})
+
+test_that("module selectors offer a high-cardinality column named in defaults", {
+    df <- data.frame(
+        id = paste0("s", seq_len(60)), grp = rep(c("a", "b"), 30), time = seq_len(60),
+        status = rep(c(0, 1), 30), stringsAsFactors = FALSE
+    )
+    select_values <- function(ui, input_id) {
+        html <- as.character(ui)
+        pattern <- sprintf('<script type="application/json" data-for="%s">(.*?)</script>', input_id)
+        json <- regmatches(html, regexec(pattern, html))[[1]][2]
+        jsonlite::fromJSON(json)$options$choices$value
+    }
+    base <- list(time = "time", status = "status")
+    expect_identical(select_values(survivalCurveInputsUI("s", df, defaults = base), "s-group.by"), c("", "grp"))
+    expect_identical(
+        select_values(survivalCurveInputsUI("s", df, defaults = c(base, group.by = "id")), "s-group.by"),
+        c("", "id", "grp")
+    )
 })
 
 test_that(".sci_shared_panel_borders boxes each panel that shares an axis", {

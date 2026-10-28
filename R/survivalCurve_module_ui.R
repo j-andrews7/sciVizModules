@@ -78,8 +78,8 @@ survivalCurveInputsUI <- function(id, data, defaults = NULL, title = "Survival C
     }
 
     num.choices <- names(data)[vapply(data, is.numeric, logical(1))]
-    # Strata with too many levels to draw (an ID column) are left out.
-    cat.choices <- .sci_discrete_cols(data)
+    # Strata with too many levels to draw (an ID column) are left out, unless named in `defaults`.
+    cat.choices <- .sci_discrete_cols(data, keep = get_default(defaults, "group.by", NULL))
     group.choices <- c("None" = "", stats::setNames(cat.choices, cat.choices))
     pair.choices <- .surv_pair_choices(if (isTRUE(d$group.by %in% names(data))) .surv_levels(data[[d$group.by]]))
 

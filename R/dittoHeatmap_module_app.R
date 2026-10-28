@@ -23,7 +23,8 @@
 #' @author Jared Andrews
 #' @examples
 #' library(sciVizModules)
-#' if (requireNamespace("InteractiveComplexHeatmap", quietly = TRUE) &&
+#' if (requireNamespace("ComplexHeatmap", quietly = TRUE) &&
+#'     requireNamespace("InteractiveComplexHeatmap", quietly = TRUE) &&
 #'     requireNamespace("circlize", quietly = TRUE)) {
 #'     app <- dittoHeatmapApp()
 #'     if (interactive()) shiny::runApp(app)

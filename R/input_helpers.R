@@ -40,22 +40,25 @@
 
 #' Columns fit to colour, shape or group by
 #'
-#' The categorical columns [VizModules::facet_check()] accepts (character or
-#' factor, with fewer than `max.levels` distinct values) plus the logical
-#' columns, in data order. A column of IDs or gene names would otherwise ask
-#' for one colour, shape or group per row, which can bring an app down.
+#' [VizModules::discrete_choices()] (the categorical columns
+#' [VizModules::facet_check()] accepts, plus the logical columns and any named
+#' in `keep`), in data order, for any input [as.data.frame()] accepts. A column
+#' of IDs or gene names would otherwise ask for one colour, shape or group per
+#' row, which can bring an app down.
 #'
 #' @param data A data frame (or anything [as.data.frame()] accepts).
 #' @param numeric Whether to also keep numeric columns with fewer than
 #'   `max.levels` distinct values, e.g. a dose.
 #' @param max.levels Columns with this many or more distinct values are left
-#'   out. Passed to [VizModules::facet_check()].
+#'   out. Passed to [VizModules::discrete_choices()].
+#' @param keep Column names to keep whatever their size, such as the column a
+#'   caller named in `defaults`. Passed to [VizModules::discrete_choices()].
 #' @return A character vector of column names.
 #'
 #' @author Jared Andrews
 #' @rdname INTERNAL_sci_discrete_cols
 #' @keywords internal
-.sci_discrete_cols <- function(data, numeric = FALSE, max.levels = 50) {
+.sci_discrete_cols <- function(data, numeric = FALSE, max.levels = 50, keep = NULL) {
     if (is.null(data)) {
         return(character(0))
     }
@@ -64,7 +67,7 @@
         return(character(0))
     }
     nm <- names(data)
-    ok <- nm %in% facet_check(data, max.levels) | vapply(data, is.logical, logical(1))
+    ok <- nm %in% discrete_choices(data, max.levels = max.levels, keep = keep)
     if (isTRUE(numeric)) {
         ok <- ok | vapply(data, function(x) is.numeric(x) && length(unique(x[!is.na(x)])) < max.levels, logical(1))
     }

@@ -43,7 +43,8 @@ DESeq2 results, \link{airway_deseq2}, on the settings the module gallery
 }
 \examples{
 library(sciVizModules)
-if (requireNamespace("InteractiveComplexHeatmap", quietly = TRUE) &&
+if (requireNamespace("ComplexHeatmap", quietly = TRUE) &&
+    requireNamespace("InteractiveComplexHeatmap", quietly = TRUE) &&
     requireNamespace("circlize", quietly = TRUE) &&
     requireNamespace("airway", quietly = TRUE)) {
     app <- deHeatmapApp()

@@ -4,13 +4,16 @@
 \alias{.pca_metadata_cols}
 \title{Metadata columns of a \code{pca} object, by type}
 \usage{
-.pca_metadata_cols(p, type = c("discrete", "numeric"))
+.pca_metadata_cols(p, type = c("discrete", "numeric"), keep = NULL)
 }
 \arguments{
 \item{p}{A \code{pca} object.}
 
 \item{type}{\code{"discrete"} (logical, or factor and character with fewer than
 50 levels; see \code{\link[=.sci_discrete_cols]{.sci_discrete_cols()}}) or \code{"numeric"}.}
+
+\item{keep}{Discrete column names to keep whatever their size, such as the
+columns a caller named in \code{defaults}.}
 }
 \value{
 A character vector of column names, possibly empty.

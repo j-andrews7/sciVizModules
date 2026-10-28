@@ -82,12 +82,14 @@
 #' @param p A `pca` object.
 #' @param type `"discrete"` (logical, or factor and character with fewer than
 #'   50 levels; see [.sci_discrete_cols()]) or `"numeric"`.
+#' @param keep Discrete column names to keep whatever their size, such as the
+#'   columns a caller named in `defaults`.
 #' @return A character vector of column names, possibly empty.
 #'
 #' @author Jared Andrews
 #' @rdname INTERNAL_pca_metadata_cols
 #' @keywords internal
-.pca_metadata_cols <- function(p, type = c("discrete", "numeric")) {
+.pca_metadata_cols <- function(p, type = c("discrete", "numeric"), keep = NULL) {
     type <- match.arg(type)
     meta <- p$metadata
     if (is.null(meta) || ncol(as.data.frame(meta)) == 0) {
@@ -96,7 +98,7 @@
     meta <- as.data.frame(meta)
     if (identical(type, "discrete")) {
         # Sample IDs and other columns with too many levels to colour or shape by are left out.
-        return(.sci_discrete_cols(meta))
+        return(.sci_discrete_cols(meta, keep = keep))
     }
     names(meta)[vapply(meta, is.numeric, logical(1))]
 }

@@ -54,8 +54,9 @@ pkConcentrationTimeInputsUI <- function(id, data, defaults = NULL, title = "PK S
     data <- as.data.frame(data)
     d <- .pk_defaults(data, defaults)
     num <- names(data)[vapply(data, is.numeric, logical(1))]
-    # Dose groups are often numeric; columns with too many levels to average over are left out.
-    groups <- .sci_discrete_cols(data, numeric = TRUE)
+    # Dose groups are often numeric; columns with too many levels to average over are left out,
+    # unless named in `defaults`.
+    groups <- .sci_discrete_cols(data, numeric = TRUE, keep = get_default(defaults, "group.col", NULL))
     none <- c("None" = "", stats::setNames(groups, groups))
 
     data_tab <- tagList(

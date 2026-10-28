@@ -42,7 +42,8 @@ pcaPairsPlotInputsUI <- function(id, data, defaults = NULL, title = "Pairs Plot 
     ns <- NS(id)
     .assert_pca(data)
     comps <- .pca_components(data)
-    disc <- .pca_metadata_cols(data, "discrete")
+    disc <- .pca_metadata_cols(data, "discrete",
+        keep = c(get_default(defaults, "color.by", NULL), get_default(defaults, "shape.by", NULL)))
     group.choices <- c("None" = "", stats::setNames(disc, disc))
 
     data_tab <- tagList(

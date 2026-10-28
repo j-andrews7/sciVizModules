@@ -43,7 +43,8 @@ With the example data, the app opens on the settings the module gallery
 }
 \examples{
 library(sciVizModules)
-if (requireNamespace("InteractiveComplexHeatmap", quietly = TRUE) &&
+if (requireNamespace("ComplexHeatmap", quietly = TRUE) &&
+    requireNamespace("InteractiveComplexHeatmap", quietly = TRUE) &&
     requireNamespace("circlize", quietly = TRUE)) {
     app <- dittoHeatmapApp()
     if (interactive()) shiny::runApp(app)
