@@ -1,0 +1,936 @@
+# sciVizModules
+
+sciVizModules extends
+[VizModules](https://github.com/j-andrews7/VizModules) with a curated
+collection of domain-specific Shiny modules tailored for the biological,
+chemical, and physical sciences. Built on the flexible foundations of
+VizModules, these modules introduce plot types and interactive controls
+commonly needed in scientific research. Each module preserves the
+interactivity-first philosophy of its parent package while incorporating
+scientifically meaningful defaults, axis conventions, and annotation
+layers relevant to each domain. sciVizModules enables researchers to
+rapidly deploy publication-ready, interactive visualizations with
+minimal code, bridging the gap between raw experimental data and
+interpretable scientific figures.
+
+Developed by [Jared Andrews](https://github.com/j-andrews7) and [Jacob
+Martin](https://github.com/Jacob1106)
+
+## Install
+
+Note that this package is in development and may break at any time.
+
+VizModules 0.6.0 or newer must be installed first:
+
+``` r
+
+install.packages("VizModules")
+# ... or, for the development version:
+# remotes::install_github("j-andrews7/VizModules")
+
+remotes::install_github("j-andrews7/sciVizModules")
+```
+
+## Module Gallery
+
+To preview every module in one place, launch the gallery. Every module
+has its own tab, grouped into menus by field, each opening on a bundled
+example dataset with the module’s main features already switched on
+(labelled genes and variants, risk tables, trajectories, annotation
+tracks and more), so you can explore the plot types and their
+interactive controls without writing any code. An Overview page lists
+every module as a card, each tab links to the module’s reference page,
+and a Figure Builder tab composes several modules into one figure:
+
+``` r
+
+library(sciVizModules)
+sciModuleGalleryApp()
+```
+
+Each module’s `*App()` opens on the same settings as its gallery tab.
+The same gallery ships as
+`system.file("apps/module-gallery", package = "sciVizModules")` for
+deployment to a Shiny server, shinyapps.io or Posit Connect.
+
+## Available Modules
+
+Each module follows the VizModules trio contract:
+`*InputsUI(id, data, ...)` renders the controls, `*OutputUI(id)` renders
+the interactive plotly output, and `*Server(id, data, ...)` holds the
+logic. Every module also ships a standalone `*App()` you can run to see
+it in action.
+
+- **`volcanoPlot`** — differential-expression volcano plot with
+  interactive significance and fold-change thresholding (wraps
+  `VizModules::dittoViz_scatterPlot`).
+- **`enrichmentDotPlot`** — functional-enrichment dot plot for
+  over-representation / GSEA results (e.g. `clusterProfiler` output).
+  Enrichment terms sit on the y-axis, a grouping variable
+  (e.g. `Cluster`) on the x-axis, dot size encodes the gene ratio, and
+  dot color encodes significance (`-log10` p-value) (wraps
+  `VizModules::plotthis_DotPlot`).
+- **`goFanPlot`** — Gene Ontology (GO) enrichment **sunburst** (“fan”)
+  plot that converts the GO DAG into a clean circular layout, where each
+  ring is a hierarchy level and each segment is a GO term. Accepts an
+  enrichment table with a GO-ID column and a numeric column
+  (e.g. `qvalue`) to colour by, and renders an interactive plotly
+  sunburst (wraps
+  [`GOfan::sunburstGO`](https://rdrr.io/pkg/GOfan/man/sunburstGO.html)).
+  Requires the [GOfan](https://github.com/jianhong/GOfan) package and
+  the relevant organism annotation (`OrgDb`) package
+  (e.g. `org.Hs.eg.db`).
+- **`survivalCurve`** — Kaplan-Meier survival curve fitted with the
+  [survival](https://cran.r-project.org/package=survival) package.
+  Accepts a tidy survival data frame (a numeric follow-up `time` column,
+  an event `status` column, and an optional grouping column) and renders
+  an interactive plotly curve with optional confidence bands, censoring
+  marks, log-rank p-value, median-survival lines, and a number-at-risk
+  table.
+- **`maPlot`** — differential-expression MA plot: mean abundance on the
+  x-axis (log10 for DESeq2’s `baseMean`, identity for the already-logged
+  edgeR/limma columns) against log fold change, with the same
+  interactive significance and fold-change thresholding as the volcano
+  plot (wraps `VizModules::dittoViz_scatterPlot`).
+- **`michaelisMenten`** — Michaelis-Menten plot for enzyme-substrate
+  kinetics, built on the outputs of the
+  [drc](https://cran.r-project.org/package=drc) package. The module
+  takes a `data` (observed points), `model` (fitted line) and optional
+  `stats` (an `nls` fit, or named `K` / `Vmax` coefficients) bundle
+  produced by the **drc** Michaelis-Menten workflow.
+- **`doseResponse`** — dose-response curve with the dose on a log10 axis
+  and a log-logistic curve fitted with **drc**. The `drm` model backend
+  is registered with VizModules at load, so the curve is one of the fit
+  options on the wrapped scatter plot (wraps
+  `VizModules::dittoViz_scatterPlot`).
+- **`cnSegmentPlot`** — genome-wide array copy-number segment plot over
+  a `CNSegment` object as returned by
+  [`sesame::cnSegmentation()`](https://bioconductor.org/packages/sesame/).
+  Bin-level log2 signal ratios are drawn across the genome with
+  chromosome guides, centromere marks and optional gene labels; several
+  samples stack vertically over a shared genomic x-axis.
+- **`forestPlot`** — forest plot of hazard ratios (Cox), odds ratios
+  (logistic) or coefficients (linear regression), fitted from the raw
+  data inside the module. Choose the outcome and covariates
+  interactively, and switch between one adjusted (multivariable) model
+  and one model per covariate; factors show a row per level against
+  their reference level.
+- **`rocCurve`** — ROC curves for one or more numeric predictors of a
+  binary outcome, with the AUC (and its DeLong 95% CI when
+  [pROC](https://cran.r-project.org/package=pROC) is installed) in the
+  legend and the Youden-optimal cut-off marked. Curves and AUCs are
+  computed in the package and match pROC’s.
+- **`pkConcentrationTime`** — pharmacokinetic concentration-time
+  profiles per subject or as the mean ± SD per group, on a linear or log
+  axis, with the terminal elimination fits. Each subject’s
+  non-compartmental parameters (Cmax, Tmax, AUC, half-life, CL/F, Vz/F)
+  are computed as [PKNCA](https://cran.r-project.org/package=PKNCA)
+  computes them and go in the source-data download.
+- **`plateHeatmap`** — 6- to 1536-well assay plates in their physical
+  layout, raw or normalised per plate (percent of control, percent
+  inhibition, z, robust z, B-score), with the control wells outlined,
+  each plate’s Z’-factor in its title, and optional row and column means
+  for spotting edge effects.
+- **`manhattanPlot`** / **`gwasQQPlot`** — GWAS summary statistics as a
+  Manhattan plot (chromosomes end to end, genome-wide and suggestive
+  lines) and a QQ plot (confidence band, lambda GC). Columns are
+  detected from the usual names (qqman, PLINK, REGENIE, GWAS Catalog),
+  and large files are thinned to keep the plot responsive (both wrap
+  `VizModules::dittoViz_scatterPlot`).
+- **`gseaEnrichmentPlot`** — the GSEA running enrichment score for one
+  or more gene sets, with hit ticks and the ranked statistic, from fgsea
+  output or a clusterProfiler `gseaResult`.
+- **`crisprScreenRank`** — gene rank plot of a pooled CRISPR screen from
+  a MAGeCK RRA or MLE gene summary
+  ([`read_mageck()`](https://j-andrews7.github.io/sciVizModules/reference/read_mageck.md)),
+  with depletion and enrichment on one signed axis and FDR hits coloured
+  (wraps `VizModules::dittoViz_scatterPlot`).
+- **`alphafoldConfidence`** — AlphaFold prediction confidence: the
+  per-residue pLDDT over the AlphaFold DB confidence bands, above the
+  predicted aligned error (PAE) heatmap on the same residue axis, with
+  chain boundaries for multimers.
+  [`read_alphafold()`](https://j-andrews7.github.io/sciVizModules/reference/read_alphafold.md)
+  reads AlphaFold DB PAE/confidence JSON, ColabFold score files, or the
+  pLDDT stored in a model’s PDB/mmCIF B-factors.
+- **`structureViewer`** — an interactive 3D viewer for protein and
+  molecule structures (PDB / mmCIF, read with
+  [`read_structure()`](https://j-andrews7.github.io/sciVizModules/reference/read_structure.md)),
+  coloured by AlphaFold pLDDT band, B-factor, chain, residue index,
+  secondary structure or hydrophobicity, with residues highlighted by
+  number. It is the one module that is not a plotly figure: it is an
+  [NGL](https://nglviewer.org/) widget (via
+  [NGLVieweR](https://cran.r-project.org/package=NGLVieweR)) with its
+  own PNG snapshot, and it restyles in place without resetting the
+  camera.
+- **`mdTrajectoryMetrics`** — molecular dynamics trajectory metrics
+  (RMSD, radius of gyration, RMSF, …) from GROMACS `.xvg` files read
+  with
+  [`read_xvg()`](https://j-andrews7.github.io/sciVizModules/reference/read_xvg.md),
+  one line per replica, with running-mean smoothing, ps/ns and nm/Å
+  conversion, and a panel per metric.
+
+### Somatic mutations
+
+The cohort figures of
+[maftools](https://bioconductor.org/packages/maftools/), drawn natively
+in plotly from a maftools `MAF` object or a plain data frame in Mutation
+Annotation Format columns (so maftools is optional; its summaries are
+matched in the tests). The `*App()` functions open on the TCGA LAML
+cohort maftools ships (so need maftools).
+
+- **`oncoPlot`** — the oncoplot: genes by samples coloured by variant
+  class (Multi_Hit where a gene carries several), each sample’s mutation
+  burden above, each gene’s frequency beside, and sample annotations as
+  tracks, with a hover per tile.
+- **`mafSummary`** — the `plotmafSummary()` dashboard: counts per
+  variant classification, type and substitution class, variants per
+  sample, and the most mutated genes.
+- **`mutationLollipop`** — one gene’s mutations along its protein, over
+  its Pfam/SMART domains (from maftools’ table when installed).
+- **`mutationalProfile`** — the 96-channel single-base-substitution
+  spectrum of each sample, from a MutationalPatterns, maftools or
+  SigProfiler count matrix (wraps `VizModules::plotthis_BarPlot`).
+
+### Bulk expression
+
+Sample-level views of a bulk experiment in a `SummarizedExperiment`,
+with the counts transformed in the module (DESeq2’s variance-stabilising
+transformation, log2 CPM or log2). The `*App()` functions open on the
+[airway](https://bioconductor.org/packages/airway/) package’s counts, so
+need airway.
+
+- **`samplePCA`** — the sample PCA over the most variable genes, drawn
+  by `pcaBiplot`;
+  [`sample_pca()`](https://j-andrews7.github.io/sciVizModules/reference/sample_pca.md)
+  builds the same PCA for the other PCAtools modules.
+- **`sampleDistanceHeatmap`** — Euclidean distances (or correlations)
+  between samples, clustered, with `colData` annotations.
+- **`deHeatmap`** — per-gene z-scores of the top differentially
+  expressed genes from a results table, split into up and down.
+
+The two heatmaps, like `dittoHeatmap` below, wrap VizModules’
+`ComplexHeatmap_Heatmap` module: they are
+[InteractiveComplexHeatmap](https://bioconductor.org/packages/InteractiveComplexHeatmap/)
+widgets (hover, click, brush a sub-heatmap) rather than plotly figures,
+and need ComplexHeatmap, InteractiveComplexHeatmap and circlize.
+
+### Principal component analysis (PCAtools)
+
+One module per [PCAtools](https://bioconductor.org/packages/PCAtools/)
+view, each taking a PCAtools `pca` object (from
+[`PCAtools::pca()`](https://rdrr.io/pkg/PCAtools/man/pca.html)), so any
+data matrix with sample metadata works. The bundled `example_pca`
+(airway RNA-seq) is the default in every `*App()`.
+
+- **`pcaBiplot`** — sample scores with % variance in the axis titles and
+  optional loading arrows (wraps `VizModules::dittoViz_scatterPlot`, so
+  colour, shape, ellipses and point annotations all apply).
+- **`pcaScreePlot`** — variance explained per component, the cumulative
+  line, and markers for the elbow and any components you name.
+- **`pcaLoadingsPlot`** — the variables loading most strongly on each
+  component (PCAtools’ `rangeRetain` rule).
+- **`pcaPairsPlot`** — a lower-triangle grid of score scatters for every
+  pair of components.
+- **`pcaEigencorPlot`** — correlation of each component with each sample
+  metadata variable, with significance.
+
+### RNA-seq / single-cell modules (dittoSeq)
+
+These modules wrap
+[dittoSeq](https://bioconductor.org/packages/dittoSeq/) and accept a
+`SingleCellExperiment`, `Seurat`, or `SummarizedExperiment` object
+(passed to `*Server()` as a
+[`reactive()`](https://rdrr.io/pkg/shiny/man/reactive.html)). Each
+renders the corresponding `dittoSeq` figure as an interactive plotly
+output and reuses the standard VizModules
+aesthetic/axis/legend/reference-line controls. The bundled `example_sce`
+dataset is used as the default in every `*App()`.
+
+- **`dittoDimPlot`** — dimensionality-reduction (UMAP/tSNE/PCA)
+  embedding colored by a gene or metadata variable (wraps
+  [`dittoSeq::dittoDimPlot`](https://rdrr.io/pkg/dittoSeq/man/dittoDimPlot.html)).
+- **`dittoScatterPlot`** — scatter plot of any two genes/metadata with
+  optional color variable (wraps
+  [`dittoSeq::dittoScatterPlot`](https://rdrr.io/pkg/dittoSeq/man/dittoScatterPlot.html)).
+- **`dittoPlot`** — per-group violin/box/jitter/ridge distribution of a
+  gene or continuous variable (wraps
+  [`dittoSeq::dittoPlot`](https://rdrr.io/pkg/dittoSeq/man/dittoPlot.html)).
+- **`dittoBarPlot`** — composition bar plot of a discrete variable per
+  group, as counts or proportions (wraps
+  [`dittoSeq::dittoBarPlot`](https://rdrr.io/pkg/dittoSeq/man/dittoBarPlot.html)).
+- **`dittoDimHex`** — hex-binned embedding summarising a color variable
+  over cells (wraps
+  [`dittoSeq::dittoDimHex`](https://rdrr.io/pkg/dittoSeq/man/dittoHex.html)).
+- **`dittoFreqPlot`** — per-sample frequency of a discrete variable
+  across groups (wraps
+  [`dittoSeq::dittoFreqPlot`](https://rdrr.io/pkg/dittoSeq/man/dittoFreqPlot.html)).
+- **`dittoRidgeJitter`** — ridgeline-with-jitter distribution plot
+  (wraps
+  [`dittoSeq::dittoRidgeJitter`](https://rdrr.io/pkg/dittoSeq/man/dittoPlot.html)).
+- **`dittoDotPlot`** — marker dot plot: mean expression (colour) and
+  fraction expressing (size) per gene and group (wraps
+  [`dittoSeq::dittoDotPlot`](https://rdrr.io/pkg/dittoSeq/man/dittoDotPlot.html)).
+- **`dittoHeatmap`** — expression of chosen genes across cells, ordered
+  and annotated by cell metadata (wraps
+  [`dittoSeq::dittoHeatmap`](https://rdrr.io/pkg/dittoSeq/man/dittoHeatmap.html)‘s
+  data through VizModules’ `ComplexHeatmap_Heatmap`; an
+  InteractiveComplexHeatmap widget, not plotly).
+
+### Example
+
+``` r
+
+library(sciVizModules)
+
+# Launch the survival curve app with the bundled example data:
+survivalCurveApp()
+
+# Or build a figure directly:
+data(survival_lung)
+survivalCurve(survival_lung, time = "time", status = "status", group.by = "sex")
+
+# Launch an RNA-seq module app with the bundled example SingleCellExperiment:
+dittoDimPlotApp()
+```
+
+Note that this package sets no `LazyData`, so the bundled datasets need
+a [`data()`](https://rdrr.io/r/utils/data.html) call before you can use
+them by name.
+
+## Multi-panel Figures
+
+The data-frame modules are registered with the [VizModules Figure
+Builder](https://j-andrews7.github.io/VizModules/), so several panels
+can be dragged, sized and exported as one figure, with a source-data
+archive per panel:
+
+``` r
+
+library(sciVizModules)
+sciFigureBuilderApp()
+```
+
+[`sci_figure_builder_registry()`](https://j-andrews7.github.io/sciVizModules/reference/sci_figure_builder_registry.md)
+returns the registry itself, so you can combine it with your own modules
+(or with the VizModules ones) and pass the result to
+[`VizModules::figureBuilderApp()`](https://j-andrews7.github.io/VizModules/reference/figureBuilderApp.html).
+
+The single-cell modules, the bulk expression modules, `cnSegmentPlot`,
+`michaelisMenten`, the PCAtools modules and `alphafoldConfidence` are
+not registered: the builder’s dataset catalogue holds data frames, and
+those take a `SingleCellExperiment`, a `SummarizedExperiment`, a
+`CNSegment` object, a bundle carrying a model fit, a PCAtools `pca`
+object and a
+[`read_alphafold()`](https://j-andrews7.github.io/sciVizModules/reference/read_alphafold.md)
+result respectively. `structureViewer` is a 3D widget rather than a
+plotly figure. `mutationalProfile` is registered; `forestPlot` and the
+other newer data-frame modules (GWAS, GSEA, CRISPR, the MAF modules,
+ROC, PK, plate and MD) are not registered yet. Run their `*App()`
+functions instead.
+
+## Working with an AI Coding Agent
+
+This package builds on VizModules, which ships three agent skills
+describing its APIs. Install them into your project once and any
+compatible agent (Claude Code, GitHub Copilot, OpenAI Codex) will pick
+them up:
+
+``` r
+
+VizModules::use_vizmodules_skills(".", client = "claude")  # or "agents" / "copilot"
+```
+
+- `vizmodules-app` — wiring modules into an app, with a generated
+  inventory of every module’s column-mapping keys, colour key and tab
+  names.
+- `vizmodules-custom-module` — building wrapper modules on top of a base
+  module, which is what most of sciVizModules does.
+- `vizmodules-new-module` — authoring a module inside VizModules itself.
+
+`AGENTS.md` in this repository covers the sciVizModules-specific
+conventions on top of those, including adding a module: every module
+ships with a gallery entry (its showcase settings in
+`R/module_showcase.R`), and the test suite fails for one that has none.
+
+# Package index
+
+## Differential expression
+
+Volcano and MA plots over a differential-expression results table. Both
+wrap the VizModules scatter plot module, adding threshold controls and
+an auto-generated Up/Down/n.s. grouping.
+
+- [`volcanoPlotInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/volcanoPlotInputsUI.md)
+  : Input UI components for the volcanoPlot module
+- [`volcanoPlotOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/volcanoPlotOutputUI.md)
+  : Output UI components for the volcanoPlot module
+- [`volcanoPlotServer()`](https://j-andrews7.github.io/sciVizModules/reference/volcanoPlotServer.md)
+  : Server logic for volcanoPlot module
+- [`volcanoPlotApp()`](https://j-andrews7.github.io/sciVizModules/reference/volcanoPlotApp.md)
+  : Create a standalone Shiny app for the volcanoPlot module
+- [`maPlotInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/maPlotInputsUI.md)
+  : Input UI components for the maPlot module
+- [`maPlotOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/maPlotOutputUI.md)
+  : Output UI components for the maPlot module
+- [`maPlotServer()`](https://j-andrews7.github.io/sciVizModules/reference/maPlotServer.md)
+  : Server logic for maPlot module
+- [`maPlotApp()`](https://j-andrews7.github.io/sciVizModules/reference/maPlotApp.md)
+  : Create a standalone Shiny app for the maPlot module
+
+## Bulk expression
+
+Sample-level views of a bulk RNA-seq (or array) experiment held in a
+`SummarizedExperiment`: the sample PCA (feeding the PCAtools biplot),
+the sample-distance heatmap, and the heatmap of the top differentially
+expressed genes. The two heatmaps wrap VizModules’ ComplexHeatmap
+module, so they are InteractiveComplexHeatmap widgets rather than plotly
+figures.
+
+- [`sample_pca()`](https://j-andrews7.github.io/sciVizModules/reference/sample_pca.md)
+  : Principal component analysis of a bulk expression experiment
+- [`samplePCAInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/samplePCAInputsUI.md)
+  : Input UI components for the samplePCA module
+- [`samplePCAOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/samplePCAOutputUI.md)
+  : Output UI components for the samplePCA module
+- [`samplePCAServer()`](https://j-andrews7.github.io/sciVizModules/reference/samplePCAServer.md)
+  : Server logic for the samplePCA module
+- [`samplePCAApp()`](https://j-andrews7.github.io/sciVizModules/reference/samplePCAApp.md)
+  : Create a standalone Shiny app for the samplePCA module
+- [`sampleDistanceHeatmapInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/sampleDistanceHeatmapInputsUI.md)
+  : Input UI components for the sampleDistanceHeatmap module
+- [`sampleDistanceHeatmapOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/sampleDistanceHeatmapOutputUI.md)
+  : Output UI components for the sampleDistanceHeatmap module
+- [`sampleDistanceHeatmapServer()`](https://j-andrews7.github.io/sciVizModules/reference/sampleDistanceHeatmapServer.md)
+  : Server logic for the sampleDistanceHeatmap module
+- [`sampleDistanceHeatmapApp()`](https://j-andrews7.github.io/sciVizModules/reference/sampleDistanceHeatmapApp.md)
+  : Create a standalone Shiny app for the sampleDistanceHeatmap module
+- [`deHeatmapInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/deHeatmapInputsUI.md)
+  : Input UI components for the deHeatmap module
+- [`deHeatmapOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/deHeatmapOutputUI.md)
+  : Output UI components for the deHeatmap module
+- [`deHeatmapServer()`](https://j-andrews7.github.io/sciVizModules/reference/deHeatmapServer.md)
+  : Server logic for the deHeatmap module
+- [`deHeatmapApp()`](https://j-andrews7.github.io/sciVizModules/reference/deHeatmapApp.md)
+  : Create a standalone Shiny app for the deHeatmap module
+
+## Functional enrichment
+
+Dot plot and GO sunburst (“fan”) plot over over-representation or GSEA
+results, and the GSEA running enrichment score plot.
+
+- [`enrichmentDotPlotInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/enrichmentDotPlotInputsUI.md)
+  : Input UI components for the enrichmentDotPlot module
+- [`enrichmentDotPlotOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/enrichmentDotPlotOutputUI.md)
+  : Output UI components for the enrichmentDotPlot module
+- [`enrichmentDotPlotServer()`](https://j-andrews7.github.io/sciVizModules/reference/enrichmentDotPlotServer.md)
+  : Server logic for the enrichmentDotPlot module
+- [`enrichmentDotPlotApp()`](https://j-andrews7.github.io/sciVizModules/reference/enrichmentDotPlotApp.md)
+  : Create a standalone Shiny app for the enrichmentDotPlot module
+- [`goFanPlot()`](https://j-andrews7.github.io/sciVizModules/reference/goFanPlot.md)
+  : Create an interactive GO enrichment sunburst ("fan") plot
+- [`goFanPlotInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/goFanPlotInputsUI.md)
+  : Input UI components for the goFanPlot module
+- [`goFanPlotOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/goFanPlotOutputUI.md)
+  : Output UI components for the goFanPlot module
+- [`goFanPlotServer()`](https://j-andrews7.github.io/sciVizModules/reference/goFanPlotServer.md)
+  : Server logic for the goFanPlot module
+- [`goFanPlotApp()`](https://j-andrews7.github.io/sciVizModules/reference/goFanPlotApp.md)
+  : Create a standalone Shiny app for the goFanPlot module
+- [`gseaEnrichmentPlot()`](https://j-andrews7.github.io/sciVizModules/reference/gseaEnrichmentPlot.md)
+  : GSEA enrichment plot
+- [`gseaEnrichmentPlotInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/gseaEnrichmentPlotInputsUI.md)
+  : Input UI components for the gseaEnrichmentPlot module
+- [`gseaEnrichmentPlotOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/gseaEnrichmentPlotOutputUI.md)
+  : Output UI components for the gseaEnrichmentPlot module
+- [`gseaEnrichmentPlotServer()`](https://j-andrews7.github.io/sciVizModules/reference/gseaEnrichmentPlotServer.md)
+  : Server logic for the gseaEnrichmentPlot module
+- [`gseaEnrichmentPlotApp()`](https://j-andrews7.github.io/sciVizModules/reference/gseaEnrichmentPlotApp.md)
+  : Create a standalone Shiny app for the gseaEnrichmentPlot module
+
+## Genetics (GWAS)
+
+Manhattan and QQ plots of GWAS summary statistics. Both wrap the
+VizModules scatter plot module; columns are detected from the common
+naming styles.
+
+- [`manhattanPlotInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/manhattanPlotInputsUI.md)
+  : Input UI components for the manhattanPlot module
+- [`manhattanPlotOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/manhattanPlotOutputUI.md)
+  : Output UI components for the manhattanPlot module
+- [`manhattanPlotServer()`](https://j-andrews7.github.io/sciVizModules/reference/manhattanPlotServer.md)
+  : Server logic for the manhattanPlot module
+- [`manhattanPlotApp()`](https://j-andrews7.github.io/sciVizModules/reference/manhattanPlotApp.md)
+  : Create a standalone Shiny app for the manhattanPlot module
+- [`gwasQQPlotInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/gwasQQPlotInputsUI.md)
+  : Input UI components for the gwasQQPlot module
+- [`gwasQQPlotOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/gwasQQPlotOutputUI.md)
+  : Output UI components for the gwasQQPlot module
+- [`gwasQQPlotServer()`](https://j-andrews7.github.io/sciVizModules/reference/gwasQQPlotServer.md)
+  : Server logic for the gwasQQPlot module
+- [`gwasQQPlotApp()`](https://j-andrews7.github.io/sciVizModules/reference/gwasQQPlotApp.md)
+  : Create a standalone Shiny app for the gwasQQPlot module
+
+## Functional genomics screens
+
+Pooled CRISPR screens summarised by MAGeCK: the gene rank plot, and the
+reader for MAGeCK gene summaries.
+
+- [`read_mageck()`](https://j-andrews7.github.io/sciVizModules/reference/read_mageck.md)
+  : Read a MAGeCK gene summary
+- [`crisprScreenRankInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/crisprScreenRankInputsUI.md)
+  : Input UI components for the crisprScreenRank module
+- [`crisprScreenRankOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/crisprScreenRankOutputUI.md)
+  : Output UI components for the crisprScreenRank module
+- [`crisprScreenRankServer()`](https://j-andrews7.github.io/sciVizModules/reference/crisprScreenRankServer.md)
+  : Server logic for the crisprScreenRank module
+- [`crisprScreenRankApp()`](https://j-andrews7.github.io/sciVizModules/reference/crisprScreenRankApp.md)
+  : Create a standalone Shiny app for the crisprScreenRank module
+
+## Somatic mutations
+
+Cohort views of somatic mutations from a maftools `MAF` object or a data
+frame in MAF columns - the oncoplot, the MAF summary dashboard and the
+protein lollipop plot, built natively in plotly and checked against
+maftools - and the 96-channel substitution spectrum of a mutational
+count matrix.
+
+- [`oncoPlot()`](https://j-andrews7.github.io/sciVizModules/reference/oncoPlot.md)
+  : Interactive oncoplot of somatic mutations
+- [`oncoPlotInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/oncoPlotInputsUI.md)
+  : Input UI components for the oncoPlot module
+- [`oncoPlotOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/oncoPlotOutputUI.md)
+  : Output UI components for the oncoPlot module
+- [`oncoPlotServer()`](https://j-andrews7.github.io/sciVizModules/reference/oncoPlotServer.md)
+  : Server logic for the oncoPlot module
+- [`oncoPlotApp()`](https://j-andrews7.github.io/sciVizModules/reference/oncoPlotApp.md)
+  : Create a standalone Shiny app for the oncoPlot module
+- [`mafSummary()`](https://j-andrews7.github.io/sciVizModules/reference/mafSummary.md)
+  : Interactive summary of a MAF
+- [`mafSummaryInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/mafSummaryInputsUI.md)
+  : Input UI components for the mafSummary module
+- [`mafSummaryOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/mafSummaryOutputUI.md)
+  : Output UI components for the mafSummary module
+- [`mafSummaryServer()`](https://j-andrews7.github.io/sciVizModules/reference/mafSummaryServer.md)
+  : Server logic for the mafSummary module
+- [`mafSummaryApp()`](https://j-andrews7.github.io/sciVizModules/reference/mafSummaryApp.md)
+  : Create a standalone Shiny app for the mafSummary module
+- [`mutationLollipop()`](https://j-andrews7.github.io/sciVizModules/reference/mutationLollipop.md)
+  : Interactive lollipop plot of the mutations in a protein
+- [`mutationLollipopInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/mutationLollipopInputsUI.md)
+  : Input UI components for the mutationLollipop module
+- [`mutationLollipopOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/mutationLollipopOutputUI.md)
+  : Output UI components for the mutationLollipop module
+- [`mutationLollipopServer()`](https://j-andrews7.github.io/sciVizModules/reference/mutationLollipopServer.md)
+  : Server logic for the mutationLollipop module
+- [`mutationLollipopApp()`](https://j-andrews7.github.io/sciVizModules/reference/mutationLollipopApp.md)
+  : Create a standalone Shiny app for the mutationLollipop module
+- [`mutationalProfileInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/mutationalProfileInputsUI.md)
+  : Input UI components for the mutationalProfile module
+- [`mutationalProfileOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/mutationalProfileOutputUI.md)
+  : Output UI components for the mutationalProfile module
+- [`mutationalProfileServer()`](https://j-andrews7.github.io/sciVizModules/reference/mutationalProfileServer.md)
+  : Server logic for the mutationalProfile module
+- [`mutationalProfileApp()`](https://j-andrews7.github.io/sciVizModules/reference/mutationalProfileApp.md)
+  : Create a standalone Shiny app for the mutationalProfile module
+
+## Survival analysis
+
+Kaplan-Meier curves with confidence bands, censor marks and risk table.
+
+- [`survivalCurve()`](https://j-andrews7.github.io/sciVizModules/reference/survivalCurve.md)
+  : Create an interactive Kaplan-Meier survival curve
+- [`survivalCurveInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/survivalCurveInputsUI.md)
+  : Input UI components for the survivalCurve module
+- [`survivalCurveOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/survivalCurveOutputUI.md)
+  : Output UI components for the survivalCurve module
+- [`survivalCurveServer()`](https://j-andrews7.github.io/sciVizModules/reference/survivalCurveServer.md)
+  : Server logic for survivalCurve module
+- [`survivalCurveApp()`](https://j-andrews7.github.io/sciVizModules/reference/survivalCurveApp.md)
+  : Create a standalone Shiny app for the survivalCurve module
+
+## Clinical models
+
+Forest plots of hazard ratios, odds ratios or coefficients, fitted from
+the raw data inside the module (Cox, logistic or linear regression), and
+ROC curves with AUCs and optimal cut-offs for diagnostic markers.
+
+- [`forestPlot()`](https://j-andrews7.github.io/sciVizModules/reference/forestPlot.md)
+  : Forest plot of model effect estimates
+- [`forestPlotInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/forestPlotInputsUI.md)
+  : Input UI components for the forestPlot module
+- [`forestPlotOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/forestPlotOutputUI.md)
+  : Output UI components for the forestPlot module
+- [`forestPlotServer()`](https://j-andrews7.github.io/sciVizModules/reference/forestPlotServer.md)
+  : Server logic for the forestPlot module
+- [`forestPlotApp()`](https://j-andrews7.github.io/sciVizModules/reference/forestPlotApp.md)
+  : Create a standalone Shiny app for the forestPlot module
+- [`rocCurve()`](https://j-andrews7.github.io/sciVizModules/reference/rocCurve.md)
+  : ROC curves
+- [`rocCurveInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/rocCurveInputsUI.md)
+  : Input UI components for the rocCurve module
+- [`rocCurveOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/rocCurveOutputUI.md)
+  : Output UI components for the rocCurve module
+- [`rocCurveServer()`](https://j-andrews7.github.io/sciVizModules/reference/rocCurveServer.md)
+  : Server logic for the rocCurve module
+- [`rocCurveApp()`](https://j-andrews7.github.io/sciVizModules/reference/rocCurveApp.md)
+  : Create a standalone Shiny app for the rocCurve module
+
+## Principal component analysis (PCAtools)
+
+One module per PCAtools view, each taking a PCAtools `pca` object: the
+biplot (wrapping the VizModules scatter module, with loading arrows),
+the scree, loadings and pairs plots, and the PC-metadata correlation
+heatmap.
+
+- [`pcaBiplotInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/pcaBiplotInputsUI.md)
+  : Input UI components for the pcaBiplot module
+
+- [`pcaBiplotOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/pcaBiplotOutputUI.md)
+  : Output UI components for the pcaBiplot module
+
+- [`pcaBiplotServer()`](https://j-andrews7.github.io/sciVizModules/reference/pcaBiplotServer.md)
+  : Server logic for the pcaBiplot module
+
+- [`pcaBiplotApp()`](https://j-andrews7.github.io/sciVizModules/reference/pcaBiplotApp.md)
+  : Create a standalone Shiny app for the pcaBiplot module
+
+- [`pcaScreePlot()`](https://j-andrews7.github.io/sciVizModules/reference/pcaScreePlot.md)
+  :
+
+  Scree plot of a PCAtools `pca` object
+
+- [`pcaScreePlotInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/pcaScreePlotInputsUI.md)
+  : Input UI components for the pcaScreePlot module
+
+- [`pcaScreePlotOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/pcaScreePlotOutputUI.md)
+  : Output UI components for the pcaScreePlot module
+
+- [`pcaScreePlotServer()`](https://j-andrews7.github.io/sciVizModules/reference/pcaScreePlotServer.md)
+  : Server logic for the pcaScreePlot module
+
+- [`pcaScreePlotApp()`](https://j-andrews7.github.io/sciVizModules/reference/pcaScreePlotApp.md)
+  : Create a standalone Shiny app for the pcaScreePlot module
+
+- [`pcaLoadingsPlot()`](https://j-andrews7.github.io/sciVizModules/reference/pcaLoadingsPlot.md)
+  :
+
+  Loadings plot of a PCAtools `pca` object
+
+- [`pcaLoadingsPlotInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/pcaLoadingsPlotInputsUI.md)
+  : Input UI components for the pcaLoadingsPlot module
+
+- [`pcaLoadingsPlotOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/pcaLoadingsPlotOutputUI.md)
+  : Output UI components for the pcaLoadingsPlot module
+
+- [`pcaLoadingsPlotServer()`](https://j-andrews7.github.io/sciVizModules/reference/pcaLoadingsPlotServer.md)
+  : Server logic for the pcaLoadingsPlot module
+
+- [`pcaLoadingsPlotApp()`](https://j-andrews7.github.io/sciVizModules/reference/pcaLoadingsPlotApp.md)
+  : Create a standalone Shiny app for the pcaLoadingsPlot module
+
+- [`pcaPairsPlot()`](https://j-andrews7.github.io/sciVizModules/reference/pcaPairsPlot.md)
+  :
+
+  Pairs plot of a PCAtools `pca` object
+
+- [`pcaPairsPlotInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/pcaPairsPlotInputsUI.md)
+  : Input UI components for the pcaPairsPlot module
+
+- [`pcaPairsPlotOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/pcaPairsPlotOutputUI.md)
+  : Output UI components for the pcaPairsPlot module
+
+- [`pcaPairsPlotServer()`](https://j-andrews7.github.io/sciVizModules/reference/pcaPairsPlotServer.md)
+  : Server logic for the pcaPairsPlot module
+
+- [`pcaPairsPlotApp()`](https://j-andrews7.github.io/sciVizModules/reference/pcaPairsPlotApp.md)
+  : Create a standalone Shiny app for the pcaPairsPlot module
+
+- [`pcaEigencorPlot()`](https://j-andrews7.github.io/sciVizModules/reference/pcaEigencorPlot.md)
+  :
+
+  PC-metadata correlation plot of a PCAtools `pca` object
+
+- [`pcaEigencorPlotInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/pcaEigencorPlotInputsUI.md)
+  : Input UI components for the pcaEigencorPlot module
+
+- [`pcaEigencorPlotOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/pcaEigencorPlotOutputUI.md)
+  : Output UI components for the pcaEigencorPlot module
+
+- [`pcaEigencorPlotServer()`](https://j-andrews7.github.io/sciVizModules/reference/pcaEigencorPlotServer.md)
+  : Server logic for the pcaEigencorPlot module
+
+- [`pcaEigencorPlotApp()`](https://j-andrews7.github.io/sciVizModules/reference/pcaEigencorPlotApp.md)
+  : Create a standalone Shiny app for the pcaEigencorPlot module
+
+## Structural biology
+
+AlphaFold prediction confidence (per-residue pLDDT and the predicted
+aligned error), an interactive 3D structure viewer for PDB / mmCIF
+files, and molecular dynamics trajectory metrics from GROMACS `.xvg`
+output. `structureViewer` is the one module here that is not a plotly
+figure: it is an NGL widget with its own PNG snapshot.
+
+- [`read_alphafold()`](https://j-andrews7.github.io/sciVizModules/reference/read_alphafold.md)
+  : Read AlphaFold confidence outputs
+- [`alphafoldConfidence()`](https://j-andrews7.github.io/sciVizModules/reference/alphafoldConfidence.md)
+  : AlphaFold confidence plot: pLDDT track and predicted aligned error
+- [`alphafoldConfidenceInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/alphafoldConfidenceInputsUI.md)
+  : Input UI components for the alphafoldConfidence module
+- [`alphafoldConfidenceOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/alphafoldConfidenceOutputUI.md)
+  : Output UI components for the alphafoldConfidence module
+- [`alphafoldConfidenceServer()`](https://j-andrews7.github.io/sciVizModules/reference/alphafoldConfidenceServer.md)
+  : Server logic for the alphafoldConfidence module
+- [`alphafoldConfidenceApp()`](https://j-andrews7.github.io/sciVizModules/reference/alphafoldConfidenceApp.md)
+  : Create a standalone Shiny app for the alphafoldConfidence module
+- [`read_structure()`](https://j-andrews7.github.io/sciVizModules/reference/read_structure.md)
+  : Read a macromolecular structure
+- [`structureViewer()`](https://j-andrews7.github.io/sciVizModules/reference/structureViewer.md)
+  : Interactive 3D structure viewer
+- [`structureViewerInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/structureViewerInputsUI.md)
+  : Input UI components for the structureViewer module
+- [`structureViewerOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/structureViewerOutputUI.md)
+  : Output UI components for the structureViewer module
+- [`structureViewerServer()`](https://j-andrews7.github.io/sciVizModules/reference/structureViewerServer.md)
+  : Server logic for the structureViewer module
+- [`structureViewerApp()`](https://j-andrews7.github.io/sciVizModules/reference/structureViewerApp.md)
+  : Create a standalone Shiny app for the structureViewer module
+- [`read_xvg()`](https://j-andrews7.github.io/sciVizModules/reference/read_xvg.md)
+  : Read a GROMACS .xvg file
+- [`mdTrajectoryMetrics()`](https://j-andrews7.github.io/sciVizModules/reference/mdTrajectoryMetrics.md)
+  : Molecular dynamics trajectory metrics plot
+- [`mdTrajectoryMetricsInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/mdTrajectoryMetricsInputsUI.md)
+  : Input UI components for the mdTrajectoryMetrics module
+- [`mdTrajectoryMetricsOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/mdTrajectoryMetricsOutputUI.md)
+  : Output UI components for the mdTrajectoryMetrics module
+- [`mdTrajectoryMetricsServer()`](https://j-andrews7.github.io/sciVizModules/reference/mdTrajectoryMetricsServer.md)
+  : Server logic for the mdTrajectoryMetrics module
+- [`mdTrajectoryMetricsApp()`](https://j-andrews7.github.io/sciVizModules/reference/mdTrajectoryMetricsApp.md)
+  : Create a standalone Shiny app for the mdTrajectoryMetrics module
+
+## Pharmacology and kinetics
+
+Dose-response curves, Michaelis-Menten enzyme kinetics, and
+pharmacokinetic concentration-time profiles with non-compartmental
+parameters.
+
+- [`doseResponseInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/doseResponseInputsUI.md)
+  : Input UI components for the dose-response module
+- [`doseResponseOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/doseResponseOutputUI.md)
+  : Output UI components for the dose-response module
+- [`doseResponseServer()`](https://j-andrews7.github.io/sciVizModules/reference/doseResponseServer.md)
+  : Server logic for the dose-response module
+- [`doseResponseApp()`](https://j-andrews7.github.io/sciVizModules/reference/doseResponseApp.md)
+  : Create a standalone Shiny app for the dose-response module
+- [`michaelisMentenPlot()`](https://j-andrews7.github.io/sciVizModules/reference/michaelisMentenPlot.md)
+  : Plot a Michaelis-Menten kinetics fit
+- [`michaelisMentenInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/michaelisMentenInputsUI.md)
+  : Input UI components for the michaelisMenten module
+- [`michaelisMentenOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/michaelisMentenOutputUI.md)
+  : Output UI components for the michaelisMenten module
+- [`michaelisMentenServer()`](https://j-andrews7.github.io/sciVizModules/reference/michaelisMentenServer.md)
+  : Server logic for the michaelisMenten module
+- [`michaelisMentenApp()`](https://j-andrews7.github.io/sciVizModules/reference/michaelisMentenApp.md)
+  : Create a standalone Shiny app for the michaelisMenten module
+- [`pkConcentrationTime()`](https://j-andrews7.github.io/sciVizModules/reference/pkConcentrationTime.md)
+  : Pharmacokinetic concentration-time plot
+- [`pkConcentrationTimeInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/pkConcentrationTimeInputsUI.md)
+  : Input UI components for the pkConcentrationTime module
+- [`pkConcentrationTimeOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/pkConcentrationTimeOutputUI.md)
+  : Output UI components for the pkConcentrationTime module
+- [`pkConcentrationTimeServer()`](https://j-andrews7.github.io/sciVizModules/reference/pkConcentrationTimeServer.md)
+  : Server logic for the pkConcentrationTime module
+- [`pkConcentrationTimeApp()`](https://j-andrews7.github.io/sciVizModules/reference/pkConcentrationTimeApp.md)
+  : Create a standalone Shiny app for the pkConcentrationTime module
+
+## Screening and plate assays
+
+Assay plate heatmaps in physical layout, raw or normalised per plate,
+with control wells, Z’-factors and edge-effect margins.
+
+- [`plateHeatmap()`](https://j-andrews7.github.io/sciVizModules/reference/plateHeatmap.md)
+  : Assay plate heatmap
+- [`plateHeatmapInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/plateHeatmapInputsUI.md)
+  : Input UI components for the plateHeatmap module
+- [`plateHeatmapOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/plateHeatmapOutputUI.md)
+  : Output UI components for the plateHeatmap module
+- [`plateHeatmapServer()`](https://j-andrews7.github.io/sciVizModules/reference/plateHeatmapServer.md)
+  : Server logic for the plateHeatmap module
+- [`plateHeatmapApp()`](https://j-andrews7.github.io/sciVizModules/reference/plateHeatmapApp.md)
+  : Create a standalone Shiny app for the plateHeatmap module
+
+## Copy number
+
+Stacked genome-wide copy-number segment plots over `CNSegment` objects,
+as returned by
+[`sesame::cnSegmentation()`](https://rdrr.io/pkg/sesame/man/cnSegmentation.html).
+
+- [`cnSegmentPlot()`](https://j-andrews7.github.io/sciVizModules/reference/cnSegmentPlot.md)
+  : Plot DNA methylation array-based copy number segmentation
+- [`cnSegmentPlotInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/cnSegmentPlotInputsUI.md)
+  : Input UI components for the cnSegmentPlot module
+- [`cnSegmentPlotOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/cnSegmentPlotOutputUI.md)
+  : Output UI components for the cnSegmentPlot module
+- [`cnSegmentPlotServer()`](https://j-andrews7.github.io/sciVizModules/reference/cnSegmentPlotServer.md)
+  : Server logic for the cnSegmentPlot module
+- [`cnSegmentPlotApp()`](https://j-andrews7.github.io/sciVizModules/reference/cnSegmentPlotApp.md)
+  : Create a standalone Shiny app for the cnSegmentPlot module
+
+## Single-cell and RNA-seq (dittoSeq)
+
+Wrappers around the dittoSeq plotting functions. Each takes a
+`SingleCellExperiment`, `Seurat` or `SummarizedExperiment` object rather
+than a data frame, and so takes `object_list` in its `*App()`.
+`dittoHeatmap` wraps VizModules’ ComplexHeatmap module, so it is an
+InteractiveComplexHeatmap widget rather than a plotly figure.
+
+- [`dittoDotPlotInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/dittoDotPlotInputsUI.md)
+  : Input UI components for the dittoDotPlot module
+- [`dittoDotPlotOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/dittoDotPlotOutputUI.md)
+  : Output UI components for the dittoDotPlot module
+- [`dittoDotPlotServer()`](https://j-andrews7.github.io/sciVizModules/reference/dittoDotPlotServer.md)
+  : Server logic for the dittoDotPlot module
+- [`dittoDotPlotApp()`](https://j-andrews7.github.io/sciVizModules/reference/dittoDotPlotApp.md)
+  : Create a standalone Shiny app for the dittoDotPlot module
+- [`dittoHeatmapInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/dittoHeatmapInputsUI.md)
+  : Input UI components for the dittoHeatmap module
+- [`dittoHeatmapOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/dittoHeatmapOutputUI.md)
+  : Output UI components for the dittoHeatmap module
+- [`dittoHeatmapServer()`](https://j-andrews7.github.io/sciVizModules/reference/dittoHeatmapServer.md)
+  : Server logic for the dittoHeatmap module
+- [`dittoHeatmapApp()`](https://j-andrews7.github.io/sciVizModules/reference/dittoHeatmapApp.md)
+  : Create a standalone Shiny app for the dittoHeatmap module
+- [`dittoDimPlotInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/dittoDimPlotInputsUI.md)
+  : Input UI components for the dittoDimPlot module
+- [`dittoDimPlotOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/dittoDimPlotOutputUI.md)
+  : Output UI components for the dittoDimPlot module
+- [`dittoDimPlotServer()`](https://j-andrews7.github.io/sciVizModules/reference/dittoDimPlotServer.md)
+  : Server logic for the dittoDimPlot module
+- [`dittoDimPlotApp()`](https://j-andrews7.github.io/sciVizModules/reference/dittoDimPlotApp.md)
+  : Create a standalone Shiny app for the dittoDimPlot module
+- [`dittoDimHexInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/dittoDimHexInputsUI.md)
+  : Input UI components for the dittoDimHex module
+- [`dittoDimHexOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/dittoDimHexOutputUI.md)
+  : Output UI components for the dittoDimHex module
+- [`dittoDimHexServer()`](https://j-andrews7.github.io/sciVizModules/reference/dittoDimHexServer.md)
+  : Server logic for the dittoDimHex module
+- [`dittoDimHexApp()`](https://j-andrews7.github.io/sciVizModules/reference/dittoDimHexApp.md)
+  : Create a standalone Shiny app for the dittoDimHex module
+- [`dittoScatterPlotInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/dittoScatterPlotInputsUI.md)
+  : Input UI components for the dittoScatterPlot module
+- [`dittoScatterPlotOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/dittoScatterPlotOutputUI.md)
+  : Output UI components for the dittoScatterPlot module
+- [`dittoScatterPlotServer()`](https://j-andrews7.github.io/sciVizModules/reference/dittoScatterPlotServer.md)
+  : Server logic for the dittoScatterPlot module
+- [`dittoScatterPlotApp()`](https://j-andrews7.github.io/sciVizModules/reference/dittoScatterPlotApp.md)
+  : Create a standalone Shiny app for the dittoScatterPlot module
+- [`dittoPlotInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/dittoPlotInputsUI.md)
+  : Input UI components for the dittoPlot module
+- [`dittoPlotOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/dittoPlotOutputUI.md)
+  : Output UI components for the dittoPlot module
+- [`dittoPlotServer()`](https://j-andrews7.github.io/sciVizModules/reference/dittoPlotServer.md)
+  : Server logic for the dittoPlot module
+- [`dittoPlotApp()`](https://j-andrews7.github.io/sciVizModules/reference/dittoPlotApp.md)
+  : Create a standalone Shiny app for the dittoPlot module
+- [`dittoRidgeJitterInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/dittoRidgeJitterInputsUI.md)
+  : Input UI components for the dittoRidgeJitter module
+- [`dittoRidgeJitterOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/dittoRidgeJitterOutputUI.md)
+  : Output UI components for the dittoRidgeJitter module
+- [`dittoRidgeJitterServer()`](https://j-andrews7.github.io/sciVizModules/reference/dittoRidgeJitterServer.md)
+  : Server logic for the dittoRidgeJitter module
+- [`dittoRidgeJitterApp()`](https://j-andrews7.github.io/sciVizModules/reference/dittoRidgeJitterApp.md)
+  : Create a standalone Shiny app for the dittoRidgeJitter module
+- [`dittoBarPlotInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/dittoBarPlotInputsUI.md)
+  : Input UI components for the dittoBarPlot module
+- [`dittoBarPlotOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/dittoBarPlotOutputUI.md)
+  : Output UI components for the dittoBarPlot module
+- [`dittoBarPlotServer()`](https://j-andrews7.github.io/sciVizModules/reference/dittoBarPlotServer.md)
+  : Server logic for the dittoBarPlot module
+- [`dittoBarPlotApp()`](https://j-andrews7.github.io/sciVizModules/reference/dittoBarPlotApp.md)
+  : Create a standalone Shiny app for the dittoBarPlot module
+- [`dittoFreqPlotInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/dittoFreqPlotInputsUI.md)
+  : Input UI components for the dittoFreqPlot module
+- [`dittoFreqPlotOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/dittoFreqPlotOutputUI.md)
+  : Output UI components for the dittoFreqPlot module
+- [`dittoFreqPlotServer()`](https://j-andrews7.github.io/sciVizModules/reference/dittoFreqPlotServer.md)
+  : Server logic for the dittoFreqPlot module
+- [`dittoFreqPlotApp()`](https://j-andrews7.github.io/sciVizModules/reference/dittoFreqPlotApp.md)
+  : Create a standalone Shiny app for the dittoFreqPlot module
+
+## Module Gallery & Figure Builder
+
+Every module in one app, each on example data with its main features
+switched on, and the VizModules Figure Builder for arranging several of
+these modules into one multi-panel figure.
+
+- [`sciModuleGalleryApp()`](https://j-andrews7.github.io/sciVizModules/reference/sciModuleGalleryApp.md)
+  : Launch the sciVizModules module gallery
+- [`sci_figure_builder_registry()`](https://j-andrews7.github.io/sciVizModules/reference/sci_figure_builder_registry.md)
+  : Module registry for the VizModules Figure Builder
+- [`sciFigureBuilderApp()`](https://j-andrews7.github.io/sciVizModules/reference/sciFigureBuilderApp.md)
+  : Figure Builder app seeded with the sciVizModules modules
+
+## Example data
+
+Bundled datasets used by the example apps, the vignette and the tests.
+This package sets no `LazyData`, so load them with
+[`data()`](https://rdrr.io/r/utils/data.html).
+
+- [`airway_deseq2`](https://j-andrews7.github.io/sciVizModules/reference/airway_deseq2.md)
+  : Example DESeq2 results from airway dataset
+
+- [`airway_edger`](https://j-andrews7.github.io/sciVizModules/reference/airway_edger.md)
+  : Example edgeR results from airway dataset
+
+- [`airway_voom`](https://j-andrews7.github.io/sciVizModules/reference/airway_voom.md)
+  : Example limma-voom results from airway dataset
+
+- [`dose_response`](https://j-andrews7.github.io/sciVizModules/reference/dose_response.md)
+  : Example dose-response data (simulated)
+
+- [`example_biomarkers`](https://j-andrews7.github.io/sciVizModules/reference/example_biomarkers.md)
+  : Example diagnostic biomarker data (simulated)
+
+- [`example_cn_segment`](https://j-andrews7.github.io/sciVizModules/reference/example_cn_segment.md)
+  : Example copy number segmentation results from sesame
+
+- [`example_enrichment`](https://j-andrews7.github.io/sciVizModules/reference/example_enrichment.md)
+  : Example functional enrichment results (simulated)
+
+- [`example_gsea`](https://j-andrews7.github.io/sciVizModules/reference/example_gsea.md)
+  : Example GSEA input (fgsea example data)
+
+- [`example_gwas`](https://j-andrews7.github.io/sciVizModules/reference/example_gwas.md)
+  : Example GWAS summary statistics (simulated)
+
+- [`example_pca`](https://j-andrews7.github.io/sciVizModules/reference/example_pca.md)
+  :
+
+  Example PCAtools `pca` object (airway RNA-seq)
+
+- [`example_plate`](https://j-andrews7.github.io/sciVizModules/reference/example_plate.md)
+  : Example assay plates
+
+- [`example_sbs96`](https://j-andrews7.github.io/sciVizModules/reference/example_sbs96.md)
+  : Example single-base-substitution spectra (simulated)
+
+- [`example_sce`](https://j-andrews7.github.io/sciVizModules/reference/example_sce.md)
+  : Example single-cell RNA-seq dataset (simulated)
+
+- [`mm_kinetics`](https://j-andrews7.github.io/sciVizModules/reference/mm_kinetics.md)
+  : Example Michaelis-Menten enzyme-kinetics observations (simulated)
+
+- [`mm_kinetics_line`](https://j-andrews7.github.io/sciVizModules/reference/mm_kinetics_line.md)
+  : Fitted Michaelis-Menten curve for the example kinetics data
+
+- [`mm_kinetics_fit`](https://j-andrews7.github.io/sciVizModules/reference/mm_kinetics_fit.md)
+  : Fitted Michaelis-Menten model for the example kinetics data
+
+- [`survival_lung`](https://j-andrews7.github.io/sciVizModules/reference/survival_lung.md)
+  : Example survival dataset (NCCTG lung cancer)
+
+# Articles
+
+### All vignettes
+
+- [Quick
+  Start](https://j-andrews7.github.io/sciVizModules/articles/quick-start.md):
