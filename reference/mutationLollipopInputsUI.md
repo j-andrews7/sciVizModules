@@ -103,28 +103,28 @@ if (requireNamespace("maftools", quietly = TRUE)) {
 }
 #> <h3>Lollipop Settings</h3>
 #> <div class="tabbable vizmodules-input-tabs">
-#>   <ul class="nav nav-tabs shiny-tab-input" id="lollipop-mutationLollipopTabsetPanel" data-tabsetid="9853">
+#>   <ul class="nav nav-tabs shiny-tab-input" id="lollipop-mutationLollipopTabsetPanel" data-tabsetid="1299">
 #>     <li class="active">
-#>       <a href="#tab-9853-1" data-toggle="tab" data-bs-toggle="tab" data-value="Data">Data</a>
+#>       <a href="#tab-1299-1" data-toggle="tab" data-bs-toggle="tab" data-value="Data">Data</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-9853-2" data-toggle="tab" data-bs-toggle="tab" data-value="Aesthetics">Aesthetics</a>
+#>       <a href="#tab-1299-2" data-toggle="tab" data-bs-toggle="tab" data-value="Aesthetics">Aesthetics</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-9853-3" data-toggle="tab" data-bs-toggle="tab" data-value="Legend">Legend</a>
+#>       <a href="#tab-1299-3" data-toggle="tab" data-bs-toggle="tab" data-value="Legend">Legend</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-9853-4" data-toggle="tab" data-bs-toggle="tab" data-value="Axes">Axes</a>
+#>       <a href="#tab-1299-4" data-toggle="tab" data-bs-toggle="tab" data-value="Axes">Axes</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-9853-5" data-toggle="tab" data-bs-toggle="tab" data-value="Lines">Lines</a>
+#>       <a href="#tab-1299-5" data-toggle="tab" data-bs-toggle="tab" data-value="Lines">Lines</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-9853-6" data-toggle="tab" data-bs-toggle="tab" data-value="Plotly">Plotly</a>
+#>       <a href="#tab-1299-6" data-toggle="tab" data-bs-toggle="tab" data-value="Plotly">Plotly</a>
 #>     </li>
 #>   </ul>
-#>   <div class="tab-content" data-tabsetid="9853">
-#>     <div class="tab-pane active" data-value="Data" id="tab-9853-1">
+#>   <div class="tab-content" data-tabsetid="1299">
+#>     <div class="tab-pane active" data-value="Data" id="tab-1299-1">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify9554548">
@@ -154,7 +154,7 @@ if (requireNamespace("maftools", quietly = TRUE)) {
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Aesthetics" id="tab-9853-2">
+#>     <div class="tab-pane" data-value="Aesthetics" id="tab-1299-2">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div id="lollipop-palette.selection" class="shiny-html-output"></div>
@@ -168,7 +168,7 @@ if (requireNamespace("maftools", quietly = TRUE)) {
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Legend" id="tab-9853-3">
+#>     <div class="tab-pane" data-value="Legend" id="tab-1299-3">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" id="tipify8356562">
@@ -212,7 +212,7 @@ if (requireNamespace("maftools", quietly = TRUE)) {
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Axes" id="tab-9853-4">
+#>     <div class="tab-pane" data-value="Axes" id="tab-1299-4">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;">
@@ -398,7 +398,7 @@ if (requireNamespace("maftools", quietly = TRUE)) {
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Lines" id="tab-9853-5">
+#>     <div class="tab-pane" data-value="Lines" id="tab-1299-5">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" id="tipify4197834">
@@ -514,7 +514,7 @@ if (requireNamespace("maftools", quietly = TRUE)) {
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Plotly" id="tab-9853-6">
+#>     <div class="tab-pane" data-value="Plotly" id="tab-1299-6">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;">

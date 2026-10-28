@@ -97,25 +97,25 @@ data(example_gsea)
 gseaEnrichmentPlotInputsUI("gsea", example_gsea)
 #> <h3>GSEA Plot Settings</h3>
 #> <div class="tabbable vizmodules-input-tabs">
-#>   <ul class="nav nav-tabs shiny-tab-input" id="gsea-gseaEnrichmentPlotTabsetPanel" data-tabsetid="8034">
+#>   <ul class="nav nav-tabs shiny-tab-input" id="gsea-gseaEnrichmentPlotTabsetPanel" data-tabsetid="7840">
 #>     <li class="active">
-#>       <a href="#tab-8034-1" data-toggle="tab" data-bs-toggle="tab" data-value="Data">Data</a>
+#>       <a href="#tab-7840-1" data-toggle="tab" data-bs-toggle="tab" data-value="Data">Data</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-8034-2" data-toggle="tab" data-bs-toggle="tab" data-value="Aesthetics">Aesthetics</a>
+#>       <a href="#tab-7840-2" data-toggle="tab" data-bs-toggle="tab" data-value="Aesthetics">Aesthetics</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-8034-3" data-toggle="tab" data-bs-toggle="tab" data-value="Legend">Legend</a>
+#>       <a href="#tab-7840-3" data-toggle="tab" data-bs-toggle="tab" data-value="Legend">Legend</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-8034-4" data-toggle="tab" data-bs-toggle="tab" data-value="Axes">Axes</a>
+#>       <a href="#tab-7840-4" data-toggle="tab" data-bs-toggle="tab" data-value="Axes">Axes</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-8034-5" data-toggle="tab" data-bs-toggle="tab" data-value="Plotly">Plotly</a>
+#>       <a href="#tab-7840-5" data-toggle="tab" data-bs-toggle="tab" data-value="Plotly">Plotly</a>
 #>     </li>
 #>   </ul>
-#>   <div class="tab-content" data-tabsetid="8034">
-#>     <div class="tab-pane active" data-value="Data" id="tab-8034-1">
+#>   <div class="tab-content" data-tabsetid="7840">
+#>     <div class="tab-pane active" data-value="Data" id="tab-7840-1">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify7773061">
@@ -155,7 +155,7 @@ gseaEnrichmentPlotInputsUI("gsea", example_gsea)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Aesthetics" id="tab-8034-2">
+#>     <div class="tab-pane" data-value="Aesthetics" id="tab-7840-2">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div id="gsea-palette.selection" class="shiny-html-output"></div>
@@ -169,7 +169,7 @@ gseaEnrichmentPlotInputsUI("gsea", example_gsea)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Legend" id="tab-8034-3">
+#>     <div class="tab-pane" data-value="Legend" id="tab-7840-3">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" id="tipify7429240">
@@ -213,7 +213,7 @@ gseaEnrichmentPlotInputsUI("gsea", example_gsea)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Axes" id="tab-8034-4">
+#>     <div class="tab-pane" data-value="Axes" id="tab-7840-4">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;">
@@ -399,7 +399,7 @@ gseaEnrichmentPlotInputsUI("gsea", example_gsea)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Plotly" id="tab-8034-5">
+#>     <div class="tab-pane" data-value="Plotly" id="tab-7840-5">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;">

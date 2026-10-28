@@ -113,28 +113,28 @@ data(example_sce)
 dittoPlotInputsUI("dittoPlot", example_sce)
 #> <h3>dittoPlot Settings</h3>
 #> <div class="tabbable vizmodules-input-tabs">
-#>   <ul class="nav nav-tabs shiny-tab-input" id="dittoPlot-dittoPlotTabsetPanel" data-tabsetid="7945">
+#>   <ul class="nav nav-tabs shiny-tab-input" id="dittoPlot-dittoPlotTabsetPanel" data-tabsetid="6203">
 #>     <li class="active">
-#>       <a href="#tab-7945-1" data-toggle="tab" data-bs-toggle="tab" data-value="Data">Data</a>
+#>       <a href="#tab-6203-1" data-toggle="tab" data-bs-toggle="tab" data-value="Data">Data</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-7945-2" data-toggle="tab" data-bs-toggle="tab" data-value="Aesthetics">Aesthetics</a>
+#>       <a href="#tab-6203-2" data-toggle="tab" data-bs-toggle="tab" data-value="Aesthetics">Aesthetics</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-7945-3" data-toggle="tab" data-bs-toggle="tab" data-value="Plotly">Plotly</a>
+#>       <a href="#tab-6203-3" data-toggle="tab" data-bs-toggle="tab" data-value="Plotly">Plotly</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-7945-4" data-toggle="tab" data-bs-toggle="tab" data-value="Axes">Axes</a>
+#>       <a href="#tab-6203-4" data-toggle="tab" data-bs-toggle="tab" data-value="Axes">Axes</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-7945-5" data-toggle="tab" data-bs-toggle="tab" data-value="Legend">Legend</a>
+#>       <a href="#tab-6203-5" data-toggle="tab" data-bs-toggle="tab" data-value="Legend">Legend</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-7945-6" data-toggle="tab" data-bs-toggle="tab" data-value="Lines">Lines</a>
+#>       <a href="#tab-6203-6" data-toggle="tab" data-bs-toggle="tab" data-value="Lines">Lines</a>
 #>     </li>
 #>   </ul>
-#>   <div class="tab-content" data-tabsetid="7945">
-#>     <div class="tab-pane active" data-value="Data" id="tab-7945-1">
+#>   <div class="tab-content" data-tabsetid="6203">
+#>     <div class="tab-pane active" data-value="Data" id="tab-6203-1">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify7311036">
@@ -206,7 +206,7 @@ dittoPlotInputsUI("dittoPlot", example_sce)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Aesthetics" id="tab-7945-2">
+#>     <div class="tab-pane" data-value="Aesthetics" id="tab-6203-2">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div id="dittoPlot-palette.selection" class="shiny-html-output"></div>
@@ -285,7 +285,7 @@ dittoPlotInputsUI("dittoPlot", example_sce)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Plotly" id="tab-7945-3">
+#>     <div class="tab-pane" data-value="Plotly" id="tab-6203-3">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;">
@@ -362,7 +362,7 @@ dittoPlotInputsUI("dittoPlot", example_sce)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Axes" id="tab-7945-4">
+#>     <div class="tab-pane" data-value="Axes" id="tab-6203-4">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;">
@@ -548,7 +548,7 @@ dittoPlotInputsUI("dittoPlot", example_sce)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Legend" id="tab-7945-5">
+#>     <div class="tab-pane" data-value="Legend" id="tab-6203-5">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" id="tipify4305207">
@@ -592,7 +592,7 @@ dittoPlotInputsUI("dittoPlot", example_sce)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Lines" id="tab-7945-6">
+#>     <div class="tab-pane" data-value="Lines" id="tab-6203-6">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" id="tipify7423262">

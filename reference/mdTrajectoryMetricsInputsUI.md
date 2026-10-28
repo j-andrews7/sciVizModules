@@ -109,28 +109,28 @@ rmsd <- read_xvg(system.file("extdata", "example_rmsd_rep1.xvg.gz", package = "s
 mdTrajectoryMetricsInputsUI("md", rmsd)
 #> <h3>MD Trajectory Settings</h3>
 #> <div class="tabbable vizmodules-input-tabs">
-#>   <ul class="nav nav-tabs shiny-tab-input" id="md-mdTrajectoryMetricsTabsetPanel" data-tabsetid="8586">
+#>   <ul class="nav nav-tabs shiny-tab-input" id="md-mdTrajectoryMetricsTabsetPanel" data-tabsetid="6409">
 #>     <li class="active">
-#>       <a href="#tab-8586-1" data-toggle="tab" data-bs-toggle="tab" data-value="Data">Data</a>
+#>       <a href="#tab-6409-1" data-toggle="tab" data-bs-toggle="tab" data-value="Data">Data</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-8586-2" data-toggle="tab" data-bs-toggle="tab" data-value="Aesthetics">Aesthetics</a>
+#>       <a href="#tab-6409-2" data-toggle="tab" data-bs-toggle="tab" data-value="Aesthetics">Aesthetics</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-8586-3" data-toggle="tab" data-bs-toggle="tab" data-value="Legend">Legend</a>
+#>       <a href="#tab-6409-3" data-toggle="tab" data-bs-toggle="tab" data-value="Legend">Legend</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-8586-4" data-toggle="tab" data-bs-toggle="tab" data-value="Axes">Axes</a>
+#>       <a href="#tab-6409-4" data-toggle="tab" data-bs-toggle="tab" data-value="Axes">Axes</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-8586-5" data-toggle="tab" data-bs-toggle="tab" data-value="Lines">Lines</a>
+#>       <a href="#tab-6409-5" data-toggle="tab" data-bs-toggle="tab" data-value="Lines">Lines</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-8586-6" data-toggle="tab" data-bs-toggle="tab" data-value="Plotly">Plotly</a>
+#>       <a href="#tab-6409-6" data-toggle="tab" data-bs-toggle="tab" data-value="Plotly">Plotly</a>
 #>     </li>
 #>   </ul>
-#>   <div class="tab-content" data-tabsetid="8586">
-#>     <div class="tab-pane active" data-value="Data" id="tab-8586-1">
+#>   <div class="tab-content" data-tabsetid="6409">
+#>     <div class="tab-pane active" data-value="Data" id="tab-6409-1">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify3576113">
@@ -195,7 +195,7 @@ mdTrajectoryMetricsInputsUI("md", rmsd)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Aesthetics" id="tab-8586-2">
+#>     <div class="tab-pane" data-value="Aesthetics" id="tab-6409-2">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div id="md-palette.selection" class="shiny-html-output"></div>
@@ -219,7 +219,7 @@ mdTrajectoryMetricsInputsUI("md", rmsd)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Legend" id="tab-8586-3">
+#>     <div class="tab-pane" data-value="Legend" id="tab-6409-3">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" id="tipify2051782">
@@ -263,7 +263,7 @@ mdTrajectoryMetricsInputsUI("md", rmsd)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Axes" id="tab-8586-4">
+#>     <div class="tab-pane" data-value="Axes" id="tab-6409-4">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;">
@@ -449,7 +449,7 @@ mdTrajectoryMetricsInputsUI("md", rmsd)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Lines" id="tab-8586-5">
+#>     <div class="tab-pane" data-value="Lines" id="tab-6409-5">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" id="tipify2588608">
@@ -565,7 +565,7 @@ mdTrajectoryMetricsInputsUI("md", rmsd)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Plotly" id="tab-8586-6">
+#>     <div class="tab-pane" data-value="Plotly" id="tab-6409-6">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;">

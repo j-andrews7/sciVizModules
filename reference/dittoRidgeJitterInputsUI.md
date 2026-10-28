@@ -108,28 +108,28 @@ data(example_sce)
 dittoRidgeJitterInputsUI("dittoRidgeJitter", example_sce)
 #> <h3>RidgeJitter Settings</h3>
 #> <div class="tabbable vizmodules-input-tabs">
-#>   <ul class="nav nav-tabs shiny-tab-input" id="dittoRidgeJitter-dittoRidgeJitterTabsetPanel" data-tabsetid="7344">
+#>   <ul class="nav nav-tabs shiny-tab-input" id="dittoRidgeJitter-dittoRidgeJitterTabsetPanel" data-tabsetid="1992">
 #>     <li class="active">
-#>       <a href="#tab-7344-1" data-toggle="tab" data-bs-toggle="tab" data-value="Data">Data</a>
+#>       <a href="#tab-1992-1" data-toggle="tab" data-bs-toggle="tab" data-value="Data">Data</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-7344-2" data-toggle="tab" data-bs-toggle="tab" data-value="Aesthetics">Aesthetics</a>
+#>       <a href="#tab-1992-2" data-toggle="tab" data-bs-toggle="tab" data-value="Aesthetics">Aesthetics</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-7344-3" data-toggle="tab" data-bs-toggle="tab" data-value="Plotly">Plotly</a>
+#>       <a href="#tab-1992-3" data-toggle="tab" data-bs-toggle="tab" data-value="Plotly">Plotly</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-7344-4" data-toggle="tab" data-bs-toggle="tab" data-value="Axes">Axes</a>
+#>       <a href="#tab-1992-4" data-toggle="tab" data-bs-toggle="tab" data-value="Axes">Axes</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-7344-5" data-toggle="tab" data-bs-toggle="tab" data-value="Legend">Legend</a>
+#>       <a href="#tab-1992-5" data-toggle="tab" data-bs-toggle="tab" data-value="Legend">Legend</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-7344-6" data-toggle="tab" data-bs-toggle="tab" data-value="Lines">Lines</a>
+#>       <a href="#tab-1992-6" data-toggle="tab" data-bs-toggle="tab" data-value="Lines">Lines</a>
 #>     </li>
 #>   </ul>
-#>   <div class="tab-content" data-tabsetid="7344">
-#>     <div class="tab-pane active" data-value="Data" id="tab-7344-1">
+#>   <div class="tab-content" data-tabsetid="1992">
+#>     <div class="tab-pane active" data-value="Data" id="tab-1992-1">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify6406805">
@@ -169,7 +169,7 @@ dittoRidgeJitterInputsUI("dittoRidgeJitter", example_sce)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Aesthetics" id="tab-7344-2">
+#>     <div class="tab-pane" data-value="Aesthetics" id="tab-1992-2">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div id="dittoRidgeJitter-palette.selection" class="shiny-html-output"></div>
@@ -227,7 +227,7 @@ dittoRidgeJitterInputsUI("dittoRidgeJitter", example_sce)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Plotly" id="tab-7344-3">
+#>     <div class="tab-pane" data-value="Plotly" id="tab-1992-3">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;">
@@ -304,7 +304,7 @@ dittoRidgeJitterInputsUI("dittoRidgeJitter", example_sce)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Axes" id="tab-7344-4">
+#>     <div class="tab-pane" data-value="Axes" id="tab-1992-4">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;">
@@ -490,7 +490,7 @@ dittoRidgeJitterInputsUI("dittoRidgeJitter", example_sce)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Legend" id="tab-7344-5">
+#>     <div class="tab-pane" data-value="Legend" id="tab-1992-5">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" id="tipify5437927">
@@ -534,7 +534,7 @@ dittoRidgeJitterInputsUI("dittoRidgeJitter", example_sce)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Lines" id="tab-7344-6">
+#>     <div class="tab-pane" data-value="Lines" id="tab-1992-6">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" id="tipify5147446">

@@ -105,25 +105,25 @@ data(example_pca)
 pcaEigencorPlotInputsUI("eigencor", example_pca)
 #> <h3>PC-Metadata Correlation Settings</h3>
 #> <div class="tabbable vizmodules-input-tabs">
-#>   <ul class="nav nav-tabs shiny-tab-input" id="eigencor-pcaEigencorPlotTabsetPanel" data-tabsetid="3062">
+#>   <ul class="nav nav-tabs shiny-tab-input" id="eigencor-pcaEigencorPlotTabsetPanel" data-tabsetid="8195">
 #>     <li class="active">
-#>       <a href="#tab-3062-1" data-toggle="tab" data-bs-toggle="tab" data-value="Data">Data</a>
+#>       <a href="#tab-8195-1" data-toggle="tab" data-bs-toggle="tab" data-value="Data">Data</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-3062-2" data-toggle="tab" data-bs-toggle="tab" data-value="Aesthetics">Aesthetics</a>
+#>       <a href="#tab-8195-2" data-toggle="tab" data-bs-toggle="tab" data-value="Aesthetics">Aesthetics</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-3062-3" data-toggle="tab" data-bs-toggle="tab" data-value="Legend">Legend</a>
+#>       <a href="#tab-8195-3" data-toggle="tab" data-bs-toggle="tab" data-value="Legend">Legend</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-3062-4" data-toggle="tab" data-bs-toggle="tab" data-value="Axes">Axes</a>
+#>       <a href="#tab-8195-4" data-toggle="tab" data-bs-toggle="tab" data-value="Axes">Axes</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-3062-5" data-toggle="tab" data-bs-toggle="tab" data-value="Plotly">Plotly</a>
+#>       <a href="#tab-8195-5" data-toggle="tab" data-bs-toggle="tab" data-value="Plotly">Plotly</a>
 #>     </li>
 #>   </ul>
-#>   <div class="tab-content" data-tabsetid="3062">
-#>     <div class="tab-pane active" data-value="Data" id="tab-3062-1">
+#>   <div class="tab-content" data-tabsetid="8195">
+#>     <div class="tab-pane active" data-value="Data" id="tab-8195-1">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify7636785">
@@ -173,7 +173,7 @@ pcaEigencorPlotInputsUI("eigencor", example_pca)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Aesthetics" id="tab-3062-2">
+#>     <div class="tab-pane" data-value="Aesthetics" id="tab-8195-2">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" data-shiny-input-type="colour" id="tipify888213">
@@ -215,7 +215,7 @@ pcaEigencorPlotInputsUI("eigencor", example_pca)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Legend" id="tab-3062-3">
+#>     <div class="tab-pane" data-value="Legend" id="tab-8195-3">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" id="tipify1610262">
@@ -259,7 +259,7 @@ pcaEigencorPlotInputsUI("eigencor", example_pca)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Axes" id="tab-3062-4">
+#>     <div class="tab-pane" data-value="Axes" id="tab-8195-4">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;">
@@ -445,7 +445,7 @@ pcaEigencorPlotInputsUI("eigencor", example_pca)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Plotly" id="tab-3062-5">
+#>     <div class="tab-pane" data-value="Plotly" id="tab-8195-5">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;">

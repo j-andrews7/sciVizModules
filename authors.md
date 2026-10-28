@@ -10,7 +10,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/j-andrews7/sciVizModules/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/j-andrews7/sciVizModules/blob/devel/DESCRIPTION)
 
 Andrews J, Martin J (2026). *sciVizModules: Flexible, Science-Focused
 Interactive Plotting Modules*. R package version 0.99.0,

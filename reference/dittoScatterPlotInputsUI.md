@@ -111,28 +111,28 @@ data(example_sce)
 dittoScatterPlotInputsUI("dittoScatterPlot", example_sce)
 #> <h3>ScatterPlot Settings</h3>
 #> <div class="tabbable vizmodules-input-tabs">
-#>   <ul class="nav nav-tabs shiny-tab-input" id="dittoScatterPlot-dittoScatterPlotTabsetPanel" data-tabsetid="6525">
+#>   <ul class="nav nav-tabs shiny-tab-input" id="dittoScatterPlot-dittoScatterPlotTabsetPanel" data-tabsetid="1848">
 #>     <li class="active">
-#>       <a href="#tab-6525-1" data-toggle="tab" data-bs-toggle="tab" data-value="Data">Data</a>
+#>       <a href="#tab-1848-1" data-toggle="tab" data-bs-toggle="tab" data-value="Data">Data</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-6525-2" data-toggle="tab" data-bs-toggle="tab" data-value="Aesthetics">Aesthetics</a>
+#>       <a href="#tab-1848-2" data-toggle="tab" data-bs-toggle="tab" data-value="Aesthetics">Aesthetics</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-6525-3" data-toggle="tab" data-bs-toggle="tab" data-value="Plotly">Plotly</a>
+#>       <a href="#tab-1848-3" data-toggle="tab" data-bs-toggle="tab" data-value="Plotly">Plotly</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-6525-4" data-toggle="tab" data-bs-toggle="tab" data-value="Axes">Axes</a>
+#>       <a href="#tab-1848-4" data-toggle="tab" data-bs-toggle="tab" data-value="Axes">Axes</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-6525-5" data-toggle="tab" data-bs-toggle="tab" data-value="Legend">Legend</a>
+#>       <a href="#tab-1848-5" data-toggle="tab" data-bs-toggle="tab" data-value="Legend">Legend</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-6525-6" data-toggle="tab" data-bs-toggle="tab" data-value="Lines">Lines</a>
+#>       <a href="#tab-1848-6" data-toggle="tab" data-bs-toggle="tab" data-value="Lines">Lines</a>
 #>     </li>
 #>   </ul>
-#>   <div class="tab-content" data-tabsetid="6525">
-#>     <div class="tab-pane active" data-value="Data" id="tab-6525-1">
+#>   <div class="tab-content" data-tabsetid="1848">
+#>     <div class="tab-pane active" data-value="Data" id="tab-1848-1">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify8880151">
@@ -181,7 +181,7 @@ dittoScatterPlotInputsUI("dittoScatterPlot", example_sce)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Aesthetics" id="tab-6525-2">
+#>     <div class="tab-pane" data-value="Aesthetics" id="tab-1848-2">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div id="dittoScatterPlot-palette.selection" class="shiny-html-output"></div>
@@ -262,7 +262,7 @@ dittoScatterPlotInputsUI("dittoScatterPlot", example_sce)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Plotly" id="tab-6525-3">
+#>     <div class="tab-pane" data-value="Plotly" id="tab-1848-3">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;">
@@ -339,7 +339,7 @@ dittoScatterPlotInputsUI("dittoScatterPlot", example_sce)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Axes" id="tab-6525-4">
+#>     <div class="tab-pane" data-value="Axes" id="tab-1848-4">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;">
@@ -525,7 +525,7 @@ dittoScatterPlotInputsUI("dittoScatterPlot", example_sce)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Legend" id="tab-6525-5">
+#>     <div class="tab-pane" data-value="Legend" id="tab-1848-5">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" id="tipify3654865">
@@ -569,7 +569,7 @@ dittoScatterPlotInputsUI("dittoScatterPlot", example_sce)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Lines" id="tab-6525-6">
+#>     <div class="tab-pane" data-value="Lines" id="tab-1848-6">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" id="tipify3559015">

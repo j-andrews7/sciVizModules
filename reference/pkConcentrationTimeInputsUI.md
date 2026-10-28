@@ -120,28 +120,28 @@ library(sciVizModules)
 pkConcentrationTimeInputsUI("pk", datasets::Theoph)
 #> <h3>PK Settings</h3>
 #> <div class="tabbable vizmodules-input-tabs">
-#>   <ul class="nav nav-tabs shiny-tab-input" id="pk-pkConcentrationTimeTabsetPanel" data-tabsetid="1212">
+#>   <ul class="nav nav-tabs shiny-tab-input" id="pk-pkConcentrationTimeTabsetPanel" data-tabsetid="2252">
 #>     <li class="active">
-#>       <a href="#tab-1212-1" data-toggle="tab" data-bs-toggle="tab" data-value="Data">Data</a>
+#>       <a href="#tab-2252-1" data-toggle="tab" data-bs-toggle="tab" data-value="Data">Data</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-1212-2" data-toggle="tab" data-bs-toggle="tab" data-value="Aesthetics">Aesthetics</a>
+#>       <a href="#tab-2252-2" data-toggle="tab" data-bs-toggle="tab" data-value="Aesthetics">Aesthetics</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-1212-3" data-toggle="tab" data-bs-toggle="tab" data-value="Legend">Legend</a>
+#>       <a href="#tab-2252-3" data-toggle="tab" data-bs-toggle="tab" data-value="Legend">Legend</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-1212-4" data-toggle="tab" data-bs-toggle="tab" data-value="Axes">Axes</a>
+#>       <a href="#tab-2252-4" data-toggle="tab" data-bs-toggle="tab" data-value="Axes">Axes</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-1212-5" data-toggle="tab" data-bs-toggle="tab" data-value="Lines">Lines</a>
+#>       <a href="#tab-2252-5" data-toggle="tab" data-bs-toggle="tab" data-value="Lines">Lines</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-1212-6" data-toggle="tab" data-bs-toggle="tab" data-value="Plotly">Plotly</a>
+#>       <a href="#tab-2252-6" data-toggle="tab" data-bs-toggle="tab" data-value="Plotly">Plotly</a>
 #>     </li>
 #>   </ul>
-#>   <div class="tab-content" data-tabsetid="1212">
-#>     <div class="tab-pane active" data-value="Data" id="tab-1212-1">
+#>   <div class="tab-content" data-tabsetid="2252">
+#>     <div class="tab-pane active" data-value="Data" id="tab-2252-1">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify7449058">
@@ -266,7 +266,7 @@ pkConcentrationTimeInputsUI("pk", datasets::Theoph)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Aesthetics" id="tab-1212-2">
+#>     <div class="tab-pane" data-value="Aesthetics" id="tab-2252-2">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div id="pk-palette.selection" class="shiny-html-output"></div>
@@ -280,7 +280,7 @@ pkConcentrationTimeInputsUI("pk", datasets::Theoph)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Legend" id="tab-1212-3">
+#>     <div class="tab-pane" data-value="Legend" id="tab-2252-3">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" id="tipify9889192">
@@ -324,7 +324,7 @@ pkConcentrationTimeInputsUI("pk", datasets::Theoph)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Axes" id="tab-1212-4">
+#>     <div class="tab-pane" data-value="Axes" id="tab-2252-4">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;">
@@ -510,7 +510,7 @@ pkConcentrationTimeInputsUI("pk", datasets::Theoph)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Lines" id="tab-1212-5">
+#>     <div class="tab-pane" data-value="Lines" id="tab-2252-5">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" id="tipify9270147">
@@ -626,7 +626,7 @@ pkConcentrationTimeInputsUI("pk", datasets::Theoph)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Plotly" id="tab-1212-6">
+#>     <div class="tab-pane" data-value="Plotly" id="tab-2252-6">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;">

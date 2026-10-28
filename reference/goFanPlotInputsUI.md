@@ -106,19 +106,19 @@ data(example_enrichment)
 goFanPlotInputsUI("goFanPlot", example_enrichment)
 #> <h3>GO Sunburst Settings</h3>
 #> <div class="tabbable vizmodules-input-tabs">
-#>   <ul class="nav nav-tabs shiny-tab-input" id="goFanPlot-goFanPlotTabsetPanel" data-tabsetid="2274">
+#>   <ul class="nav nav-tabs shiny-tab-input" id="goFanPlot-goFanPlotTabsetPanel" data-tabsetid="3847">
 #>     <li class="active">
-#>       <a href="#tab-2274-1" data-toggle="tab" data-bs-toggle="tab" data-value="Data">Data</a>
+#>       <a href="#tab-3847-1" data-toggle="tab" data-bs-toggle="tab" data-value="Data">Data</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-2274-2" data-toggle="tab" data-bs-toggle="tab" data-value="Filtering">Filtering</a>
+#>       <a href="#tab-3847-2" data-toggle="tab" data-bs-toggle="tab" data-value="Filtering">Filtering</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-2274-3" data-toggle="tab" data-bs-toggle="tab" data-value="Plotly">Plotly</a>
+#>       <a href="#tab-3847-3" data-toggle="tab" data-bs-toggle="tab" data-value="Plotly">Plotly</a>
 #>     </li>
 #>   </ul>
-#>   <div class="tab-content" data-tabsetid="2274">
-#>     <div class="tab-pane active" data-value="Data" id="tab-2274-1">
+#>   <div class="tab-content" data-tabsetid="3847">
+#>     <div class="tab-pane active" data-value="Data" id="tab-3847-1">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify1947595">
@@ -176,7 +176,7 @@ goFanPlotInputsUI("goFanPlot", example_enrichment)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Filtering" id="tab-2274-2">
+#>     <div class="tab-pane" data-value="Filtering" id="tab-3847-2">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" id="tipify3109595">
@@ -204,7 +204,7 @@ goFanPlotInputsUI("goFanPlot", example_enrichment)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Plotly" id="tab-2274-3">
+#>     <div class="tab-pane" data-value="Plotly" id="tab-3847-3">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;">

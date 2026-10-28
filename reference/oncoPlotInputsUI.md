@@ -118,25 +118,25 @@ if (requireNamespace("maftools", quietly = TRUE)) {
 }
 #> <h3>Oncoplot Settings</h3>
 #> <div class="tabbable vizmodules-input-tabs">
-#>   <ul class="nav nav-tabs shiny-tab-input" id="onco-oncoPlotTabsetPanel" data-tabsetid="3422">
+#>   <ul class="nav nav-tabs shiny-tab-input" id="onco-oncoPlotTabsetPanel" data-tabsetid="9399">
 #>     <li class="active">
-#>       <a href="#tab-3422-1" data-toggle="tab" data-bs-toggle="tab" data-value="Data">Data</a>
+#>       <a href="#tab-9399-1" data-toggle="tab" data-bs-toggle="tab" data-value="Data">Data</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-3422-2" data-toggle="tab" data-bs-toggle="tab" data-value="Aesthetics">Aesthetics</a>
+#>       <a href="#tab-9399-2" data-toggle="tab" data-bs-toggle="tab" data-value="Aesthetics">Aesthetics</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-3422-3" data-toggle="tab" data-bs-toggle="tab" data-value="Legend">Legend</a>
+#>       <a href="#tab-9399-3" data-toggle="tab" data-bs-toggle="tab" data-value="Legend">Legend</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-3422-4" data-toggle="tab" data-bs-toggle="tab" data-value="Axes">Axes</a>
+#>       <a href="#tab-9399-4" data-toggle="tab" data-bs-toggle="tab" data-value="Axes">Axes</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-3422-5" data-toggle="tab" data-bs-toggle="tab" data-value="Plotly">Plotly</a>
+#>       <a href="#tab-9399-5" data-toggle="tab" data-bs-toggle="tab" data-value="Plotly">Plotly</a>
 #>     </li>
 #>   </ul>
-#>   <div class="tab-content" data-tabsetid="3422">
-#>     <div class="tab-pane active" data-value="Data" id="tab-3422-1">
+#>   <div class="tab-content" data-tabsetid="9399">
+#>     <div class="tab-pane active" data-value="Data" id="tab-9399-1">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify2954092">
@@ -215,7 +215,7 @@ if (requireNamespace("maftools", quietly = TRUE)) {
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Aesthetics" id="tab-3422-2">
+#>     <div class="tab-pane" data-value="Aesthetics" id="tab-9399-2">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div id="onco-palette.selection" class="shiny-html-output"></div>
@@ -229,7 +229,7 @@ if (requireNamespace("maftools", quietly = TRUE)) {
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Legend" id="tab-3422-3">
+#>     <div class="tab-pane" data-value="Legend" id="tab-9399-3">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" id="tipify743211">
@@ -273,7 +273,7 @@ if (requireNamespace("maftools", quietly = TRUE)) {
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Axes" id="tab-3422-4">
+#>     <div class="tab-pane" data-value="Axes" id="tab-9399-4">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;">
@@ -459,7 +459,7 @@ if (requireNamespace("maftools", quietly = TRUE)) {
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Plotly" id="tab-3422-5">
+#>     <div class="tab-pane" data-value="Plotly" id="tab-9399-5">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;">
