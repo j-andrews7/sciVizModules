@@ -10,15 +10,21 @@ survivalCurve(
   status,
   group.by = NULL,
   conf.int = TRUE,
+  conf.level = 0.95,
+  conf.type = c("log", "log-log", "plain"),
+  conf.int.opacity = 0.25,
   pval = TRUE,
   risk.table = FALSE,
   censor = TRUE,
   surv.median.line = "none",
   fun = NULL,
   palette.selection = NULL,
-  line.size = 1,
+  line.size = 2,
   break.time.by = NULL,
-  legend.title = NULL
+  legend.title = NULL,
+  pairwise = FALSE,
+  pairs = NULL,
+  p.adjust.method = "holm"
 )
 }
 \arguments{
@@ -29,57 +35,122 @@ survivalCurve(
 \item{status}{The name of the event/status indicator column.}
 
 \item{group.by}{Optional name of a categorical column to stratify the curves
-by. When \code{NULL} or \code{""} a single overall survival curve is drawn.}
+by. When \code{NULL} or \code{""} a single overall survival curve (named "All") is drawn.}
 
-\item{conf.int}{Logical; draw confidence interval ribbons (default \code{TRUE}).}
+\item{conf.int}{Logical; draw a confidence band around each curve (default \code{TRUE}).}
+
+\item{conf.level}{Confidence level of the band, between 0 and 1 (default 0.95),
+passed to \code{\link[survival:survfit]{survival::survfit()}} as its \code{conf.int}.}
+
+\item{conf.type}{How the band is computed, one of \code{"log"} (the
+\code{\link[survival:survfit]{survival::survfit()}} default), \code{"log-log"} or \code{"plain"}.}
+
+\item{conf.int.opacity}{Fill opacity of the band, between 0 and 1 (default 0.25).}
 
 \item{pval}{Logical; display the log-rank test p-value. Only applied when
 \code{group.by} defines more than one group (default \code{TRUE}).}
 
 \item{risk.table}{Logical; append a "number at risk" table beneath the curve
-(default \code{FALSE}).}
+(default \code{FALSE}). The table has no gridlines; its time axis zooms with the
+curve's.}
 
 \item{censor}{Logical; draw censoring marks (default \code{TRUE}).}
 
 \item{surv.median.line}{Character; draw median survival reference lines. One
-of \code{"none"}, \code{"hv"}, \code{"h"}, or \code{"v"} (default \code{"none"}).}
+of \code{"none"}, \code{"hv"}, \code{"h"}, or \code{"v"} (default \code{"none"}). Drawn only for the
+survival probability and percentage curves.}
 
-\item{fun}{Optional transformation of the survival curve passed to
-\code{\link[survminer:ggsurvplot]{survminer::ggsurvplot()}}. One of \code{NULL} (survival probability), \code{"pct"}
-(survival percentage), \code{"event"} (cumulative events), or \code{"cumhaz"}
-(cumulative hazard).}
+\item{fun}{Optional transformation of the survival curve. One of \code{NULL} or
+\code{"survival"} (survival probability), \code{"pct"} (survival percentage), \code{"event"}
+(cumulative events, \code{1 - S}), or \code{"cumhaz"} (cumulative hazard, \code{-log(S)}).
+The band is transformed with the curve.}
 
-\item{palette.selection}{Optional vector of colors used for the strata. Passed
-through to the \code{palette} argument of \code{\link[survminer:ggsurvplot]{survminer::ggsurvplot()}}.}
+\item{palette.selection}{Optional vector of colors for the strata, named by
+stratum level (an unnamed vector is used in level order).}
 
-\item{line.size}{Numeric line width for the survival curves (default \code{1}).}
+\item{line.size}{Numeric width of the survival curves in pixels (default \code{2}).}
 
-\item{break.time.by}{Optional numeric spacing between x-axis tick marks.}
+\item{break.time.by}{Optional numeric spacing between x-axis tick marks, which
+also sets the times the risk table counts at.}
 
 \item{legend.title}{Legend title. Defaults to \code{group.by} when stratified.}
+
+\item{pairwise}{Logical; also test each pair of groups (default \code{FALSE}). Only
+applied when \code{group.by} defines three or more groups; with two, the pairwise
+test is the global one. See Details for how to read the results.}
+
+\item{pairs}{Optional list of length-2 character vectors naming the pairs to
+test, e.g. \code{list(c("Asymptomatic", "Symptomatic"))}, as for
+\code{\link[VizModules:compute_pairwise_stats]{VizModules::compute_pairwise_stats()}}. \code{NULL} (the default) tests every
+pair. The p-values are adjusted across the pairs tested.}
+
+\item{p.adjust.method}{A \code{\link[stats:p.adjust]{stats::p.adjust()}} method for the pairwise p-values
+(default \code{"holm"}).}
 }
 \value{
-A \code{\link[plotly:plot_ly]{plotly::plot_ly()}} object containing the interactive survival curve.
+A \code{\link[plotly:plot_ly]{plotly::plot_ly()}} object containing the interactive survival curve,
+with a per-stratum summary (subjects, events, median survival and its
+confidence interval, and the log-rank test) as attribute \code{"table"}. With
+\code{pairwise}, attribute \code{"pairwise"} holds a row per comparison: \code{group1},
+\code{group2}, their subjects (\code{n1}, \code{n2}) and events (\code{events1}, \code{events2}),
+the log-rank \code{chisq} and \code{p.value}, the adjusted \code{p.adj} and its
+\code{p.adjust.method}, and the hazard ratio of \code{group2} relative to \code{group1}
+(\code{hr}) with its 95\% confidence interval (\code{hr.lower}, \code{hr.upper}), \code{NA} when
+a group has no events or the model has no finite estimate.
 }
 \description{
-Builds a Kaplan-Meier survival curve from a survival-style data frame and
-returns an interactive \code{plotly} figure. The statistical fit and the base plot
-are produced with the \href{https://cran.r-project.org/package=survminer}{survminer}
-package (via \code{\link[survminer:surv_fit]{survminer::surv_fit()}} and \code{\link[survminer:ggsurvplot]{survminer::ggsurvplot()}}); the
-resulting \code{ggplot} is then converted to \code{plotly} with \code{\link[plotly:ggplotly]{plotly::ggplotly()}} to
-provide the interactivity-first experience shared by all VizModules modules.
+Fits a Kaplan-Meier survival curve with \code{\link[survival:survfit]{survival::survfit()}} and draws it as
+an interactive \code{plotly} figure. The curves and their confidence bands are drawn
+by \code{\link[VizModules:linePlot]{VizModules::linePlot()}} from the curve's step coordinates, so the band takes
+its line's colour, sits underneath it and toggles with it from the legend.
 }
 \details{
-The input \code{data} should be in the "tidy" survival format expected by
-survminer: one row per subject with a numeric follow-up \code{time} column and a
-\code{status} (event) indicator. The status column may be numeric (\code{0}/\code{1} where
-\code{1} = event, or \code{1}/\code{2} where \code{2} = event, following the
-\code{\link[survival:Surv]{survival::Surv()}} conventions), logical (\code{TRUE} = event), or a two-level
-factor/character where the level containing "dead"/"death"/"event"/"yes"/
-"true"/"1" is treated as the event.
+The input \code{data} should be in the "tidy" survival format: one row per
+subject with a numeric follow-up \code{time} column and a \code{status} (event) indicator.
+The status column may be numeric (\code{0}/\code{1} where \code{1} = event, or \code{1}/\code{2} where
+\code{2} = event, following the \code{\link[survival:Surv]{survival::Surv()}} conventions), logical (\code{TRUE} =
+event), or a two-level factor/character where the level containing
+"dead"/"death"/"event"/"yes"/"true"/"1" is treated as the event.
 
-When \code{group.by} is supplied the curve is stratified by that column and a
-log-rank p-value can be shown via \code{pval}.
+When \code{group.by} is supplied the curve is stratified by that column and the
+log-rank test p-value (from \code{\link[survival:survdiff]{survival::survdiff()}}) can be shown via \code{pval}.
+
+\strong{Comparing three or more groups.} The log-rank test above is a global test:
+it asks whether survival differs anywhere among the groups, not which groups
+differ. With \code{pairwise = TRUE} and three or more groups, each pair is also
+tested on its own subjects (a log-rank test of the two groups, as
+survminer's \code{pairwise_survdiff()} computes), and the results are listed on
+the plot and returned as attribute \code{"pairwise"}. To read them:
+\itemize{
+\item The p-values are adjusted for the number of comparisons made
+(\code{p.adjust.method}, default Holm, which keeps the chance of any false
+positive among them at the nominal level; \code{"BH"} controls the false
+discovery rate instead and suits screening many groups; \code{"none"} overstates
+significance). Testing only the comparisons that matter (\code{pairs}, each
+group against a control, say) costs less power. The adjustment covers only
+the comparisons in this call: picking them after looking at the curves, or
+regrouping the data until something is significant, is not accounted for.
+\item A p-value does not say how large a difference is. Each pair also gets the
+hazard ratio (\code{hr}) of \code{group2} relative to \code{group1}, from a Cox model of
+the pair, with its 95\% confidence interval: above 1, \code{group2} has the
+higher hazard (shorter survival). The interval is not adjusted for
+multiplicity, and being a Wald interval it can disagree slightly with the
+log-rank p-value near the significance cut-off.
+\item The log-rank test is most sensitive when one group's hazard is a constant
+multiple of the other's (proportional hazards). Curves that cross can hide
+a real difference, and the hazard ratio then averages over opposite
+effects, so read the tests against the curves.
+\item Groups with few subjects or events give unstable results; in
+\code{survival_lung}, \code{ph.ecog}'s "In bed >50\%" group is a single subject, yet
+its comparisons come out "significant". Check \code{n1}, \code{n2}, \code{events1} and
+\code{events2}, and drop or merge sparse groups before testing.
+\item The tests ignore any order among the groups (stage, dose), for which a trend
+test is more powerful, and they are unadjusted for other covariates: see
+\code{\link[=forestPlot]{forestPlot()}} for a Cox model with covariates.
+}
+
+The figure is built natively in plotly rather than converted from a ggplot:
+\code{\link[plotly:ggplotly]{plotly::ggplotly()}} cannot draw the stepped confidence band survminer uses.
 }
 \examples{
 library(sciVizModules)
@@ -88,12 +159,24 @@ fig <- survivalCurve(survival_lung,
     time = "time", status = "status", group.by = "sex"
 )
 if (interactive()) fig
+
+# Cumulative events with a number-at-risk table.
+fig2 <- survivalCurve(survival_lung,
+    time = "time", status = "status", group.by = "sex",
+    fun = "event", risk.table = TRUE
+)
+
+# Four performance-status groups, each pair compared.
+fig3 <- survivalCurve(survival_lung,
+    time = "time", status = "status", group.by = "ph.ecog", pairwise = TRUE
+)
+attr(fig3, "pairwise")
 }
 \seealso{
-\code{\link[survminer:ggsurvplot]{survminer::ggsurvplot()}}, \code{\link[survival:survfit]{survival::survfit()}},
+\code{\link[survival:survfit]{survival::survfit()}}, \code{\link[VizModules:linePlot]{VizModules::linePlot()}},
 \code{\link[=survivalCurveInputsUI]{survivalCurveInputsUI()}}, \code{\link[=survivalCurveServer]{survivalCurveServer()}},
 \code{\link[=survivalCurveApp]{survivalCurveApp()}}
 }
 \author{
-Jacob Martin
+Jacob Martin, Jared Andrews
 }

@@ -6,7 +6,9 @@
 #'
 #' @param id The ID for the Shiny module.
 #' @param data A `reactive` returning the enrichment results data frame. Must
-#'   contain a column of GO identifiers and a numeric column to colour by.
+#'   contain a column of GO identifiers and a numeric column to colour by. Values that
+#'   are not data frames are coerced with [as.data.frame()]; a `NULL` value is
+#'   treated as "not ready yet" and the module waits for data.
 #' @param hide.inputs A character vector of input IDs to hide. These will still
 #'   be initialized and their values passed to the plot function, but the user
 #'   will not be able to see/adjust them in the UI.
@@ -31,7 +33,9 @@
 #' @author Jacob Martin, Jared Andrews
 goFanPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defaults = NULL) {
     stopifnot(is.reactive(data))
-    data_reactive <- data
+    # A NULL (a parent app switching datasets) becomes a silent wait, and anything
+    # coercible, such as a DataFrame, is converted before the module reads it.
+    data_reactive <- require_data_frame(data)
 
     moduleServer(id, function(input, output, session) {
         hide_input(session, hide.inputs)
@@ -50,12 +54,12 @@ goFanPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defa
             num.choices <- names(df)[vapply(df, is.numeric, logical(1))]
             if (is.null(detected.fill)) detected.fill <- if (length(num.choices)) num.choices[1] else ""
 
-            updateSelectInput(session, "term.id", selected = get_default(defaults, "term.id", detected.id))
-            updateSelectInput(session, "onto", selected = get_default(defaults, "onto", .gofan_onto(df)))
-            updateSelectInput(session, "org", selected = get_default(defaults, "org", "org.Hs.eg.db"))
-            updateSelectInput(session, "fill", selected = get_default(defaults, "fill", detected.fill))
-            updateSelectInput(session, "palette", selected = get_default(defaults, "palette", "Viridis"))
-            updateSelectInput(session, "sub_rect", selected = get_default(defaults, "sub_rect", ""))
+            update_viz_select(session, "term.id", selected = get_default(defaults, "term.id", detected.id))
+            update_viz_select(session, "onto", selected = get_default(defaults, "onto", .gofan_onto(df)))
+            update_viz_select(session, "org", selected = get_default(defaults, "org", "org.Hs.eg.db"))
+            update_viz_select(session, "fill", selected = get_default(defaults, "fill", detected.fill))
+            update_viz_select(session, "palette", selected = get_default(defaults, "palette", "Viridis"))
+            update_viz_select(session, "sub_rect", selected = get_default(defaults, "sub_rect", ""))
             updateNumericInput(session, "go.annotation.level.cutoff",
                 value = get_default(defaults, "go.annotation.level.cutoff", 4))
             updateNumericInput(session, "filter.nodes.by.edge.number",
@@ -72,11 +76,11 @@ goFanPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defa
 
             term.id <- isolate_fn(input$term.id)
             fill <- isolate_fn(input$fill)
-            req(term.id, nzchar(term.id), fill, nzchar(fill))
+            req(nz_value(term.id), nz_value(fill))
             req(term.id %in% names(df), fill %in% names(df))
 
             sub_rect <- isolate_fn(input$sub_rect)
-            if (is.null(sub_rect) || !nzchar(sub_rect)) sub_rect <- NULL
+            sub_rect <- blank_to_null(sub_rect)
 
             fig <- goFanPlot(
                 data = df,
@@ -93,11 +97,12 @@ goFanPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defa
 
             # Apply the generic (non-cartesian) plotly styling: title and export
             # config. Axis/legend/reference-line controls do not apply to a
-            # radial sunburst layout and are intentionally omitted.
+            # radial sunburst layout and are intentionally omitted, as are the
+            # shape-drawing modebar buttons, which need cartesian axes.
             fig <- VizModules::apply_title_layout(fig, input, isolate_fn, title_y = 0.95, title_x = 0.5)
             config_list <- add_plot_config(
                 download.format = isolate_fn(input$download.format),
-                include.modebar.buttons = TRUE, facet.by = NULL
+                include.modebar.buttons = FALSE, facet.by = NULL
             )
             fig <- do.call(config, c(list(p = fig), config_list))
             fig

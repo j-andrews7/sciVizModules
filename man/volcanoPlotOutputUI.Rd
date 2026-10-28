@@ -4,10 +4,14 @@
 \alias{volcanoPlotOutputUI}
 \title{Output UI components for the volcanoPlot module}
 \usage{
-volcanoPlotOutputUI(id)
+volcanoPlotOutputUI(id, resizable = TRUE)
 }
 \arguments{
 \item{id}{The ID for the Shiny module.}
+
+\item{resizable}{Logical, whether to wrap the output in a resizable
+container. Set \code{FALSE} when the output already sits in something that
+provides its own resize handle, such as a Figure Builder panel.}
 }
 \value{
 A Shiny plotlyOutput for the volcano plot

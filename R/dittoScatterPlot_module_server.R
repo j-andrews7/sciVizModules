@@ -31,6 +31,10 @@ dittoScatterPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
     data_reactive <- data
 
     moduleServer(id, function(input, output, session) {
+        # Resolve any reactive() entries in `defaults` server-side, so a parent
+        # app driving a parameter costs one render rather than a client round-trip.
+        params <- setup_reactive_defaults(defaults, input, session)
+
         ns <- session$ns
 
         hide_input(session, hide.inputs)
@@ -43,7 +47,7 @@ dittoScatterPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
         palette_groups <- reactive({
             obj <- data_reactive()
             color.var <- input$color.var
-            if (is.null(obj) || is.null(color.var) || !nzchar(color.var)) {
+            if (is.null(obj) || !nz_value(color.var)) {
                 return(character(0))
             }
             if (!color.var %in% .ditto_discrete_metas(obj)) {
@@ -52,12 +56,29 @@ dittoScatterPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
             .ditto_group_levels(obj, color.var)
         })
 
+        # The group-to-colour mapping the plot draws with. The picker is rebuilt
+        # by renderUI() whenever the group set changes, and the value it then
+        # reports is exactly what the server seeded it with -- reading the raw
+        # input would rebuild the plot for that echo, on load and again the first
+        # time the user opens the tab the picker lives on. See
+        # VizModules::setup_group_colors().
+        palette_store <- setup_group_colors(
+            input, "palette.colours", palette_groups,
+            default_palette_values, defaults, params
+        )
+
         output$palette.selection <- renderUI({
             groups <- palette_groups()
             if (length(groups) == 0) {
                 return(NULL)
             }
-            initial_colors <- isolate(resolve_palette(groups, input$palette.colours, default_palette_values))
+            initial_colors <- isolate(resolve_palette(
+                groups, input$palette.colours, default_palette_values,
+                default_group_colors(defaults, "palette.colours")
+            ))
+            # Seed the store with what the picker is built from, so its first
+            # report back is a no-op rather than a change.
+            palette_store(initial_colors)
             multiColorPicker(
                 ns("palette.colours"),
                 label = "Group Colors",
@@ -72,40 +93,49 @@ dittoScatterPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
         observeEvent(input$reset, {
             obj <- data_reactive()
             req(obj)
-            updateSelectInput(session, "color.var", selected = get_default(defaults, "color.var", ""))
-            updateSelectInput(session, "shape.by", selected = get_default(defaults, "shape.by", ""))
-            updateSelectInput(session, "split.by", selected = get_default(defaults, "split.by", ""))
-            updateSelectInput(session, "order", selected = get_default(defaults, "order", "unordered"))
+            update_viz_select(session, "color.var", selected = get_default(defaults, "color.var", ""))
+            update_viz_select(session, "shape.by", selected = get_default(defaults, "shape.by", ""))
+            update_viz_select(session, "split.by", selected = get_default(defaults, "split.by", ""))
+            update_viz_select(session, "order", selected = get_default(defaults, "order", "unordered"))
             updateNumericInput(session, "size", value = get_default(defaults, "size", 1))
             updateNumericInput(session, "opacity", value = get_default(defaults, "opacity", 1))
             updateMaterialSwitch(session, "do.label", value = get_default(defaults, "do.label", FALSE))
             updateNumericInput(session, "labels.size", value = get_default(defaults, "labels.size", 5))
             updateMaterialSwitch(session, "do.ellipse", value = get_default(defaults, "do.ellipse", FALSE))
             updateMaterialSwitch(session, "do.contour", value = get_default(defaults, "do.contour", FALSE))
+            reset_group_colors(session, "palette.colours", defaults, palette_groups(), default_palette_values)
             .ditto_reset_uniform(session, defaults)
         })
 
+        observeEvent(input$split.by, {
+            split.set <- nz_value(input$split.by)
+            toggle_facet_title_inputs(session, split.set, hidden = hide.inputs)
+        }, ignoreNULL = FALSE)
+
         generate_dittoScatterPlot <- reactive({
-            isolate_fn <- setup_auto_update_logic(input)
+            isolate_fn <- setup_auto_update_logic(input, params)
 
             obj <- data_reactive()
             req(obj)
 
             x.var <- isolate_fn(input$x.var)
             y.var <- isolate_fn(input$y.var)
-            req(x.var, nzchar(x.var), y.var, nzchar(y.var))
+            req(nz_value(x.var), nz_value(y.var))
 
             color.var <- isolate_fn(input$color.var)
-            if (is.null(color.var) || !nzchar(color.var)) color.var <- NULL
+            color.var <- blank_to_null(color.var)
             shape.by <- isolate_fn(input$shape.by)
-            if (is.null(shape.by) || !nzchar(shape.by)) shape.by <- NULL
+            shape.by <- blank_to_null(shape.by)
             split.by <- isolate_fn(input$split.by)
-            if (is.null(split.by) || !nzchar(split.by)) split.by <- NULL
+            split.by <- blank_to_null(split.by)
 
             groups <- isolate_fn(palette_groups())
             color.panel <- default_palette_values
             if (length(groups) > 0) {
-                palette_values <- resolve_palette(groups, isolate_fn(input$palette.colours), default_palette_values)
+                palette_values <- resolve_palette(
+                    groups, isolate_fn(palette_store()), default_palette_values,
+                    default_group_colors(defaults, "palette.colours")
+                )
                 color.panel <- unname(palette_values[groups])
             }
 
@@ -139,7 +169,7 @@ dittoScatterPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
             )
 
             fig <- plotly::ggplotly(gg)
-            .ditto_finalize_plotly(fig, input, isolate_fn)
+            .sci_finalize_plotly(fig, input, isolate_fn, faceted = !is.null(split.by))
         })
 
         output$dittoScatterPlot <- renderPlotly({

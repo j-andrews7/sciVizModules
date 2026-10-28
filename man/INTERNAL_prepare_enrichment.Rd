@@ -11,7 +11,9 @@
 }
 \value{
 A list with elements \code{data} (the augmented data frame) and \code{mapping}
-(a named list with \code{x}, \code{y}, \code{size}, and \code{fill} column names).
+(a named list with \code{x}, \code{y}, \code{size}, and \code{fill} column names, and
+\code{size.scale.min}: 0 when the size column is a ratio or count that cannot be
+negative, so dot area is proportional to it, else \code{NULL}).
 }
 \description{
 Augments an enrichment results table with a numeric \code{GeneRatio} column and a

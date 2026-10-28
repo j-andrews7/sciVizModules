@@ -31,6 +31,7 @@
 #' @importFrom GenomicRanges seqinfo mcols
 #' @importFrom Seqinfo seqnames
 #' @import VizModules
+#' @importFrom utils modifyList
 #'
 #' @export
 #'
@@ -106,7 +107,7 @@ cnSegmentPlotInputsUI <- function(id, seg, defaults = NULL,
             placement = "top", options = list(container = "body")
         ),
         tipify(
-            selectInput(ns("hover.text.cols"), "Hover Text Columns",
+            viz_select_input(ns("hover.text.cols"), "Hover Text Columns",
                 choices = hover.choices,
                 selected = get_default(defaults, "hover.text.cols", c("signal", "genes")),
                 multiple = TRUE
@@ -118,8 +119,8 @@ cnSegmentPlotInputsUI <- function(id, seg, defaults = NULL,
     if (!is.null(genes) && length(genes) > 0) {
         data.inputs <- c(data.inputs, list(
             tipify(
-                selectInput(ns("id.col"), "Gene Label Column",
-                    choices = id.col.choices, selected = default.id.col, selectize = FALSE
+                viz_select_input(ns("id.col"), "Gene Label Column",
+                    choices = id.col.choices, selected = default.id.col
                 ), "Metadata column in `genes` holding the label to display for each gene.",
                 placement = "top", options = list(container = "body")
             ),
@@ -215,9 +216,9 @@ cnSegmentPlotInputsUI <- function(id, seg, defaults = NULL,
                 placement = "top", options = list(container = "body")
             ),
             tipify(
-                selectInput(ns("centromere.linetype"), "Centromere Line Type",
+                viz_select_input(ns("centromere.linetype"), "Centromere Line Type",
                     choices = c("solid", "dashed", "dotted", "dotdash", "longdash", "twodash"),
-                    selected = get_default(defaults, "centromere.linetype", "dashed"), selectize = FALSE
+                    selected = get_default(defaults, "centromere.linetype", "dashed")
                 ),
                 "Line type of the centromere guide lines.",
                 placement = "top", options = list(container = "body")
@@ -237,9 +238,9 @@ cnSegmentPlotInputsUI <- function(id, seg, defaults = NULL,
                 placement = "top", options = list(container = "body")
             ),
             tipify(
-                selectInput(ns("border.linetype"), "Chromosome Border Type",
+                viz_select_input(ns("border.linetype"), "Chromosome Border Type",
                     choices = c("solid", "dashed", "dotted", "dotdash", "longdash", "twodash"),
-                    selected = get_default(defaults, "border.linetype", "solid"), selectize = FALSE
+                    selected = get_default(defaults, "border.linetype", "solid")
                 ),
                 "Line type of the chromosome boundary lines.",
                 placement = "top", options = list(container = "body")
@@ -262,9 +263,9 @@ cnSegmentPlotInputsUI <- function(id, seg, defaults = NULL,
                 placement = "top", options = list(container = "body")
             ),
             tipify(
-                selectInput(ns("gene.line.linetype"), "Gene Guide Line Type",
+                viz_select_input(ns("gene.line.linetype"), "Gene Guide Line Type",
                     choices = c("solid", "dashed", "dotted", "dotdash", "longdash", "twodash"),
-                    selected = get_default(defaults, "gene.line.linetype", "dotted"), selectize = FALSE
+                    selected = get_default(defaults, "gene.line.linetype", "dotted")
                 ),
                 "Line type of the gene guide lines.",
                 placement = "top", options = list(container = "body")

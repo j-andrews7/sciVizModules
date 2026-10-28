@@ -28,6 +28,7 @@
 #' @importFrom GenomicRanges mcols
 #' @importFrom stats complete.cases
 #' @import VizModules
+#' @importFrom utils modifyList
 #'
 #' @seealso [sciVizModules::cnSegmentPlot()],
 #' [sciVizModules::cnSegmentPlotInputsUI()],
@@ -70,6 +71,22 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
         seg_obj <- reactive(.cn_seg_as_list(data_reactive()))
         genes_obj <- reactive(.cn_seg_genes(seg_obj()))
 
+        # "Genes to Label" and "Plot Title" are free text, so they report on
+        # every keystroke; without this, typing a gene list redraws every panel
+        # once per character. See .sci_debounced_input().
+        label_genes_text <- .sci_debounced_input(input, "label.genes", params)
+        main_text <- .sci_debounced_input(input, "main", params)
+
+        # The y-limits are pushed back to the client by the reset handler, and
+        # the echo of a value the module itself set would otherwise rebuild the
+        # plot. Reading a server-side store instead makes that echo a no-op while
+        # a limit the user types comes straight through. No `headroom`: this
+        # module draws no significance brackets. See VizModules::setup_axis_range().
+        y_range_store <- setup_axis_range(
+            input, session,
+            min_key = "y.min", max_key = "y.max", params = params
+        )
+
         observeEvent(input$reset, {
             seg.list <- seg_obj()
             req(seg.list)
@@ -83,7 +100,7 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 choices = sample.choices, selected = get_default(defaults, "samples", sample.choices))
             update_viz_select(session, "to.plot",
                 choices = seq.choices, selected = get_default(defaults, "to.plot", character(0)))
-            updateSelectInput(session, "hover.text.cols",
+            update_viz_select(session, "hover.text.cols",
                 choices = hover.choices, selected = get_default(defaults, "hover.text.cols", c("signal", "genes")))
 
             genes <- genes_obj()
@@ -97,7 +114,7 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                     } else {
                         id.col.choices[1]
                     })
-                updateSelectInput(session, "id.col", choices = id.col.choices, selected = default.id.col)
+                update_viz_select(session, "id.col", choices = id.col.choices, selected = default.id.col)
                 updateTextInput(session, "label.genes", value = get_default(defaults, "label.genes", ""))
             }
 
@@ -116,23 +133,27 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 value = get_default(defaults, "centromere.color", "#B3B3B3"))
             updateNumericInput(session, "centromere.width",
                 value = get_default(defaults, "centromere.width", 0.3))
-            updateSelectInput(session, "centromere.linetype",
+            update_viz_select(session, "centromere.linetype",
                 selected = get_default(defaults, "centromere.linetype", "dashed"))
             updateColourInput(session, "border.color",
                 value = get_default(defaults, "border.color", "#000000"))
             updateNumericInput(session, "border.width",
                 value = get_default(defaults, "border.width", 0.3))
-            updateSelectInput(session, "border.linetype",
+            update_viz_select(session, "border.linetype",
                 selected = get_default(defaults, "border.linetype", "solid"))
             updateColourInput(session, "gene.line.color",
                 value = get_default(defaults, "gene.line.color", "#666666"))
             updateNumericInput(session, "gene.line.width",
                 value = get_default(defaults, "gene.line.width", 0.3))
-            updateSelectInput(session, "gene.line.linetype",
+            update_viz_select(session, "gene.line.linetype",
                 selected = get_default(defaults, "gene.line.linetype", "dotted"))
             updateNumericInput(session, "label.size", value = get_default(defaults, "label.size", 10))
-            updateNumericInput(session, "y.min", value = get_default(defaults, "y.min", NA))
-            updateNumericInput(session, "y.max", value = get_default(defaults, "y.max", NA))
+            y.min.default <- get_default(defaults, "y.min", NA)
+            y.max.default <- get_default(defaults, "y.max", NA)
+            # Seed the store beside the updates, so the client's echo is a no-op.
+            y_range_store(list(min = y.min.default, max = y.max.default))
+            updateNumericInput(session, "y.min", value = y.min.default)
+            updateNumericInput(session, "y.max", value = y.max.default)
             updateCheckboxInput(session, "free.y", value = get_default(defaults, "free.y", FALSE))
 
             reset_axes_inputs(session, defaults)
@@ -159,10 +180,11 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             if (is.null(hover.text.cols) || length(hover.text.cols) == 0) hover.text.cols <- "signal"
 
             id.col <- if (!is.null(input$id.col)) isolate_fn(input$id.col) else NULL
-            if (!is.null(id.col) && !nzchar(id.col)) id.col <- NULL
+            id.col <- blank_to_null(id.col)
 
             genes <- genes_obj()
-            label.genes <- if (!is.null(input$label.genes)) isolate_fn(input$label.genes) else ""
+            label.genes <- isolate_fn(label_genes_text())
+            if (is.null(label.genes)) label.genes <- ""
             genes.to.label <- .cn_seg_select_genes(genes, id.col, label.genes)
 
             color.limit.low <- isolate_fn(input$color.limit.low)
@@ -173,10 +195,11 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 c(color.limit.low, color.limit.high)
             }
 
-            y.min <- isolate_fn(input$y.min)
-            if (is.na(y.min)) y.min <- NULL
-            y.max <- isolate_fn(input$y.max)
-            if (is.na(y.max)) y.max <- NULL
+            y.range <- isolate_fn(y_range_store())
+            y.min <- y.range$min
+            if (is.null(y.min) || length(y.min) != 1 || is.na(y.min)) y.min <- NULL
+            y.max <- y.range$max
+            if (is.null(y.max) || length(y.max) != 1 || is.na(y.max)) y.max <- NULL
 
             fig <- cnSegmentPlot(
                 seg = seg.list,
@@ -215,7 +238,7 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 free.y = isTRUE(isolate_fn(input$free.y)),
                 y.min = y.min,
                 y.max = y.max,
-                main = isolate_fn(input$main)
+                main = isolate_fn(main_text())
             )
 
             fig <- apply_title_layout(
@@ -262,6 +285,7 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             )
 
             fig <- do.call(config, c(list(p = fig), config_list))
+            fig <- apply_plotly_newshape(fig, input, isolate_fn)
 
             # A stacked plot is multi-panel, so ggplotly already renders its
             # shared axis titles as annotations (which axis_titles_as_annotations()

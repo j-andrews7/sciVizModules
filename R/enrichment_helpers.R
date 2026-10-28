@@ -1,23 +1,3 @@
-#' Merge enrichment default mappings into a user-supplied defaults list
-#'
-#' User-supplied defaults take precedence over the auto-detected mappings.
-#'
-#' @param defaults A named list of user defaults (or `NULL`).
-#' @param mapping The mapping list produced by [.prepare_enrichment()].
-#' @return A named list of defaults keyed by DotPlot UI input IDs.
-#'
-#' @author Jacob Martin, Jared Andrews
-#' @rdname INTERNAL_enrich_defaults
-#' @keywords internal
-.enrich_defaults <- function(defaults, mapping) {
-    if (is.null(defaults)) defaults <- list()
-    if (!is.null(mapping$y) && is.null(defaults[["y.data"]])) defaults[["y.data"]] <- mapping$y
-    if (!is.null(mapping$x) && is.null(defaults[["x.data"]])) defaults[["x.data"]] <- mapping$x
-    if (!is.null(mapping$size) && is.null(defaults[["size.by"]])) defaults[["size.by"]] <- mapping$size
-    if (!is.null(mapping$fill) && is.null(defaults[["fill.by"]])) defaults[["fill.by"]] <- mapping$fill
-    defaults
-}
-
 #' Detect a column by matching a list of candidate names
 #'
 #' Shared column-detection primitive used by the GO enrichment sunburst

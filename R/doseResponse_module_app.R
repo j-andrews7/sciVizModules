@@ -6,12 +6,15 @@
 #' plot tabs and inputs are hidden.
 #'
 #' When `data_list` is not provided, the app launches with the bundled
-#' [dose_response] example data.
+#' [dose_response] example data, on the settings the module gallery
+#' ([sciModuleGalleryApp()]) opens this module on.
 #'
 #' @param data_list An optional named list of dose-response data frames. If
 #'   `NULL` (the default), `list("dose_response" = dose_response)` is used.
 #' @param defaults A named list of default values, merged over the module's
-#'   dose-response defaults (user values win).
+#'   dose-response defaults (user values win) and, with the example data, over
+#'   the gallery's settings.
+#' @inheritParams volcanoPlotApp
 #' @return A Shiny app object.
 #'
 #' @importFrom VizModules createModuleApp
@@ -27,9 +30,11 @@
 #' # Launch with the bundled example dose-response data:
 #' app <- doseResponseApp()
 #' if (interactive()) shiny::runApp(app)
-doseResponseApp <- function(data_list = NULL, defaults = NULL) {
+doseResponseApp <- function(data_list = NULL, defaults = NULL, hide.inputs = NULL, hide.tabs = NULL) {
     if (is.null(data_list)) {
-        data_list <- list("dose_response" = dose_response)
+        example <- .sci_module_example("dose", defaults)
+        data_list <- example$data_list
+        defaults <- example$defaults
     }
 
     stopifnot(is.list(data_list), length(data_list) >= 1)
@@ -43,6 +48,8 @@ doseResponseApp <- function(data_list = NULL, defaults = NULL) {
         server_fn    = doseResponseServer,
         data_list    = data_list,
         defaults     = defaults,
+        hide.inputs  = hide.inputs,
+        hide.tabs    = hide.tabs,
         title        = "Modular Dose-Response Curves"
     )
 }

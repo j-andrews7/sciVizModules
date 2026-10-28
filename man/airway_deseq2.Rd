@@ -29,7 +29,7 @@ A dataset containing differential expression results from comparing treated vs u
 samples in the airway dataset using DESeq2.
 }
 \examples{
-library(VizModules)
+data(airway_deseq2)
 head(airway_deseq2)
 
 }

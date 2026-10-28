@@ -85,29 +85,29 @@ dittoScatterPlotInputsUI <- function(id, data, defaults = NULL, title = "Scatter
 
     inputs <- list(
         "Data" = tagList(
-            tipify(selectInput(ns("x.var"), "X Variable",
+            tipify(viz_select_input(ns("x.var"), "X Variable",
                 choices = cont.choices,
-                selected = default.x, selectize = FALSE
+                selected = default.x
             ), documentParameters$x.var,
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("y.var"), "Y Variable",
+            tipify(viz_select_input(ns("y.var"), "Y Variable",
                 choices = cont.choices,
-                selected = default.y, selectize = FALSE
+                selected = default.y
             ), documentParameters$y.var,
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("color.var"), "Color By",
+            tipify(viz_select_input(ns("color.var"), "Color By",
                 choices = var.choices,
-                selected = get_default(defaults, "color.var", ""), selectize = FALSE
+                selected = get_default(defaults, "color.var", "")
             ), documentParameters$color.var,
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("shape.by"), "Shape By",
+            tipify(viz_select_input(ns("shape.by"), "Shape By",
                 choices = disc.choices,
-                selected = get_default(defaults, "shape.by", ""), selectize = FALSE
+                selected = get_default(defaults, "shape.by", "")
             ), documentParameters$shape.by,
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("split.by"), "Split By (facet)",
+            tipify(viz_select_input(ns("split.by"), "Split By (facet)",
                 choices = disc.choices,
-                selected = get_default(defaults, "split.by", ""), selectize = FALSE
+                selected = get_default(defaults, "split.by", "")
             ), documentParameters$split.by,
                 placement = "top", options = list(container = "body"))
         ),
@@ -121,9 +121,9 @@ dittoScatterPlotInputsUI <- function(id, data, defaults = NULL, title = "Scatter
                 value = get_default(defaults, "max.color", "#0072B2")),
                 documentParameters$max.color,
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("order"), "Point Order",
+            tipify(viz_select_input(ns("order"), "Point Order",
                 choices = c("unordered", "increasing", "decreasing", "randomize"),
-                selected = get_default(defaults, "order", "unordered"), selectize = FALSE
+                selected = get_default(defaults, "order", "unordered")
             ), documentParameters$order,
                 placement = "top", options = list(container = "body")),
             tipify(numericInput(ns("size"), "Point Size",

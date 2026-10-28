@@ -33,6 +33,8 @@
 #' - `x.data` - A grouping column (e.g. `Cluster`) or a constant
 #'   `Group` column when none is present
 #' - `size.by` - `GeneRatio` (or another detected ratio column)
+#' - `size.scale.min` - 0 when that column is a ratio or count (never negative), so dot area is
+#'   proportional to it and the size legend starts at 0; a signed score such as NES keeps its range
 #' - `fill.by` - `neg_log10_pvalue`
 #'
 #' All other [plotthis::DotPlot()] parameters remain available via the wrapped UI.

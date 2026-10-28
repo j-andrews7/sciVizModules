@@ -4,12 +4,27 @@
 \alias{survivalCurveApp}
 \title{Create a standalone Shiny app for the survivalCurve module}
 \usage{
-survivalCurveApp(data_list = NULL)
+survivalCurveApp(
+  data_list = NULL,
+  defaults = NULL,
+  hide.inputs = NULL,
+  hide.tabs = NULL
+)
 }
 \arguments{
 \item{data_list}{An optional named list of data frames. If \code{NULL} (the default),
 \code{list("survival_lung" = survival_lung)} is used as example data. Each data frame
 must contain a numeric follow-up time column and an event/status column.}
+
+\item{defaults}{A named list of input IDs and their default values to apply on
+startup. With the example data, they are applied over the settings the module
+gallery opens the module on, a key given here replacing its showcase value.}
+
+\item{hide.inputs}{A character vector of input IDs to hide. Their values are still
+initialized and used, but the controls are not shown in the UI.}
+
+\item{hide.tabs}{A character vector of tab names to hide. Inputs in these tabs are
+still initialized and used. \code{NULL} (the default) keeps the module's own default.}
 }
 \value{
 A Shiny app object.
@@ -22,7 +37,9 @@ for configuring and displaying an interactive Kaplan-Meier survival curve.
 }
 \details{
 When \code{data_list} is not provided (or \code{NULL}), the app launches with
-\code{survival_lung} as an example dataset. Uploaded files are added to the
+\code{survival_lung} as an example dataset, on the settings the module gallery
+(\code{\link[=sciModuleGalleryApp]{sciModuleGalleryApp()}}) opens this module on: curves grouped by \code{sex}, with
+median survival marked and a risk table. Uploaded files are added to the
 available datasets and can be selected for plotting.
 
 This is a convenience wrapper around \code{\link[VizModules:createModuleApp]{VizModules::createModuleApp()}}.

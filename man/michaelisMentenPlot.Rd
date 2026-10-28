@@ -67,6 +67,7 @@ Draws the observed reaction velocities against substrate concentration and
 overlays a pre-computed fitted Michaelis-Menten curve (\code{mml}).
 }
 \examples{
+data(mm_kinetics)
 if (requireNamespace("drc", quietly = TRUE)) {
     library(drc)
     mm_model <- drm(v ~ S, data = mm_kinetics, fct = MM.2())

@@ -5,6 +5,7 @@
 #'   or `Seurat` object, otherwise `FALSE`.
 #'
 #' @importFrom methods is
+#' @importClassesFrom SingleCellExperiment SingleCellExperiment
 #' @author Jacob Martin, Jared Andrews
 #' @rdname INTERNAL_is_ditto_object
 #' @keywords internal
@@ -128,18 +129,22 @@ get_default_reduction <- function(object) {
 
 #' Identify discrete metadata columns in a dittoSeq object
 #'
-#' Metadata are treated as discrete when they are factors, characters, logicals,
-#' or numeric columns with a small number of unique values (<= `max.levels`).
+#' Metadata are treated as discrete when they are logicals, numeric columns
+#' with a small number of unique values (<= `max.levels`), or factors and
+#' characters with fewer than `max.categories` levels. A character column of
+#' cell barcodes is left out, since it would ask for one colour per cell.
 #'
 #' @param object A dittoSeq-compatible object.
 #' @param max.levels Maximum number of unique values for a numeric column to be
 #'   treated as discrete.
+#' @param max.categories Factor and character columns with this many or more
+#'   levels are left out. Passed to [VizModules::facet_check()].
 #' @return A character vector of discrete metadata names.
 #'
 #' @author Jacob Martin, Jared Andrews
 #' @rdname INTERNAL_ditto_discrete_metas
 #' @keywords internal
-.ditto_discrete_metas <- function(object, max.levels = 30) {
+.ditto_discrete_metas <- function(object, max.levels = 30, max.categories = 50) {
     metas <- .ditto_metas(object)
     if (length(metas) == 0) {
         return(character(0))
@@ -149,8 +154,10 @@ get_default_reduction <- function(object) {
         if (is.null(vals)) {
             return(FALSE)
         }
-        is.factor(vals) || is.character(vals) || is.logical(vals) ||
-            length(unique(stats::na.omit(vals))) <= max.levels
+        if (is.factor(vals) || is.character(vals)) {
+            return(length(facet_check(data.frame(v = vals), max.categories)) > 0)
+        }
+        is.logical(vals) || length(unique(stats::na.omit(vals))) <= max.levels
     }, logical(1))
     metas[keep]
 }
@@ -184,13 +191,15 @@ get_default_reduction <- function(object) {
 #'
 #' @param object A dittoSeq-compatible object.
 #' @param include.blank Whether to prepend an empty choice.
-#' @return A named character vector suitable for `selectInput()` choices.
+#' @return A named character vector suitable for `VizModules::viz_select_input()` choices.
 #'
 #' @author Jacob Martin, Jared Andrews
 #' @rdname INTERNAL_ditto_var_choices
 #' @keywords internal
 .ditto_var_choices <- function(object, include.blank = TRUE) {
+    # Discrete metadata with too many levels to colour by are left out.
     metas <- .ditto_metas(object)
+    metas <- metas[metas %in% c(.ditto_discrete_metas(object), .ditto_continuous_metas(object))]
     genes <- .ditto_genes(object)
     choices <- list()
     if (length(metas) > 0) choices[["Metadata"]] <- metas
@@ -205,7 +214,7 @@ get_default_reduction <- function(object) {
 #'
 #' @param object A dittoSeq-compatible object.
 #' @param include.blank Whether to prepend an empty choice.
-#' @return A named character vector suitable for `selectInput()` choices.
+#' @return A named character vector suitable for `VizModules::viz_select_input()` choices.
 #'
 #' @author Jacob Martin, Jared Andrews
 #' @rdname INTERNAL_ditto_continuous_choices
@@ -267,75 +276,6 @@ get_default_reduction <- function(object) {
         lv <- levels(as.factor(as.character(vals)))
     }
     as.character(lv)
-}
-
-#' Apply the shared VizModules plotly styling stack to a dittoSeq figure
-#'
-#' Applies the title, axis, legend, reference-line, config, and annotation
-#' post-processing used across the sciVizModules dittoSeq modules so that the
-#' plotly figure produced from a `dittoSeq` `ggplot` respects the module's UI
-#' controls. Mirrors the styling stack used by [survivalCurveServer()].
-#'
-#' @param fig A `plotly` figure (typically from [plotly::ggplotly()]).
-#' @param input The Shiny module `input` object.
-#' @param isolate_fn The isolation helper returned by
-#'   [VizModules::setup_auto_update_logic()].
-#' @return The styled `plotly` figure.
-#'
-#' @import plotly
-#' @author Jacob Martin, Jared Andrews
-#' @rdname INTERNAL_ditto_finalize_plotly
-#' @keywords internal
-.ditto_finalize_plotly <- function(fig, input, isolate_fn) {
-    fig <- VizModules::apply_title_layout(
-        fig, input, isolate_fn,
-        title_y = 0.95,
-        title_x = isolate_fn(input$axis.title.horizontal.position)
-    )
-    xaxis_style <- VizModules::create_axis_styles(
-        input,
-        axis_side = "x", isolate_fn = isolate_fn, ggplot.axis.styling = FALSE
-    )
-    yaxis_style <- VizModules::create_axis_styles(
-        input,
-        axis_side = "y", isolate_fn = isolate_fn, ggplot.axis.styling = FALSE
-    )
-    fig <- VizModules::apply_subplot_axis_styling(fig, xaxis_style, yaxis_style)
-
-    fig <- VizModules::add_reference_lines(fig,
-        hline.intercepts = isolate_fn(input$hline.intercepts),
-        hline.colors = isolate_fn(input$hline.colors),
-        hline.widths = isolate_fn(input$hline.widths),
-        hline.linetypes = isolate_fn(input$hline.linetypes),
-        hline.opacities = isolate_fn(input$hline.opacities),
-        vline.intercepts = isolate_fn(input$vline.intercepts),
-        vline.colors = isolate_fn(input$vline.colors),
-        vline.widths = isolate_fn(input$vline.widths),
-        vline.linetypes = isolate_fn(input$vline.linetypes),
-        vline.opacities = isolate_fn(input$vline.opacities),
-        abline.slopes = isolate_fn(input$abline.slopes),
-        abline.intercepts = isolate_fn(input$abline.intercepts),
-        abline.colors = isolate_fn(input$abline.colors),
-        abline.widths = isolate_fn(input$abline.widths),
-        abline.linetypes = isolate_fn(input$abline.linetypes),
-        abline.opacities = isolate_fn(input$abline.opacities)
-    )
-
-    config_list <- add_plot_config(
-        download.format = isolate_fn(input$download.format),
-        include.modebar.buttons = TRUE, facet.by = NULL
-    )
-    fig <- do.call(config, c(list(p = fig), config_list))
-    fig <- apply_plotly_newshape(fig, input, isolate_fn)
-
-    fig <- apply_legend_styling(
-        fig,
-        title.size = isolate_fn(input$legend.title.size),
-        text.size = isolate_fn(input$legend.text.size),
-        position = c(1.02, "left", "v")
-    )
-    fig <- axis_titles_as_annotations(fig)
-    fig
 }
 
 #' Build the module reset handler shared by dittoSeq modules

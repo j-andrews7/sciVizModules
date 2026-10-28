@@ -31,6 +31,10 @@ dittoDimHexServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, de
     data_reactive <- data
 
     moduleServer(id, function(input, output, session) {
+        # Resolve any reactive() entries in `defaults` server-side, so a parent
+        # app driving a parameter costs one render rather than a client round-trip.
+        params <- setup_reactive_defaults(defaults, input, session)
+
         hide_input(session, hide.inputs)
         if (!is.null(hide.tabs)) {
             for (tab.name in hide.tabs) hideTab(inputId = "dittoDimHexTabsetPanel", target = tab.name)
@@ -38,17 +42,22 @@ dittoDimHexServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, de
 
         default_palette_values <- default_palettes()[["choices"]][["Defaults"]][["dittoColors"]]
 
+        # "Color Method" is free text naming a summary function, so it reports on
+        # every keystroke; without this the plot rebinds and redraws the hexes
+        # once per character. See .sci_debounced_input().
+        color_method_text <- .sci_debounced_input(input, "color.method", params)
+
         observeEvent(input$reset, {
             obj <- data_reactive()
             req(obj)
-            updateSelectInput(session, "color.var", selected = get_default(defaults, "color.var", ""))
-            updateSelectInput(session, "reduction.use",
+            update_viz_select(session, "color.var", selected = get_default(defaults, "color.var", ""))
+            update_viz_select(session, "reduction.use",
                 selected = get_default(defaults, "reduction.use", get_default_reduction(obj)))
             updateNumericInput(session, "dim.1", value = get_default(defaults, "dim.1", 1))
             updateNumericInput(session, "dim.2", value = get_default(defaults, "dim.2", 2))
             updateNumericInput(session, "bins", value = get_default(defaults, "bins", 30))
             updateTextInput(session, "color.method", value = get_default(defaults, "color.method", ""))
-            updateSelectInput(session, "split.by", selected = get_default(defaults, "split.by", ""))
+            update_viz_select(session, "split.by", selected = get_default(defaults, "split.by", ""))
             updateNumericInput(session, "min.opacity", value = get_default(defaults, "min.opacity", 0.2))
             updateNumericInput(session, "max.opacity", value = get_default(defaults, "max.opacity", 1))
             updateMaterialSwitch(session, "do.contour", value = get_default(defaults, "do.contour", FALSE))
@@ -58,23 +67,28 @@ dittoDimHexServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, de
             .ditto_reset_uniform(session, defaults)
         })
 
+        observeEvent(input$split.by, {
+            split.set <- nz_value(input$split.by)
+            toggle_facet_title_inputs(session, split.set, hidden = hide.inputs)
+        }, ignoreNULL = FALSE)
+
         generate_dittoDimHex <- reactive({
-            isolate_fn <- setup_auto_update_logic(input)
+            isolate_fn <- setup_auto_update_logic(input, params)
 
             obj <- data_reactive()
             req(obj)
 
             reduction.use <- isolate_fn(input$reduction.use)
-            req(reduction.use, nzchar(reduction.use))
+            req(nz_value(reduction.use))
 
             color.var <- isolate_fn(input$color.var)
-            if (is.null(color.var) || !nzchar(color.var)) color.var <- NULL
+            color.var <- blank_to_null(color.var)
 
-            color.method <- isolate_fn(input$color.method)
-            if (is.null(color.method) || !nzchar(color.method)) color.method <- NULL
+            color.method <- isolate_fn(color_method_text())
+            color.method <- blank_to_null(color.method)
 
             split.by <- isolate_fn(input$split.by)
-            if (is.null(split.by) || !nzchar(split.by)) split.by <- NULL
+            split.by <- blank_to_null(split.by)
 
             # Making theme arguments for uniform aesthetic
             additional_theme <- create_ggplot_axis_style(input, isolate_fn = isolate_fn)
@@ -107,7 +121,7 @@ dittoDimHexServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, de
             )
 
             fig <- plotly::ggplotly(gg)
-            .ditto_finalize_plotly(fig, input, isolate_fn)
+            .sci_finalize_plotly(fig, input, isolate_fn, faceted = !is.null(split.by))
         })
 
         output$dittoDimHex <- renderPlotly({

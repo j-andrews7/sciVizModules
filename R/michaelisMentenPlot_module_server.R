@@ -71,16 +71,16 @@ michaelisMentenServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL
             num.choices <- names(df)[vapply(df, is.numeric, logical(1))]
             if (length(num.choices) == 0) num.choices <- col.choices
 
-            updateSelectInput(session, "x",
+            update_viz_select(session, "x",
                 selected = get_default(defaults, "x", if ("S" %in% col.choices) "S" else num.choices[1]))
-            updateSelectInput(session, "y",
+            update_viz_select(session, "y",
                 selected = get_default(defaults, "y", if ("v" %in% col.choices) "v" else num.choices[min(2, length(num.choices))]))
             updateMaterialSwitch(session, "jitter", value = get_default(defaults, "jitter", TRUE))
             updateNumericInput(session, "jitter_size", value = get_default(defaults, "jitter_size", 1.5))
             colourpicker::updateColourInput(session, "jitter_color", value = get_default(defaults, "jitter_color", "#000000"))
             updateSliderInput(session, "jitter_alpha", value = get_default(defaults, "jitter_alpha", 1.0))
             colourpicker::updateColourInput(session, "line_color", value = get_default(defaults, "line_color", "#FF0000"))
-            updateSelectInput(session, "linetype", selected = get_default(defaults, "linetype", "solid"))
+            update_viz_select(session, "linetype", selected = get_default(defaults, "linetype", "solid"))
             updateMaterialSwitch(session, "show_stats", value = get_default(defaults, "show_stats", TRUE))
             reset_plotly_inputs(session, defaults)
             reset_axes_inputs(session, defaults)
@@ -96,7 +96,7 @@ michaelisMentenServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL
 
             x <- isolate_fn(input$x)
             y <- isolate_fn(input$y)
-            req(x, nzchar(x), y, nzchar(y))
+            req(nz_value(x), nz_value(y))
             req(x %in% names(df), y %in% names(df))
             req(x %in% names(mml), y %in% names(mml))
 
@@ -108,7 +108,9 @@ michaelisMentenServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL
                 axis.ticks = additional_theme$axis.ticks,
                 strip.background = element_blank()
             )
-            gg <- michaelisMentenPlot(
+            # ggplot2 draws a jitter layer's seed when the layer is created, so build under
+            # a fixed one or the points jump to new positions on every rebuild.
+            gg <- with_stable_seed(michaelisMentenPlot(
                 data = df,
                 model = mml,
                 x = x,
@@ -120,7 +122,7 @@ michaelisMentenServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL
                 jitter_alpha = isolate_fn(input$jitter_alpha),
                 line_color = isolate_fn(input$line_color),
                 linetype = isolate_fn(input$linetype)
-            )
+            ))
 
             fig <- plotly::ggplotly(gg)
 
@@ -187,6 +189,7 @@ michaelisMentenServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL
                 include.modebar.buttons = TRUE, facet.by = NULL
             )
             fig <- do.call(config, c(list(p = fig), config_list))
+            fig <- apply_plotly_newshape(fig, input, isolate_fn)
             fig <- axis_titles_as_annotations(fig)
             fig
         })

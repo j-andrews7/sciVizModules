@@ -18,6 +18,7 @@
 #'
 #' @examples
 #' library(sciVizModules)
+#' data(dose_response)
 #' doseResponseInputsUI("dose", dose_response)
 #' @export
 #' @author Jacob Martin

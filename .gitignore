@@ -53,3 +53,9 @@ rsconnect/
 
 # R app history
 .Rapp.history
+
+# Stray base-graphics device output
+Rplots.pdf
+
+# Installed skills and such for VizModules
+.claude/

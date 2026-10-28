@@ -8,7 +8,7 @@ maPlotServer(
   id,
   data,
   hide.inputs = NULL,
-  hide.tabs = c("Trajectory", "Facet", "Colors", "Legend/Scale"),
+  hide.tabs = c("Trajectory", "Facet"),
   defaults = NULL
 )
 }
@@ -19,12 +19,17 @@ maPlotServer(
 Must contain a mean abundance (e.g., baseMean, logCPM, AveExpr), effect size
 (e.g., log2FoldChange, logFC), and significance (e.g., padj, FDR) columns.}
 
-\item{hide.inputs}{A character vector of input IDs to hide.}
+\item{hide.inputs}{A character vector of input IDs to hide. The continuous
+colour-scale and contour controls are always hidden, since an MA plot
+colours by the discrete \code{group} column.}
 
-\item{hide.tabs}{A character vector of tab names to hide. Default hides: "Trajectory", "Facet", "Colors", "Legend/Scale".}
+\item{hide.tabs}{A character vector of tab names to hide. Default hides:
+"Trajectory" and "Facet".}
 
 \item{defaults}{A named list of default values. Merged over the module's
-MA defaults (user values win) and used to restore state on reset.}
+MA defaults (user values win) and used to restore state on reset.
+Group colours are set with \code{color.up} / \code{color.down} / \code{color.ns}, or
+directly with a named \code{color.panel} vector.}
 }
 \value{
 The \code{moduleServer} function for the maPlot module.

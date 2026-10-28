@@ -63,6 +63,8 @@ The following defaults are selected automatically (any value supplied via
 \item \code{x.data} - A grouping column (e.g. \code{Cluster}) or a constant
 \code{Group} column when none is present
 \item \code{size.by} - \code{GeneRatio} (or another detected ratio column)
+\item \code{size.scale.min} - 0 when that column is a ratio or count (never negative), so dot area is
+proportional to it and the size legend starts at 0; a signed score such as NES keeps its range
 \item \code{fill.by} - \code{neg_log10_pvalue}
 }
 

@@ -6,15 +6,17 @@
 #' for configuring and displaying an interactive MA plot.
 #'
 #' When `data_list` is not provided (or `NULL`), the app launches with
-#' `airway_deseq2` as an example dataset. Uploaded Excel files are added
-#' to the available datasets and can be selected for plotting. If an uploaded
-#' file shares a name with an existing dataset, the existing one is overwritten
-#' with a warning.
+#' `airway_deseq2` as an example dataset, on the settings the module gallery
+#' ([sciModuleGalleryApp()]) opens this module on. Uploaded Excel files are
+#' added to the available datasets and can be selected for plotting. If an
+#' uploaded file shares a name with an existing dataset, the existing one is
+#' overwritten with a warning.
 #'
 #' @param data_list An optional named list of data frames. If `NULL` (the default),
 #'   `list("airway_deseq2" = airway_deseq2)` is used as example data. Each data frame
 #'   must contain a mean abundance (e.g., baseMean), effect size (e.g., log2FoldChange),
 #'   and significance (e.g., padj) columns.
+#' @inheritParams volcanoPlotApp
 #' @return A Shiny app object.
 #'
 #' @import shiny
@@ -36,10 +38,12 @@
 #' data(airway_deseq2)
 #' app2 <- maPlotApp(list("airway" = airway_deseq2))
 #' if (interactive()) runApp(app2)
-maPlotApp <- function(data_list = NULL) {
+maPlotApp <- function(data_list = NULL, defaults = NULL, hide.inputs = NULL, hide.tabs = NULL) {
     # Use default example data when none is provided
     if (is.null(data_list)) {
-        data_list <- list("airway_deseq2" = airway_deseq2)
+        example <- .sci_module_example("ma", defaults)
+        data_list <- example$data_list
+        defaults <- example$defaults
     }
 
     # Validate input
@@ -126,12 +130,13 @@ maPlotApp <- function(data_list = NULL) {
         output$plot_inputs_ui <- renderUI({
             req(rv$datasets[[input$plot_select]])
             maPlotInputsUI("active_plot", rv$datasets[[input$plot_select]],
+                defaults = defaults,
                 title = h3(paste(input$plot_select, "Settings"))
             )
         })
 
         # ---- Plot Module ----
-        maPlotServer("active_plot", data = filtered_data)
+        do.call(maPlotServer, .sci_server_args("active_plot", filtered_data, defaults, hide.inputs, hide.tabs))
     }
     shinyApp(ui, server)
 }

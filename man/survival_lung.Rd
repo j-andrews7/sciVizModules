@@ -29,7 +29,7 @@ A lightly cleaned version of the NCCTG lung cancer dataset from the
 an event indicator, and a couple of grouping variables.
 }
 \examples{
-library(sciVizModules)
+data(survival_lung)
 head(survival_lung)
 
 }

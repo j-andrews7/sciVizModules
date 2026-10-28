@@ -4,13 +4,28 @@
 \alias{goFanPlotApp}
 \title{Create a standalone Shiny app for the goFanPlot module}
 \usage{
-goFanPlotApp(data_list = NULL)
+goFanPlotApp(
+  data_list = NULL,
+  defaults = NULL,
+  hide.inputs = NULL,
+  hide.tabs = NULL
+)
 }
 \arguments{
 \item{data_list}{An optional named list of enrichment results data frames. If
 \code{NULL} (the default), \code{list("example_enrichment" = example_enrichment)} is
 used as example data. Each data frame should contain a column of GO
 identifiers and a numeric column (e.g. \code{qvalue}) to colour by.}
+
+\item{defaults}{A named list of input IDs and their default values to apply on
+startup. With the example data, they are applied over the settings the module
+gallery opens the module on, a key given here replacing its showcase value.}
+
+\item{hide.inputs}{A character vector of input IDs to hide. Their values are still
+initialized and used, but the controls are not shown in the UI.}
+
+\item{hide.tabs}{A character vector of tab names to hide. Inputs in these tabs are
+still initialized and used. \code{NULL} (the default) keeps the module's own default.}
 }
 \value{
 A Shiny app object.
@@ -24,8 +39,9 @@ plot built on \code{\link[GOfan:sunburstGO]{GOfan::sunburstGO()}}.
 }
 \details{
 When \code{data_list} is not provided (or \code{NULL}), the app launches with the
-bundled \code{example_enrichment} dataset. Uploaded files are added to the
-available datasets and can be selected for plotting. If an uploaded file
+bundled \code{example_enrichment} dataset, on the settings the module gallery
+(\code{\link[=sciModuleGalleryApp]{sciModuleGalleryApp()}}) opens this module on. Uploaded files are added to
+the available datasets and can be selected for plotting. If an uploaded file
 shares a name with an existing dataset, the existing one is overwritten with
 a warning.
 

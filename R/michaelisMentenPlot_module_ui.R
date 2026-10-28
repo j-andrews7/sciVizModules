@@ -30,6 +30,7 @@
 #' [sciVizModules::michaelisMentenServer()], [sciVizModules::michaelisMentenApp()]
 #' @examples
 #' library(sciVizModules)
+#' data(mm_kinetics)
 #' michaelisMentenInputsUI("mm", mm_kinetics)
 michaelisMentenInputsUI <- function(id, data, defaults = NULL,
                                     title = "Michaelis-Menten Settings", columns = 2) {
@@ -56,12 +57,12 @@ michaelisMentenInputsUI <- function(id, data, defaults = NULL,
 
     inputs <- list(
         "Data" = tagList(
-            tipify(selectInput(ns("x"), "X Column",
-                choices = col.choices, selected = default.x, selectize = FALSE
+            tipify(viz_select_input(ns("x"), "X Column",
+                choices = col.choices, selected = default.x
             ), "Column plotted on the x-axis (substrate concentration).",
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("y"), "Y Column",
-                choices = col.choices, selected = default.y, selectize = FALSE
+            tipify(viz_select_input(ns("y"), "Y Column",
+                choices = col.choices, selected = default.y
             ), "Column plotted on the y-axis (velocity).",
                 placement = "top", options = list(container = "body")),
             tipify(materialSwitch(ns("show_stats"), "Annotate K / Vmax",
@@ -91,9 +92,9 @@ michaelisMentenInputsUI <- function(id, data, defaults = NULL,
                 value = get_default(defaults, "line_color", "#FF0000")),
                 "Colour of the fitted Michaelis-Menten curve.",
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("linetype"), "Line Type",
+            tipify(viz_select_input(ns("linetype"), "Line Type",
                 choices = linetype.choices,
-                selected = get_default(defaults, "linetype", "solid"), selectize = FALSE
+                selected = get_default(defaults, "linetype", "solid")
             ), "Line style of the fitted curve.",
                 placement = "top", options = list(container = "body"))
         ),

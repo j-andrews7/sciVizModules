@@ -81,32 +81,32 @@ dittoFreqPlotInputsUI <- function(id, data, defaults = NULL, title = "FreqPlot S
 
     inputs <- list(
         "Data" = tagList(
-            tipify(selectInput(ns("var"), "Variable",
+            tipify(viz_select_input(ns("var"), "Variable",
                 choices = var.choices,
-                selected = default.var, selectize = FALSE
+                selected = default.var
             ), documentParameters$var,
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("sample.by"), "Sample By",
+            tipify(viz_select_input(ns("sample.by"), "Sample By",
                 choices = sample.choices,
-                selected = get_default(defaults, "sample.by", ""), selectize = FALSE
+                selected = get_default(defaults, "sample.by", "")
             ), documentParameters$sample.by,
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("group.by"), "Group By",
+            tipify(viz_select_input(ns("group.by"), "Group By",
                 choices = group.choices,
-                selected = default.group, selectize = FALSE
+                selected = default.group
             ), documentParameters$group.by,
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("color.by"), "Color By",
+            tipify(viz_select_input(ns("color.by"), "Color By",
                 choices = color.choices,
-                selected = get_default(defaults, "color.by", ""), selectize = FALSE
+                selected = get_default(defaults, "color.by", "")
             ), documentParameters$color.by,
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(ns("scale"), "Scale",
+            tipify(viz_select_input(ns("scale"), "Scale",
                 choices = c("Percent" = "percent", "Count" = "count"),
-                selected = get_default(defaults, "scale", "percent"), selectize = FALSE
+                selected = get_default(defaults, "scale", "percent")
             ), documentParameters$scale,
                 placement = "top", options = list(container = "body")),
-            tipify(selectInput(
+            tipify(viz_select_input(
                 ns("plots"),
                 "Plots",
                 choices = c("Violin" = "vlnplot", "Box" = "boxplot", "Jitter" = "jitter", "Ridge" = "ridgeplot"),
@@ -114,7 +114,7 @@ dittoFreqPlotInputsUI <- function(id, data, defaults = NULL, title = "FreqPlot S
                     defaults, "plots", c("boxplot", "jitter"),
                     function(x) all(x %in% c("vlnplot", "boxplot", "jitter", "ridgeplot"))
                 ),
-                multiple = TRUE, selectize = TRUE
+                multiple = TRUE
                 ), documentParameters$plots, placement = "top", options = list(container = "body")),
                 helpText("Order not currently respected")
         ),
