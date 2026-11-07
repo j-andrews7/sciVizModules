@@ -78,14 +78,36 @@ server, input layout and app scaffolding through
 [`.sci_plot_inputs_ui()`](https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_sci_plot_inputs_ui.md)
 and
 [`.sci_object_app()`](https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_sci_object_app.md)
-in `R/module_helpers.R`; a new module of that kind should too.
+in `R/module_helpers.R`; a new module of that kind should too. Every
+module that builds its own plotly figure, whether through
+[`.sci_plot_server()`](https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_sci_plot_server.md)
+or by hand, works in two steps, so a styling change never redraws the
+plot and reaches the browser as a layout-only update: a draw function of
+`isolate_fn` handed to `cached_structure()`, then a `generate_*`
+reactive that styles the cached figure (tests read `generate_*` by
+name). It renders through
+[`.sci_render_plotly()`](https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_sci_render_plotly.md),
+which ends in `finalize_manual_edits()`, wired with
+`setup_manual_edits()` and `reset_manual_edits()` in Reset. Three rules
+keep the cache honest, and breaking one draws a stale plot rather than
+failing: read every input as the literal `isolate_fn(input$key)`, name
+every other reactive the draw function reads in `extra`
+([`.sci_plot_server()`](https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_sci_plot_server.md)
+does this for everything in `state`, so a reactive `build` reads goes in
+`state`, as `mutationLollipop`‘s `domains` does; one that only derives
+from `data` needs no entry), and give it no side effects, returning
+anything else the module needs in its list. Inputs that style the figure
+go after the cache, in `generate_*`, unless they feed the ggplot theme,
+as the ditto modules’ axis lines do.
+`tests/testthat/test-render-pipeline.R` holds every module to this, so a
+new one adds a case there.
 [`.sci_finalize_plotly()`](https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_sci_finalize_plotly.md)
-(`R/plotly_helpers.R`) applies the uniform Axes/Legend/Lines/Plotly
-finishing to a figure a module builds itself. It styles every axis, so a
-panel whose axes must keep their own settings (the risk table’s
-gridlines) names them in `attr(fig, "fixed.axes")`; and since plotly
-draws a shared axis’s lines on one panel only, it boxes each panel of a
-`subplot()` with shared axes through
+(`R/plotly_helpers.R`) is that styling step: `apply_uniform_styling()`
+plus the panel handling below. It styles every axis, so a panel whose
+axes must keep their own settings (the risk table’s gridlines) names
+them in `attr(fig, "fixed.axes")`; and since plotly draws a shared
+axis’s lines on one panel only, it boxes each panel of a `subplot()`
+with shared axes through
 [`.sci_shared_panel_borders()`](https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_sci_shared_panel_borders.md).
 A panel that needs gridlines or borders of its own, independent of its
 neighbours, gets an x axis of its own matched to theirs
@@ -136,6 +158,25 @@ fgsea, survminer), compute it in-package and test it equal to that
 package under `skip_if_not_installed()`, keeping the reference in
 Suggests.
 
+The Annotations tab of `dittoDimPlot`, `dittoScatterPlot` and
+`dittoPlot` shares
+[`.ditto_annotation_inputs_ui()`](https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_ditto_annotation_inputs_ui.md),
+[`.ditto_annotation_state()`](https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_ditto_annotation_state.md)
+and
+[`.ditto_reset_annotations()`](https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_ditto_reset_annotations.md),
+and goes through
+[`.ditto_annotate()`](https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_ditto_annotate.md)
+in the draw step, with the selection and the debounced highlight text in
+`extra`. `dittoPlot` can only label jitter points, and dittoSeq draws no
+hover text over ridges, so it needs Jitter and not Ridge. The VizModules
+helpers find a point from its `annotate.by` line of hover text, so
+dittoSeq draws that text (`do.hover`) while Annotate By is set, and
+`.ditto_cell_id` (`"cell.id"`) stands for the cell names. A selection is
+held by each point’s place in its trace, so it is dropped when the
+traces are drawn differently, or it would label other cells. dittoSeq’s
+`do.label` is not offered in any module, since `ggplotly()` drops
+`GeomLabel` and `GeomLabelRepel`.
+
 `structureViewer` is the reference for a non-plotly widget module (see
 Critical Rule 6). It renders the NGLVieweR widget once per structure,
 restyles through `NGLVieweR_proxy()` with named representations so the
@@ -146,15 +187,17 @@ through its `fig.fn` hook via a testable internal
 `.<module>_layers(fig, ..., input, isolate_fn)` function (see
 [`.pca_biplot_layers()`](https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_pca_biplot_layers.md),
 [`.manhattan_layers()`](https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_manhattan_layers.md)).
-The scatter server draws trajectories (arrowheads as annotations), then
-runs `fig.fn`, then adds the Marginals tab’s strips with
-`add_marginal_plots()`, which shrinks the main panel and moves
-paper-anchored shapes and annotations into it. So a layer function
-appends to `layout$annotations` and `layout$shapes` rather than
-replacing them, and a layer on paper coordinates still lands in the
-panel. A wrapper whose axes are not distributions (genomic position,
-expected quantiles, rank, dose) hides “Marginals” by default, as
-`manhattanPlot`, `gwasQQPlot`, `crisprScreenRank` and `doseResponse` do.
+The scatter server draws trajectories (arrowheads as annotations) and
+the Marginals tab’s strips in its cached step, and runs `fig.fn`
+afterwards, in the styling step. So a layer function appends to
+`layout$annotations` and `layout$shapes` rather than replacing them, and
+it runs on every restyle, so it stays cheap and adds the same thing each
+time. `add_marginal_plots()` moved only what was already there, so a
+layer spanning the panel uses `xref = "x domain"` / `yref = "y domain"`,
+not `"paper"`, which would run across the strips. A wrapper whose axes
+are not distributions (genomic position, expected quantiles, rank, dose)
+hides “Marginals” by default, as `manhattanPlot`, `gwasQQPlot`,
+`crisprScreenRank` and `doseResponse` do.
 
 The heatmap modules (`dittoHeatmap`, `sampleDistanceHeatmap`,
 `deHeatmap`) wrap VizModules’ `ComplexHeatmap_Heatmap` (non-plotly,
@@ -292,14 +335,14 @@ organization, downloads, annotations, and module infrastructure.
     `reset_annotation_inputs()`), plus
     `uniform_subplot_spacing_inputs_ui()` / `subplot_spacing_defaults()`
     for a Facet tab’s spacing controls.
-  - **Defaults and server-side stores**: `get_default()`,
-    `setup_reactive_defaults()`, `setup_auto_update_logic()`,
-    `setup_group_colors()`, `setup_axis_range()`, `resolve_palette()`,
-    `setup_manual_edits()` / `finalize_manual_edits()` /
-    `reset_manual_edits()`, and for a group colour picker
-    `default_group_colors()` (validates and hex-normalises a mapping in
-    `defaults`) with `reset_group_colors()` (restores the picker on
-    Reset). See “Avoiding Double Renders” below.
+  - **Defaults and server-side stores**: `cached_structure()`,
+    `get_default()`, `setup_reactive_defaults()`,
+    `setup_auto_update_logic()`, `setup_group_colors()`,
+    `setup_axis_range()`, `resolve_palette()`, `setup_manual_edits()` /
+    `finalize_manual_edits()` / `reset_manual_edits()`, and for a group
+    colour picker `default_group_colors()` (validates and hex-normalises
+    a mapping in `defaults`) with `reset_group_colors()` (restores the
+    picker on Reset). See “Avoiding Double Renders” below.
   - **Server boilerplate**: `require_data_frame()` wraps a data-frame
     module’s `data` reactive; `blank_to_null()` turns a select’s `""`
     (or `NA`, or a missing input) into `NULL`, and `nz_value()` tests
@@ -310,7 +353,14 @@ organization, downloads, annotations, and module infrastructure.
     levels), `flatten_palette_options()`, and `as_plotted()` /
     `adjusted_values()` / `adjustment_fn()` for anything drawn over an
     adjusted axis.
-  - **Plot finishing**: `apply_title_layout()`, `create_axis_styles()`,
+  - **Plot finishing**: `apply_uniform_styling()` (the whole styling
+    step, with `ggplot.axis.styling = FALSE` for a figure whose axis
+    lines do not come from a ggplot theme), `auto_webgl()` with
+    `webgl_input()` (points switch to WebGL at 5,000 by default; WebGL
+    canvases sit above SVG traces, so pass `overlays = TRUE` where lines
+    must stay on top of the points), `split_color_shape_legend()`
+    (ggplot2’s two legend sections for a built ggplotly figure),
+    `apply_title_layout()`, `create_axis_styles()`,
     `apply_subplot_axis_styling()`, `axis_titles_as_annotations()`,
     `apply_axis_title_to_annotations()`, `reset_axis_title_text()`,
     `add_reference_lines()`, `add_plot_config()`,
@@ -474,7 +524,13 @@ a real one.
     branch. Never wrap `renderPlotly()` in a catch-all
     [`tryCatch()`](https://rdrr.io/r/base/conditions.html): the pause
     arrives as a silent condition, and swallowing it turns a clean pause
-    into a blank plot.
+    into a blank plot. A `shiny.silent.error = function(e) stop(e)`
+    handler beside an `error` handler does not help:
+    [`tryCatch()`](https://rdrr.io/r/base/conditions.html) nests the
+    second around the first, so the re-raise is caught there. Test the
+    class inside a single `error` handler, as
+    [`.sci_rendered_figure()`](https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_sci_rendered_figure.md)
+    does.
 3.  **A module updates an input that `renderUI()` rebuilds** -\> a
     server-side store. Freezing cannot help: it pauses only readers that
     run after it in that flush, and at startup the plot output runs
@@ -586,8 +642,9 @@ file, e.g. `goFanPlot.R`, `cnSegmentPlot.R`.
 
 Keep the plotting function usable on its own, independent of Shiny. The
 module server should be a thin layer that maps inputs onto that
-function’s arguments and then applies the shared VizModules finalize
-stack.
+function’s arguments in a cached draw step, then applies the shared
+VizModules finalize stack in a styling step (see “Modules In This
+Package”).
 
 Where the UI and server both need the same defaults or input choices,
 factor them into a shared internal helper rather than duplicating the
@@ -640,9 +697,10 @@ scales, Seqinfo, shinyBS, shinyjqui, shinyjs, shinyWidgets,
 SingleCellExperiment, stats, SummarizedExperiment, survival
 
 **Suggests**: airway, circlize, ComplexHeatmap, DESeq2, drc, edgeR,
-fgsea, GOfan, htmltools, InteractiveComplexHeatmap, knitr, maftools,
-org.Hs.eg.db, PCAtools, PKNCA, pROC, rmarkdown, sesame, sesameData,
-survminer, testthat (\>= 3.0.0)
+fgsea, ggplot.multistats, GOfan, hexbin, htmltools,
+InteractiveComplexHeatmap, knitr, maftools, org.Hs.eg.db, PCAtools,
+PKNCA, pROC, rmarkdown, sesame, sesameData, survminer, testthat (\>=
+3.0.0)
 
 Keep `Imports:` and `NAMESPACE` in step in **both** directions -
 `R CMD check` and `BiocCheck` flag an undeclared import and an unused
@@ -651,11 +709,14 @@ VizModules `Depends:` on them; that is not a declaration.
 
 Bioconductor packages appear throughout; some example data depends on
 `sesame`/`sesameData`, `goFanPlot` needs `GOfan` plus an `OrgDb`, and
-`doseResponse` needs `drc`. `PCAtools` is needed only to build a `pca`
-object and for the scree plot’s elbow marker. `pROC` supplies the DeLong
-AUC interval in `rocCurve`; `pROC`, `PKNCA` and `fgsea` are otherwise
-test references for quantities computed in-package, as `survminer` is
-for `survivalCurve`‘s pairwise log-rank tests. The heatmap modules
+`doseResponse` needs `drc`. `dittoDimHex` needs `hexbin`, which
+[`dittoSeq::dittoDimHex()`](https://rdrr.io/pkg/dittoSeq/man/dittoHex.html)
+draws its hexes with, and `ggplot.multistats` for its Color By.
+`PCAtools` is needed only to build a `pca` object and for the scree
+plot’s elbow marker. `pROC` supplies the DeLong AUC interval in
+`rocCurve`; `pROC`, `PKNCA` and `fgsea` are otherwise test references
+for quantities computed in-package, as `survminer` is for
+`survivalCurve`‘s pairwise log-rank tests. The heatmap modules
 (`dittoHeatmap`, `sampleDistanceHeatmap`, `deHeatmap`) need
 `ComplexHeatmap`, `InteractiveComplexHeatmap` and `circlize`; `DESeq2`
 supplies the variance-stabilising transformation of the bulk modules;
@@ -683,6 +744,7 @@ in examples and tests.
 | Faceted figure loses its draggable axis titles | `axis_titles_as_annotations()` intentionally skips multi-panel figures; use `apply_axis_title_to_annotations()` instead |
 | “object ‘example_sce’ not found” in package code | No `LazyData`, so bundled datasets are not promises in the namespace. Use `.sci_example_data("example_sce")`; in an `@examples` block or a test, call [`data()`](https://rdrr.io/r/utils/data.html) first |
 | A plot renders two or three times for one change | See “Avoiding Double Renders” above - pick the right one of reactive `defaults`, `freezeReactiveValue()`, or a server-side store |
+| A plot ignores a change, or shows an earlier one | A read `cached_structure()` cannot see: a wrapped `isolate_fn()` read, a bare `input$key`, or a reactive missing from `extra` (see “Modules In This Package”) |
 | [`shiny::testServer()`](https://rdrr.io/pkg/shiny/man/testServer.html) cannot drive a plotly output | Expected; assert on the server’s own reactives instead, or verify structurally with [`plotly::plotly_build()`](https://rdrr.io/pkg/plotly/man/plotly_build.html) |
 | `test-showcase.R` fails with “No gallery showcase entry for: …” | A module was added without its gallery entry. Add one to [`.sci_module_showcase()`](https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_sci_module_showcase.md) and open its `*App()` on it (see “Adding a Module: Gallery, App and Figure Builder”) |
 | A showcase default “does nothing” | `get_default()` drops a value its control rejects and ignores a key no control reads; `test-showcase.R` reports both. Check the key against the module’s `*InputsUI()` docs |
@@ -737,6 +799,13 @@ in examples and tests.
     and an `*App()` that opens on them (see “Adding a Module: Gallery,
     App and Figure Builder”). `tests/testthat/test-showcase.R` enforces
     this
+14. **Draw once, style often** - a module building its own plotly figure
+    draws it in `cached_structure()` and styles it afterwards, rendering
+    through
+    [`.sci_render_plotly()`](https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_sci_render_plotly.md)
+    (see “Modules In This Package”). `finalize_manual_edits()` must stay
+    the last call in a render: on a layout-only update it cancels the
+    render
 
 ## Best Practices
 

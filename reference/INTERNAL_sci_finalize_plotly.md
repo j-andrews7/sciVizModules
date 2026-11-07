@@ -1,10 +1,13 @@
 # Apply the shared VizModules plotly styling stack to a module figure
 
-Applies the title, axis, legend, reference-line, config, and annotation
-post-processing shared by the sciVizModules modules that build their own
-figure (the dittoSeq wrappers and the native plotly modules), so the
-figure respects the module's Axes, Legend, Lines and Plotly tab
-controls.
+The styling step of the sciVizModules modules that build their own
+figure (the dittoSeq wrappers and the native plotly modules):
+[`VizModules::apply_uniform_styling()`](https://j-andrews7.github.io/VizModules/reference/apply_uniform_styling.html)
+with the panel handling those figures need, so the figure respects the
+module's Axes, Legend, Lines and Plotly tab controls. It reads only
+inputs that style the figure, so it belongs after the module's
+[`VizModules::cached_structure()`](https://j-andrews7.github.io/VizModules/reference/cached_structure.html)
+step.
 
 ## Usage
 

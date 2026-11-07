@@ -3,13 +3,13 @@
 module differ only in the inputs they read and the plot function they call,
 so they share this server: reactive
 defaults, input/tab hiding, the Reset handler for the uniform tabs, the plot
-reactive (finished with .sci_finalize_plotly()), the render, and the source
-download, whose statistics table is the plotted table attached to the figure."><meta property="og:description" content="The PCAtools scree, loadings, pairs and correlation modules and the AlphaFold
+reactives, the render, and the source download, whose statistics table is the
+plotted table attached to the figure."><meta property="og:description" content="The PCAtools scree, loadings, pairs and correlation modules and the AlphaFold
 module differ only in the inputs they read and the plot function they call,
 so they share this server: reactive
 defaults, input/tab hiding, the Reset handler for the uniform tabs, the plot
-reactive (finished with .sci_finalize_plotly()), the render, and the source
-download, whose statistics table is the plotted table attached to the figure."></head><body>
+reactives, the render, and the source download, whose statistics table is the
+plotted table attached to the figure."></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -52,8 +52,8 @@ download, whose statistics table is the plotted table attached to the figure."><
 module differ only in the inputs they read and the plot function they call,
 so they share this server: reactive
 defaults, input/tab hiding, the Reset handler for the uniform tabs, the plot
-reactive (finished with <code><a href="INTERNAL_sci_finalize_plotly.html">.sci_finalize_plotly()</a></code>), the render, and the source
-download, whose statistics table is the plotted table attached to the figure.</p>
+reactives, the render, and the source download, whose statistics table is the
+plotted table attached to the figure.</p>
     </div>
 
     <div class="section level2">
@@ -87,7 +87,9 @@ of its tabset id (<code>&lt;name&gt;TabsetPanel</code>).</p></dd>
 
 <dt id="arg-build">build<a class="anchor" aria-label="anchor" href="#arg-build"></a></dt>
 <dd><p><code>function(obj, input, isolate_fn, state)</code> returning the figure.
-Inputs must be read in the literal form <code>isolate_fn(input$key)</code>.</p></dd>
+It is cached, so inputs must be read in the literal form
+<code>isolate_fn(input$key)</code>, any other reactive it reads must be in <code>state</code>, and
+it must have no side effects.</p></dd>
 
 
 <dt id="arg-reset">reset<a class="anchor" aria-label="anchor" href="#arg-reset"></a></dt>
@@ -109,6 +111,14 @@ stores the build and reset functions need.</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>The source-data reactive.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>The plot is drawn in two steps: <code>build</code> under
+<code><a href="https://j-andrews7.github.io/VizModules/reference/cached_structure.html" class="external-link">VizModules::cached_structure()</a></code>, then <code><a href="INTERNAL_sci_finalize_plotly.html">.sci_finalize_plotly()</a></code> on the cached
+figure, so a styling change never redraws it and reaches the browser as a
+layout-only update. The reactives in <code>state</code> are named to the cache
+automatically.</p>
     </div>
     <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>

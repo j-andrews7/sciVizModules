@@ -57,6 +57,10 @@
 <url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_detect_time_col.html</loc></url>
 <url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_dh_defaults.html</loc></url>
 <url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_dh_heat_defaults.html</loc></url>
+<url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_ditto_annotate.html</loc></url>
+<url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_ditto_annotation_choices.html</loc></url>
+<url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_ditto_annotation_inputs_ui.html</loc></url>
+<url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_ditto_annotation_state.html</loc></url>
 <url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_ditto_assays.html</loc></url>
 <url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_ditto_cell_meta.html</loc></url>
 <url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_ditto_continuous_choices.html</loc></url>
@@ -73,9 +77,11 @@
 <url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_ditto_module_app.html</loc></url>
 <url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_ditto_preview.html</loc></url>
 <url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_ditto_reductions.html</loc></url>
+<url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_ditto_reset_annotations.html</loc></url>
 <url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_ditto_reset_uniform.html</loc></url>
 <url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_ditto_top_variable_genes.html</loc></url>
 <url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_ditto_var_choices.html</loc></url>
+<url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_ditto_with_cell_ids.html</loc></url>
 <url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_dose_response_defaults.html</loc></url>
 <url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_enrich_defaults.html</loc></url>
 <url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_enrich_group_col.html</loc></url>
@@ -219,6 +225,7 @@
 <url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_sbs96_defaults.html</loc></url>
 <url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_sbs96_long.html</loc></url>
 <url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_sbs96_matrix.html</loc></url>
+<url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_sci_clear_stale_titles.html</loc></url>
 <url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_sci_debounced_input.html</loc></url>
 <url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_sci_discrete_cols.html</loc></url>
 <url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_sci_example_catalogue.html</loc></url>
@@ -247,6 +254,8 @@
 <url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_sci_plot_inputs_ui.html</loc></url>
 <url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_sci_plot_output_ui.html</loc></url>
 <url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_sci_plot_server.html</loc></url>
+<url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_sci_render_plotly.html</loc></url>
+<url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_sci_rendered_figure.html</loc></url>
 <url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_sci_require_df.html</loc></url>
 <url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_sci_server_args.html</loc></url>
 <url><loc>https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_sci_shared_panel_borders.html</loc></url>
