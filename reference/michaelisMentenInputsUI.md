@@ -73,25 +73,25 @@ data(mm_kinetics)
 michaelisMentenInputsUI("mm", mm_kinetics)
 #> <h3>Michaelis-Menten Settings</h3>
 #> <div class="tabbable vizmodules-input-tabs">
-#>   <ul class="nav nav-tabs shiny-tab-input" id="mm-michaelisMentenTabsetPanel" data-tabsetid="7563">
+#>   <ul class="nav nav-tabs shiny-tab-input" id="mm-michaelisMentenTabsetPanel" data-tabsetid="4677">
 #>     <li class="active">
-#>       <a href="#tab-7563-1" data-toggle="tab" data-bs-toggle="tab" data-value="Data">Data</a>
+#>       <a href="#tab-4677-1" data-toggle="tab" data-bs-toggle="tab" data-value="Data">Data</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-7563-2" data-toggle="tab" data-bs-toggle="tab" data-value="Aesthetics">Aesthetics</a>
+#>       <a href="#tab-4677-2" data-toggle="tab" data-bs-toggle="tab" data-value="Aesthetics">Aesthetics</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-7563-3" data-toggle="tab" data-bs-toggle="tab" data-value="Plotly">Plotly</a>
+#>       <a href="#tab-4677-3" data-toggle="tab" data-bs-toggle="tab" data-value="Plotly">Plotly</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-7563-4" data-toggle="tab" data-bs-toggle="tab" data-value="Axes">Axes</a>
+#>       <a href="#tab-4677-4" data-toggle="tab" data-bs-toggle="tab" data-value="Axes">Axes</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-7563-5" data-toggle="tab" data-bs-toggle="tab" data-value="Lines">Lines</a>
+#>       <a href="#tab-4677-5" data-toggle="tab" data-bs-toggle="tab" data-value="Lines">Lines</a>
 #>     </li>
 #>   </ul>
-#>   <div class="tab-content" data-tabsetid="7563">
-#>     <div class="tab-pane active" data-value="Data" id="tab-7563-1">
+#>   <div class="tab-content" data-tabsetid="4677">
+#>     <div class="tab-pane active" data-value="Data" id="tab-4677-1">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify1506211">
@@ -123,7 +123,7 @@ michaelisMentenInputsUI("mm", mm_kinetics)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Aesthetics" id="tab-7563-2">
+#>     <div class="tab-pane" data-value="Aesthetics" id="tab-4677-2">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" id="tipify8067556">
@@ -174,7 +174,7 @@ michaelisMentenInputsUI("mm", mm_kinetics)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Plotly" id="tab-7563-3">
+#>     <div class="tab-pane" data-value="Plotly" id="tab-4677-3">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;">
@@ -251,7 +251,7 @@ michaelisMentenInputsUI("mm", mm_kinetics)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Axes" id="tab-7563-4">
+#>     <div class="tab-pane" data-value="Axes" id="tab-4677-4">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;">
@@ -437,7 +437,7 @@ michaelisMentenInputsUI("mm", mm_kinetics)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Lines" id="tab-7563-5">
+#>     <div class="tab-pane" data-value="Lines" id="tab-4677-5">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" id="tipify2125141">

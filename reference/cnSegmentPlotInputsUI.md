@@ -81,25 +81,25 @@ data(example_cn_segment)
 cnSegmentPlotInputsUI("cn_plot", example_cn_segment)
 #> <h3>CN Segment Settings</h3>
 #> <div class="tabbable vizmodules-input-tabs">
-#>   <ul class="nav nav-tabs shiny-tab-input" id="cn_plot-cnSegmentPlotTabsetPanel" data-tabsetid="5420">
+#>   <ul class="nav nav-tabs shiny-tab-input" id="cn_plot-cnSegmentPlotTabsetPanel" data-tabsetid="2541">
 #>     <li class="active">
-#>       <a href="#tab-5420-1" data-toggle="tab" data-bs-toggle="tab" data-value="Data">Data</a>
+#>       <a href="#tab-2541-1" data-toggle="tab" data-bs-toggle="tab" data-value="Data">Data</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-5420-2" data-toggle="tab" data-bs-toggle="tab" data-value="Aesthetics">Aesthetics</a>
+#>       <a href="#tab-2541-2" data-toggle="tab" data-bs-toggle="tab" data-value="Aesthetics">Aesthetics</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-5420-3" data-toggle="tab" data-bs-toggle="tab" data-value="Axes">Axes</a>
+#>       <a href="#tab-2541-3" data-toggle="tab" data-bs-toggle="tab" data-value="Axes">Axes</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-5420-4" data-toggle="tab" data-bs-toggle="tab" data-value="Plotly">Plotly</a>
+#>       <a href="#tab-2541-4" data-toggle="tab" data-bs-toggle="tab" data-value="Plotly">Plotly</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-5420-5" data-toggle="tab" data-bs-toggle="tab" data-value="Lines">Lines</a>
+#>       <a href="#tab-2541-5" data-toggle="tab" data-bs-toggle="tab" data-value="Lines">Lines</a>
 #>     </li>
 #>   </ul>
-#>   <div class="tab-content" data-tabsetid="5420">
-#>     <div class="tab-pane active" data-value="Data" id="tab-5420-1">
+#>   <div class="tab-content" data-tabsetid="2541">
+#>     <div class="tab-pane active" data-value="Data" id="tab-2541-1">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" id="tipify9265464">
@@ -153,7 +153,7 @@ cnSegmentPlotInputsUI("cn_plot", example_cn_segment)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Aesthetics" id="tab-5420-2">
+#>     <div class="tab-pane" data-value="Aesthetics" id="tab-2541-2">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" id="tipify9098545">
@@ -296,7 +296,7 @@ cnSegmentPlotInputsUI("cn_plot", example_cn_segment)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Axes" id="tab-5420-3">
+#>     <div class="tab-pane" data-value="Axes" id="tab-2541-3">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" id="tipify4640136">
@@ -507,7 +507,7 @@ cnSegmentPlotInputsUI("cn_plot", example_cn_segment)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Plotly" id="tab-5420-4">
+#>     <div class="tab-pane" data-value="Plotly" id="tab-2541-4">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;">
@@ -584,7 +584,7 @@ cnSegmentPlotInputsUI("cn_plot", example_cn_segment)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Lines" id="tab-5420-5">
+#>     <div class="tab-pane" data-value="Lines" id="tab-2541-5">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" id="tipify8666157">

@@ -146,31 +146,31 @@ data(survival_lung)
 survivalCurveInputsUI("survivalCurve", survival_lung)
 #> <h3>Survival Curve Settings</h3>
 #> <div class="tabbable vizmodules-input-tabs">
-#>   <ul class="nav nav-tabs shiny-tab-input" id="survivalCurve-survivalCurveTabsetPanel" data-tabsetid="6238">
+#>   <ul class="nav nav-tabs shiny-tab-input" id="survivalCurve-survivalCurveTabsetPanel" data-tabsetid="9340">
 #>     <li class="active">
-#>       <a href="#tab-6238-1" data-toggle="tab" data-bs-toggle="tab" data-value="Data">Data</a>
+#>       <a href="#tab-9340-1" data-toggle="tab" data-bs-toggle="tab" data-value="Data">Data</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-6238-2" data-toggle="tab" data-bs-toggle="tab" data-value="Statistics">Statistics</a>
+#>       <a href="#tab-9340-2" data-toggle="tab" data-bs-toggle="tab" data-value="Statistics">Statistics</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-6238-3" data-toggle="tab" data-bs-toggle="tab" data-value="Aesthetics">Aesthetics</a>
+#>       <a href="#tab-9340-3" data-toggle="tab" data-bs-toggle="tab" data-value="Aesthetics">Aesthetics</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-6238-4" data-toggle="tab" data-bs-toggle="tab" data-value="Plotly">Plotly</a>
+#>       <a href="#tab-9340-4" data-toggle="tab" data-bs-toggle="tab" data-value="Plotly">Plotly</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-6238-5" data-toggle="tab" data-bs-toggle="tab" data-value="Axes">Axes</a>
+#>       <a href="#tab-9340-5" data-toggle="tab" data-bs-toggle="tab" data-value="Axes">Axes</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-6238-6" data-toggle="tab" data-bs-toggle="tab" data-value="Legend">Legend</a>
+#>       <a href="#tab-9340-6" data-toggle="tab" data-bs-toggle="tab" data-value="Legend">Legend</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-6238-7" data-toggle="tab" data-bs-toggle="tab" data-value="Lines">Lines</a>
+#>       <a href="#tab-9340-7" data-toggle="tab" data-bs-toggle="tab" data-value="Lines">Lines</a>
 #>     </li>
 #>   </ul>
-#>   <div class="tab-content" data-tabsetid="6238">
-#>     <div class="tab-pane active" data-value="Data" id="tab-6238-1">
+#>   <div class="tab-content" data-tabsetid="9340">
+#>     <div class="tab-pane active" data-value="Data" id="tab-9340-1">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify1596419">
@@ -201,7 +201,7 @@ survivalCurveInputsUI("survivalCurve", survival_lung)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Statistics" id="tab-6238-2">
+#>     <div class="tab-pane" data-value="Statistics" id="tab-9340-2">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" id="tipify6032">
@@ -305,7 +305,7 @@ survivalCurveInputsUI("survivalCurve", survival_lung)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Aesthetics" id="tab-6238-3">
+#>     <div class="tab-pane" data-value="Aesthetics" id="tab-9340-3">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify2176160">
@@ -335,7 +335,7 @@ survivalCurveInputsUI("survivalCurve", survival_lung)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Plotly" id="tab-6238-4">
+#>     <div class="tab-pane" data-value="Plotly" id="tab-9340-4">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;">
@@ -412,7 +412,7 @@ survivalCurveInputsUI("survivalCurve", survival_lung)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Axes" id="tab-6238-5">
+#>     <div class="tab-pane" data-value="Axes" id="tab-9340-5">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;">
@@ -598,7 +598,7 @@ survivalCurveInputsUI("survivalCurve", survival_lung)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Legend" id="tab-6238-6">
+#>     <div class="tab-pane" data-value="Legend" id="tab-9340-6">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" id="tipify5135570">
@@ -642,7 +642,7 @@ survivalCurveInputsUI("survivalCurve", survival_lung)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Lines" id="tab-6238-7">
+#>     <div class="tab-pane" data-value="Lines" id="tab-9340-7">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" id="tipify3047661">

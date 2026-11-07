@@ -114,31 +114,31 @@ data(example_enrichment)
 enrichmentDotPlotInputsUI("enrichmentDotPlot", example_enrichment)
 #> <h3>Enrichment DotPlot Settings</h3>
 #> <div class="tabbable vizmodules-input-tabs">
-#>   <ul class="nav nav-tabs shiny-tab-input" id="enrichmentDotPlot-DotPlotTabsetPanel" data-tabsetid="1580">
+#>   <ul class="nav nav-tabs shiny-tab-input" id="enrichmentDotPlot-DotPlotTabsetPanel" data-tabsetid="2530">
 #>     <li class="active">
-#>       <a href="#tab-1580-1" data-toggle="tab" data-bs-toggle="tab" data-value="Data">Data</a>
+#>       <a href="#tab-2530-1" data-toggle="tab" data-bs-toggle="tab" data-value="Data">Data</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-1580-2" data-toggle="tab" data-bs-toggle="tab" data-value="Facet">Facet</a>
+#>       <a href="#tab-2530-2" data-toggle="tab" data-bs-toggle="tab" data-value="Facet">Facet</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-1580-3" data-toggle="tab" data-bs-toggle="tab" data-value="Aesthetics">Aesthetics</a>
+#>       <a href="#tab-2530-3" data-toggle="tab" data-bs-toggle="tab" data-value="Aesthetics">Aesthetics</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-1580-4" data-toggle="tab" data-bs-toggle="tab" data-value="Legend">Legend</a>
+#>       <a href="#tab-2530-4" data-toggle="tab" data-bs-toggle="tab" data-value="Legend">Legend</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-1580-5" data-toggle="tab" data-bs-toggle="tab" data-value="Plotly">Plotly</a>
+#>       <a href="#tab-2530-5" data-toggle="tab" data-bs-toggle="tab" data-value="Plotly">Plotly</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-1580-6" data-toggle="tab" data-bs-toggle="tab" data-value="Axes">Axes</a>
+#>       <a href="#tab-2530-6" data-toggle="tab" data-bs-toggle="tab" data-value="Axes">Axes</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-1580-7" data-toggle="tab" data-bs-toggle="tab" data-value="Lines">Lines</a>
+#>       <a href="#tab-2530-7" data-toggle="tab" data-bs-toggle="tab" data-value="Lines">Lines</a>
 #>     </li>
 #>   </ul>
-#>   <div class="tab-content" data-tabsetid="1580">
-#>     <div class="tab-pane active" data-value="Data" id="tab-1580-1">
+#>   <div class="tab-content" data-tabsetid="2530">
+#>     <div class="tab-pane active" data-value="Data" id="tab-2530-1">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify979781">
@@ -194,7 +194,7 @@ enrichmentDotPlotInputsUI("enrichmentDotPlot", example_enrichment)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Facet" id="tab-1580-2">
+#>     <div class="tab-pane" data-value="Facet" id="tab-2530-2">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify7395895">
@@ -254,7 +254,7 @@ enrichmentDotPlotInputsUI("enrichmentDotPlot", example_enrichment)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Aesthetics" id="tab-1580-3">
+#>     <div class="tab-pane" data-value="Aesthetics" id="tab-2530-3">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify1791275">
@@ -337,7 +337,7 @@ enrichmentDotPlotInputsUI("enrichmentDotPlot", example_enrichment)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Legend" id="tab-1580-4">
+#>     <div class="tab-pane" data-value="Legend" id="tab-2530-4">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" id="tipify3610061">
@@ -423,7 +423,7 @@ enrichmentDotPlotInputsUI("enrichmentDotPlot", example_enrichment)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Plotly" id="tab-1580-5">
+#>     <div class="tab-pane" data-value="Plotly" id="tab-2530-5">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;">
@@ -500,7 +500,7 @@ enrichmentDotPlotInputsUI("enrichmentDotPlot", example_enrichment)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Axes" id="tab-1580-6">
+#>     <div class="tab-pane" data-value="Axes" id="tab-2530-6">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container">
@@ -695,7 +695,7 @@ enrichmentDotPlotInputsUI("enrichmentDotPlot", example_enrichment)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Lines" id="tab-1580-7">
+#>     <div class="tab-pane" data-value="Lines" id="tab-2530-7">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" id="tipify4513363">

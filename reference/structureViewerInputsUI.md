@@ -110,19 +110,19 @@ p53 <- read_structure(system.file("extdata", "AF-P04637-F1-model_v6.pdb.gz",
 structureViewerInputsUI("viewer", p53)
 #> <h3>Structure Viewer Settings</h3>
 #> <div class="tabbable vizmodules-input-tabs">
-#>   <ul class="nav nav-tabs shiny-tab-input" id="viewer-structureViewerTabsetPanel" data-tabsetid="6398">
+#>   <ul class="nav nav-tabs shiny-tab-input" id="viewer-structureViewerTabsetPanel" data-tabsetid="3658">
 #>     <li class="active">
-#>       <a href="#tab-6398-1" data-toggle="tab" data-bs-toggle="tab" data-value="Style">Style</a>
+#>       <a href="#tab-3658-1" data-toggle="tab" data-bs-toggle="tab" data-value="Style">Style</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-6398-2" data-toggle="tab" data-bs-toggle="tab" data-value="Highlight">Highlight</a>
+#>       <a href="#tab-3658-2" data-toggle="tab" data-bs-toggle="tab" data-value="Highlight">Highlight</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-6398-3" data-toggle="tab" data-bs-toggle="tab" data-value="View">View</a>
+#>       <a href="#tab-3658-3" data-toggle="tab" data-bs-toggle="tab" data-value="View">View</a>
 #>     </li>
 #>   </ul>
-#>   <div class="tab-content" data-tabsetid="6398">
-#>     <div class="tab-pane active" data-value="Style" id="tab-6398-1">
+#>   <div class="tab-content" data-tabsetid="3658">
+#>     <div class="tab-pane active" data-value="Style" id="tab-3658-1">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify9437307">
@@ -160,7 +160,7 @@ structureViewerInputsUI("viewer", p53)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Highlight" id="tab-6398-2">
+#>     <div class="tab-pane" data-value="Highlight" id="tab-3658-2">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" id="tipify8352655">
@@ -187,7 +187,7 @@ structureViewerInputsUI("viewer", p53)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="View" id="tab-6398-3">
+#>     <div class="tab-pane" data-value="View" id="tab-3658-3">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" id="tipify227775">

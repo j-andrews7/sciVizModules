@@ -118,22 +118,22 @@ data(example_plate)
 plateHeatmapInputsUI("plate", example_plate)
 #> <h3>Plate Settings</h3>
 #> <div class="tabbable vizmodules-input-tabs">
-#>   <ul class="nav nav-tabs shiny-tab-input" id="plate-plateHeatmapTabsetPanel" data-tabsetid="9958">
+#>   <ul class="nav nav-tabs shiny-tab-input" id="plate-plateHeatmapTabsetPanel" data-tabsetid="7646">
 #>     <li class="active">
-#>       <a href="#tab-9958-1" data-toggle="tab" data-bs-toggle="tab" data-value="Data">Data</a>
+#>       <a href="#tab-7646-1" data-toggle="tab" data-bs-toggle="tab" data-value="Data">Data</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-9958-2" data-toggle="tab" data-bs-toggle="tab" data-value="Aesthetics">Aesthetics</a>
+#>       <a href="#tab-7646-2" data-toggle="tab" data-bs-toggle="tab" data-value="Aesthetics">Aesthetics</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-9958-3" data-toggle="tab" data-bs-toggle="tab" data-value="Axes">Axes</a>
+#>       <a href="#tab-7646-3" data-toggle="tab" data-bs-toggle="tab" data-value="Axes">Axes</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-9958-4" data-toggle="tab" data-bs-toggle="tab" data-value="Plotly">Plotly</a>
+#>       <a href="#tab-7646-4" data-toggle="tab" data-bs-toggle="tab" data-value="Plotly">Plotly</a>
 #>     </li>
 #>   </ul>
-#>   <div class="tab-content" data-tabsetid="9958">
-#>     <div class="tab-pane active" data-value="Data" id="tab-9958-1">
+#>   <div class="tab-content" data-tabsetid="7646">
+#>     <div class="tab-pane active" data-value="Data" id="tab-7646-1">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify4889994">
@@ -229,7 +229,7 @@ plateHeatmapInputsUI("plate", example_plate)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Aesthetics" id="tab-9958-2">
+#>     <div class="tab-pane" data-value="Aesthetics" id="tab-7646-2">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" data-shiny-input-type="colour" id="tipify392313">
@@ -282,7 +282,7 @@ plateHeatmapInputsUI("plate", example_plate)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Axes" id="tab-9958-3">
+#>     <div class="tab-pane" data-value="Axes" id="tab-7646-3">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;">
@@ -468,7 +468,7 @@ plateHeatmapInputsUI("plate", example_plate)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Plotly" id="tab-9958-4">
+#>     <div class="tab-pane" data-value="Plotly" id="tab-7646-4">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;">
