@@ -13,7 +13,8 @@
   title,
   columns,
   lines = TRUE,
-  legend = TRUE
+  legend = TRUE,
+  extra_tabs = NULL
 )
 }
 \arguments{
@@ -30,6 +31,8 @@
 \item{lines}{Logical; include the Lines tab.}
 
 \item{legend}{Logical; include the Legend tab.}
+
+\item{extra_tabs}{An optional named list of further tabs, placed after the Data tab.}
 }
 \value{
 The organised inputs.

@@ -14,7 +14,8 @@
   build,
   reset,
   validate,
-  setup = NULL
+  setup = NULL,
+  style = NULL
 )
 }
 \arguments{
@@ -37,6 +38,11 @@ module cannot take.}
 \item{setup}{Optional \verb{function(input, output, session, object, params)}
 run once in the server body, returning a list (\code{state}) of reactives or
 stores the build and reset functions need.}
+
+\item{style}{Optional \verb{function(fig, input, isolate_fn, state)} returning the
+figure, run on the cached figure before the shared styling. It is not
+cached, so what it sets (a \code{layout.coloraxis}, say) changes without a redraw;
+it should write to the layout only, or the change is not a layout-only update.}
 }
 \value{
 The source-data reactive.

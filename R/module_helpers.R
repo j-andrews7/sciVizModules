@@ -22,6 +22,7 @@
 #' @param title,columns As for the module UIs.
 #' @param lines Logical; include the Lines tab.
 #' @param legend Logical; include the Legend tab.
+#' @param extra_tabs An optional named list of further tabs, placed after the Data tab.
 #' @return The organised inputs.
 #'
 #' @import shiny
@@ -29,15 +30,14 @@
 #' @rdname INTERNAL_sci_plot_inputs_ui
 #' @keywords internal
 .sci_plot_inputs_ui <- function(ns, name, data_tab, aes_tab, defaults, title, columns, lines = TRUE,
-                                legend = TRUE) {
-    inputs <- list(
-        "Data" = data_tab,
+                                legend = TRUE, extra_tabs = NULL) {
+    inputs <- c(list("Data" = data_tab), extra_tabs, list(
         "Aesthetics" = aes_tab,
         "Legend" = if (isTRUE(legend)) uniform_legend_inputs_ui(ns, defaults),
         "Axes" = uniform_axes_inputs_ui(ns, defaults),
         "Lines" = if (isTRUE(lines)) uniform_lines_inputs_ui(ns, defaults),
         "Plotly" = uniform_plotly_inputs_ui(ns, defaults)
-    )
+    ))
     inputs <- inputs[!vapply(inputs, is.null, logical(1))]
 
     organize_inputs(
@@ -194,6 +194,10 @@
 #' @param setup Optional `function(input, output, session, object, params)`
 #'   run once in the server body, returning a list (`state`) of reactives or
 #'   stores the build and reset functions need.
+#' @param style Optional `function(fig, input, isolate_fn, state)` returning the
+#'   figure, run on the cached figure before the shared styling. It is not
+#'   cached, so what it sets (a `layout.coloraxis`, say) changes without a redraw;
+#'   it should write to the layout only, or the change is not a layout-only update.
 #' @return The source-data reactive.
 #'
 #' @import shiny
@@ -202,7 +206,7 @@
 #' @rdname INTERNAL_sci_plot_server
 #' @keywords internal
 .sci_plot_server <- function(id, data, hide.inputs, hide.tabs, defaults, name, build, reset, validate,
-                             setup = NULL) {
+                             setup = NULL, style = NULL) {
     stopifnot(is.reactive(data))
 
     moduleServer(id, function(input, output, session) {
@@ -239,6 +243,7 @@
             isolate_fn <- setup_auto_update_logic(input, params)
             fig <- base_plot()$fig
             table <- attr(fig, "table")
+            if (is.function(style)) fig <- style(fig, input, isolate_fn, state)
             fig <- .sci_finalize_plotly(fig, input, isolate_fn)
             attr(fig, "table") <- table
             fig

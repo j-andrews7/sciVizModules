@@ -15,7 +15,7 @@ module_prefixes <- c(
     "doseResponse", "enrichmentDotPlot", "goFanPlot", "maPlot",
     "michaelisMenten", "survivalCurve", "volcanoPlot",
     "dittoDotPlot", "dittoHeatmap", "samplePCA", "sampleDistanceHeatmap", "deHeatmap",
-    "mutationalProfile", "mafSummary", "mutationLollipop", "oncoPlot"
+    "mutationalProfile", "mafSummary", "mutationLollipop", "oncoPlot", "methylationTrack"
 )
 
 module_functions <- function() {

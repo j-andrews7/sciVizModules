@@ -244,6 +244,19 @@ reference:
   - cnSegmentPlotServer
   - cnSegmentPlotApp
 
+- title: DNA methylation
+  desc: >
+    A track view of beta values over a gene or region, joined on genomic position
+    across Infinium arrays, with transcripts and sample annotations.
+  contents:
+  - methylationCohort
+  - print.methylationCohort
+  - methylationTrack
+  - methylationTrackInputsUI
+  - methylationTrackOutputUI
+  - methylationTrackServer
+  - methylationTrackApp
+
 - title: Single-cell and RNA-seq (dittoSeq)
   desc: >
     Wrappers around the dittoSeq plotting functions. Each takes a
@@ -310,6 +323,7 @@ reference:
   - dose_response
   - example_biomarkers
   - example_cn_segment
+  - example_methylation
   - example_enrichment
   - example_gsea
   - example_gwas

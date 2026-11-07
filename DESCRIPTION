@@ -56,6 +56,7 @@ Suggests:
     airway,
     circlize,
     ComplexHeatmap,
+    DelayedArray,
     DESeq2,
     drc,
     edgeR,
@@ -85,4 +86,5 @@ BugReports: https://github.com/j-andrews7/sciVizModules/issues
 Config/roxygen2/version: 8.1.0
 biocViews: Visualization, ShinyApps, GUI, DifferentialExpression,
     GeneExpression, SingleCell, GeneSetEnrichment, Pathways, GO, Survival,
-    SomaticMutation, PrincipalComponent, Clustering
+    SomaticMutation, PrincipalComponent, Clustering, DNAMethylation,
+    MethylationArray

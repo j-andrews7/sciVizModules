@@ -159,6 +159,7 @@ if (interactive()) volcanoPlotApp()     # differential expression, airway_deseq2
 if (interactive()) dittoDimPlotApp()    # single-cell reduction, example_sce
 if (interactive()) doseResponseApp()    # pharmacology, dose_response
 if (interactive()) cnSegmentPlotApp()   # copy number, example_cn_segment
+if (interactive()) methylationTrackApp() # DNA methylation arrays, example_methylation
 if (interactive()) forestPlotApp()      # Cox / logistic / linear model, survival_lung
 if (interactive()) pcaBiplotApp()       # PCAtools pca object, example_pca
 if (interactive()) alphafoldConfidenceApp() # AlphaFold DB prediction for p53
@@ -440,6 +441,56 @@ data(example_cn_segment)
 example_cn_segment
 ```
 
+### DNA methylation
+
+| Module | Server function | Data type | Expected data | Example data |
+|---|---|---|---|---|
+| Methylation track | `methylationTrackServer()` | `methylationCohort`, or what it takes | Beta values from one or more Infinium arrays, as matrices or `SummarizedExperiment`s, with probes in rows | `example_methylation` |
+
+`methylationTrack()` draws SeSAMe's track view: a heatmap of beta values under the
+transcripts of a gene, region or set of probes. It takes cohorts that mix arrays.
+`methylationCohort()` gathers them, from a list with one entry per platform or from
+one matrix or `SummarizedExperiment` already merged across them. Probe positions
+come from `rowRanges()`, `rowData()` columns, or the sesameData manifests.
+
+```{r methylation-format}
+# betas_450k, betas_epic and betas_epicv2 are matrices with probes in rows, from
+# sesame::openSesame() or any other pipeline, and sample_info has their sample
+# names as row names. Positions are read from the sesameData manifests.
+cohort <- methylationCohort(
+    list(HM450 = betas_450k, EPIC = betas_epic, EPICv2 = betas_epicv2),
+    samples = sample_info
+)
+cohort # counts the CpGs each pair of arrays shares
+
+methylationTrack(cohort, gene = "DNMT1", group.by = "platform", cluster.samples = TRUE)
+
+if (interactive()) methylationTrackApp(cohort)
+```
+
+Arrays are joined on genomic position, not probe ID. The same cg ID can sit at
+different positions on different arrays, and different IDs can measure the same
+CpG, so a join on IDs merges some CpGs that differ and splits some that do not.
+Replicate probes at one position are averaged.
+
+Reading a mixed cohort takes some care:
+
+- **Grey is not missing data.** Only around a third of the CpGs on these arrays
+  are on all three, so a HM450 sample is empty at many of the columns an EPICv2
+  sample fills. These cells are "not on this array", and they differ from a probe
+  the array has but gave no value, which has a colour of its own. Nothing is
+  imputed. Set CpGs to "Shared by all arrays" to see only those on every plotted array.
+- **Clustering rests on the CpGs measured in all the samples clustered.** That can
+  be few in a small region, and with fewer than two the figure says it fell back
+  on each pair's shared CpGs.
+- **Arrays are not corrected for.** Probe chemistry and preprocessing differ
+  between platforms, so a cluster that follows `platform` may be technical. Group
+  by `platform`, or compare within an array, before reading it as biology.
+- `example_methylation` holds different samples on each array, so it shows how the
+  module works and is not a comparison of platforms.
+
+Because the data is not a data frame, it cannot go in the Figure Builder.
+
 ### Genetics (GWAS)
 
 | Module | Server function | Data type | Expected data | Example data |
@@ -635,8 +686,8 @@ app, and `vizmodules-custom-module` covers building a module to register in it.
 
 `mutationalProfile` is registered alongside the differential-expression,
 enrichment, dose-response and survival modules. The dittoSeq modules, the bulk
-expression modules, `cnSegmentPlot`, `michaelisMenten`, the PCAtools modules,
-`gseaEnrichmentPlot` and `alphafoldConfidence` are not: the builder's dataset
+expression modules, `cnSegmentPlot`, `methylationTrack`, `michaelisMenten`, the
+PCAtools modules, `gseaEnrichmentPlot` and `alphafoldConfidence` are not: the builder's dataset
 catalogue holds data frames, and those take other objects. `structureViewer`
 is a 3D widget rather than a plotly figure. `forestPlot`, the GWAS modules,
 `crisprScreenRank`, the MAF modules (`oncoPlot`, `mafSummary`,

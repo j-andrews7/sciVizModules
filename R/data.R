@@ -286,6 +286,40 @@
 #' @author Jared Andrews
 #' @keywords datasets
 "example_cn_segment"
+#' Example multi-array DNA methylation cohort
+#'
+#' A [methylationCohort()] of real beta values from the example data in sesameData, on
+#' three Infinium arrays, limited to the CpGs within 5 kb of DNMT1, ADA, MLH1, BRCA1,
+#' TP53, and GNAS. It carries its own probe positions, transcripts, and cytobands.
+#'
+#' The arrays hold different samples, so differences between them are biology and
+#' platform together. It shows how the module handles mixed arrays and is not a
+#' comparison of them.
+#'
+#' @format A `methylationCohort` on hg38, with 23 samples: 10 normal pancreas samples
+#' from TCGA on HM450, 5 of primary cells (PrEC and NAF) on EPIC, and 8 of four cell
+#' lines (GM12878, K562, LNCaP, and HCT116) on EPICv2. Its sample table has these columns:
+#' \describe{
+#'   \item{sample}{The sample name.}
+#'   \item{platform}{The array.}
+#'   \item{cell.type}{The tissue or cell line.}
+#'   \item{category}{Normal tissue, normal cells, or a cell line.}
+#'   \item{global.beta}{The mean beta value over the CpGs of the whole array.}
+#' }
+#'
+#' @source Generated from `HM450.10.TCGA.PAAD.normal`, `EPIC.5.SigDF.normal`,
+#' `EPICv2.8.SigDF`, the array manifests, and `genomeInfo.hg38` in the sesameData package
+#' by \code{data-raw/generate_example_methylation.R}.
+#'
+#' @examples
+#' library(sciVizModules)
+#' data(example_methylation)
+#' example_methylation
+#' methylationTrack(example_methylation, gene = "MLH1", group.by = "platform")
+#'
+#' @author Jared Andrews
+#' @keywords datasets
+"example_methylation"
 #' Example dose-response data (simulated)
 #'
 #' A small, self-contained dose-response dataset: a serial dilution of doses

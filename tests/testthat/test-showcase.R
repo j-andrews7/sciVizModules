@@ -98,7 +98,7 @@ test_that("every menu has a module, and the gallery groups have no strays", {
     "x.by", "y.by", "x.data", "y.data", "color.by", "size.by", "fill.by", "group.by", "annotate.by",
     "split.by", "time", "status", "covariates", "response", "predictors", "clinical.tracks", "var",
     "vars", "sample.by", "trajectory.group.by", "dh.genes", "dh.order.by", "annot.by", "color.var",
-    "x.var", "y.var", "fill", "sub_rect", "column_split_cols"
+    "x.var", "y.var", "fill", "sub_rect", "column_split_cols", "anno.left", "anno.right", "filter.col"
 )
 
 # The names a dataset's column-valued defaults may take.
@@ -108,6 +108,9 @@ test_that("every menu has a module, and the gallery groups have no strays", {
     }
     if (inherits(data, "pca")) {
         return(names(data$metadata))
+    }
+    if (inherits(data, "methylationCohort")) {
+        return(names(data$samples))
     }
     if (is.list(data) && !is.null(data$object)) {
         data <- data$object

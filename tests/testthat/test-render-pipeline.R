@@ -27,6 +27,7 @@
 
 .all_pipeline_cases <- function() {
     data("example_cn_segment", package = "sciVizModules", envir = environment())
+    data("example_methylation", package = "sciVizModules", envir = environment())
     data("mm_kinetics", package = "sciVizModules", envir = environment())
     data("mm_kinetics_line", package = "sciVizModules", envir = environment())
     data("survival_lung", package = "sciVizModules", envir = environment())
@@ -110,6 +111,23 @@
                 download.format = "png"
             ), test_axes_inputs()),
             structural = list(point.size = 2), debounced = list(main = "A title")
+        ),
+        methylation = list(
+            server = methylationTrackServer, data = example_methylation, builder = ".meth_figure",
+            package = "sciVizModules", base = "base_plot", generate = "generate_plot",
+            inputs = c(list(
+                auto.update = TRUE, locate.by = "gene", gene = "DNMT1", region = "", probes = "", upstream = 2000,
+                downstream = 2000, cpg.scope = "all", max.cpgs = 1000, filter.col = "", sample.filter = "",
+                group.by = "platform", group.gap = 1, cluster.samples = FALSE, dist.method = "euclidean",
+                hclust.method = "ward.D2", show.dendrogram = TRUE, anno.left = "category",
+                anno.low = "#DEEBF7", anno.high = "#08306B", show.sample.names = TRUE, sample.font.size = 10,
+                txn.view = "full", txn.types = "protein_coding", txn.labels = TRUE, txn.font.size = 8,
+                show.cytoband = TRUE, show.map.lines = TRUE, show.coverage = TRUE, cpg.labels = "none",
+                colorscale.min = 0, colorscale.max = 1, colorbar.title = "Beta value", download.format = "png"
+            ), test_axes_inputs(), test_legend_inputs()),
+            structural = list(group.gap = 2),
+            reactive_change = list(gene = "MLH1"),
+            debounced = list(sample.filter = "platform == 'EPIC'")
         ),
         gofan = list(
             server = goFanPlotServer, data = data.frame(id = c("GO:1", "GO:2"), p = c(0.1, 0.2)),
@@ -220,6 +238,59 @@ test_that("every reactive a draw step reads redraws it", {
             expect_gt(draws(), n, label = nm)
         })
     }
+})
+
+test_that("methylationTrack redraws for each kind of typed input and for strip colours", {
+    case <- .pipeline_cases()$methylation
+    .with_pipeline(case, {
+        styled()
+        n <- draws()
+
+        set(case$debounced)
+        expect_identical(attr(styled(), "table")$samples$cell.type[1], factor("PrEC", levels(
+            attr(styled(), "table")$samples$cell.type
+        )))
+        expect_gt(draws(), n)
+        n <- draws()
+
+        set(list(sample.filter = "", locate.by = "region", region = "chr3:36990000-37010000"))
+        styled()
+        expect_gt(draws(), n)
+        n <- draws()
+
+        set(list(locate.by = "probes", probes = names(case$data$arrays$EPIC$loci)[1]))
+        styled()
+        expect_gt(draws(), n)
+        n <- draws()
+
+        # The discrete strips are heatmaps of their own, so their colours are drawn.
+        set(list(locate.by = "gene", anno.colors = c("category: Cell line" = "#123456")))
+        styled()
+        expect_gt(draws(), n)
+    })
+})
+
+test_that("methylationTrack's colour scale and frame change without a redraw", {
+    case <- .pipeline_cases()$methylation
+    .with_pipeline(case, {
+        first <- plotly::plotly_build(styled())
+        n <- draws()
+
+        set(list(
+            colorscale.colors = c(Lowest = "#000000", Highest = "#FFFFFF"), colorscale.reverse = TRUE,
+            colorscale.min = 0.2, colorbar.title = "New", absent.color = "#123456", na.color = "#654321",
+            sample.font.size = 6, axis.linewidth = 3
+        ))
+        second <- plotly::plotly_build(styled())
+
+        expect_equal(draws(), n)
+        expect_identical(second$x$data, first$x$data)
+        expect_identical(second$x$layout$coloraxis$cmin, 0.2)
+        expect_identical(second$x$layout$coloraxis$colorscale[[1]][[2]], "#FFFFFF")
+        expect_identical(second$x$layout$coloraxis$colorbar$title$text, "New")
+        expect_identical(second$x$layout$coloraxis2$colorscale[[1]][[2]], "#123456")
+        expect_identical(second$x$layout$yaxis$tickfont$size, 6)
+    })
 })
 
 test_that("with Auto Update off, nothing redraws until Update is pressed", {

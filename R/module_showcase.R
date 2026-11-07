@@ -40,6 +40,7 @@
         example_sbs96 = bundled("example_sbs96"),
         example_sce = bundled("example_sce"),
         example_cn_segment = bundled("example_cn_segment"),
+        example_methylation = bundled("example_methylation"),
         example_pca = bundled("example_pca"),
         example_gsea = bundled("example_gsea"),
         example_mageck = entry(function() .crispr_example("rra"), label = "example_mageck"),
@@ -388,6 +389,16 @@
             "Array copy-number segments and bin signals along the genome, with cancer genes marked.",
             "example_cn_segment", "object",
             preview = .cn_preview
+        ),
+        methylation = entry(
+            "methylationTrack", "Methylation Track", "Methylation", "Genomics",
+            "Beta values over a gene across 450K, EPIC and EPICv2 samples, joined on position, with transcripts.",
+            "example_methylation", "object",
+            defaults = list(
+                gene = "DNMT1", group.by = "platform", cluster.samples = TRUE, anno.left = "category",
+                anno.right = c("cell.type", "global.beta"), txn.view = "collapsed"
+            ),
+            preview = .meth_preview
         ),
 
         # ---- Mutations -----------------------------------------------------
