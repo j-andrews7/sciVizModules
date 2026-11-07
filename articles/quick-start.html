@@ -215,6 +215,7 @@ and showcase settings as its gallery tab:</p>
 <span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="../reference/dittoDimPlotApp.html">dittoDimPlotApp</a></span><span class="op">(</span><span class="op">)</span>    <span class="co"># single-cell reduction, example_sce</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="../reference/doseResponseApp.html">doseResponseApp</a></span><span class="op">(</span><span class="op">)</span>    <span class="co"># pharmacology, dose_response</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="../reference/cnSegmentPlotApp.html">cnSegmentPlotApp</a></span><span class="op">(</span><span class="op">)</span>   <span class="co"># copy number, example_cn_segment</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="../reference/methylationTrackApp.html">methylationTrackApp</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># DNA methylation arrays, example_methylation</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="../reference/forestPlotApp.html">forestPlotApp</a></span><span class="op">(</span><span class="op">)</span>      <span class="co"># Cox / logistic / linear model, survival_lung</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="../reference/pcaBiplotApp.html">pcaBiplotApp</a></span><span class="op">(</span><span class="op">)</span>       <span class="co"># PCAtools pca object, example_pca</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="../reference/alphafoldConfidenceApp.html">alphafoldConfidenceApp</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># AlphaFold DB prediction for p53</span></span>
@@ -701,6 +702,85 @@ not take a data frame, so it cannot go in the Figure Builder.</p>
 <span><span class="va">example_cn_segment</span></span></code></pre></div>
 </div>
 <div class="section level3">
+<h3 id="dna-methylation">DNA methylation<a class="anchor" aria-label="anchor" href="#dna-methylation"></a>
+</h3>
+<table class="table">
+<colgroup>
+<col width="20%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
+</colgroup>
+<thead><tr class="header">
+<th>Module</th>
+<th>Server function</th>
+<th>Data type</th>
+<th>Expected data</th>
+<th>Example data</th>
+</tr></thead>
+<tbody><tr class="odd">
+<td>Methylation track</td>
+<td><code><a href="../reference/methylationTrackServer.html">methylationTrackServer()</a></code></td>
+<td>
+<code>methylationCohort</code>, or what it takes</td>
+<td>Beta values from one or more Infinium arrays, as matrices or
+<code>SummarizedExperiment</code>s, with probes in rows</td>
+<td><code>example_methylation</code></td>
+</tr></tbody>
+</table>
+<p><code><a href="../reference/methylationTrack.html">methylationTrack()</a></code> draws SeSAMe’s track view: a heatmap
+of beta values under the transcripts of a gene, region or set of probes.
+It takes cohorts that mix arrays. <code><a href="../reference/methylationCohort.html">methylationCohort()</a></code>
+gathers them, from a list with one entry per platform or from one matrix
+or <code>SummarizedExperiment</code> already merged across them. Probe
+positions come from <code>rowRanges()</code>, <code>rowData()</code>
+columns, or the sesameData manifests.</p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># betas_450k, betas_epic and betas_epicv2 are matrices with probes in rows, from</span></span>
+<span><span class="co"># sesame::openSesame() or any other pipeline, and sample_info has their sample</span></span>
+<span><span class="co"># names as row names. Positions are read from the sesameData manifests.</span></span>
+<span><span class="va">cohort</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/methylationCohort.html">methylationCohort</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>HM450 <span class="op">=</span> <span class="va">betas_450k</span>, EPIC <span class="op">=</span> <span class="va">betas_epic</span>, EPICv2 <span class="op">=</span> <span class="va">betas_epicv2</span><span class="op">)</span>,</span>
+<span>    samples <span class="op">=</span> <span class="va">sample_info</span></span>
+<span><span class="op">)</span></span>
+<span><span class="va">cohort</span> <span class="co"># counts the CpGs each pair of arrays shares</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/methylationTrack.html">methylationTrack</a></span><span class="op">(</span><span class="va">cohort</span>, gene <span class="op">=</span> <span class="st">"DNMT1"</span>, group.by <span class="op">=</span> <span class="st">"platform"</span>, cluster.samples <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="../reference/methylationTrackApp.html">methylationTrackApp</a></span><span class="op">(</span><span class="va">cohort</span><span class="op">)</span></span></code></pre></div>
+<p>Arrays are joined on genomic position, not probe ID. The same cg ID
+can sit at different positions on different arrays, and different IDs
+can measure the same CpG, so a join on IDs merges some CpGs that differ
+and splits some that do not. Replicate probes at one position are
+averaged.</p>
+<p>Reading a mixed cohort takes some care:</p>
+<ul>
+<li>
+<strong>Grey is not missing data.</strong> Only around a third of
+the CpGs on these arrays are on all three, so a HM450 sample is empty at
+many of the columns an EPICv2 sample fills. These cells are “not on this
+array”, and they differ from a probe the array has but gave no value,
+which has a colour of its own. Nothing is imputed. Set CpGs to “Shared
+by all arrays” to see only those on every plotted array.</li>
+<li>
+<strong>Clustering rests on the CpGs measured in all the samples
+clustered.</strong> That can be few in a small region, and with fewer
+than two the figure says it fell back on each pair’s shared CpGs.</li>
+<li>
+<strong>Arrays are not corrected for.</strong> Probe chemistry and
+preprocessing differ between platforms, so a cluster that follows
+<code>platform</code> may be technical. Group by <code>platform</code>,
+or compare within an array, before reading it as biology.</li>
+<li>
+<code>example_methylation</code> holds different samples on each
+array, so it shows how the module works and is not a comparison of
+platforms.</li>
+</ul>
+<p>Because the data is not a data frame, it cannot go in the Figure
+Builder.</p>
+</div>
+<div class="section level3">
 <h3 id="genetics-gwas">Genetics (GWAS)<a class="anchor" aria-label="anchor" href="#genetics-gwas"></a>
 </h3>
 <table class="table">
@@ -801,7 +881,7 @@ or a clusterProfiler <code>gseaResult</code>
 </td>
 </tr></tbody>
 </table>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">screen</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_mageck.html">read_mageck</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"example_mageck.gene_summary.txt.gz"</span>,</span>
 <span>    package <span class="op">=</span> <span class="st">"sciVizModules"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">screen</span><span class="op">)</span></span>
@@ -881,7 +961,7 @@ one column per sample</td>
 <p>Silent variants are dropped as <code><a href="https://rdrr.io/pkg/maftools/man/read.maf.html" class="external-link">maftools::read.maf()</a></code>
 drops them; the gene, sample and substitution summaries match
 maftools’.</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># The TCGA LAML cohort maftools ships, with its clinical annotations.</span></span>
 <span><span class="va">laml</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/read.table.html" class="external-link">read.delim</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"tcga_laml.maf.gz"</span>, package <span class="op">=</span> <span class="st">"maftools"</span><span class="op">)</span>,</span>
 <span>    comment.char <span class="op">=</span> <span class="st">"#"</span><span class="op">)</span></span>
@@ -951,7 +1031,7 @@ InteractiveComplexHeatmap widgets rather than plotly figures and need
 ComplexHeatmap, InteractiveComplexHeatmap and circlize.
 <code><a href="../reference/sample_pca.html">sample_pca()</a></code> builds the same PCA for the PCAtools modules
 below.</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"airway"</span>, package <span class="op">=</span> <span class="st">"airway"</span><span class="op">)</span></span>
 <span><span class="va">airway</span></span>
 <span><span class="fu"><a href="../reference/pcaScreePlot.html">pcaScreePlot</a></span><span class="op">(</span><span class="fu"><a href="../reference/sample_pca.html">sample_pca</a></span><span class="op">(</span><span class="va">airway</span>, transform <span class="op">=</span> <span class="st">"log2cpm"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
@@ -1025,7 +1105,7 @@ below.</p>
 <code>pca_list</code>. A <code>pca</code> object is a plain list, so the
 modules read it without PCAtools installed; PCAtools is needed only to
 make one, and to mark the elbow on the scree plot.</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">example_pca</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">example_pca</span><span class="op">$</span><span class="va">variance</span>, <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">example_pca</span><span class="op">$</span><span class="va">metadata</span><span class="op">)</span></span></code></pre></div>
@@ -1063,7 +1143,7 @@ gzipped</td>
 </td>
 </tr></tbody>
 </table>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">af</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_alphafold.html">read_alphafold</a></span><span class="op">(</span></span>
 <span>    pae <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"AF-P04637-F1-predicted_aligned_error_v6.json.gz"</span>,</span>
 <span>        package <span class="op">=</span> <span class="st">"sciVizModules"</span><span class="op">)</span>,</span>
@@ -1121,12 +1201,12 @@ optionally gzipped</td>
 figure. It is an NGL 3D widget, so it has its own PNG snapshot button
 instead of the Source Data download, and it is not available to the
 Figure Builder.</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">p53</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/read_structure.html">read_structure</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="st">"AF-P04637-F1-model_v6.pdb.gz"</span>,</span>
 <span>    package <span class="op">=</span> <span class="st">"sciVizModules"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">p53</span></span>
 <span><span class="fu"><a href="../reference/structureViewer.html">structureViewer</a></span><span class="op">(</span><span class="va">p53</span>, color.by <span class="op">=</span> <span class="st">"plddt"</span>, highlight <span class="op">=</span> <span class="st">"175, 248, 273"</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ext</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">f</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"extdata"</span>, <span class="va">f</span>, package <span class="op">=</span> <span class="st">"sciVizModules"</span><span class="op">)</span></span>
 <span><span class="va">md</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="../reference/read_xvg.html">read_xvg</a></span><span class="op">(</span><span class="fu">ext</span><span class="op">(</span><span class="st">"example_rmsd_rep1.xvg.gz"</span><span class="op">)</span>, series <span class="op">=</span> <span class="st">"replica 1"</span><span class="op">)</span>,</span>
@@ -1211,7 +1291,7 @@ ridge)</td>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">example_sce</span><span class="op">)</span></span>
 <span><span class="va">example_sce</span></span></code></pre></div>
 </div>
@@ -1222,14 +1302,14 @@ ridge)</td>
 <p>The data-frame modules are registered with the VizModules Figure
 Builder, so several panels can be dragged, sized and exported as one
 figure. It is also the last tab of the module gallery:</p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/sciFigureBuilderApp.html">sciFigureBuilderApp</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><code><a href="../reference/sci_figure_builder_registry.html">sci_figure_builder_registry()</a></code> returns the registry
 itself, in the shape <code><a href="https://j-andrews7.github.io/VizModules/reference/figureBuilderServer.html" class="external-link">VizModules::figureBuilderServer()</a></code>
 documents, so you can extend it with your own modules. Its entries come
 from the same registry as the gallery, so a panel opens on its gallery
 tab’s settings when its example dataset is the one picked:</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">registry</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/sci_figure_builder_registry.html">sci_figure_builder_registry</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">registry</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">registry</span><span class="op">$</span><span class="va">volcano</span>, max.level <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
@@ -1240,12 +1320,12 @@ register in it.</p>
 <p><code>mutationalProfile</code> is registered alongside the
 differential-expression, enrichment, dose-response and survival modules.
 The dittoSeq modules, the bulk expression modules,
-<code>cnSegmentPlot</code>, <code>michaelisMenten</code>, the PCAtools
-modules, <code>gseaEnrichmentPlot</code> and
-<code>alphafoldConfidence</code> are not: the builder’s dataset
-catalogue holds data frames, and those take other objects.
-<code>structureViewer</code> is a 3D widget rather than a plotly figure.
-<code>forestPlot</code>, the GWAS modules,
+<code>cnSegmentPlot</code>, <code>methylationTrack</code>,
+<code>michaelisMenten</code>, the PCAtools modules,
+<code>gseaEnrichmentPlot</code> and <code>alphafoldConfidence</code> are
+not: the builder’s dataset catalogue holds data frames, and those take
+other objects. <code>structureViewer</code> is a 3D widget rather than a
+plotly figure. <code>forestPlot</code>, the GWAS modules,
 <code>crisprScreenRank</code>, the MAF modules (<code>oncoPlot</code>,
 <code>mafSummary</code>, <code>mutationLollipop</code>),
 <code>rocCurve</code>, <code>pkConcentrationTime</code>,

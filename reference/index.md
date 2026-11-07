@@ -421,6 +421,26 @@ as returned by
 - [`cnSegmentPlotApp()`](https://j-andrews7.github.io/sciVizModules/reference/cnSegmentPlotApp.md)
   : Create a standalone Shiny app for the cnSegmentPlot module
 
+## DNA methylation
+
+A track view of beta values over a gene or region, joined on genomic
+position across Infinium arrays, with transcripts and sample
+annotations.
+
+- [`methylationCohort()`](https://j-andrews7.github.io/sciVizModules/reference/methylationCohort.md)
+  [`print(`*`<methylationCohort>`*`)`](https://j-andrews7.github.io/sciVizModules/reference/methylationCohort.md)
+  : Assemble a DNA methylation cohort from one or more arrays
+- [`methylationTrack()`](https://j-andrews7.github.io/sciVizModules/reference/methylationTrack.md)
+  : Plot a genomic region of DNA methylation across arrays
+- [`methylationTrackInputsUI()`](https://j-andrews7.github.io/sciVizModules/reference/methylationTrackInputsUI.md)
+  : Input UI components for the methylationTrack module
+- [`methylationTrackOutputUI()`](https://j-andrews7.github.io/sciVizModules/reference/methylationTrackOutputUI.md)
+  : Output UI components for the methylationTrack module
+- [`methylationTrackServer()`](https://j-andrews7.github.io/sciVizModules/reference/methylationTrackServer.md)
+  : Server logic for the methylationTrack module
+- [`methylationTrackApp()`](https://j-andrews7.github.io/sciVizModules/reference/methylationTrackApp.md)
+  : Create a standalone Shiny app for the methylationTrack module
+
 ## Single-cell and RNA-seq (dittoSeq)
 
 Wrappers around the dittoSeq plotting functions. Each takes a
@@ -538,6 +558,9 @@ This package sets no `LazyData`, so load them with
 
 - [`example_cn_segment`](https://j-andrews7.github.io/sciVizModules/reference/example_cn_segment.md)
   : Example copy number segmentation results from sesame
+
+- [`example_methylation`](https://j-andrews7.github.io/sciVizModules/reference/example_methylation.md)
+  : Example multi-array DNA methylation cohort
 
 - [`example_enrichment`](https://j-andrews7.github.io/sciVizModules/reference/example_enrichment.md)
   : Example functional enrichment results (simulated)

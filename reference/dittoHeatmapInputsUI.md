@@ -181,28 +181,28 @@ if (requireNamespace("ComplexHeatmap", quietly = TRUE)) {
 #> </div>
 #> <h3>dittoHeatmap Settings</h3>
 #> <div class="tabbable vizmodules-input-tabs">
-#>   <ul class="nav nav-tabs shiny-tab-input" id="heatmap-HeatmapTabsetPanel" data-tabsetid="9764">
+#>   <ul class="nav nav-tabs shiny-tab-input" id="heatmap-HeatmapTabsetPanel" data-tabsetid="2688">
 #>     <li class="active">
-#>       <a href="#tab-9764-1" data-toggle="tab" data-bs-toggle="tab" data-value="Matrix">Matrix</a>
+#>       <a href="#tab-2688-1" data-toggle="tab" data-bs-toggle="tab" data-value="Matrix">Matrix</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-9764-2" data-toggle="tab" data-bs-toggle="tab" data-value="Filter">Filter</a>
+#>       <a href="#tab-2688-2" data-toggle="tab" data-bs-toggle="tab" data-value="Filter">Filter</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-9764-3" data-toggle="tab" data-bs-toggle="tab" data-value="Colors">Colors</a>
+#>       <a href="#tab-2688-3" data-toggle="tab" data-bs-toggle="tab" data-value="Colors">Colors</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-9764-4" data-toggle="tab" data-bs-toggle="tab" data-value="Clustering">Clustering</a>
+#>       <a href="#tab-2688-4" data-toggle="tab" data-bs-toggle="tab" data-value="Clustering">Clustering</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-9764-5" data-toggle="tab" data-bs-toggle="tab" data-value="Labels">Labels</a>
+#>       <a href="#tab-2688-5" data-toggle="tab" data-bs-toggle="tab" data-value="Labels">Labels</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-9764-6" data-toggle="tab" data-bs-toggle="tab" data-value="Annotations">Annotations</a>
+#>       <a href="#tab-2688-6" data-toggle="tab" data-bs-toggle="tab" data-value="Annotations">Annotations</a>
 #>     </li>
 #>   </ul>
-#>   <div class="tab-content" data-tabsetid="9764">
-#>     <div class="tab-pane active" data-value="Matrix" id="tab-9764-1">
+#>   <div class="tab-content" data-tabsetid="2688">
+#>     <div class="tab-pane active" data-value="Matrix" id="tab-2688-1">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify4308988">
@@ -247,7 +247,7 @@ if (requireNamespace("ComplexHeatmap", quietly = TRUE)) {
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Filter" id="tab-9764-2">
+#>     <div class="tab-pane" data-value="Filter" id="tab-2688-2">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" id="tipify430013">
@@ -265,7 +265,7 @@ if (requireNamespace("ComplexHeatmap", quietly = TRUE)) {
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Colors" id="tab-9764-3">
+#>     <div class="tab-pane" data-value="Colors" id="tab-2688-3">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" data-shiny-input-type="colour" id="tipify5144025">
@@ -344,7 +344,7 @@ if (requireNamespace("ComplexHeatmap", quietly = TRUE)) {
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Clustering" id="tab-9764-4">
+#>     <div class="tab-pane" data-value="Clustering" id="tab-2688-4">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" id="tipify7337297">
@@ -492,7 +492,7 @@ if (requireNamespace("ComplexHeatmap", quietly = TRUE)) {
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Labels" id="tab-9764-5">
+#>     <div class="tab-pane" data-value="Labels" id="tab-2688-5">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" id="tipify7311036">
@@ -600,7 +600,7 @@ if (requireNamespace("ComplexHeatmap", quietly = TRUE)) {
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Annotations" id="tab-9764-6">
+#>     <div class="tab-pane" data-value="Annotations" id="tab-2688-6">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="multi-dynamic-input shiny-input-container form-group " id="heatmap-row_annotations" data-keys="[&quot;column&quot;,&quot;side&quot;,&quot;label_side&quot;,&quot;label_size&quot;,&quot;show_legend&quot;]" data-initial="[]" data-input-id="heatmap-row_annotations" data-row-prefix="row annotations">

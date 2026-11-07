@@ -19,17 +19,20 @@ Bioconductor packaging conventions.
 - **R/** - source files: `*_module_ui.R` (UI), `*_module_server.R`
   (logic), `*_module_app.R` (examples), plus `*_helpers.R` and
   standalone plot functions. Package-wide helpers live in
-  `example_data.R`, `input_helpers.R`, `palette_helpers.R` and
-  `figure_builder_registry.R`. `module_showcase.R` holds the
-  example-data catalogue and the showcase registry every module needs an
-  entry in; `moduleGallery_app.R` builds the gallery from it (see
-  “Adding a Module: Gallery, App and Figure Builder”)
+  `example_data.R`, `input_helpers.R` and `figure_builder_registry.R`.
+  `module_showcase.R` holds the example-data catalogue and the showcase
+  registry every module needs an entry in; `moduleGallery_app.R` builds
+  the gallery from it (see “Adding a Module: Gallery, App and Figure
+  Builder”)
 - **man/** - Auto-generated roxygen2 docs
 - **data/** - example datasets used by tests, examples, and vignettes.
   `DESCRIPTION` sets no `LazyData`, so package code reaches them through
   [`.sci_example_data()`](https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_sci_example_data.md),
-  never by bare name. Do not ship data a dependency already ships: read
-  it from that package with a small internal loader
+  never by bare name. Save them with
+  [`save()`](https://rdrr.io/r/base/save.html), since
+  `usethis::use_data()` turns `LazyData` on. Do not ship data a
+  dependency already ships: read it from that package with a small
+  internal loader
   ([`.maf_example()`](https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_maf_example.md)
   reads maftools’ TCGA LAML MAF,
   [`.se_example()`](https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_se_example.md)
@@ -61,19 +64,20 @@ Bioconductor packaging conventions.
 `dittoHeatmap`, `dittoPlot`, `dittoRidgeJitter`, `dittoScatterPlot`,
 `crisprScreenRank`, `doseResponse`, `enrichmentDotPlot`, `forestPlot`,
 `goFanPlot`, `gseaEnrichmentPlot`, `gwasQQPlot`, `mafSummary`, `maPlot`,
-`manhattanPlot`, `mdTrajectoryMetrics`, `michaelisMenten`,
-`mutationalProfile`, `mutationLollipop`, `oncoPlot`, `pcaBiplot`,
-`pcaEigencorPlot`, `pcaLoadingsPlot`, `pcaPairsPlot`, `pcaScreePlot`,
-`pkConcentrationTime`, `plateHeatmap`, `rocCurve`,
+`manhattanPlot`, `mdTrajectoryMetrics`, `methylationTrack`,
+`michaelisMenten`, `mutationalProfile`, `mutationLollipop`, `oncoPlot`,
+`pcaBiplot`, `pcaEigencorPlot`, `pcaLoadingsPlot`, `pcaPairsPlot`,
+`pcaScreePlot`, `pkConcentrationTime`, `plateHeatmap`, `rocCurve`,
 `sampleDistanceHeatmap`, `samplePCA`, `structureViewer`,
 `survivalCurve`, `volcanoPlot`.
 
 The modules that build their own plotly figure (the PCAtools family
 except `pcaBiplot`, `alphafoldConfidence`, `gseaEnrichmentPlot`, the MAF
-modules `oncoPlot`, `mafSummary` and `mutationLollipop`, and the
-data-frame modules `forestPlot`, `rocCurve`, `pkConcentrationTime`,
-`plateHeatmap`, `mdTrajectoryMetrics` and `survivalCurve`) share their
-server, input layout and app scaffolding through
+modules `oncoPlot`, `mafSummary` and `mutationLollipop`,
+`methylationTrack`, and the data-frame modules `forestPlot`, `rocCurve`,
+`pkConcentrationTime`, `plateHeatmap`, `mdTrajectoryMetrics` and
+`survivalCurve`) share their server, input layout and app scaffolding
+through
 [`.sci_plot_server()`](https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_sci_plot_server.md),
 [`.sci_plot_inputs_ui()`](https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_sci_plot_inputs_ui.md)
 and
@@ -85,7 +89,10 @@ or by hand, works in two steps, so a styling change never redraws the
 plot and reaches the browser as a layout-only update: a draw function of
 `isolate_fn` handed to `cached_structure()`, then a `generate_*`
 reactive that styles the cached figure (tests read `generate_*` by
-name). It renders through
+name).
+[`.sci_plot_server()`](https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_sci_plot_server.md)
+takes an optional `style` for anything of a module’s own in that second
+step. It renders through
 [`.sci_render_plotly()`](https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_sci_render_plotly.md),
 which ends in `finalize_manual_edits()`, wired with
 `setup_manual_edits()` and `reset_manual_edits()` in Reset. Three rules
@@ -227,6 +234,40 @@ object or a MAF data frame through
 (`R/maf_helpers.R`), whose summaries are tested equal to maftools’;
 maftools itself is needed only for protein domains.
 
+`methylationTrack` reads a
+[`methylationCohort()`](https://j-andrews7.github.io/sciVizModules/reference/methylationCohort.md)
+(`R/methylationCohort.R`), which holds one entry per array and never
+builds the union of their CpGs:
+[`.meth_query()`](https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_meth_query.md)
+pulls a region from each array, and only then joins them, on genomic
+position rather than probe ID, because cg IDs do not identify a CpG
+across arrays. Its results are tested equal to
+[`sesame::visualizeRegion()`](https://rdrr.io/pkg/sesame/man/visualizeRegion.html)
+and `visualizeGene()`. Which cells a sample’s array lacks is kept apart
+from which are `NA` (`absent`), since most cells of a mixed cohort are
+one or the other. It is the reference for a figure with hand-set
+domains, used where panels must share a coordinate system but a
+`subplot()` would not do. Each panel has axes of its own, linked with
+`matches`, since a shared axis makes
+[`.sci_shared_panel_borders()`](https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_sci_shared_panel_borders.md)
+box every panel and an axis with no traces does not draw. The primary
+`xaxis` and `yaxis` go on the outermost panels, so the Axes tab styles
+the labels, and every other axis goes through `mark_overlay_axes()`.
+Colour lives on `layout.coloraxis` and is set in the `style` step of
+[`.sci_plot_server()`](https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_sci_plot_server.md)
+([`.meth_apply_scale()`](https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_meth_figure.md)),
+so a colour change is layout-only and a dragged colourbar is restored,
+which `.reapply_manual_edits()` does only from there or a marker.
+`edits$colorbar` holds one position, so such a figure has one colorbar:
+numeric annotation strips use legend swatches. An annotation picker over
+strips that come and go is seeded with a cohort-wide level-to-colour map
+through a reactive in `defaults`
+([`.meth_level_colors()`](https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_meth_strips.md)),
+since `resolve_palette()` starts new groups from the palette’s first
+colour. Neither `gene` nor `filter.levels` is frozen around its update,
+because a value that does not change is never echoed: readers tolerate
+stale values instead.
+
 Each exposes the `*InputsUI()` / `*OutputUI()` / `*Server()` / `*App()`
 set. Run the `*App()` to inspect one interactively, or
 [`sciModuleGalleryApp()`](https://j-andrews7.github.io/sciVizModules/reference/sciModuleGalleryApp.md)
@@ -244,9 +285,11 @@ multi-panel figure with
 [`sciFigureBuilderApp()`](https://j-andrews7.github.io/sciVizModules/reference/sciFigureBuilderApp.md).
 The dittoSeq modules (`SingleCellExperiment` input), the bulk expression
 modules `samplePCA`, `sampleDistanceHeatmap` and `deHeatmap`
-(`SummarizedExperiment`), `cnSegmentPlot` (`CNSegment`) and
-`michaelisMenten` (a bundle carrying a model fit), the PCAtools modules
-(a `pca` object) and `alphafoldConfidence` (a
+(`SummarizedExperiment`), `cnSegmentPlot` (`CNSegment`),
+`methylationTrack` (a
+[`methylationCohort()`](https://j-andrews7.github.io/sciVizModules/reference/methylationCohort.md))
+and `michaelisMenten` (a bundle carrying a model fit), the PCAtools
+modules (a `pca` object) and `alphafoldConfidence` (a
 [`read_alphafold()`](https://j-andrews7.github.io/sciVizModules/reference/read_alphafold.md)
 result) cannot be registered - the builder’s dataset catalogue holds
 data frames - and `structureViewer` is not a plotly figure.
@@ -329,10 +372,12 @@ organization, downloads, annotations, and module infrastructure.
     `updateMultiDynamicInput()`, and the uniform input blocks
     (`uniform_axes_inputs_ui()`, `uniform_legend_inputs_ui()`,
     `uniform_lines_inputs_ui()`, `uniform_plotly_inputs_ui()`,
-    `uniform_annotation_inputs_ui()`) with their reset counterparts
+    `uniform_annotation_inputs_ui()`, `uniform_colorscale_inputs_ui()`
+    for a colorbar’s five-stop scale, limits and title, passed to
+    `resolve_colorscale()`) with their reset counterparts
     (`reset_axes_inputs()`, `reset_legend_inputs()`,
     `reset_lines_inputs()`, `reset_plotly_inputs()`,
-    `reset_annotation_inputs()`), plus
+    `reset_annotation_inputs()`, `reset_colorscale_inputs()`), plus
     `uniform_subplot_spacing_inputs_ui()` / `subplot_spacing_defaults()`
     for a Facet tab’s spacing controls.
   - **Defaults and server-side stores**: `cached_structure()`,
@@ -355,10 +400,11 @@ organization, downloads, annotations, and module infrastructure.
     adjusted axis.
   - **Plot finishing**: `apply_uniform_styling()` (the whole styling
     step, with `ggplot.axis.styling = FALSE` for a figure whose axis
-    lines do not come from a ggplot theme), `auto_webgl()` with
-    `webgl_input()` (points switch to WebGL at 5,000 by default; WebGL
-    canvases sit above SVG traces, so pass `overlays = TRUE` where lines
-    must stay on top of the points), `split_color_shape_legend()`
+    lines do not come from a ggplot theme), `mark_overlay_axes()`
+    (exempts the axes of panels beside the plot from it), `auto_webgl()`
+    with `webgl_input()` (points switch to WebGL at 5,000 by default;
+    WebGL canvases sit above SVG traces, so pass `overlays = TRUE` where
+    lines must stay on top of the points), `split_color_shape_legend()`
     (ggplot2’s two legend sections for a built ggplotly figure),
     `apply_title_layout()`, `create_axis_styles()`,
     `apply_subplot_axis_styling()`, `axis_titles_as_annotations()`,
@@ -696,8 +742,8 @@ IRanges, jsonlite, methods, NGLVieweR, plotly, readxl, S4Vectors,
 scales, Seqinfo, shinyBS, shinyjqui, shinyjs, shinyWidgets,
 SingleCellExperiment, stats, SummarizedExperiment, survival
 
-**Suggests**: airway, circlize, ComplexHeatmap, DESeq2, drc, edgeR,
-fgsea, ggplot.multistats, GOfan, hexbin, htmltools,
+**Suggests**: airway, circlize, ComplexHeatmap, DelayedArray, DESeq2,
+drc, edgeR, fgsea, ggplot.multistats, GOfan, hexbin, htmltools,
 InteractiveComplexHeatmap, knitr, maftools, org.Hs.eg.db, PCAtools,
 PKNCA, pROC, rmarkdown, sesame, sesameData, survminer, testthat (\>=
 3.0.0)
@@ -708,15 +754,19 @@ declaration alike. Several packages resolve at runtime only because
 VizModules `Depends:` on them; that is not a declaration.
 
 Bioconductor packages appear throughout; some example data depends on
-`sesame`/`sesameData`, `goFanPlot` needs `GOfan` plus an `OrgDb`, and
-`doseResponse` needs `drc`. `dittoDimHex` needs `hexbin`, which
+`sesame`/`sesameData`, `sesameData` supplies
+[`methylationCohort()`](https://j-andrews7.github.io/sciVizModules/reference/methylationCohort.md)‘s
+default probe positions, transcripts and cytobands (a cohort can carry
+its own, as `example_methylation` does) and, with `sesame`, is a test
+reference, `goFanPlot` needs `GOfan` plus an `OrgDb`, and `doseResponse`
+needs `drc`. `dittoDimHex` needs `hexbin`, which
 [`dittoSeq::dittoDimHex()`](https://rdrr.io/pkg/dittoSeq/man/dittoHex.html)
 draws its hexes with, and `ggplot.multistats` for its Color By.
 `PCAtools` is needed only to build a `pca` object and for the scree
 plot’s elbow marker. `pROC` supplies the DeLong AUC interval in
 `rocCurve`; `pROC`, `PKNCA` and `fgsea` are otherwise test references
 for quantities computed in-package, as `survminer` is for
-`survivalCurve`‘s pairwise log-rank tests. The heatmap modules
+`survivalCurve`’s pairwise log-rank tests. The heatmap modules
 (`dittoHeatmap`, `sampleDistanceHeatmap`, `deHeatmap`) need
 `ComplexHeatmap`, `InteractiveComplexHeatmap` and `circlize`; `DESeq2`
 supplies the variance-stabilising transformation of the bulk modules;
@@ -728,7 +778,9 @@ bulk modules’ example experiment
 ([`.se_example()`](https://j-andrews7.github.io/sciVizModules/reference/INTERNAL_se_example.md)).
 All are Suggests and must be reached through
 [`requireNamespace()`](https://rdrr.io/r/base/ns-load.html) and guarded
-in examples and tests.
+in examples and tests. `DelayedArray` is a test dependency, for
+[`methylationCohort()`](https://j-andrews7.github.io/sciVizModules/reference/methylationCohort.md)
+on a delayed matrix.
 
 ## Common Issues
 

@@ -110,104 +110,104 @@ p53 <- read_structure(system.file("extdata", "AF-P04637-F1-model_v6.pdb.gz",
 structureViewerInputsUI("viewer", p53)
 #> <h3>Structure Viewer Settings</h3>
 #> <div class="tabbable vizmodules-input-tabs">
-#>   <ul class="nav nav-tabs shiny-tab-input" id="viewer-structureViewerTabsetPanel" data-tabsetid="3658">
+#>   <ul class="nav nav-tabs shiny-tab-input" id="viewer-structureViewerTabsetPanel" data-tabsetid="8677">
 #>     <li class="active">
-#>       <a href="#tab-3658-1" data-toggle="tab" data-bs-toggle="tab" data-value="Style">Style</a>
+#>       <a href="#tab-8677-1" data-toggle="tab" data-bs-toggle="tab" data-value="Style">Style</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-3658-2" data-toggle="tab" data-bs-toggle="tab" data-value="Highlight">Highlight</a>
+#>       <a href="#tab-8677-2" data-toggle="tab" data-bs-toggle="tab" data-value="Highlight">Highlight</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-3658-3" data-toggle="tab" data-bs-toggle="tab" data-value="View">View</a>
+#>       <a href="#tab-8677-3" data-toggle="tab" data-bs-toggle="tab" data-value="View">View</a>
 #>     </li>
 #>   </ul>
-#>   <div class="tab-content" data-tabsetid="3658">
-#>     <div class="tab-pane active" data-value="Style" id="tab-3658-1">
+#>   <div class="tab-content" data-tabsetid="8677">
+#>     <div class="tab-pane active" data-value="Style" id="tab-8677-1">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify9437307">
+#>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify690960">
 #>             <label class="control-label" id="viewer-representation-label" for="viewer-representation">Representation</label>
 #>             <div id="viewer-representation" class="virtual-select" style="width:100%;max-width:none;display:block;" data-update="change">
 #>               <script type="application/json" data-for="viewer-representation">{"stateInput":false,"options":{"type":["transpose"],"choices":{"label":["Cartoon","Backbone","Ribbon","Rope","Surface","Ball and stick","Licorice","Spacefill"],"value":["cartoon","backbone","ribbon","rope","surface","ball+stick","licorice","spacefill"]}},"config":{"multiple":false,"search":false,"selectedValue":"cartoon","hideClearButton":true,"autoSelectFirstOption":false,"showSelectedOptionsFirst":false,"showValueAsTags":false,"optionsCount":10,"noOfDisplayValues":50,"allowNewOption":false,"disableSelectAll":true,"disableOptionGroupCheckbox":true,"disabled":false,"dropboxWrapper":"body","zIndex":1060}}</script>
 #>             </div>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify9437307', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'How the polymer is drawn.'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify690960', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'How the polymer is drawn.'})}, 500)});</script>
 #>         </div>
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify701685">
+#>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify4314967">
 #>             <label class="control-label" id="viewer-color.by-label" for="viewer-color.by">Color By</label>
 #>             <div id="viewer-color.by" class="virtual-select" style="width:100%;max-width:none;display:block;" data-update="change">
 #>               <script type="application/json" data-for="viewer-color.by">{"stateInput":false,"options":{"type":["transpose"],"choices":{"label":["pLDDT (AlphaFold)","B-factor","Chain","Rainbow (N to C)","Secondary structure","Hydrophobicity","Element"],"value":["plddt","bfactor","chainname","residueindex","sstruc","hydrophobicity","element"]}},"config":{"multiple":false,"search":false,"selectedValue":"plddt","hideClearButton":true,"autoSelectFirstOption":false,"showSelectedOptionsFirst":false,"showValueAsTags":false,"optionsCount":10,"noOfDisplayValues":50,"allowNewOption":false,"disableSelectAll":true,"disableOptionGroupCheckbox":true,"disabled":false,"dropboxWrapper":"body","zIndex":1060}}</script>
 #>             </div>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify701685', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Colour scheme. pLDDT uses the AlphaFold DB confidence bands from the B-factor column (very high > 90, confident 70-90, low 50-70, very low < 50).'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify4314967', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Colour scheme. pLDDT uses the AlphaFold DB confidence bands from the B-factor column (very high > 90, confident 70-90, low 50-70, very low < 50).'})}, 500)});</script>
 #>         </div>
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" data-shiny-input-type="colour" id="tipify719735">
+#>           <div class="form-group shiny-input-container" data-shiny-input-type="colour" id="tipify5541634">
 #>             <label class="control-label" for="viewer-background">Background</label>
 #>             <input id="viewer-background" type="text" class="form-control shiny-colour-input" data-init-value="#FFFFFF" data-show-colour="both" data-palette="square"/>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify719735', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Background colour.'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify5541634', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Background colour.'})}, 500)});</script>
 #>         </div>
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify3462587">
+#>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify1082176">
 #>             <label class="control-label" id="viewer-quality-label" for="viewer-quality">Quality</label>
 #>             <div id="viewer-quality" class="virtual-select" style="width:100%;max-width:none;display:block;" data-update="change">
 #>               <script type="application/json" data-for="viewer-quality">{"stateInput":false,"options":{"type":["transpose"],"choices":{"label":["Low","Medium","High"],"value":["low","medium","high"]}},"config":{"multiple":false,"search":false,"selectedValue":"medium","hideClearButton":true,"autoSelectFirstOption":false,"showSelectedOptionsFirst":false,"showValueAsTags":false,"optionsCount":10,"noOfDisplayValues":50,"allowNewOption":false,"disableSelectAll":true,"disableOptionGroupCheckbox":true,"disabled":false,"dropboxWrapper":"body","zIndex":1060}}</script>
 #>             </div>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify3462587', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Rendering quality; lower is faster for large structures.'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify1082176', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Rendering quality; lower is faster for large structures.'})}, 500)});</script>
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Highlight" id="tab-3658-2">
+#>     <div class="tab-pane" data-value="Highlight" id="tab-8677-2">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" id="tipify8352655">
+#>           <div class="form-group shiny-input-container" id="tipify9023379">
 #>             <label class="control-label" id="viewer-highlight.residues-label" for="viewer-highlight.residues">Residues</label>
 #>             <input id="viewer-highlight.residues" type="text" class="shiny-input-text form-control" value="" placeholder="175, 245-250, B:12" data-update-on="change"/>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify8352655', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Residue numbers and ranges to highlight, optionally prefixed with a chain and a colon.'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify9023379', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Residue numbers and ranges to highlight, optionally prefixed with a chain and a colon.'})}, 500)});</script>
 #>         </div>
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" data-shiny-input-type="colour" id="tipify4480053">
+#>           <div class="form-group shiny-input-container" data-shiny-input-type="colour" id="tipify285657">
 #>             <label class="control-label" for="viewer-highlight.color">Highlight Color</label>
 #>             <input id="viewer-highlight.color" type="text" class="form-control shiny-colour-input" data-init-value="#E7298A" data-show-colour="both" data-palette="square"/>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify4480053', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Colour of the highlighted residues.'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify285657', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Colour of the highlighted residues.'})}, 500)});</script>
 #>         </div>
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify8674794">
+#>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify984126">
 #>             <label class="control-label" id="viewer-highlight.representation-label" for="viewer-highlight.representation">Highlight Style</label>
 #>             <div id="viewer-highlight.representation" class="virtual-select" style="width:100%;max-width:none;display:block;" data-update="change">
 #>               <script type="application/json" data-for="viewer-highlight.representation">{"stateInput":false,"options":{"type":["transpose"],"choices":{"label":["Ball and stick","Licorice","Spacefill","Surface"],"value":["ball+stick","licorice","spacefill","surface"]}},"config":{"multiple":false,"search":false,"selectedValue":"ball+stick","hideClearButton":true,"autoSelectFirstOption":false,"showSelectedOptionsFirst":false,"showValueAsTags":false,"optionsCount":10,"noOfDisplayValues":50,"allowNewOption":false,"disableSelectAll":true,"disableOptionGroupCheckbox":true,"disabled":false,"dropboxWrapper":"body","zIndex":1060}}</script>
 #>             </div>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify8674794', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'How the highlighted residues are drawn.'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify984126', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'How the highlighted residues are drawn.'})}, 500)});</script>
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="View" id="tab-3658-3">
+#>     <div class="tab-pane" data-value="View" id="tab-8677-3">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" id="tipify227775">
+#>           <div class="form-group shiny-input-container" id="tipify4623544">
 #>             <div class="material-switch">
 #>               <label for="viewer-show.ligands" style="padding-right: 10px;">Ligands and Ions</label>
 #>               <input id="viewer-show.ligands" type="checkbox" checked="checked"/>
 #>               <label class="switch label-success bg-success" for="viewer-show.ligands"></label>
 #>             </div>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify227775', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Draw ligands and ions as ball-and-stick.'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify4623544', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Draw ligands and ions as ball-and-stick.'})}, 500)});</script>
 #>         </div>
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" id="tipify9955748">
+#>           <div class="form-group shiny-input-container" id="tipify1642615">
 #>             <div class="material-switch">
 #>               <label for="viewer-spin" style="padding-right: 10px;">Spin</label>
 #>               <input id="viewer-spin" type="checkbox"/>
 #>               <label class="switch label-success bg-success" for="viewer-spin"></label>
 #>             </div>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify9955748', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Spin the structure about its vertical axis.'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify1642615', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Spin the structure about its vertical axis.'})}, 500)});</script>
 #>         </div>
 #>       </div>
 #>     </div>

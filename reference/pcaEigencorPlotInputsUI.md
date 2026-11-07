@@ -105,161 +105,161 @@ data(example_pca)
 pcaEigencorPlotInputsUI("eigencor", example_pca)
 #> <h3>PC-Metadata Correlation Settings</h3>
 #> <div class="tabbable vizmodules-input-tabs">
-#>   <ul class="nav nav-tabs shiny-tab-input" id="eigencor-pcaEigencorPlotTabsetPanel" data-tabsetid="7529">
+#>   <ul class="nav nav-tabs shiny-tab-input" id="eigencor-pcaEigencorPlotTabsetPanel" data-tabsetid="6686">
 #>     <li class="active">
-#>       <a href="#tab-7529-1" data-toggle="tab" data-bs-toggle="tab" data-value="Data">Data</a>
+#>       <a href="#tab-6686-1" data-toggle="tab" data-bs-toggle="tab" data-value="Data">Data</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-7529-2" data-toggle="tab" data-bs-toggle="tab" data-value="Aesthetics">Aesthetics</a>
+#>       <a href="#tab-6686-2" data-toggle="tab" data-bs-toggle="tab" data-value="Aesthetics">Aesthetics</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-7529-3" data-toggle="tab" data-bs-toggle="tab" data-value="Legend">Legend</a>
+#>       <a href="#tab-6686-3" data-toggle="tab" data-bs-toggle="tab" data-value="Legend">Legend</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-7529-4" data-toggle="tab" data-bs-toggle="tab" data-value="Axes">Axes</a>
+#>       <a href="#tab-6686-4" data-toggle="tab" data-bs-toggle="tab" data-value="Axes">Axes</a>
 #>     </li>
 #>     <li>
-#>       <a href="#tab-7529-5" data-toggle="tab" data-bs-toggle="tab" data-value="Plotly">Plotly</a>
+#>       <a href="#tab-6686-5" data-toggle="tab" data-bs-toggle="tab" data-value="Plotly">Plotly</a>
 #>     </li>
 #>   </ul>
-#>   <div class="tab-content" data-tabsetid="7529">
-#>     <div class="tab-pane active" data-value="Data" id="tab-7529-1">
+#>   <div class="tab-content" data-tabsetid="6686">
+#>     <div class="tab-pane active" data-value="Data" id="tab-6686-1">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify1442918">
+#>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify9163004">
 #>             <label class="control-label" id="eigencor-components-label" for="eigencor-components">Components</label>
 #>             <div id="eigencor-components" class="virtual-select" style="width:100%;max-width:none;display:block;" data-update="close">
 #>               <script type="application/json" data-for="eigencor-components">{"stateInput":false,"options":{"type":["transpose"],"choices":{"label":["PC1","PC2","PC3","PC4","PC5","PC6","PC7","PC8"],"value":["PC1","PC2","PC3","PC4","PC5","PC6","PC7","PC8"]}},"config":{"multiple":true,"search":false,"selectedValue":["PC1","PC2","PC3","PC4","PC5","PC6","PC7","PC8"],"hideClearButton":false,"autoSelectFirstOption":false,"showSelectedOptionsFirst":false,"showValueAsTags":true,"optionsCount":10,"noOfDisplayValues":50,"allowNewOption":false,"disableSelectAll":false,"disableOptionGroupCheckbox":false,"disabled":false,"dropboxWrapper":"body","zIndex":1060}}</script>
 #>             </div>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify1442918', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Components to correlate with the metadata.'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify9163004', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Components to correlate with the metadata.'})}, 500)});</script>
 #>         </div>
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify8038033">
+#>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify8421652">
 #>             <label class="control-label" id="eigencor-metavars-label" for="eigencor-metavars">Metadata Variables</label>
 #>             <div id="eigencor-metavars" class="virtual-select" style="width:100%;max-width:none;display:block;" data-update="close">
 #>               <script type="application/json" data-for="eigencor-metavars">{"stateInput":false,"options":{"type":["transpose"],"choices":{"label":["dex","cell","avgLength","lib.size","size.factor"],"value":["dex","cell","avgLength","lib.size","size.factor"]}},"config":{"multiple":true,"search":false,"selectedValue":["dex","cell","avgLength","lib.size","size.factor"],"hideClearButton":false,"autoSelectFirstOption":false,"showSelectedOptionsFirst":false,"showValueAsTags":true,"optionsCount":10,"noOfDisplayValues":50,"allowNewOption":false,"disableSelectAll":false,"disableOptionGroupCheckbox":false,"disabled":false,"dropboxWrapper":"body","zIndex":1060}}</script>
 #>             </div>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify8038033', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Metadata variables to correlate. Non-numeric variables are converted to integer codes.'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify8421652', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Metadata variables to correlate. Non-numeric variables are converted to integer codes.'})}, 500)});</script>
 #>         </div>
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify2943442">
+#>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify9530339">
 #>             <label class="control-label" id="eigencor-cor.method-label" for="eigencor-cor.method">Correlation</label>
 #>             <div id="eigencor-cor.method" class="virtual-select" style="width:100%;max-width:none;display:block;" data-update="change">
 #>               <script type="application/json" data-for="eigencor-cor.method">{"stateInput":false,"options":{"type":["transpose"],"choices":{"label":["Pearson","Spearman","Kendall"],"value":["pearson","spearman","kendall"]}},"config":{"multiple":false,"search":false,"selectedValue":"pearson","hideClearButton":true,"autoSelectFirstOption":false,"showSelectedOptionsFirst":false,"showValueAsTags":false,"optionsCount":10,"noOfDisplayValues":50,"allowNewOption":false,"disableSelectAll":true,"disableOptionGroupCheckbox":true,"disabled":false,"dropboxWrapper":"body","zIndex":1060}}</script>
 #>             </div>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify2943442', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Correlation coefficient.'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify9530339', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Correlation coefficient.'})}, 500)});</script>
 #>         </div>
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify3813734">
+#>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify3136254">
 #>             <label class="control-label" id="eigencor-p.adjust.method-label" for="eigencor-p.adjust.method">P-value Adjustment</label>
 #>             <div id="eigencor-p.adjust.method" class="virtual-select" style="width:100%;max-width:none;display:block;" data-update="change">
 #>               <script type="application/json" data-for="eigencor-p.adjust.method">{"stateInput":false,"options":{"type":["transpose"],"choices":{"label":["holm","hochberg","hommel","bonferroni","BH","BY","fdr","none"],"value":["holm","hochberg","hommel","bonferroni","BH","BY","fdr","none"]}},"config":{"multiple":false,"search":false,"selectedValue":"none","hideClearButton":true,"autoSelectFirstOption":false,"showSelectedOptionsFirst":false,"showValueAsTags":false,"optionsCount":10,"noOfDisplayValues":50,"allowNewOption":false,"disableSelectAll":true,"disableOptionGroupCheckbox":true,"disabled":false,"dropboxWrapper":"body","zIndex":1060}}</script>
 #>             </div>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify3813734', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Multiple-testing correction, applied across every cell.'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify3136254', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Multiple-testing correction, applied across every cell.'})}, 500)});</script>
 #>         </div>
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" id="tipify2372413">
+#>           <div class="form-group shiny-input-container" id="tipify8803836">
 #>             <div class="material-switch">
 #>               <label for="eigencor-plot.rsquared" style="padding-right: 10px;">R-squared</label>
 #>               <input id="eigencor-plot.rsquared" type="checkbox"/>
 #>               <label class="switch label-success bg-success" for="eigencor-plot.rsquared"></label>
 #>             </div>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify2372413', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Show R-squared rather than the signed coefficient.'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify8803836', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Show R-squared rather than the signed coefficient.'})}, 500)});</script>
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Aesthetics" id="tab-7529-2">
+#>     <div class="tab-pane" data-value="Aesthetics" id="tab-6686-2">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" data-shiny-input-type="colour" id="tipify3461422">
+#>           <div class="form-group shiny-input-container" data-shiny-input-type="colour" id="tipify2994848">
 #>             <label class="control-label" for="eigencor-low.color">Low Color</label>
 #>             <input id="eigencor-low.color" type="text" class="form-control shiny-colour-input" data-init-value="#00008B" data-show-colour="both" data-palette="square"/>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify3461422', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Colour of the strongest negative correlations.'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify2994848', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Colour of the strongest negative correlations.'})}, 500)});</script>
 #>         </div>
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" data-shiny-input-type="colour" id="tipify4290002">
+#>           <div class="form-group shiny-input-container" data-shiny-input-type="colour" id="tipify4408169">
 #>             <label class="control-label" for="eigencor-mid.color">Mid Color</label>
 #>             <input id="eigencor-mid.color" type="text" class="form-control shiny-colour-input" data-init-value="#FFFFFF" data-show-colour="both" data-palette="square"/>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify4290002', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Colour of no correlation.'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify4408169', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Colour of no correlation.'})}, 500)});</script>
 #>         </div>
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" data-shiny-input-type="colour" id="tipify5998603">
+#>           <div class="form-group shiny-input-container" data-shiny-input-type="colour" id="tipify4457041">
 #>             <label class="control-label" for="eigencor-high.color">High Color</label>
 #>             <input id="eigencor-high.color" type="text" class="form-control shiny-colour-input" data-init-value="#8B0000" data-show-colour="both" data-palette="square"/>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify5998603', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Colour of the strongest positive correlations.'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify4457041', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Colour of the strongest positive correlations.'})}, 500)});</script>
 #>         </div>
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" id="tipify5655163">
+#>           <div class="form-group shiny-input-container" id="tipify4294309">
 #>             <div class="material-switch">
 #>               <label for="eigencor-show.values" style="padding-right: 10px;">Cell Values</label>
 #>               <input id="eigencor-show.values" type="checkbox" checked="checked"/>
 #>               <label class="switch label-success bg-success" for="eigencor-show.values"></label>
 #>             </div>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify5655163', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Print the value and significance stars (* < 0.05, ** < 0.01, *** < 0.001) in each cell.'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify4294309', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Print the value and significance stars (* < 0.05, ** < 0.01, *** < 0.001) in each cell.'})}, 500)});</script>
 #>         </div>
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" id="tipify4661924">
+#>           <div class="form-group shiny-input-container" id="tipify8614284">
 #>             <label class="control-label" id="eigencor-digits-label" for="eigencor-digits">Decimal Places</label>
 #>             <input id="eigencor-digits" type="number" class="shiny-input-number form-control" value="2" data-update-on="change" min="0" max="4" step="1"/>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify4661924', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Decimal places of the printed values.'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify8614284', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Decimal places of the printed values.'})}, 500)});</script>
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Legend" id="tab-7529-3">
+#>     <div class="tab-pane" data-value="Legend" id="tab-6686-3">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" id="tipify2334880">
+#>           <div class="form-group shiny-input-container" id="tipify7890478">
 #>             <div class="material-switch">
 #>               <label for="eigencor-legend.show" style="padding-right: 10px;">Show Legend</label>
 #>               <input id="eigencor-legend.show" type="checkbox" checked="checked"/>
 #>               <label class="switch label-success bg-success" for="eigencor-legend.show"></label>
 #>             </div>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify2334880', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Show the legend. Turning it off also hides colorbars and any point size legend.'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify7890478', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Show the legend. Turning it off also hides colorbars and any point size legend.'})}, 500)});</script>
 #>         </div>
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify7408126">
+#>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify3662304">
 #>             <label class="control-label" id="eigencor-legend.font.family-label" for="eigencor-legend.font.family">Legend Font</label>
 #>             <div id="eigencor-legend.font.family" class="virtual-select" style="width:100%;max-width:none;display:block;" data-update="change">
 #>               <script type="application/json" data-for="eigencor-legend.font.family">{"stateInput":false,"options":{"type":["transpose"],"choices":{"label":["Arial","Balto","Courier New","Droid Sans","Droid Serif","Droid Sans Mono","Gravitas One","Old Standard TT","Open Sans","Overpass","PT Sans Narrow","Raleway","Times New Roman","Verdana","sans-serif","serif","monospace"],"value":["Arial","Balto","Courier New","Droid Sans","Droid Serif","Droid Sans Mono","Gravitas One","Old Standard TT","Open Sans","Overpass","PT Sans Narrow","Raleway","Times New Roman","Verdana","sans-serif","serif","monospace"]}},"config":{"multiple":false,"search":true,"selectedValue":"Arial","hideClearButton":true,"autoSelectFirstOption":false,"showSelectedOptionsFirst":false,"showValueAsTags":false,"optionsCount":10,"noOfDisplayValues":50,"allowNewOption":false,"disableSelectAll":true,"disableOptionGroupCheckbox":true,"disabled":false,"dropboxWrapper":"body","zIndex":1060}}</script>
 #>             </div>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify7408126', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Font family of the legend title and entry labels.'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify3662304', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Font family of the legend title and entry labels.'})}, 500)});</script>
 #>         </div>
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" data-shiny-input-type="colour" id="tipify2953448">
+#>           <div class="form-group shiny-input-container" data-shiny-input-type="colour" id="tipify3387799">
 #>             <label class="control-label" for="eigencor-legend.font.color">Legend Font Color</label>
 #>             <input id="eigencor-legend.font.color" type="text" class="form-control shiny-colour-input" data-init-value="#000000" data-show-colour="both" data-palette="square"/>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify2953448', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Font color of the legend title and entry labels.'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify3387799', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Font color of the legend title and entry labels.'})}, 500)});</script>
 #>         </div>
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" id="tipify823733">
+#>           <div class="form-group shiny-input-container" id="tipify9619562">
 #>             <label class="control-label" id="eigencor-legend.title.size-label" for="eigencor-legend.title.size">Legend Title Size</label>
 #>             <input id="eigencor-legend.title.size" type="number" class="shiny-input-number form-control" value="14" data-update-on="change" min="0" step="1"/>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify823733', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Font size of the legend title.'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify9619562', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Font size of the legend title.'})}, 500)});</script>
 #>         </div>
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" id="tipify2743648">
+#>           <div class="form-group shiny-input-container" id="tipify8873374">
 #>             <label class="control-label" id="eigencor-legend.text.size-label" for="eigencor-legend.text.size">Legend Text Size</label>
 #>             <input id="eigencor-legend.text.size" type="number" class="shiny-input-number form-control" value="12" data-update-on="change" min="0" step="1"/>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify2743648', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Font size of the legend entry labels.'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify8873374', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Font size of the legend entry labels.'})}, 500)});</script>
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Axes" id="tab-7529-4">
+#>     <div class="tab-pane" data-value="Axes" id="tab-6686-4">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;">
@@ -445,7 +445,7 @@ pcaEigencorPlotInputsUI("eigencor", example_pca)
 #>         </div>
 #>       </div>
 #>     </div>
-#>     <div class="tab-pane" data-value="Plotly" id="tab-7529-5">
+#>     <div class="tab-pane" data-value="Plotly" id="tab-6686-5">
 #>       <div class="vizmodules-input-grid" style="--viz-input-columns: 2;">
 #>         <div class="vizmodules-input-cell">
 #>           <div class="form-group shiny-input-container" style="width:100%;">
@@ -456,69 +456,69 @@ pcaEigencorPlotInputsUI("eigencor", example_pca)
 #>           </div>
 #>         </div>
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" id="tipify9310599">
+#>           <div class="form-group shiny-input-container" id="tipify4318412">
 #>             <label class="control-label" id="eigencor-margin.t-label" for="eigencor-margin.t">Margin Top</label>
 #>             <input id="eigencor-margin.t" type="number" class="shiny-input-number form-control" value="70" data-update-on="change" min="0" step="5"/>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify9310599', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Top margin of the plot in pixels'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify4318412', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Top margin of the plot in pixels'})}, 500)});</script>
 #>         </div>
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" id="tipify8814145">
+#>           <div class="form-group shiny-input-container" id="tipify8925788">
 #>             <label class="control-label" id="eigencor-margin.b-label" for="eigencor-margin.b">Margin Bottom</label>
 #>             <input id="eigencor-margin.b" type="number" class="shiny-input-number form-control" value="70" data-update-on="change" min="0" step="5"/>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify8814145', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Bottom margin of the plot in pixels'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify8925788', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Bottom margin of the plot in pixels'})}, 500)});</script>
 #>         </div>
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" id="tipify4742308">
+#>           <div class="form-group shiny-input-container" id="tipify1908250">
 #>             <label class="control-label" id="eigencor-margin.l-label" for="eigencor-margin.l">Margin Left</label>
 #>             <input id="eigencor-margin.l" type="number" class="shiny-input-number form-control" value="70" data-update-on="change" min="0" step="5"/>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify4742308', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Left margin of the plot in pixels'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify1908250', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Left margin of the plot in pixels'})}, 500)});</script>
 #>         </div>
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" id="tipify5750370">
+#>           <div class="form-group shiny-input-container" id="tipify7535412">
 #>             <label class="control-label" id="eigencor-margin.r-label" for="eigencor-margin.r">Margin Right</label>
 #>             <input id="eigencor-margin.r" type="number" class="shiny-input-number form-control" value="90" data-update-on="change" min="0" step="5"/>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify5750370', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Right margin of the plot in pixels'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify7535412', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Right margin of the plot in pixels'})}, 500)});</script>
 #>         </div>
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" data-shiny-input-type="colour" id="tipify2103327">
+#>           <div class="form-group shiny-input-container" data-shiny-input-type="colour" id="tipify1867189">
 #>             <label class="control-label" for="eigencor-shape.fill">Shape Fill</label>
 #>             <input id="eigencor-shape.fill" type="text" class="form-control shiny-colour-input" data-init-value="rgba(0, 0, 0, 0)" data-show-colour="both" data-palette="square" data-allow-alpha="true"/>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify2103327', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Interior fill color for shapes drawn on the plot using Plotly&#39;s drawing tools'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify1867189', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Interior fill color for shapes drawn on the plot using Plotly&#39;s drawing tools'})}, 500)});</script>
 #>         </div>
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" data-shiny-input-type="colour" id="tipify5982999">
+#>           <div class="form-group shiny-input-container" data-shiny-input-type="colour" id="tipify4893102">
 #>             <label class="control-label" for="eigencor-shape.line.color">Shape Line Color</label>
 #>             <input id="eigencor-shape.line.color" type="text" class="form-control shiny-colour-input" data-init-value="black" data-show-colour="both" data-palette="square" data-allow-alpha="true"/>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify5982999', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Outline color for shapes drawn on the plot using Plotly&#39;s drawing tools'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify4893102', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Outline color for shapes drawn on the plot using Plotly&#39;s drawing tools'})}, 500)});</script>
 #>         </div>
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" id="tipify265022">
+#>           <div class="form-group shiny-input-container" id="tipify1323064">
 #>             <label class="control-label" id="eigencor-shape.line.width-label" for="eigencor-shape.line.width">Shape Line Width</label>
 #>             <input id="eigencor-shape.line.width" type="number" class="shiny-input-number form-control" value="4" data-update-on="change" min="0" step="0.25"/>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify265022', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Outline width for shapes drawn on the plot using Plotly&#39;s drawing tools'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify1323064', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Outline width for shapes drawn on the plot using Plotly&#39;s drawing tools'})}, 500)});</script>
 #>         </div>
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify8523679">
+#>           <div class="form-group shiny-input-container" style="width:100%;" id="tipify6215600">
 #>             <label class="control-label" id="eigencor-shape.linetype-label" for="eigencor-shape.linetype">Shape Linetype</label>
 #>             <div id="eigencor-shape.linetype" class="virtual-select" style="width:100%;max-width:none;display:block;" data-update="change">
 #>               <script type="application/json" data-for="eigencor-shape.linetype">{"stateInput":false,"options":{"type":["transpose"],"choices":{"label":["solid","dot","dash","longdash","dashdot","longdashdot"],"value":["solid","dot","dash","longdash","dashdot","longdashdot"]}},"config":{"multiple":false,"search":false,"selectedValue":"solid","hideClearButton":true,"autoSelectFirstOption":false,"showSelectedOptionsFirst":false,"showValueAsTags":false,"optionsCount":10,"noOfDisplayValues":50,"allowNewOption":false,"disableSelectAll":true,"disableOptionGroupCheckbox":true,"disabled":false,"dropboxWrapper":"body","zIndex":1060}}</script>
 #>             </div>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify8523679', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Line dash style for shapes drawn on the plot using Plotly&#39;s drawing tools'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify6215600', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Line dash style for shapes drawn on the plot using Plotly&#39;s drawing tools'})}, 500)});</script>
 #>         </div>
 #>         <div class="vizmodules-input-cell">
-#>           <div class="form-group shiny-input-container" id="tipify5338073">
+#>           <div class="form-group shiny-input-container" id="tipify3441610">
 #>             <label class="control-label" id="eigencor-shape.opacity-label" for="eigencor-shape.opacity">Shape Opacity</label>
 #>             <input id="eigencor-shape.opacity" type="number" class="shiny-input-number form-control" value="1" data-update-on="change" min="0" max="1" step="0.01"/>
 #>           </div>
-#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify5338073', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Opacity of shapes drawn on the plot, where 0 is fully transparent and 1 is fully opaque'})}, 500)});</script>
+#>           <script>$(document).ready(function() {setTimeout(function() {shinyBS.addTooltip('tipify3441610', 'tooltip', {'container': 'body', 'placement': 'top', 'trigger': 'hover', 'title': 'Opacity of shapes drawn on the plot, where 0 is fully transparent and 1 is fully opaque'})}, 500)});</script>
 #>         </div>
 #>       </div>
 #>     </div>

@@ -14,7 +14,8 @@ Shared input layout for the native plot modules
   title,
   columns,
   lines = TRUE,
-  legend = TRUE
+  legend = TRUE,
+  extra_tabs = NULL
 )
 ```
 
@@ -47,6 +48,10 @@ Shared input layout for the native plot modules
 - legend:
 
   Logical; include the Legend tab.
+
+- extra_tabs:
+
+  An optional named list of further tabs, placed after the Data tab.
 
 ## Value
 

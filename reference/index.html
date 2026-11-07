@@ -1189,6 +1189,57 @@
         </dt>
         <dd>Create a standalone Shiny app for the cnSegmentPlot module</dd>
       </dl></div><div class="section level2">
+      <h2 id="dna-methylation">DNA methylation<a class="anchor" aria-label="anchor" href="#dna-methylation"></a></h2>
+
+      <div class="section-desc"><p>A track view of beta values over a gene or region, joined on genomic position across Infinium arrays, with transcripts and sample annotations.</p></div>
+
+      <dl></dl></div><div class="section level2">
+
+
+
+
+      <dl><dt>
+
+          <code><a href="methylationCohort.html">methylationCohort()</a></code> <code><a href="methylationCohort.html">print(<i>&lt;methylationCohort&gt;</i>)</a></code>
+
+        </dt>
+        <dd>Assemble a DNA methylation cohort from one or more arrays</dd>
+
+        <dt>
+
+          <code><a href="methylationTrack.html">methylationTrack()</a></code>
+
+        </dt>
+        <dd>Plot a genomic region of DNA methylation across arrays</dd>
+
+        <dt>
+
+          <code><a href="methylationTrackInputsUI.html">methylationTrackInputsUI()</a></code>
+
+        </dt>
+        <dd>Input UI components for the methylationTrack module</dd>
+
+        <dt>
+
+          <code><a href="methylationTrackOutputUI.html">methylationTrackOutputUI()</a></code>
+
+        </dt>
+        <dd>Output UI components for the methylationTrack module</dd>
+
+        <dt>
+
+          <code><a href="methylationTrackServer.html">methylationTrackServer()</a></code>
+
+        </dt>
+        <dd>Server logic for the methylationTrack module</dd>
+
+        <dt>
+
+          <code><a href="methylationTrackApp.html">methylationTrackApp()</a></code>
+
+        </dt>
+        <dd>Create a standalone Shiny app for the methylationTrack module</dd>
+      </dl></div><div class="section level2">
       <h2 id="single-cell-and-rna-seq-dittoseq-">Single-cell and RNA-seq (dittoSeq)<a class="anchor" aria-label="anchor" href="#single-cell-and-rna-seq-dittoseq-"></a></h2>
 
       <div class="section-desc"><p>Wrappers around the dittoSeq plotting functions. Each takes a <code>SingleCellExperiment</code>, <code>Seurat</code> or <code>SummarizedExperiment</code> object rather than a data frame, and so takes <code>object_list</code> in its <code>*App()</code>. <code>dittoHeatmap</code> wraps VizModules’ ComplexHeatmap module, so it is an InteractiveComplexHeatmap widget rather than a plotly figure.</p></div>
@@ -1530,6 +1581,13 @@
 
         </dt>
         <dd>Example copy number segmentation results from sesame</dd>
+
+        <dt>
+
+          <code><a href="example_methylation.html">example_methylation</a></code>
+
+        </dt>
+        <dd>Example multi-array DNA methylation cohort</dd>
 
         <dt>
 

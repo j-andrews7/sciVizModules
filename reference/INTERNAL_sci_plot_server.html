@@ -68,7 +68,8 @@ plotted table attached to the figure.</p>
 <span>  <span class="va">build</span>,</span>
 <span>  <span class="va">reset</span>,</span>
 <span>  <span class="va">validate</span>,</span>
-<span>  setup <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  setup <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  style <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -106,6 +107,13 @@ module cannot take.</p></dd>
 <dd><p>Optional <code>function(input, output, session, object, params)</code>
 run once in the server body, returning a list (<code>state</code>) of reactives or
 stores the build and reset functions need.</p></dd>
+
+
+<dt id="arg-style">style<a class="anchor" aria-label="anchor" href="#arg-style"></a></dt>
+<dd><p>Optional <code>function(fig, input, isolate_fn, state)</code> returning the
+figure, run on the cached figure before the shared styling. It is not
+cached, so what it sets (a <code>layout.coloraxis</code>, say) changes without a redraw;
+it should write to the layout only, or the change is not a layout-only update.</p></dd>
 
 </dl></div>
     <div class="section level2">

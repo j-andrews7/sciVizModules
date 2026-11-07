@@ -20,7 +20,8 @@ is the plotted table attached to the figure.
   build,
   reset,
   validate,
-  setup = NULL
+  setup = NULL,
+  style = NULL
 )
 ```
 
@@ -57,6 +58,14 @@ is the plotted table attached to the figure.
   Optional `function(input, output, session, object, params)` run once
   in the server body, returning a list (`state`) of reactives or stores
   the build and reset functions need.
+
+- style:
+
+  Optional `function(fig, input, isolate_fn, state)` returning the
+  figure, run on the cached figure before the shared styling. It is not
+  cached, so what it sets (a `layout.coloraxis`, say) changes without a
+  redraw; it should write to the layout only, or the change is not a
+  layout-only update.
 
 ## Value
 
