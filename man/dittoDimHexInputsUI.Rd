@@ -40,12 +40,16 @@ This module wraps \code{\link[dittoSeq:dittoDimHex]{dittoSeq::dittoDimHex()}}, w
 dimensionality reduction embedding into hexagons and (optionally) summarizes a
 gene/metadata within each bin. The resulting \code{ggplot} is converted to an
 interactive \code{plotly} figure.
+
+dittoSeq's group labels (\code{do.label}) are not offered, since \code{\link[plotly:ggplotly]{plotly::ggplotly()}}
+drops the layer that draws them.
 }
 \section{Plot parameters and defaults}{
 
 The following parameters can be accessed via UI inputs and/or the \code{defaults} argument:
 \itemize{
-\item \code{color.var} - Gene or metadata summarized within each hex (default: density only)
+\item \code{color.var} - Gene or metadata summarized within each hex, which needs the
+ggplot.multistats package (default: density only)
 \item \code{reduction.use} - Dimensionality reduction to plot (default: auto-detected)
 \item \code{dim.1}, \code{dim.2} - Which dimensions to plot on x/y (default: 1 and 2)
 \item \code{bins} - Number of hexagonal bins (default: 30)
@@ -54,8 +58,6 @@ metadata level) or for continuous data ("median", "mean", etc.)
 \item \code{split.by} - Discrete metadata to facet by (default: none)
 \item \code{min.color}, \code{max.color} - Colors for the continuous color scale
 \item \code{do.contour} - Overlay kernel-density contour lines (default: FALSE)
-\item \code{do.label} - Draw group labels for a discrete \code{color.var} (default: FALSE)
-\item \code{labels.size} - Text size of the group labels (default: 5)
 \item \code{do.ellipse} - Draw ellipses for a discrete \code{color.var} (default: FALSE)
 }
 }

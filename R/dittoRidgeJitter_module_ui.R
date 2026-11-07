@@ -26,6 +26,9 @@
 #' - `jitter.size` - Jitter point size (default: 1)
 #' - `jitter.color` - Color of the jitter points (default: "#000000")
 #' - `palette.selection` - Colors for discrete groups (multiColorPicker)
+#' - `webgl` - Draw the points with WebGL once there are 5,000 or more, as set by the
+#'   `VizModules.webgl.threshold` option. WebGL points sit above the plot's SVG layers
+#'   and are an embedded image in SVG downloads (UI: "Plot with WebGL", default: TRUE)
 #'
 #' @param id The ID for the Shiny module.
 #' @param data A `SingleCellExperiment`, `Seurat`, or `SummarizedExperiment` object
@@ -128,7 +131,8 @@ dittoRidgeJitterInputsUI <- function(id, data, defaults = NULL, title = "RidgeJi
             tipify(colourInput(ns("jitter.color"), "Jitter Point Color",
                 value = get_default(defaults, "jitter.color", "#000000")),
                 documentParameters$jitter.color,
-                placement = "top", options = list(container = "body"))
+                placement = "top", options = list(container = "body")),
+            webgl_input(ns, defaults)
         ),
         "Plotly" = uniform_plotly_inputs_ui(ns, defaults),
         "Axes" = uniform_axes_inputs_ui(ns, defaults, include.rotate = FALSE),

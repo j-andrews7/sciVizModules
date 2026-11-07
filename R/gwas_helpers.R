@@ -293,7 +293,7 @@
         for (l in lines) {
             if (is.numeric(l$p) && length(l$p) == 1 && !is.na(l$p) && l$p > 0 && l$p < 1) {
                 fig$x$layout$shapes <- c(fig$x$layout$shapes, list(list(
-                    type = "line", xref = "paper", x0 = 0, x1 = 1, yref = "y",
+                    type = "line", xref = "x domain", x0 = 0, x1 = 1, yref = "y",
                     y0 = -log10(l$p), y1 = -log10(l$p), line = list(color = l$color, dash = l$dash, width = 1)
                 )))
             }
@@ -497,7 +497,7 @@
     }
     if (isTRUE(isolate_fn(input$show.lambda)) && is.finite(lambda)) {
         fig$x$layout$annotations <- c(fig$x$layout$annotations, list(list(
-            x = 0.02, y = 0.98, xref = "paper", yref = "paper", xanchor = "left", yanchor = "top",
+            x = 0.02, y = 0.98, xref = "x domain", yref = "y domain", xanchor = "left", yanchor = "top",
             text = sprintf("\u03bb<sub>GC</sub> = %.3f", lambda), showarrow = FALSE
         )))
     }

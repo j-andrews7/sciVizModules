@@ -58,6 +58,8 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
         # the data -> a single render. NULL when no defaults are reactive, in
         # which case behavior is unchanged. See setup_reactive_defaults().
         params <- setup_reactive_defaults(defaults, input, session)
+        plot_source <- session$ns("cnSegmentPlot")
+        edit_store <- setup_manual_edits(input, session, plot_source)
 
         hide_input(session, hide.inputs)
         if (!is.null(hide.tabs)) {
@@ -159,11 +161,13 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             reset_axes_inputs(session, defaults)
             reset_plotly_inputs(session, defaults)
             reset_lines_inputs(session, defaults = defaults)
+            reset_manual_edits(edit_store)
         })
 
-        generate_cnSegmentPlot <- reactive({
-            isolate_fn <- setup_auto_update_logic(input, params)
-
+        # What is drawn, cached by cached_structure(): it runs again only for a
+        # change to the data, to `extra`, or to an input read here as
+        # isolate_fn(input$key). A styling change re-runs generate_*() alone.
+        draw_cnSegmentPlot <- function(isolate_fn) {
             seg.list <- seg_obj()
             req(seg.list)
 
@@ -179,8 +183,7 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             hover.text.cols <- isolate_fn(input$hover.text.cols)
             if (is.null(hover.text.cols) || length(hover.text.cols) == 0) hover.text.cols <- "signal"
 
-            id.col <- if (!is.null(input$id.col)) isolate_fn(input$id.col) else NULL
-            id.col <- blank_to_null(id.col)
+            id.col <- blank_to_null(isolate_fn(input$id.col))
 
             genes <- genes_obj()
             label.genes <- isolate_fn(label_genes_text())
@@ -240,80 +243,31 @@ cnSegmentPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 y.max = y.max,
                 main = isolate_fn(main_text())
             )
+            list(fig = fig, multi = multi)
+        }
+        # genes_obj() derives from seg_obj(), so the data covers it.
+        base_cnSegmentPlot <- cached_structure(draw_cnSegmentPlot, input, session, seg_obj,
+            params = params, extra = function() list(label_genes_text(), main_text(), y_range_store())
+        )
 
-            fig <- apply_title_layout(
-                fig, input, isolate_fn,
-                title_y = 0.95,
-                title_x = isolate_fn(input$axis.title.horizontal.position)
-            )
-
-            xaxis_style <- create_axis_styles(
-                input,
-                axis_side = "x", isolate_fn = isolate_fn, ggplot.axis.styling = FALSE
-            )
-
-            yaxis_style <- create_axis_styles(
-                input,
-                axis_side = "y", isolate_fn = isolate_fn, ggplot.axis.styling = FALSE
-            )
-
-            fig <- apply_subplot_axis_styling(fig, xaxis_style, yaxis_style)
-
-            fig <- add_reference_lines(fig,
-                hline.intercepts = isolate_fn(input$hline.intercepts),
-                hline.colors = isolate_fn(input$hline.colors),
-                hline.widths = isolate_fn(input$hline.widths),
-                hline.linetypes = isolate_fn(input$hline.linetypes),
-                hline.opacities = isolate_fn(input$hline.opacities),
-                vline.intercepts = isolate_fn(input$vline.intercepts),
-                vline.colors = isolate_fn(input$vline.colors),
-                vline.widths = isolate_fn(input$vline.widths),
-                vline.linetypes = isolate_fn(input$vline.linetypes),
-                vline.opacities = isolate_fn(input$vline.opacities),
-                abline.slopes = isolate_fn(input$abline.slopes),
-                abline.intercepts = isolate_fn(input$abline.intercepts),
-                abline.colors = isolate_fn(input$abline.colors),
-                abline.widths = isolate_fn(input$abline.widths),
-                abline.linetypes = isolate_fn(input$abline.linetypes),
-                abline.opacities = isolate_fn(input$abline.opacities)
-            )
-
-            config_list <- add_plot_config(
-                download.format = isolate_fn(input$download.format),
-                include.modebar.buttons = TRUE,
-                facet.by = if (multi) "sample" else NULL
-            )
-
-            fig <- do.call(config, c(list(p = fig), config_list))
-            fig <- apply_plotly_newshape(fig, input, isolate_fn)
-
-            # A stacked plot is multi-panel, so ggplotly already renders its
-            # shared axis titles as annotations (which axis_titles_as_annotations()
-            # deliberately leaves alone); style those instead.
-            fig <- if (multi) {
-                apply_axis_title_to_annotations(fig, input, isolate_fn)
-            } else {
-                axis_titles_as_annotations(fig)
-            }
-            fig
-        })
-
-        output$cnSegmentPlot <- renderPlotly({
-            # seg_obj() validates the supplied data, so it is inside the
-            # tryCatch: a malformed `data` reactive should surface as the
-            # module's message plot rather than a raw Shiny error. req()'s own
-            # silent error is re-raised so it still cancels the render.
-            tryCatch(
-                {
-                    req(seg_obj())
-                    apply_render_margins(generate_cnSegmentPlot(), input)
-                },
-                shiny.silent.error = function(e) stop(e),
-                error = function(e) {
-                    empty_plot(text = conditionMessage(e), plotly = TRUE)
-                }
+        # How it looks: re-run for a styling change, without redrawing.
+        generate_cnSegmentPlot <- reactive({
+            isolate_fn <- setup_auto_update_logic(input, params)
+            base <- base_cnSegmentPlot()
+            # A stacked plot is multi-panel, so ggplotly already renders its shared
+            # axis titles as annotations, which this styles.
+            apply_uniform_styling(
+                base$fig, input, isolate_fn,
+                facet.by = if (base$multi) "sample", ggplot.axis.styling = FALSE
             )
         })
+
+        # seg_obj() validates the supplied data, so it is in the guard: a malformed
+        # `data` reactive should surface as the module's message plot rather than a
+        # raw Shiny error.
+        output$cnSegmentPlot <- .sci_render_plotly(generate_cnSegmentPlot, input, plot_source, edit_store, session,
+            guard = function() req(seg_obj())
+        )
 
         AllInputs <- reactive({
             reactiveValuesToList(input)

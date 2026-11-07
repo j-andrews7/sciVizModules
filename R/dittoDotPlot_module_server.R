@@ -31,6 +31,8 @@ dittoDotPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, d
 
     moduleServer(id, function(input, output, session) {
         params <- setup_reactive_defaults(defaults, input, session)
+        plot_source <- session$ns("dittoDotPlot")
+        edit_store <- setup_manual_edits(input, session, plot_source)
 
         hide_input(session, hide.inputs)
         for (tab.name in hide.tabs) hideTab(inputId = "dittoDotPlotTabsetPanel", target = tab.name)
@@ -49,16 +51,17 @@ dittoDotPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, d
             for (k in c("size", "min.percent", "max.percent", "size.legend.x", "size.legend.y")) {
                 updateNumericInput(session, k, value = d[[k]])
             }
-            .ditto_reset_uniform(session, defaults)
+            .ditto_reset_uniform(session, defaults, edit_store)
         })
 
         observeEvent(input$split.by, {
             toggle_facet_title_inputs(session, nz_value(input$split.by), hidden = hide.inputs)
         }, ignoreNULL = FALSE)
 
-        generate_dittoDotPlot <- reactive({
-            isolate_fn <- setup_auto_update_logic(input, params)
-
+        # What is drawn, cached by cached_structure(): it runs again only for a
+        # change to the data, to `extra`, or to an input read here as
+        # isolate_fn(input$key). A styling change re-runs generate_*() alone.
+        draw_dittoDotPlot <- function(isolate_fn) {
             obj <- data()
             req(obj)
 
@@ -102,24 +105,33 @@ dittoDotPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, d
             if (!is.null(assay)) args$assay <- assay
             out <- do.call(dittoSeq::dittoDotPlot, args)
 
-            fig <- .ddp_colorbar_top(plotly::ggplotly(out$p))
-            fig <- .sci_finalize_plotly(fig, input, isolate_fn, faceted = !is.null(split.by))
+            list(
+                fig = .ddp_colorbar_top(plotly::ggplotly(out$p)), faceted = !is.null(split.by),
+                size = args$size, limits = 100 * c(min.percent, max.percent),
+                legend_data = .ddp_size_legend_data(out$data, min.percent, max.percent)
+            )
+        }
+        base_dittoDotPlot <- cached_structure(draw_dittoDotPlot, input, session, data, params = params)
+
+        # How it looks: re-run for a styling change, without redrawing.
+        generate_dittoDotPlot <- reactive({
+            isolate_fn <- setup_auto_update_logic(input, params)
+            base <- base_dittoDotPlot()
+            fig <- .sci_finalize_plotly(base$fig, input, isolate_fn, faceted = base$faceted)
 
             # ggplotly() drops the size legend; draw it as the VizModules DotPlot
             # module does, from dittoSeq's own size scale (scale_size() over
             # min.percent to max.percent, sizes 0 to `size`) so the circles match
             # the dots. Hiding the legend hides this one too.
-            legend_data <- .ddp_size_legend_data(out$data, min.percent, max.percent)
-            limits <- 100 * c(min.percent, max.percent)
             add_size_legend(
                 fig,
-                data = legend_data,
+                data = base$legend_data,
                 size.by = if (isFALSE(isolate_fn(input$legend.show))) NULL else "percent",
                 title = "percent<br>expression",
                 digits = 0,
-                limits = limits,
-                size.range = c(0, args$size),
-                breaks = .ddp_size_breaks(legend_data$percent, limits),
+                limits = base$limits,
+                size.range = c(0, base$size),
+                breaks = .ddp_size_breaks(base$legend_data$percent, base$limits),
                 gap = 0.04,
                 title.size = isolate_fn(input$legend.title.size),
                 text.size = isolate_fn(input$legend.text.size),
@@ -130,14 +142,9 @@ dittoDotPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, d
             )
         })
 
-        output$dittoDotPlot <- renderPlotly({
-            req(input$vars, input$group.by)
-            tryCatch(
-                apply_render_margins(generate_dittoDotPlot(), input),
-                shiny.silent.error = function(e) stop(e),
-                error = function(e) empty_plot(text = conditionMessage(e), plotly = TRUE)
-            )
-        })
+        output$dittoDotPlot <- .sci_render_plotly(generate_dittoDotPlot, input, plot_source, edit_store, session,
+            guard = function() req(input$vars, input$group.by)
+        )
 
         AllInputs <- reactive({
             reactiveValuesToList(input)

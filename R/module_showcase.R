@@ -255,9 +255,12 @@
         # ---- Single-cell ---------------------------------------------------
         dimplot = entry(
             "dittoDimPlot", "Dimensionality Reduction Plot", "DimPlot", "Single-cell",
-            "Cells on a UMAP embedding coloured and labelled by cell type, split by condition.",
+            "Cells on a UMAP embedding coloured by cell type and split by condition, with three cells labelled.",
             "example_sce", "object",
-            defaults = list(reduction.use = "UMAP", var = "celltype", do.label = TRUE, split.by = "condition"),
+            defaults = list(
+                reduction.use = "UMAP", var = "celltype", split.by = "condition",
+                annotate.by = "cell.id", highlight.points = "Cell12, Cell97, Cell140"
+            ),
             preview = .ditto_preview
         ),
         dimhex = entry(
@@ -265,20 +268,26 @@
             "Cell density on a UMAP embedding in hexagonal bins, with density contours, split by condition.",
             "example_sce", "object",
             defaults = list(reduction.use = "UMAP", do.contour = TRUE, split.by = "condition"),
-            preview = .ditto_preview
+            needs = "hexbin", preview = .ditto_preview
         ),
         scatter = entry(
             "dittoScatterPlot", "Cell Scatter Plot", "Scatter", "Single-cell",
-            "Per-cell QC metrics against each other, coloured by cell type with an ellipse around each.",
+            "Per-cell QC metrics by cell type, with group ellipses and the two most mitochondrial cells labelled.",
             "example_sce", "object",
-            defaults = list(color.var = "celltype", do.ellipse = TRUE),
+            defaults = list(
+                color.var = "celltype", do.ellipse = TRUE,
+                annotate.by = "cell.id", highlight.points = "Cell203, Cell160"
+            ),
             preview = .ditto_preview
         ),
         dittoplot = entry(
             "dittoPlot", "Expression Distribution Plot", "dittoPlot", "Single-cell",
-            "A B-cell marker's expression per cell type as violins, boxes and points.",
+            "A B-cell marker's expression per cell type as violins, boxes and points, its highest cell labelled.",
             "example_sce", "object",
-            defaults = list(var = "Gene34", group.by = "celltype", plots = c("vlnplot", "boxplot", "jitter")),
+            defaults = list(
+                var = "Gene34", group.by = "celltype", plots = c("vlnplot", "boxplot", "jitter"),
+                annotate.by = "cell.id", highlight.points = "Cell189"
+            ),
             preview = .ditto_preview
         ),
         dotplot = entry(

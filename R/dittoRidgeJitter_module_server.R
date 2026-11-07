@@ -34,6 +34,8 @@ dittoRidgeJitterServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
         # Resolve any reactive() entries in `defaults` server-side, so a parent
         # app driving a parameter costs one render rather than a client round-trip.
         params <- setup_reactive_defaults(defaults, input, session)
+        plot_source <- session$ns("dittoRidgeJitter")
+        edit_store <- setup_manual_edits(input, session, plot_source)
 
         ns <- session$ns
 
@@ -106,7 +108,8 @@ dittoRidgeJitterServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
             updateNumericInput(session, "jitter.size", value = get_default(defaults, "jitter.size", 1))
             updateNumericInput(session, "jitter.width", value = get_default(defaults, "jitter.width", 0.2))
             reset_group_colors(session, "palette.colours", defaults, palette_groups(), default_palette_values)
-            .ditto_reset_uniform(session, defaults)
+            updateCheckboxInput(session, "webgl", value = get_default(defaults, "webgl", TRUE, is.logical))
+            .ditto_reset_uniform(session, defaults, edit_store)
         })
 
         observeEvent(input$split.by, {
@@ -114,9 +117,10 @@ dittoRidgeJitterServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
             toggle_facet_title_inputs(session, split.set, hidden = hide.inputs)
         }, ignoreNULL = FALSE)
 
-        generate_dittoRidgeJitter <- reactive({
-            isolate_fn <- setup_auto_update_logic(input, params)
-
+        # What is drawn, cached by cached_structure(): it runs again only for a
+        # change to the data, to `extra`, or to an input read here as
+        # isolate_fn(input$key). A styling change re-runs generate_*() alone.
+        draw_dittoRidgeJitter <- function(isolate_fn) {
             obj <- data_reactive()
             req(obj)
 
@@ -168,18 +172,26 @@ dittoRidgeJitterServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
             ))
 
             fig <- plotly::ggplotly(gg)
-            .sci_finalize_plotly(fig, input, isolate_fn, faceted = !is.null(split.by))
+            if (!isFALSE(isolate_fn(input$webgl))) {
+                fig <- auto_webgl(fig)
+            }
+            list(fig = fig, faceted = !is.null(split.by))
+        }
+        base_dittoRidgeJitter <- cached_structure(draw_dittoRidgeJitter, input, session, data_reactive,
+            params = params, extra = function() list(palette_groups(), palette_store())
+        )
+
+        # How it looks: re-run for a styling change, without redrawing.
+        generate_dittoRidgeJitter <- reactive({
+            isolate_fn <- setup_auto_update_logic(input, params)
+            base <- base_dittoRidgeJitter()
+            .sci_finalize_plotly(base$fig, input, isolate_fn, faceted = base$faceted)
         })
 
-        output$dittoRidgeJitter <- renderPlotly({
-            req(input$var, input$group.by)
-            tryCatch(
-                apply_render_margins(generate_dittoRidgeJitter(), input),
-                error = function(e) {
-                    empty_plot(text = conditionMessage(e), plotly = TRUE)
-                }
-            )
-        })
+        output$dittoRidgeJitter <- .sci_render_plotly(
+            generate_dittoRidgeJitter, input, plot_source, edit_store, session,
+            guard = function() req(input$var, input$group.by)
+        )
 
         AllInputs <- reactive({
             reactiveValuesToList(input)

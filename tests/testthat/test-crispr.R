@@ -172,6 +172,7 @@ test_that("the layers title the axes and draw both FDR lines, and add no labels"
     out <- .crispr_layers(fig, screen, input, identity)
     expect_length(out$x$layout$annotations, 0)
     expect_equal(vapply(out$x$layout$shapes, `[[`, 0, "y0"), c(log10(0.05), -log10(0.05)))
+    expect_true(all(vapply(out$x$layout$shapes, function(s) identical(s$xref, "x domain"), logical(1))))
     expect_identical(out$x$layout$yaxis$title$text, "Signed -log10(FDR)")
     expect_identical(out$x$layout$xaxis$title$text, "Gene rank")
 

@@ -59,6 +59,15 @@ The following parameters can be accessed via UI inputs and/or the \code{defaults
 \item \code{ridgeplot.scale} - Ridge overlap scale (default: 1.25)
 \item \code{ridgeplot.lineweight} - Line weight of the ridge outlines (default: 1)
 \item \code{palette.selection} - Colors for discrete groups (multiColorPicker)
+\item \code{annotate.by} - Metadata used to identify cells, or \code{"cell.id"} for their names
+(default: none). Cells picked with the lasso or box tools are labelled with it.
+Applies to jitter points, so needs Jitter and not Ridge
+\item \code{highlight.points} - Values of \code{annotate.by} to highlight, one label per cell
+\item \verb{highlight.*}, \verb{annotation.*} - The rest of the Annotations tab, as for
+\code{\link[VizModules:uniform_annotation_inputs_ui]{VizModules::uniform_annotation_inputs_ui()}}
+\item \code{webgl} - Draw the points with WebGL once there are 5,000 or more, as set by the
+\code{VizModules.webgl.threshold} option. WebGL points sit above the plot's SVG layers
+and are an embedded image in SVG downloads (UI: "Plot with WebGL", default: TRUE)
 }
 }
 

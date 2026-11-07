@@ -24,7 +24,9 @@
 of its tabset id (\verb{<name>TabsetPanel}).}
 
 \item{build}{\verb{function(obj, input, isolate_fn, state)} returning the figure.
-Inputs must be read in the literal form \code{isolate_fn(input$key)}.}
+It is cached, so inputs must be read in the literal form
+\code{isolate_fn(input$key)}, any other reactive it reads must be in \code{state}, and
+it must have no side effects.}
 
 \item{reset}{\verb{function(session, obj, defaults, state)} restoring the module's
 own inputs.}
@@ -44,8 +46,15 @@ The PCAtools scree, loadings, pairs and correlation modules and the AlphaFold
 module differ only in the inputs they read and the plot function they call,
 so they share this server: reactive
 defaults, input/tab hiding, the Reset handler for the uniform tabs, the plot
-reactive (finished with \code{\link[=.sci_finalize_plotly]{.sci_finalize_plotly()}}), the render, and the source
-download, whose statistics table is the plotted table attached to the figure.
+reactives, the render, and the source download, whose statistics table is the
+plotted table attached to the figure.
+}
+\details{
+The plot is drawn in two steps: \code{build} under
+\code{\link[VizModules:cached_structure]{VizModules::cached_structure()}}, then \code{\link[=.sci_finalize_plotly]{.sci_finalize_plotly()}} on the cached
+figure, so a styling change never redraws it and reaches the browser as a
+layout-only update. The reactives in \code{state} are named to the cache
+automatically.
 }
 \author{
 Jared Andrews

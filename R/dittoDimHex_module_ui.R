@@ -12,10 +12,14 @@
 #' gene/metadata within each bin. The resulting `ggplot` is converted to an
 #' interactive `plotly` figure.
 #'
+#' dittoSeq's group labels (`do.label`) are not offered, since [plotly::ggplotly()]
+#' drops the layer that draws them.
+#'
 #' @section Plot parameters and defaults:
 #' The following parameters can be accessed via UI inputs and/or the `defaults` argument:
 #'
-#' - `color.var` - Gene or metadata summarized within each hex (default: density only)
+#' - `color.var` - Gene or metadata summarized within each hex, which needs the
+#'   ggplot.multistats package (default: density only)
 #' - `reduction.use` - Dimensionality reduction to plot (default: auto-detected)
 #' - `dim.1`, `dim.2` - Which dimensions to plot on x/y (default: 1 and 2)
 #' - `bins` - Number of hexagonal bins (default: 30)
@@ -24,8 +28,6 @@
 #' - `split.by` - Discrete metadata to facet by (default: none)
 #' - `min.color`, `max.color` - Colors for the continuous color scale
 #' - `do.contour` - Overlay kernel-density contour lines (default: FALSE)
-#' - `do.label` - Draw group labels for a discrete `color.var` (default: FALSE)
-#' - `labels.size` - Text size of the group labels (default: 5)
 #' - `do.ellipse` - Draw ellipses for a discrete `color.var` (default: FALSE)
 #'
 #' @param id The ID for the Shiny module.
@@ -61,7 +63,7 @@ dittoDimHexInputsUI <- function(id, data, defaults = NULL, title = "DimHex Setti
         "bins", "color.method", "split.by",
         "min.color", "max.color",
         c("min.opacity", "max.opacity"),
-        "do.contour", "do.label", "labels.size", "do.ellipse"
+        "do.contour", "do.ellipse"
     )
 
     documentParameters <- get_documentation(
@@ -130,14 +132,6 @@ dittoDimHexInputsUI <- function(id, data, defaults = NULL, title = "DimHex Setti
             tipify(materialSwitch(ns("do.contour"), "Density Contours",
                 value = get_default(defaults, "do.contour", FALSE), status = "success"),
                 documentParameters$do.contour,
-                placement = "top", options = list(container = "body")),
-            tipify(materialSwitch(ns("do.label"), "Label Groups",
-                value = get_default(defaults, "do.label", FALSE), status = "success"),
-                documentParameters$do.label,
-                placement = "top", options = list(container = "body")),
-            tipify(numericInput(ns("labels.size"), "Label Size",
-                value = get_default(defaults, "labels.size", 5), min = 1, step = 0.5),
-                documentParameters$labels.size,
                 placement = "top", options = list(container = "body")),
             tipify(materialSwitch(ns("do.ellipse"), "Group Ellipses",
                 value = get_default(defaults, "do.ellipse", FALSE), status = "success"),

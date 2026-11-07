@@ -45,6 +45,9 @@ michaelisMentenServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL
     data_reactive <- data
 
     moduleServer(id, function(input, output, session) {
+        plot_source <- session$ns("michaelisMentenPlot")
+        edit_store <- setup_manual_edits(input, session, plot_source)
+
         hide_input(session, hide.inputs)
         if (!is.null(hide.tabs)) {
             for (tab.name in hide.tabs) hideTab(inputId = "michaelisMentenTabsetPanel", target = tab.name)
@@ -85,11 +88,13 @@ michaelisMentenServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL
             reset_plotly_inputs(session, defaults)
             reset_axes_inputs(session, defaults)
             reset_lines_inputs(session, defaults = defaults)
+            reset_manual_edits(edit_store)
         })
 
-        generate_michaelisMentenPlot <- reactive({
-            isolate_fn <- setup_auto_update_logic(input)
-
+        # What is drawn, cached by cached_structure(): it runs again only for a
+        # change to the data, to `extra`, or to an input read here as
+        # isolate_fn(input$key). A styling change re-runs generate_*() alone.
+        draw_michaelisMentenPlot <- function(isolate_fn) {
             df <- plot_data()
             mml <- model_data()
             req(df, mml)
@@ -147,62 +152,23 @@ michaelisMentenServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL
                     )
                 }
             }
+            list(fig = fig)
+        }
+        base_michaelisMentenPlot <- cached_structure(draw_michaelisMentenPlot, input, session, data_reactive)
 
-            # Apply the uniform title / axis-title styling from the Plotly and
-            # Axes tabs (plot title, axis titles, axis tick/line styling).
-            fig <- VizModules::apply_title_layout(
-                fig, input, isolate_fn,
-                title_y = 0.95,
-                title_x = isolate_fn(input$axis.title.horizontal.position)
+        # How it looks: re-run for a styling change, without redrawing.
+        generate_michaelisMentenPlot <- reactive({
+            isolate_fn <- setup_auto_update_logic(input)
+            apply_uniform_styling(
+                base_michaelisMentenPlot()$fig, input, isolate_fn,
+                ggplot.axis.styling = FALSE
             )
-            xaxis_style <- VizModules::create_axis_styles(
-                input,
-                axis_side = "x", isolate_fn = isolate_fn, ggplot.axis.styling = FALSE
-            )
-            yaxis_style <- VizModules::create_axis_styles(
-                input,
-                axis_side = "y", isolate_fn = isolate_fn, ggplot.axis.styling = FALSE
-            )
-            fig <- VizModules::apply_subplot_axis_styling(fig, xaxis_style, yaxis_style)
-
-            fig <- VizModules::add_reference_lines(fig,
-                hline.intercepts = isolate_fn(input$hline.intercepts),
-                hline.colors = isolate_fn(input$hline.colors),
-                hline.widths = isolate_fn(input$hline.widths),
-                hline.linetypes = isolate_fn(input$hline.linetypes),
-                hline.opacities = isolate_fn(input$hline.opacities),
-                vline.intercepts = isolate_fn(input$vline.intercepts),
-                vline.colors = isolate_fn(input$vline.colors),
-                vline.widths = isolate_fn(input$vline.widths),
-                vline.linetypes = isolate_fn(input$vline.linetypes),
-                vline.opacities = isolate_fn(input$vline.opacities),
-                abline.slopes = isolate_fn(input$abline.slopes),
-                abline.intercepts = isolate_fn(input$abline.intercepts),
-                abline.colors = isolate_fn(input$abline.colors),
-                abline.widths = isolate_fn(input$abline.widths),
-                abline.linetypes = isolate_fn(input$abline.linetypes),
-                abline.opacities = isolate_fn(input$abline.opacities)
-            )
-
-            config_list <- add_plot_config(
-                download.format = isolate_fn(input$download.format),
-                include.modebar.buttons = TRUE, facet.by = NULL
-            )
-            fig <- do.call(config, c(list(p = fig), config_list))
-            fig <- apply_plotly_newshape(fig, input, isolate_fn)
-            fig <- axis_titles_as_annotations(fig)
-            fig
         })
 
-        output$michaelisMentenPlot <- renderPlotly({
-            req(input$x, input$y)
-            tryCatch(
-                apply_render_margins(generate_michaelisMentenPlot(), input),
-                error = function(e) {
-                    empty_plot(text = conditionMessage(e), plotly = TRUE)
-                }
-            )
-        })
+        output$michaelisMentenPlot <- .sci_render_plotly(
+            generate_michaelisMentenPlot, input, plot_source, edit_store, session,
+            guard = function() req(input$x, input$y)
+        )
 
         AllInputs <- reactive({
             reactiveValuesToList(input)

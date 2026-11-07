@@ -38,6 +38,8 @@ forestPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, def
 
     moduleServer(id, function(input, output, session) {
         params <- setup_reactive_defaults(defaults, input, session)
+        plot_source <- session$ns("forestPlot")
+        edit_store <- setup_manual_edits(input, session, plot_source)
 
         hide_input(session, hide.inputs)
         for (tab.name in hide.tabs) hideTab(inputId = "forestPlotTabsetPanel", target = tab.name)
@@ -69,11 +71,13 @@ forestPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, def
             reset_axes_inputs(session, d)
             reset_lines_inputs(session, defaults = d)
             reset_plotly_inputs(session, d)
+            reset_manual_edits(edit_store)
         })
 
-        generate_forestPlot <- reactive({
-            isolate_fn <- setup_auto_update_logic(input, params)
-
+        # What is drawn, cached by cached_structure(): it runs again only for a
+        # change to the data, to `extra`, or to an input read here as
+        # isolate_fn(input$key). A styling change re-runs generate_*() alone.
+        draw_forestPlot <- function(isolate_fn) {
             df <- data_reactive()
             model <- isolate_fn(input$model)
             req(nz_value(model))
@@ -96,58 +100,23 @@ forestPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, def
                 ci.color = isolate_fn(input$ci.color),
                 ci.width = isolate_fn(input$ci.width)
             )
+            list(fig = fig)
+        }
+        base_forestPlot <- cached_structure(draw_forestPlot, input, session, data_reactive, params = params)
+
+        # How it looks: re-run for a styling change, without redrawing.
+        generate_forestPlot <- reactive({
+            isolate_fn <- setup_auto_update_logic(input, params)
+            fig <- base_forestPlot()$fig
             estimates <- attr(fig, "estimates")
-
-            fig <- apply_title_layout(
-                fig, input, isolate_fn,
-                title_y = 0.95, title_x = isolate_fn(input$axis.title.horizontal.position)
-            )
-            xaxis_style <- create_axis_styles(input, axis_side = "x", isolate_fn = isolate_fn,
-                ggplot.axis.styling = FALSE)
-            yaxis_style <- create_axis_styles(input, axis_side = "y", isolate_fn = isolate_fn,
-                ggplot.axis.styling = FALSE)
-            fig <- apply_subplot_axis_styling(fig, xaxis_style, yaxis_style)
-
-            fig <- add_reference_lines(fig,
-                hline.intercepts = isolate_fn(input$hline.intercepts),
-                hline.colors = isolate_fn(input$hline.colors),
-                hline.widths = isolate_fn(input$hline.widths),
-                hline.linetypes = isolate_fn(input$hline.linetypes),
-                hline.opacities = isolate_fn(input$hline.opacities),
-                vline.intercepts = isolate_fn(input$vline.intercepts),
-                vline.colors = isolate_fn(input$vline.colors),
-                vline.widths = isolate_fn(input$vline.widths),
-                vline.linetypes = isolate_fn(input$vline.linetypes),
-                vline.opacities = isolate_fn(input$vline.opacities),
-                abline.slopes = isolate_fn(input$abline.slopes),
-                abline.intercepts = isolate_fn(input$abline.intercepts),
-                abline.colors = isolate_fn(input$abline.colors),
-                abline.widths = isolate_fn(input$abline.widths),
-                abline.linetypes = isolate_fn(input$abline.linetypes),
-                abline.opacities = isolate_fn(input$abline.opacities)
-            )
-
-            config_list <- add_plot_config(
-                download.format = isolate_fn(input$download.format),
-                include.modebar.buttons = TRUE, facet.by = NULL
-            )
-            fig <- do.call(config, c(list(p = fig), config_list))
-            fig <- apply_plotly_newshape(fig, input, isolate_fn)
-            fig <- axis_titles_as_annotations(fig)
+            fig <- apply_uniform_styling(fig, input, isolate_fn, ggplot.axis.styling = FALSE)
             attr(fig, "estimates") <- estimates
             fig
         })
 
-        output$forestPlot <- renderPlotly({
-            # Fitting can fail on the user's choices (a single-level factor, a
-            # non-binary outcome); show why rather than a blank plot. req()'s
-            # silent condition is re-raised so it still just pauses the render.
-            tryCatch(
-                apply_render_margins(generate_forestPlot(), input),
-                shiny.silent.error = function(e) stop(e),
-                error = function(e) empty_plot(text = conditionMessage(e), plotly = TRUE)
-            )
-        })
+        # Fitting can fail on the user's choices (a single-level factor, a
+        # non-binary outcome); the render shows why rather than a blank plot.
+        output$forestPlot <- .sci_render_plotly(generate_forestPlot, input, plot_source, edit_store, session)
 
         AllInputs <- reactive({
             reactiveValuesToList(input)

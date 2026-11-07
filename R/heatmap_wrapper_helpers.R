@@ -219,8 +219,10 @@
 .sci_soft_errors <- function(expr) {
     tryCatch(
         expr,
-        shiny.silent.error = function(e) stop(e),
-        error = function(e) validate(need(FALSE, conditionMessage(e)))
+        error = function(e) {
+            if (inherits(e, "shiny.silent.error")) stop(e)
+            validate(need(FALSE, conditionMessage(e)))
+        }
     )
 }
 

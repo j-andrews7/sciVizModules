@@ -34,6 +34,8 @@ dittoFreqPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
         # Resolve any reactive() entries in `defaults` server-side, so a parent
         # app driving a parameter costs one render rather than a client round-trip.
         params <- setup_reactive_defaults(defaults, input, session)
+        plot_source <- session$ns("dittoFreqPlot")
+        edit_store <- setup_manual_edits(input, session, plot_source)
 
         ns <- session$ns
 
@@ -111,12 +113,13 @@ dittoFreqPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
             updateNumericInput(session, "boxplot.width", value = get_default(defaults, "boxplot.width", 0.4))
             updateNumericInput(session, "vlnplot.width", value = get_default(defaults, "vlnplot.width", 1))
             reset_group_colors(session, "palette.colours", defaults, palette_groups(), default_palette_values)
-            .ditto_reset_uniform(session, defaults)
+            .ditto_reset_uniform(session, defaults, edit_store)
         })
 
-        generate_dittoFreqPlot <- reactive({
-            isolate_fn <- setup_auto_update_logic(input, params)
-
+        # What is drawn, cached by cached_structure(): it runs again only for a
+        # change to the data, to `extra`, or to an input read here as
+        # isolate_fn(input$key). A styling change re-runs generate_*() alone.
+        draw_dittoFreqPlot <- function(isolate_fn) {
             obj <- data_reactive()
             req(obj)
 
@@ -171,19 +174,22 @@ dittoFreqPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, 
                 theme = theme_style
             ))
 
-            fig <- plotly::ggplotly(gg)
-            .sci_finalize_plotly(fig, input, isolate_fn, faceted = TRUE)
+            list(fig = plotly::ggplotly(gg), faceted = TRUE)
+        }
+        base_dittoFreqPlot <- cached_structure(draw_dittoFreqPlot, input, session, data_reactive,
+            params = params, extra = function() list(palette_groups(), palette_store())
+        )
+
+        # How it looks: re-run for a styling change, without redrawing.
+        generate_dittoFreqPlot <- reactive({
+            isolate_fn <- setup_auto_update_logic(input, params)
+            base <- base_dittoFreqPlot()
+            .sci_finalize_plotly(base$fig, input, isolate_fn, faceted = base$faceted)
         })
 
-        output$dittoFreqPlot <- renderPlotly({
-            req(input$var, input$group.by, input$plots)
-            tryCatch(
-                apply_render_margins(generate_dittoFreqPlot(), input),
-                error = function(e) {
-                    empty_plot(text = conditionMessage(e), plotly = TRUE)
-                }
-            )
-        })
+        output$dittoFreqPlot <- .sci_render_plotly(generate_dittoFreqPlot, input, plot_source, edit_store, session,
+            guard = function() req(input$var, input$group.by, input$plots)
+        )
 
         AllInputs <- reactive({
             reactiveValuesToList(input)

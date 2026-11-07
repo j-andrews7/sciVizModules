@@ -42,13 +42,16 @@ mutationLollipopServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
             )
             output$palette.selection <- .sci_palette_picker_ui(input, session, palette_groups, palette_store,
                 default_palette_values, defaults, "Variant Class Colors")
-            list(palette_groups = palette_groups, palette_store = palette_store)
+            list(
+                palette_groups = palette_groups, palette_store = palette_store,
+                domains = reactive(if (is.reactive(domains)) domains() else domains)
+            )
         },
         build = function(m, input, isolate_fn, state) {
             gene <- isolate_fn(input$gene)
             label.top <- isolate_fn(input$label.top)
             point.size <- isolate_fn(input$point.size)
-            dom <- if (is.reactive(domains)) domains() else domains
+            dom <- state$domains()
             if (!is.null(dom)) {
                 dom <- as.data.frame(dom)
                 gcol <- names(dom)[tolower(names(dom)) %in% c("gene", "hugo_symbol", "hgnc")][1]

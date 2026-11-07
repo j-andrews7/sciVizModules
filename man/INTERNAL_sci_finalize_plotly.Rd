@@ -23,10 +23,12 @@ panel titles are annotations styled from the Axes tab.}
 The styled \code{plotly} figure.
 }
 \description{
-Applies the title, axis, legend, reference-line, config, and annotation
-post-processing shared by the sciVizModules modules that build their own
-figure (the dittoSeq wrappers and the native plotly modules), so the figure
-respects the module's Axes, Legend, Lines and Plotly tab controls.
+The styling step of the sciVizModules modules that build their own figure
+(the dittoSeq wrappers and the native plotly modules):
+\code{\link[VizModules:apply_uniform_styling]{VizModules::apply_uniform_styling()}} with the panel handling those figures
+need, so the figure respects the module's Axes, Legend, Lines and Plotly tab
+controls. It reads only inputs that style the figure, so it belongs after the
+module's \code{\link[VizModules:cached_structure]{VizModules::cached_structure()}} step.
 }
 \details{
 The Axes tab styles every axis of the figure. A panel whose axes

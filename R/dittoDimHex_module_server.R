@@ -34,6 +34,8 @@ dittoDimHexServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, de
         # Resolve any reactive() entries in `defaults` server-side, so a parent
         # app driving a parameter costs one render rather than a client round-trip.
         params <- setup_reactive_defaults(defaults, input, session)
+        plot_source <- session$ns("dittoDimHex")
+        edit_store <- setup_manual_edits(input, session, plot_source)
 
         hide_input(session, hide.inputs)
         if (!is.null(hide.tabs)) {
@@ -61,10 +63,8 @@ dittoDimHexServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, de
             updateNumericInput(session, "min.opacity", value = get_default(defaults, "min.opacity", 0.2))
             updateNumericInput(session, "max.opacity", value = get_default(defaults, "max.opacity", 1))
             updateMaterialSwitch(session, "do.contour", value = get_default(defaults, "do.contour", FALSE))
-            updateMaterialSwitch(session, "do.label", value = get_default(defaults, "do.label", FALSE))
-            updateNumericInput(session, "labels.size", value = get_default(defaults, "labels.size", 5))
             updateMaterialSwitch(session, "do.ellipse", value = get_default(defaults, "do.ellipse", FALSE))
-            .ditto_reset_uniform(session, defaults)
+            .ditto_reset_uniform(session, defaults, edit_store)
         })
 
         observeEvent(input$split.by, {
@@ -72,9 +72,10 @@ dittoDimHexServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, de
             toggle_facet_title_inputs(session, split.set, hidden = hide.inputs)
         }, ignoreNULL = FALSE)
 
-        generate_dittoDimHex <- reactive({
-            isolate_fn <- setup_auto_update_logic(input, params)
-
+        # What is drawn, cached by cached_structure(): it runs again only for a
+        # change to the data, to `extra`, or to an input read here as
+        # isolate_fn(input$key). A styling change re-runs generate_*() alone.
+        draw_dittoDimHex <- function(isolate_fn) {
             obj <- data_reactive()
             req(obj)
 
@@ -113,26 +114,27 @@ dittoDimHexServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, de
                 min.opacity = isolate_fn(input$min.opacity),
                 max.opacity = isolate_fn(input$max.opacity),
                 do.contour = isolate_fn(input$do.contour),
-                do.label = isolate_fn(input$do.label),
-                labels.size = isolate_fn(input$labels.size),
                 do.ellipse = isolate_fn(input$do.ellipse),
                 color.panel = default_palette_values,
                 theme = theme_style
             )
 
-            fig <- plotly::ggplotly(gg)
-            .sci_finalize_plotly(fig, input, isolate_fn, faceted = !is.null(split.by))
+            list(fig = plotly::ggplotly(gg), faceted = !is.null(split.by))
+        }
+        base_dittoDimHex <- cached_structure(draw_dittoDimHex, input, session, data_reactive,
+            params = params, extra = function() list(color_method_text())
+        )
+
+        # How it looks: re-run for a styling change, without redrawing.
+        generate_dittoDimHex <- reactive({
+            isolate_fn <- setup_auto_update_logic(input, params)
+            base <- base_dittoDimHex()
+            .sci_finalize_plotly(base$fig, input, isolate_fn, faceted = base$faceted)
         })
 
-        output$dittoDimHex <- renderPlotly({
-            req(input$reduction.use)
-            tryCatch(
-                apply_render_margins(generate_dittoDimHex(), input),
-                error = function(e) {
-                    empty_plot(text = conditionMessage(e), plotly = TRUE)
-                }
-            )
-        })
+        output$dittoDimHex <- .sci_render_plotly(generate_dittoDimHex, input, plot_source, edit_store, session,
+            guard = function() req(input$reduction.use)
+        )
 
         AllInputs <- reactive({
             reactiveValuesToList(input)

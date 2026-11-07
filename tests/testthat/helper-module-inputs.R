@@ -26,3 +26,14 @@ test_shape_inputs <- function() {
         shape.linetype = "dash", shape.opacity = 0.5
     )
 }
+
+# Values for the uniform Annotations tab, with any given here replacing them.
+test_annotation_inputs <- function(...) {
+    utils::modifyList(list(
+        annotate.by = "", highlight.points = "", highlight.color = "#00FFF7", highlight.size = 7,
+        highlight.border.color = "#000000", highlight.border.width = 1, highlight.auto.annotate = TRUE,
+        annotation.color = "black", annotation.ax = 20, annotation.ay = -20, annotation.size = 10,
+        annotation.showarrow = TRUE, annotation.arrowcolor = "black", annotation.arrowhead = 2,
+        annotation.arrowwidth = 1.5
+    ), list(...))
+}

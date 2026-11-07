@@ -43,6 +43,9 @@ This module wraps \code{\link[dittoSeq:dittoDimPlot]{dittoSeq::dittoDimPlot()}},
 metadata overlaid on a dimensionality reduction (e.g. UMAP, t-SNE, PCA)
 embedding stored in a \code{SingleCellExperiment}, \code{Seurat}, or \code{SummarizedExperiment}
 object. The resulting \code{ggplot} is converted to an interactive \code{plotly} figure.
+
+dittoSeq's group labels (\code{do.label}) are not offered, since \code{\link[plotly:ggplotly]{plotly::ggplotly()}}
+drops the layer that draws them.
 }
 \section{Plot parameters and defaults}{
 
@@ -57,12 +60,18 @@ priority UMAP > t-SNE > PCA)
 \item \code{size} - Point size (default: 1)
 \item \code{opacity} - Point opacity (default: 1)
 \item \code{order} - Point plotting order (default: "unordered")
-\item \code{do.label} - Draw cluster/group labels (default: FALSE)
-\item \code{labels.size} - Text size of the group labels (default: 5)
 \item \code{do.ellipse} - Draw grouping ellipses (default: FALSE)
 \item \code{do.contour} - Overlay kernel-density contour lines (default: FALSE)
 \item \code{min.color}, \code{max.color} - Colors for continuous color scales
 \item \code{palette.selection} - Colors for discrete groups (multiColorPicker)
+\item \code{annotate.by} - Metadata used to identify cells, or \code{"cell.id"} for their names
+(default: none). Cells picked with the lasso or box tools are labelled with it
+\item \code{highlight.points} - Values of \code{annotate.by} to highlight, one label per cell
+\item \verb{highlight.*}, \verb{annotation.*} - The rest of the Annotations tab, as for
+\code{\link[VizModules:uniform_annotation_inputs_ui]{VizModules::uniform_annotation_inputs_ui()}}
+\item \code{webgl} - Draw the points with WebGL once there are 5,000 or more, as set by the
+\code{VizModules.webgl.threshold} option. WebGL points sit above the plot's SVG layers
+and are an embedded image in SVG downloads (UI: "Plot with WebGL", default: TRUE)
 }
 }
 

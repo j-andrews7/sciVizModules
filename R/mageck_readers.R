@@ -285,7 +285,7 @@ read_mageck <- function(file) {
     thr <- isolate_fn(input$fdr.threshold)
     if (identical(metric, "fdr") && is.numeric(thr) && length(thr) == 1 && !is.na(thr) && thr > 0 && thr < 1) {
         fig$x$layout$shapes <- c(fig$x$layout$shapes, lapply(c(-1, 1) * -log10(thr), function(y) list(
-            type = "line", xref = "paper", x0 = 0, x1 = 1, yref = "y", y0 = y, y1 = y,
+            type = "line", xref = "x domain", x0 = 0, x1 = 1, yref = "y", y0 = y, y1 = y,
             line = list(color = "#7F7F7F", dash = "dash", width = 1)
         )))
     }

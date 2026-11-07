@@ -70,20 +70,123 @@
 }
 
 
+#' Render a native module's figure
+#'
+#' The `renderPlotly()` of every module that builds its own figure. It shows why
+#' a plot cannot be drawn (no metadata, an empty range) rather than leaving it
+#' blank, while `req()`'s silent pause stays a pause, and finishes with
+#' [VizModules::finalize_manual_edits()], which is what updates the plot in place
+#' and sends only the layout when its traces have not changed. That call cancels
+#' the render on such an update, so it has to stay last and outside the
+#' `tryCatch()`.
+#'
+#' @param generate The module's styled figure reactive.
+#' @param input,session The module's input and session.
+#' @param plot_source,edit_store The event source and the store from
+#'   [VizModules::setup_manual_edits()].
+#' @param guard Optional function run first, for the render's own `req()`s. Inside
+#'   the `tryCatch()`, so an error in it (a malformed `data`) shows as a message.
+#' @return A `renderPlotly()` output.
+#'
+#' @import shiny
+#' @import plotly
+#' @author Jared Andrews
+#' @rdname INTERNAL_sci_render_plotly
+#' @keywords internal
+.sci_render_plotly <- function(generate, input, plot_source, edit_store, session, guard = NULL) {
+    titles <- new.env(parent = emptyenv())
+    renderPlotly(.sci_rendered_figure(generate, input, plot_source, edit_store, session, guard, titles))
+}
+
+
+#' The body of a native module's render
+#'
+#' Apart from [.sci_render_plotly()] so it can be tested: a plotly output cannot
+#' be driven from [shiny::testServer()].
+#'
+#' @inheritParams .sci_render_plotly
+#' @param titles The environment [.sci_clear_stale_titles()] keeps its titles in.
+#' @return The figure to send. On a layout-only update the render is cancelled
+#'   instead.
+#'
+#' @import shiny
+#' @author Jared Andrews
+#' @rdname INTERNAL_sci_rendered_figure
+#' @keywords internal
+.sci_rendered_figure <- function(generate, input, plot_source, edit_store, session, guard, titles) {
+    # One handler, deliberately. tryCatch() nests a second handler around the first,
+    # so a `shiny.silent.error = function(e) stop(e)` beside an `error` handler has
+    # its re-raise caught there, and a req() pause comes out as a blank plot.
+    fig <- tryCatch(
+        {
+            if (is.function(guard)) guard()
+            apply_render_margins(generate(), input)
+        },
+        error = function(e) {
+            if (inherits(e, "shiny.silent.error")) stop(e)
+            empty_plot(text = conditionMessage(e), plotly = TRUE)
+        }
+    )
+    .sci_clear_stale_titles(fig, edit_store, titles)
+    finalize_manual_edits(fig, plot_source, edit_store, session)
+}
+
+
+#' Forget a typed axis title once the axis it named has changed
+#'
+#' A captured title's text is restored on every render, but it only makes sense
+#' for the variable it was typed for. The VizModules modules drop it when their
+#' axis column changes; a native module's axis title can follow any of its
+#' inputs, so this compares the title each render draws instead. The figure's
+#' text here is the freshly built one, since captured edits are restored after
+#' this, in [VizModules::finalize_manual_edits()]. The position stays either way.
+#'
+#' @param fig The styled figure. Its axis titles are annotations by now.
+#' @param store The store from [VizModules::setup_manual_edits()].
+#' @param seen An environment holding the titles last drawn.
+#' @return `NULL`, invisibly.
+#'
+#' @author Jared Andrews
+#' @rdname INTERNAL_sci_clear_stale_titles
+#' @keywords internal
+.sci_clear_stale_titles <- function(fig, store, seen) {
+    axes <- Filter(function(ann) identical(ann$annotationType, "axis"), fig$x$layout$annotations)
+    for (side in c("x", "y")) {
+        drawn <- Filter(function(ann) identical(isTRUE(ann$textangle == -90), side == "y"), axes)
+        # A figure with no title on this side (the error plot) says nothing about it.
+        if (length(drawn) == 0) next
+        text <- as.character(drawn[[1]]$text)
+        if (!is.null(seen[[side]]) && !identical(seen[[side]], text)) {
+            reset_axis_title_text(store, paste0("axis:", side))
+        }
+        seen[[side]] <- text
+    }
+    invisible(NULL)
+}
+
+
 #' Shared server for the native plot modules that take a non-data-frame object
 #'
 #' The PCAtools scree, loadings, pairs and correlation modules and the AlphaFold
 #' module differ only in the inputs they read and the plot function they call,
 #' so they share this server: reactive
 #' defaults, input/tab hiding, the Reset handler for the uniform tabs, the plot
-#' reactive (finished with [.sci_finalize_plotly()]), the render, and the source
-#' download, whose statistics table is the plotted table attached to the figure.
+#' reactives, the render, and the source download, whose statistics table is the
+#' plotted table attached to the figure.
+#'
+#' The plot is drawn in two steps: `build` under
+#' [VizModules::cached_structure()], then [.sci_finalize_plotly()] on the cached
+#' figure, so a styling change never redraws it and reaches the browser as a
+#' layout-only update. The reactives in `state` are named to the cache
+#' automatically.
 #'
 #' @param id,data,hide.inputs,hide.tabs,defaults As for the module servers.
 #' @param name The module name, which is also the plot output's id and the stem
 #'   of its tabset id (`<name>TabsetPanel`).
 #' @param build `function(obj, input, isolate_fn, state)` returning the figure.
-#'   Inputs must be read in the literal form `isolate_fn(input$key)`.
+#'   It is cached, so inputs must be read in the literal form
+#'   `isolate_fn(input$key)`, any other reactive it reads must be in `state`, and
+#'   it must have no side effects.
 #' @param reset `function(session, obj, defaults, state)` restoring the module's
 #'   own inputs.
 #' @param validate A function returning the object, or erroring on one the
@@ -104,6 +207,8 @@
 
     moduleServer(id, function(input, output, session) {
         params <- setup_reactive_defaults(defaults, input, session)
+        plot_source <- session$ns(name)
+        edit_store <- setup_manual_edits(input, session, plot_source)
 
         hide_input(session, hide.inputs)
         for (tab.name in hide.tabs) hideTab(inputId = paste0(name, "TabsetPanel"), target = tab.name)
@@ -121,26 +226,25 @@
             reset_legend_inputs(session, defaults)
             reset_lines_inputs(session, defaults = defaults)
             reset_plotly_inputs(session, defaults)
+            reset_manual_edits(edit_store)
         })
+
+        base_plot <- cached_structure(
+            function(isolate_fn) list(fig = build(object(), input, isolate_fn, state)),
+            input, session, object, params = params,
+            extra = function() lapply(Filter(is.reactive, state), function(value) value())
+        )
 
         generate_plot <- reactive({
             isolate_fn <- setup_auto_update_logic(input, params)
-            fig <- build(object(), input, isolate_fn, state)
+            fig <- base_plot()$fig
             table <- attr(fig, "table")
             fig <- .sci_finalize_plotly(fig, input, isolate_fn)
             attr(fig, "table") <- table
             fig
         })
 
-        output[[name]] <- renderPlotly({
-            # Show why a plot cannot be drawn (no metadata, an empty range)
-            # rather than leaving it blank; req()'s silent pause is re-raised.
-            tryCatch(
-                apply_render_margins(generate_plot(), input),
-                shiny.silent.error = function(e) stop(e),
-                error = function(e) empty_plot(text = conditionMessage(e), plotly = TRUE)
-            )
-        })
+        output[[name]] <- .sci_render_plotly(generate_plot, input, plot_source, edit_store, session)
 
         AllInputs <- reactive({
             reactiveValuesToList(input)

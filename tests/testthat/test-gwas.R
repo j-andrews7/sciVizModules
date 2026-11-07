@@ -147,3 +147,34 @@ test_that("the UIs build from detected columns and explain missing ones", {
     expect_true(inherits(gwasQQPlotInputsUI("q", example_gwas), c("shiny.tag", "shiny.tag.list")))
     expect_error(manhattanPlotInputsUI("m", data.frame(a = 1, b = 2)), "Could not detect")
 })
+
+test_that("the GWAS layers stay in the plot's panel beside marginal plots", {
+    data("example_gwas", package = "sciVizModules", envir = environment())
+    d <- .manhattan_defaults(example_gwas, NULL)
+    prep <- .gwas_prepare(example_gwas, d$chr.col, d$bp.col, d$p.col)
+    hook <- function(fig, input, isolate_fn) .manhattan_layers(fig, c(a = 1), input, isolate_fn)
+    fig <- build_scatter_figure(prep, hook, test_scatter_inputs(
+        x.by = "manhattan.x", y.by = d$p.col, y.adj.fxn = "neg_log10", p.col = d$p.col,
+        sig.threshold = 5e-8, suggestive.threshold = 1e-5, marginal.x = "density", marginal.y = "density"
+    ))
+    expect_lt(fig$x$layout$xaxis$domain[2], 1)
+    lines <- Filter(function(s) identical(s$type, "line") && !is.null(s$line$dash), fig$x$layout$shapes)
+    expect_length(lines, 2)
+    expect_true(all(vapply(lines, function(s) identical(s$xref, "x domain"), logical(1))))
+
+    plain <- plotly::plotly_build(plotly::plot_ly(x = 1:3, y = 1:3, type = "scatter", mode = "markers"))
+    input <- list(
+        x.by = "qq.expected", y.by = "qq.observed", show.band = FALSE, show.lambda = TRUE, ci.level = 0.95
+    )
+    label <- .gwas_qq_layers(plain, 100, 1.02, input, identity)$x$layout$annotations[[1]]
+    expect_identical(c(label$xref, label$yref), c("x domain", "y domain"))
+})
+
+test_that("the GWAS layers add no traces, so a restyle stays a layout-only update", {
+    plain <- plotly::plotly_build(plotly::plot_ly(x = 1:3, y = 1:3, type = "scatter", mode = "markers"))
+    input <- list(
+        x.by = "manhattan.x", y.by = "P", p.col = "P", y.adj.fxn = "neg_log10",
+        sig.threshold = 5e-8, suggestive.threshold = 1e-5
+    )
+    expect_identical(.manhattan_layers(plain, c(a = 1), input, identity)$x$data, plain$x$data)
+})

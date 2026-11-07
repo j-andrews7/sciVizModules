@@ -29,6 +29,15 @@
 #' - `ridgeplot.scale` - Ridge overlap scale (default: 1.25)
 #' - `ridgeplot.lineweight` - Line weight of the ridge outlines (default: 1)
 #' - `palette.selection` - Colors for discrete groups (multiColorPicker)
+#' - `annotate.by` - Metadata used to identify cells, or `"cell.id"` for their names
+#'   (default: none). Cells picked with the lasso or box tools are labelled with it.
+#'   Applies to jitter points, so needs Jitter and not Ridge
+#' - `highlight.points` - Values of `annotate.by` to highlight, one label per cell
+#' - `highlight.*`, `annotation.*` - The rest of the Annotations tab, as for
+#'   [VizModules::uniform_annotation_inputs_ui()]
+#' - `webgl` - Draw the points with WebGL once there are 5,000 or more, as set by the
+#'   `VizModules.webgl.threshold` option. WebGL points sit above the plot's SVG layers
+#'   and are an embedded image in SVG downloads (UI: "Plot with WebGL", default: TRUE)
 #'
 #' @param id The ID for the Shiny module.
 #' @param data A `SingleCellExperiment`, `Seurat`, or `SummarizedExperiment` object
@@ -151,7 +160,11 @@ dittoPlotInputsUI <- function(id, data, defaults = NULL, title = "dittoPlot Sett
             tipify(numericInput(ns("ridgeplot.lineweight"), "Ridge Line Weight",
                 value = get_default(defaults, "ridgeplot.lineweight", 1), min = 0, step = 0.1),
                 documentParameters$ridgeplot.lineweight,
-                placement = "top", options = list(container = "body"))
+                placement = "top", options = list(container = "body")),
+            webgl_input(ns, defaults)
+        ),
+        "Annotations" = .ditto_annotation_inputs_ui(ns, defaults, data,
+            note = "Highlighting and labelling apply to jitter points, so select Jitter and not Ridge"
         ),
         "Plotly" = uniform_plotly_inputs_ui(ns, defaults),
         "Axes" = uniform_axes_inputs_ui(ns, defaults, include.rotate = FALSE),

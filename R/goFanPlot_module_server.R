@@ -38,6 +38,9 @@ goFanPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defa
     data_reactive <- require_data_frame(data)
 
     moduleServer(id, function(input, output, session) {
+        plot_source <- session$ns("goFanPlot")
+        edit_store <- setup_manual_edits(input, session, plot_source)
+
         hide_input(session, hide.inputs)
         if (!is.null(hide.tabs)) {
             for (tab.name in hide.tabs) hideTab(inputId = "goFanPlotTabsetPanel", target = tab.name)
@@ -66,11 +69,13 @@ goFanPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defa
                 value = get_default(defaults, "filter.nodes.by.edge.number", 2))
             updateMaterialSwitch(session, "fill.na.by.0", value = get_default(defaults, "fill.na.by.0", TRUE))
             reset_plotly_inputs(session, defaults)
+            reset_manual_edits(edit_store)
         })
 
-        generate_goFanPlot <- reactive({
-            isolate_fn <- setup_auto_update_logic(input)
-
+        # What is drawn, cached by cached_structure(): it runs again only for a
+        # change to the data, to `extra`, or to an input read here as
+        # isolate_fn(input$key). A styling change re-runs generate_*() alone.
+        draw_goFanPlot <- function(isolate_fn) {
             df <- data_reactive()
             req(df)
 
@@ -94,12 +99,22 @@ goFanPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defa
                 filter.nodes.by.edge.number = isolate_fn(input$filter.nodes.by.edge.number),
                 fill.na.by.0 = isolate_fn(input$fill.na.by.0)
             )
+            list(fig = fig)
+        }
+        base_goFanPlot <- cached_structure(draw_goFanPlot, input, session, data_reactive)
+
+        # How it looks: re-run for a styling change, without redrawing.
+        generate_goFanPlot <- reactive({
+            isolate_fn <- setup_auto_update_logic(input)
 
             # Apply the generic (non-cartesian) plotly styling: title and export
             # config. Axis/legend/reference-line controls do not apply to a
             # radial sunburst layout and are intentionally omitted, as are the
             # shape-drawing modebar buttons, which need cartesian axes.
-            fig <- VizModules::apply_title_layout(fig, input, isolate_fn, title_y = 0.95, title_x = 0.5)
+            fig <- VizModules::apply_title_layout(
+                base_goFanPlot()$fig, input, isolate_fn,
+                title_y = 0.95, title_x = 0.5
+            )
             config_list <- add_plot_config(
                 download.format = isolate_fn(input$download.format),
                 include.modebar.buttons = FALSE, facet.by = NULL
@@ -108,15 +123,9 @@ goFanPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NULL, defa
             fig
         })
 
-        output$goFanPlot <- renderPlotly({
-            req(input$term.id, input$fill)
-            tryCatch(
-                apply_render_margins(generate_goFanPlot(), input),
-                error = function(e) {
-                    empty_plot(text = conditionMessage(e), plotly = TRUE)
-                }
-            )
-        })
+        output$goFanPlot <- .sci_render_plotly(generate_goFanPlot, input, plot_source, edit_store, session,
+            guard = function() req(input$term.id, input$fill)
+        )
 
         AllInputs <- reactive({
             reactiveValuesToList(input)

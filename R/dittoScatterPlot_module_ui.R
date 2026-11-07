@@ -13,6 +13,9 @@
 #' third gene/metadata. The resulting `ggplot` is converted to an interactive
 #' `plotly` figure.
 #'
+#' dittoSeq's group labels (`do.label`) are not offered, since [plotly::ggplotly()]
+#' drops the layer that draws them.
+#'
 #' @section Plot parameters and defaults:
 #' The following parameters can be accessed via UI inputs and/or the `defaults` argument:
 #'
@@ -24,12 +27,18 @@
 #' - `size` - Point size (default: 1)
 #' - `opacity` - Point opacity (default: 1)
 #' - `order` - Point plotting order (default: "unordered")
-#' - `do.label` - Draw group labels at group centers (default: FALSE)
-#' - `labels.size` - Text size of the group labels (default: 5)
 #' - `do.ellipse` - Draw grouping ellipses (default: FALSE)
 #' - `do.contour` - Overlay kernel-density contour lines (default: FALSE)
 #' - `min.color`, `max.color` - Colors for continuous color scales
 #' - `palette.selection` - Colors for discrete groups (multiColorPicker)
+#' - `annotate.by` - Metadata used to identify cells, or `"cell.id"` for their names
+#'   (default: none). Cells picked with the lasso or box tools are labelled with it
+#' - `highlight.points` - Values of `annotate.by` to highlight, one label per cell
+#' - `highlight.*`, `annotation.*` - The rest of the Annotations tab, as for
+#'   [VizModules::uniform_annotation_inputs_ui()]
+#' - `webgl` - Draw the points with WebGL once there are 5,000 or more, as set by the
+#'   `VizModules.webgl.threshold` option. WebGL points sit above the plot's SVG layers
+#'   and are an embedded image in SVG downloads (UI: "Plot with WebGL", default: TRUE)
 #'
 #' @param id The ID for the Shiny module.
 #' @param data A `SingleCellExperiment`, `Seurat`, or `SummarizedExperiment` object
@@ -64,7 +73,6 @@ dittoScatterPlotInputsUI <- function(id, data, defaults = NULL, title = "Scatter
         "shape.by", "split.by",
         "min.color", "max.color",
         "order", "size", "opacity",
-        "do.label", "labels.size",
         "do.ellipse", "do.contour"
     )
 
@@ -134,14 +142,6 @@ dittoScatterPlotInputsUI <- function(id, data, defaults = NULL, title = "Scatter
                 value = get_default(defaults, "opacity", 1), min = 0, max = 1, step = 0.05),
                 documentParameters$opacity,
                 placement = "top", options = list(container = "body")),
-            tipify(materialSwitch(ns("do.label"), "Label Groups",
-                value = get_default(defaults, "do.label", FALSE), status = "success"),
-                documentParameters$do.label,
-                placement = "top", options = list(container = "body")),
-            tipify(numericInput(ns("labels.size"), "Label Size",
-                value = get_default(defaults, "labels.size", 5), min = 1, step = 0.5),
-                documentParameters$labels.size,
-                placement = "top", options = list(container = "body")),
             tipify(materialSwitch(ns("do.ellipse"), "Group Ellipses",
                 value = get_default(defaults, "do.ellipse", FALSE), status = "success"),
                 documentParameters$do.ellipse,
@@ -149,8 +149,10 @@ dittoScatterPlotInputsUI <- function(id, data, defaults = NULL, title = "Scatter
             tipify(materialSwitch(ns("do.contour"), "Density Contours",
                 value = get_default(defaults, "do.contour", FALSE), status = "success"),
                 documentParameters$do.contour,
-                placement = "top", options = list(container = "body"))
+                placement = "top", options = list(container = "body")),
+            webgl_input(ns, defaults)
         ),
+        "Annotations" = .ditto_annotation_inputs_ui(ns, defaults, data),
         "Plotly" = uniform_plotly_inputs_ui(ns, defaults),
         "Axes" = uniform_axes_inputs_ui(ns, defaults, include.rotate = FALSE),
         "Legend" = uniform_legend_inputs_ui(ns, defaults),

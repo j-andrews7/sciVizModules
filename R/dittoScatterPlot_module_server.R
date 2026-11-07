@@ -34,6 +34,8 @@ dittoScatterPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
         # Resolve any reactive() entries in `defaults` server-side, so a parent
         # app driving a parameter costs one render rather than a client round-trip.
         params <- setup_reactive_defaults(defaults, input, session)
+        plot_source <- session$ns("dittoScatterPlot")
+        edit_store <- setup_manual_edits(input, session, plot_source)
 
         ns <- session$ns
 
@@ -90,6 +92,12 @@ dittoScatterPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
             )
         })
 
+        # What the Annotations tab labels. plotly reports a picked cell by its place in
+        # its trace, so the selection goes whenever the traces are drawn differently.
+        annotations <- .ditto_annotation_state(input, plot_source, params, function() {
+            list(data_reactive(), input$color.var, input$shape.by, input$split.by, input$order)
+        })
+
         observeEvent(input$reset, {
             obj <- data_reactive()
             req(obj)
@@ -99,12 +107,12 @@ dittoScatterPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
             update_viz_select(session, "order", selected = get_default(defaults, "order", "unordered"))
             updateNumericInput(session, "size", value = get_default(defaults, "size", 1))
             updateNumericInput(session, "opacity", value = get_default(defaults, "opacity", 1))
-            updateMaterialSwitch(session, "do.label", value = get_default(defaults, "do.label", FALSE))
-            updateNumericInput(session, "labels.size", value = get_default(defaults, "labels.size", 5))
             updateMaterialSwitch(session, "do.ellipse", value = get_default(defaults, "do.ellipse", FALSE))
             updateMaterialSwitch(session, "do.contour", value = get_default(defaults, "do.contour", FALSE))
             reset_group_colors(session, "palette.colours", defaults, palette_groups(), default_palette_values)
-            .ditto_reset_uniform(session, defaults)
+            updateCheckboxInput(session, "webgl", value = get_default(defaults, "webgl", TRUE, is.logical))
+            .ditto_reset_annotations(session, defaults, obj, annotations)
+            .ditto_reset_uniform(session, defaults, edit_store)
         })
 
         observeEvent(input$split.by, {
@@ -112,9 +120,10 @@ dittoScatterPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
             toggle_facet_title_inputs(session, split.set, hidden = hide.inputs)
         }, ignoreNULL = FALSE)
 
-        generate_dittoScatterPlot <- reactive({
-            isolate_fn <- setup_auto_update_logic(input, params)
-
+        # What is drawn, cached by cached_structure(): it runs again only for a
+        # change to the data, to `extra`, or to an input read here as
+        # isolate_fn(input$key). A styling change re-runs generate_*() alone.
+        draw_dittoScatterPlot <- function(isolate_fn) {
             obj <- data_reactive()
             req(obj)
 
@@ -128,6 +137,11 @@ dittoScatterPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
             shape.by <- blank_to_null(shape.by)
             split.by <- isolate_fn(input$split.by)
             split.by <- blank_to_null(split.by)
+
+            # Annotations find their cells through the hover text, so it is drawn
+            # while they are in use, with the Annotate By field first.
+            annotate.by <- blank_to_null(isolate_fn(input$annotate.by))
+            if (identical(annotate.by, .ditto_cell_id)) obj <- .ditto_with_cell_ids(obj)
 
             groups <- isolate_fn(palette_groups())
             color.panel <- default_palette_values
@@ -158,29 +172,48 @@ dittoScatterPlotServer <- function(id, data, hide.inputs = NULL, hide.tabs = NUL
                 size = isolate_fn(input$size),
                 opacity = isolate_fn(input$opacity),
                 order = isolate_fn(input$order),
-                do.label = isolate_fn(input$do.label),
-                labels.size = isolate_fn(input$labels.size),
                 do.ellipse = isolate_fn(input$do.ellipse),
                 do.contour = isolate_fn(input$do.contour),
                 min.color = isolate_fn(input$min.color),
                 max.color = isolate_fn(input$max.color),
                 color.panel = color.panel,
+                do.hover = !is.null(annotate.by),
+                hover.data = unique(c(annotate.by, x.var, y.var, color.var, shape.by)),
                 theme = theme_style
             )
 
-            fig <- plotly::ggplotly(gg)
-            .sci_finalize_plotly(fig, input, isolate_fn, faceted = !is.null(split.by))
+            # dittoSeq converts the plot itself when it draws the hover text.
+            fig <- plotly::plotly_build(if (inherits(gg, "plotly")) gg else plotly::ggplotly(gg))
+            fig <- .ditto_annotate(
+                fig, obj, annotate.by, isolate_fn(annotations$highlights()), isolate_fn(annotations$selected()),
+                input, isolate_fn, size = isolate_fn(input$size)
+            )
+            # With the lines, or an ellipse or contour would end up beneath the points.
+            if (!isFALSE(isolate_fn(input$webgl))) {
+                fig <- auto_webgl(fig, overlays = TRUE)
+            }
+            if (length(groups) > 0 && !is.null(shape.by)) {
+                fig <- split_color_shape_legend(fig, groups, .ditto_group_levels(obj, shape.by))
+            }
+            list(fig = fig, faceted = !is.null(split.by))
+        }
+        base_dittoScatterPlot <- cached_structure(draw_dittoScatterPlot, input, session, data_reactive,
+            params = params, extra = function() {
+                list(palette_groups(), palette_store(), annotations$highlights(), annotations$selected())
+            }
+        )
+
+        # How it looks: re-run for a styling change, without redrawing.
+        generate_dittoScatterPlot <- reactive({
+            isolate_fn <- setup_auto_update_logic(input, params)
+            base <- base_dittoScatterPlot()
+            .sci_finalize_plotly(base$fig, input, isolate_fn, faceted = base$faceted)
         })
 
-        output$dittoScatterPlot <- renderPlotly({
-            req(input$x.var, input$y.var)
-            tryCatch(
-                apply_render_margins(generate_dittoScatterPlot(), input),
-                error = function(e) {
-                    empty_plot(text = conditionMessage(e), plotly = TRUE)
-                }
-            )
-        })
+        output$dittoScatterPlot <- .sci_render_plotly(
+            generate_dittoScatterPlot, input, plot_source, edit_store, session,
+            guard = function() req(input$x.var, input$y.var)
+        )
 
         AllInputs <- reactive({
             reactiveValuesToList(input)

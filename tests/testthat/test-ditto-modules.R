@@ -145,7 +145,7 @@ test_that("split.by makes a dittoSeq module figure faceted", {
                     auto.update = TRUE, var = "clustering", download.format = "png",
                     reduction.use = SingleCellExperiment::reducedDimNames(example_sce)[1],
                     dim.1 = 1, dim.2 = 2, size = 1, opacity = 1, order = "unordered",
-                    do.label = FALSE, do.ellipse = FALSE, do.contour = FALSE, labels.size = 5,
+                    do.ellipse = FALSE, do.contour = FALSE,
                     min.color = "#F0E442", max.color = "#0072B2", split.by = ""
                 ),
                 test_axes_inputs(), test_legend_inputs()

@@ -113,7 +113,7 @@ test_that("every menu has a module, and the gallery groups have no strays", {
         data <- data$object
     }
     if (methods::is(data, "SummarizedExperiment")) {
-        return(c(names(SummarizedExperiment::colData(data)), rownames(data)))
+        return(c(names(SummarizedExperiment::colData(data)), rownames(data), .ditto_cell_id))
     }
     character(0)
 }
@@ -147,6 +147,13 @@ test_that("the highlighted genes, variants and residues exist", {
         values <- split_values(e$defaults$highlight.points)
         expect_gt(length(values), 0)
         expect_true(all(values %in% data[[columns[[id]]]]), info = id)
+    }
+
+    # The dittoSeq modules' are cell names.
+    for (id in c("dimplot", "scatter", "dittoplot")) {
+        cells <- split_values(showcase[[id]]$defaults$highlight.points)
+        expect_gt(length(cells), 0)
+        expect_true(all(cells %in% colnames(.sci_example_dataset("example_sce"))), info = id)
     }
 
     residues <- as.integer(split_values(showcase$structure$defaults$highlight.residues))

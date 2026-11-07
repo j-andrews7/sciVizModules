@@ -56,6 +56,9 @@ The following parameters can be accessed via UI inputs and/or the \code{defaults
 \item \code{jitter.size} - Jitter point size (default: 1)
 \item \code{jitter.color} - Color of the jitter points (default: "#000000")
 \item \code{palette.selection} - Colors for discrete groups (multiColorPicker)
+\item \code{webgl} - Draw the points with WebGL once there are 5,000 or more, as set by the
+\code{VizModules.webgl.threshold} option. WebGL points sit above the plot's SVG layers
+and are an embedded image in SVG downloads (UI: "Plot with WebGL", default: TRUE)
 }
 }
 

@@ -4,19 +4,22 @@
 \alias{.ditto_reset_uniform}
 \title{Build the module reset handler shared by dittoSeq modules}
 \usage{
-.ditto_reset_uniform(session, defaults = NULL)
+.ditto_reset_uniform(session, defaults = NULL, edit_store = NULL)
 }
 \arguments{
 \item{session}{The Shiny module session.}
 
 \item{defaults}{A named list of default input values (may be \code{NULL}).}
+
+\item{edit_store}{The store from \code{\link[VizModules:setup_manual_edits]{VizModules::setup_manual_edits()}}.}
 }
 \value{
 Invisibly \code{NULL}.
 }
 \description{
-Resets the uniform Plotly/Axes/Legend/Lines tabs to their defaults. Individual
-modules add their own data-tab resets on top of this.
+Resets the uniform Plotly/Axes/Legend/Lines tabs to their defaults, and drops
+any manual edits to the plot. Individual modules add their own data-tab resets
+on top of this.
 }
 \author{
 Jacob Martin, Jared Andrews

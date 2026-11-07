@@ -278,23 +278,190 @@ get_default_reduction <- function(object) {
     as.character(lv)
 }
 
+# The Annotate By choice standing for each cell's own name.
+.ditto_cell_id <- "cell.id"
+
+
+#' The Annotate By choices of a dittoSeq object
+#'
+#' @param object A dittoSeq-compatible object.
+#' @return The cells' metadata columns, the cell names and a blank.
+#'
+#' @author Jared Andrews
+#' @rdname INTERNAL_ditto_annotation_choices
+#' @keywords internal
+.ditto_annotation_choices <- function(object) {
+    unique(c("", .ditto_cell_id, .ditto_metas(object)))
+}
+
+
+#' The Annotations tab of a dittoSeq module
+#'
+#' @param ns The module's namespace function.
+#' @param defaults The module's defaults.
+#' @param object The dittoSeq-compatible object.
+#' @param note Optional further text for the Annotate By tooltip.
+#' @return The inputs of [VizModules::uniform_annotation_inputs_ui()].
+#'
+#' @author Jared Andrews
+#' @rdname INTERNAL_ditto_annotation_inputs_ui
+#' @keywords internal
+.ditto_annotation_inputs_ui <- function(ns, defaults, object, note = NULL) {
+    uniform_annotation_inputs_ui(ns, defaults, .ditto_annotation_choices(object),
+        annotate.note = c("Use cell.id for the cells' own names", note)
+    )
+}
+
+
+#' What a dittoSeq module's Annotations tab labels
+#'
+#' Call once in the server body. The cells picked with the lasso or box tools add
+#' up until Clear Annotations, or until `redrawn()` changes: plotly reports each
+#' by its place in its trace, so a plot grouped differently would have them label
+#' other cells. Nothing is recorded without an Annotate By column, so a selection
+#' then does not redraw the plot. Both values are reactives the draw step reads,
+#' so both belong in its `extra`.
+#'
+#' @param input The module's input.
+#' @param plot_source The event source from [VizModules::setup_manual_edits()].
+#' @param params The reactive-defaults store, or `NULL`.
+#' @param redrawn A function reading whatever regroups the module's traces.
+#' @return A list of `highlights`, the debounced Points to Highlight text (free
+#'   text, see [.sci_debounced_input()]), and `selected`, the picked cells.
+#'
+#' @import shiny
+#' @import plotly
+#' @author Jared Andrews
+#' @rdname INTERNAL_ditto_annotation_state
+#' @keywords internal
+.ditto_annotation_state <- function(input, plot_source, params, redrawn) {
+    selected <- reactiveVal()
+    observeEvent(event_data("plotly_selected", source = plot_source), {
+        req(nz_value(input$annotate.by))
+        picked <- rbind(selected(), event_data("plotly_selected", source = plot_source))
+        picked <- picked[!duplicated(picked), ]
+        selected(if (nrow(picked) > 0) picked)
+    })
+    observeEvent(input$annotation.clear, selected(NULL))
+    observeEvent(redrawn(), selected(NULL), ignoreInit = TRUE, priority = 1000)
+    list(highlights = .sci_debounced_input(input, "highlight.points", params), selected = selected)
+}
+
+
+#' Reset a dittoSeq module's Annotations tab
+#'
+#' @param session The module's session.
+#' @param defaults The module's defaults.
+#' @param object The dittoSeq-compatible object.
+#' @param annotations The list from [.ditto_annotation_state()].
+#' @return Invisibly `NULL`.
+#'
+#' @author Jared Andrews
+#' @rdname INTERNAL_ditto_reset_annotations
+#' @keywords internal
+.ditto_reset_annotations <- function(session, defaults, object, annotations) {
+    reset_annotation_inputs(session, defaults, .ditto_annotation_choices(object))
+    annotations$selected(NULL)
+    invisible(NULL)
+}
+
+
+#' Add the cell names to an object's metadata
+#'
+#' dittoSeq draws its hover text from metadata, so this is how the cells' own
+#' names reach it. A `cell.id` column the object already has is left alone.
+#'
+#' @param object A dittoSeq-compatible object.
+#' @return The object, with a `cell.id` metadata column.
+#'
+#' @author Jared Andrews
+#' @rdname INTERNAL_ditto_with_cell_ids
+#' @keywords internal
+.ditto_with_cell_ids <- function(object) {
+    if (!.ditto_cell_id %in% .ditto_metas(object)) object$cell.id <- colnames(object)
+    object
+}
+
+
+#' Highlight and label the cells the Annotations tab names
+#'
+#' The VizModules helpers match a point on its `annotate.by` line of hover text,
+#' so the figure must have been drawn with that field, and only its marker
+#' traces are looked at (an ellipse or contour comes from the same data).
+#'
+#' @param fig A built plotly figure.
+#' @param object The object it was drawn from.
+#' @param annotate.by The Annotate By column, or `NULL`, which leaves `fig` alone.
+#' @param highlights The Points to Highlight text.
+#' @param selected The cells picked on the plot, as `event_data()` reports them.
+#' @param input,isolate_fn The module's input and isolation helper.
+#' @param size The plot's point size.
+#' @return The figure, with its highlighted points restyled and the labels
+#'   appended to its annotations.
+#'
+#' @author Jared Andrews
+#' @rdname INTERNAL_ditto_annotate
+#' @keywords internal
+.ditto_annotate <- function(fig, object, annotate.by, highlights, selected, input, isolate_fn, size) {
+    if (is.null(annotate.by)) {
+        return(fig)
+    }
+    values <- as.character(.ditto_meta_values(object, annotate.by))
+    highlighted <- parse_highlight_values(highlights, values)
+    if (length(highlighted) > 0) {
+        fig <- apply_highlight_styling(fig, annotate.by, highlighted,
+            style = list(
+                color = isolate_fn(input$highlight.color),
+                size = isolate_fn(input$highlight.size),
+                border.color = isolate_fn(input$highlight.border.color),
+                border.width = isolate_fn(input$highlight.border.width)
+            ),
+            default.size = size, require.markers = TRUE
+        )
+    }
+
+    style <- list(
+        ax = isolate_fn(input$annotation.ax),
+        ay = isolate_fn(input$annotation.ay),
+        showarrow = isolate_fn(input$annotation.showarrow),
+        arrowcolor = isolate_fn(input$annotation.arrowcolor),
+        arrowhead = isolate_fn(input$annotation.arrowhead),
+        arrowwidth = isolate_fn(input$annotation.arrowwidth),
+        size = isolate_fn(input$annotation.size),
+        color = isolate_fn(input$annotation.color)
+    )
+    labels <- create_selected_annotations(selected, fig, annotate.by, style, require.markers = TRUE)
+    if (length(highlighted) > 0 && isTRUE(isolate_fn(input$highlight.auto.annotate))) {
+        labels <- merge_annotation_sets(labels, create_highlight_annotations(
+            stats::setNames(data.frame(values), annotate.by), fig, annotate.by, highlighted,
+            x_col = NULL, y_col = NULL, annotation_params = style, require.markers = TRUE
+        ))
+    }
+    fig$x$layout$annotations <- c(fig$x$layout$annotations, labels)
+    fig
+}
+
+
 #' Build the module reset handler shared by dittoSeq modules
 #'
-#' Resets the uniform Plotly/Axes/Legend/Lines tabs to their defaults. Individual
-#' modules add their own data-tab resets on top of this.
+#' Resets the uniform Plotly/Axes/Legend/Lines tabs to their defaults, and drops
+#' any manual edits to the plot. Individual modules add their own data-tab resets
+#' on top of this.
 #'
 #' @param session The Shiny module session.
 #' @param defaults A named list of default input values (may be `NULL`).
+#' @param edit_store The store from [VizModules::setup_manual_edits()].
 #' @return Invisibly `NULL`.
 #'
 #' @import shiny
 #' @author Jacob Martin, Jared Andrews
 #' @rdname INTERNAL_ditto_reset_uniform
 #' @keywords internal
-.ditto_reset_uniform <- function(session, defaults = NULL) {
+.ditto_reset_uniform <- function(session, defaults = NULL, edit_store = NULL) {
     reset_lines_inputs(session, defaults = defaults)
     reset_axes_inputs(session, defaults)
     reset_plotly_inputs(session, defaults)
     reset_legend_inputs(session, defaults)
+    if (!is.null(edit_store)) reset_manual_edits(edit_store)
     invisible(NULL)
 }
